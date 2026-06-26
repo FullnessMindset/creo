@@ -57,7 +57,7 @@
           document.getElementById('username').value = data.username || '';
           document.getElementById('bio').value = data.bio || '';
           document.getElementById('profile-link').innerText =
-            'https://qddxoyjtoxtdcezwuvcq.supabase.co/storage/v1/object/public/website/profile.html?u=' + (data.username || '');
+            'https://fullnessmindset.github.io/creator-tips/profile.html?u=' + (data.username || '');
           if (data.stripe_connect_id) {
             document.getElementById('stripe-btn').innerText = "Stripe Connected ✓";
             document.getElementById('stripe-btn').disabled = true;
@@ -97,7 +97,7 @@
         .eq('id', user.id);
       if (error) return alert(error.message);
       document.getElementById('profile-link').innerText =
-        'https://qddxoyjtoxtdcezwuvcq.supabase.co/storage/v1/object/public/website/profile.html?u=' + username;
+        'https://fullnessmindset.github.io/creator-tips/profile.html?u=' + username;
       alert("Profile updated!");
     }
 
@@ -113,7 +113,7 @@
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ redirect_url: 'https://qddxoyjtoxtdcezwuvcq.supabase.co/storage/v1/object/public/website/redirect.html' })
+        body: JSON.stringify({ redirect_url: 'https://fullnessmindset.github.io/creator-tips/redirect.html' })
       });
       const data = await response.json();
       if (data.url) window.location.href = data.url;
