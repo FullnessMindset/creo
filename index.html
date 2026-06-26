@@ -13,7 +13,8 @@
     }
   </script>
 </head>
-<body class="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen p-8 transition-colors duration-300">
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+  <script src="shared.js"></script>
 
   <!-- Theme Toggle -->
   <div class="fixed top-4 right-4 z-50">
@@ -23,118 +24,351 @@
     </button>
   </div>
 
-  <div class="max-w-md mx-auto bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg dark:shadow-2xl border border-gray-200 dark:border-gray-800 space-y-6 transition-colors">
-    <!-- Logo -->
+  <!-- Main Container -->
+  <div class="max-w-lg mx-auto px-4 pt-6 pb-24 space-y-6">
+
+    <!-- Logo Header -->
     <div class="text-center space-y-2">
       <img src="assets/logo-icon.png" alt="CREO" class="w-16 h-16 mx-auto rounded">
       <h2 class="text-2xl font-bold tracking-[0.2em] text-creo-purple dark:text-white">CREO</h2>
-      <p class="text-xs text-gray-500 dark:text-gray-400">Creator Dashboard Setup</p>
+      <p class="text-xs text-gray-500 dark:text-gray-400">Panel de Creador</p>
     </div>
 
-    <div id="auth-section" class="space-y-4">
-      <input id="email" type="email" placeholder="Email" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
-      <input id="password" type="password" placeholder="Password" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+    <!-- AUTH SECTION -->
+    <div id="auth-section" class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg dark:shadow-2xl border border-gray-200 dark:border-gray-800 space-y-4 transition-colors">
+      <h3 class="text-lg font-bold text-center text-gray-900 dark:text-white">Iniciar Sesión o Registrarse</h3>
+      <input id="email" type="email" placeholder="Email" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+      <input id="password" type="password" placeholder="Contraseña" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
       <div class="flex space-x-2">
-        <button onclick="signUp()" class="bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple px-4 py-2 rounded-lg w-1/2 font-semibold transition">Sign Up</button>
-        <button onclick="signIn()" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg w-1/2 font-semibold transition">Sign In</button>
+        <button onclick="signUp()" class="bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple px-4 py-3 rounded-lg w-1/2 font-semibold transition">Registrarse</button>
+        <button onclick="signIn()" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-lg w-1/2 font-semibold transition">Entrar</button>
       </div>
     </div>
 
-    <div id="dashboard-section" class="hidden space-y-4">
-      <p id="user-welcome" class="font-medium text-gray-900 dark:text-white"></p>
-      <input id="username" type="text" placeholder="Unique Username" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
-      <textarea id="bio" placeholder="Your Creator Bio" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint"></textarea>
-      <button onclick="saveProfile()" class="w-full bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple py-2 rounded-lg font-semibold transition">Save Profile Details</button>
-
-      <hr class="border-gray-200 dark:border-gray-800">
-
-      <div class="p-4 bg-amber-50 dark:bg-yellow-900/20 rounded-lg border border-amber-200 dark:border-yellow-800">
-        <p class="text-sm text-amber-800 dark:text-yellow-300 mb-2 font-semibold">Step 2: Connect Financials</p>
-        <button id="stripe-btn" onclick="startStripeOnboarding()" class="w-full bg-creo-purple dark:bg-white text-white dark:text-creo-purple py-2 rounded-lg font-bold transition hover:opacity-90">Link Stripe Account</button>
+    <!-- DASHBOARD SECTION -->
+    <div id="dashboard-section" class="hidden space-y-6">
+      <div class="bg-white dark:bg-gray-900 p-4 rounded-xl shadow border border-gray-200 dark:border-gray-800 flex items-center justify-between">
+        <p id="user-welcome" class="font-medium text-gray-900 dark:text-white text-sm"></p>
+        <button onclick="signOut()" class="text-xs text-gray-400 hover:text-red-500 transition">Salir</button>
       </div>
 
-      <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-        <p class="text-sm text-blue-800 dark:text-blue-300 mb-1 font-semibold">Your Public Profile Link:</p>
-        <p id="profile-link" class="text-xs text-creo-purple dark:text-creo-mint break-all"></p>
+      <!-- TABS -->
+      <div class="flex bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <button onclick="showTab('profile')" id="tab-profile" class="flex-1 py-3 text-xs font-semibold text-center transition tab-active">Perfil</button>
+        <button onclick="showTab('metas')" id="tab-metas" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400">Mis Metas</button>
+        <button onclick="showTab('posts')" id="tab-posts" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400">Mis Posts</button>
+        <button onclick="showTab('stripe')" id="tab-stripe" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400">Stripe</button>
+      </div>
+
+      <!-- TAB: Profile -->
+      <div id="panel-profile" class="tab-panel space-y-4">
+        <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow border border-gray-200 dark:border-gray-800 space-y-4 transition-colors">
+          <h3 class="font-bold text-gray-900 dark:text-white">Información del Perfil</h3>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Nombre de Usuario (único)</label>
+            <input id="username" type="text" placeholder="mi_nombre" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Nombre para Mostrar</label>
+            <input id="display_name" type="text" placeholder="Tu Nombre Artístico" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Bio</label>
+            <textarea id="bio" placeholder="Cuéntale al mundo quién eres..." rows="3" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">URL de Avatar (imagen de perfil)</label>
+            <input id="avatar_url" type="url" placeholder="https://ejemplo.com/mi-foto.jpg" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+          </div>
+
+          <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300 pt-2">Redes Sociales</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <input id="social-instagram" type="url" placeholder="Instagram URL" class="border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+            <input id="social-tiktok" type="url" placeholder="TikTok URL" class="border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+            <input id="social-youtube" type="url" placeholder="YouTube URL" class="border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+            <input id="social-twitter" type="url" placeholder="Twitter/X URL" class="border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+          </div>
+
+          <button onclick="saveProfile()" id="save-profile-btn" class="w-full bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple py-3 rounded-xl font-semibold transition">Guardar Perfil</button>
+        </div>
+
+        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+          <p class="text-sm text-blue-800 dark:text-blue-300 mb-1 font-semibold">Tu Enlace Público:</p>
+          <p id="profile-link" class="text-xs text-creo-purple dark:text-creo-mint break-all font-mono"></p>
+        </div>
+      </div>
+
+      <!-- TAB: Metas -->
+      <div id="panel-metas" class="tab-panel hidden space-y-4">
+        <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow border border-gray-200 dark:border-gray-800 space-y-4 transition-colors">
+          <h3 class="font-bold text-gray-900 dark:text-white">Crear Nueva Meta</h3>
+          <input id="meta-title" type="text" placeholder="Título de la meta" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+          <textarea id="meta-desc" placeholder="Describe tu meta..." rows="2" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint"></textarea>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Meta ($)</label>
+              <input id="meta-goal" type="number" min="10" step="1" placeholder="500" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Inicio</label>
+              <input id="meta-start" type="date" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-900 dark:text-white outline-none text-xs">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Fin</label>
+              <input id="meta-end" type="date" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-900 dark:text-white outline-none text-xs">
+            </div>
+          </div>
+          <button onclick="createMeta()" id="create-meta-btn" class="w-full bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple py-3 rounded-xl font-semibold transition">Crear Meta</button>
+        </div>
+
+        <div id="metas-list" class="space-y-3"></div>
+      </div>
+
+      <!-- TAB: Posts -->
+      <div id="panel-posts" class="tab-panel hidden space-y-4" id="post">
+        <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow border border-gray-200 dark:border-gray-800 space-y-4 transition-colors">
+          <h3 class="font-bold text-gray-900 dark:text-white">Publicar Video</h3>
+          <input id="post-url" type="url" placeholder="URL del video (YouTube, TikTok, Instagram)" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+          <textarea id="post-caption" placeholder="Escribe un caption..." rows="2" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint"></textarea>
+          <button onclick="createPost()" id="create-post-btn" class="w-full bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple py-3 rounded-xl font-semibold transition">Publicar</button>
+        </div>
+
+        <div id="posts-list" class="space-y-3"></div>
+      </div>
+
+      <!-- TAB: Stripe -->
+      <div id="panel-stripe" class="tab-panel hidden space-y-4">
+        <div class="bg-amber-50 dark:bg-yellow-900/20 p-6 rounded-xl border border-amber-200 dark:border-yellow-800 space-y-3">
+          <h3 class="font-bold text-amber-800 dark:text-yellow-300">Conexión con Stripe</h3>
+          <p class="text-sm text-amber-700 dark:text-yellow-400">Conecta tu cuenta de Stripe para recibir pagos de tus fans.</p>
+          <button id="stripe-btn" onclick="startStripeOnboarding()" class="w-full bg-creo-purple dark:bg-white text-white dark:text-creo-purple py-3 rounded-xl font-bold transition hover:opacity-90">Conectar Stripe</button>
+        </div>
+        <div class="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800">
+          <p class="text-xs text-gray-500 dark:text-gray-400">Stripe maneja todo el procesamiento de pagos de forma segura. CREO retiene un 5% de comisión por transacción.</p>
+        </div>
       </div>
     </div>
   </div>
 
-  <script>
-    function initTheme() {
-      const saved = localStorage.getItem('creo-theme');
-      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
-      updateIcons();
-    }
-    function toggleTheme() {
-      document.documentElement.classList.toggle('dark');
-      localStorage.setItem('creo-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-      updateIcons();
-    }
-    function updateIcons() {
-      const d = document.documentElement.classList.contains('dark');
-      document.getElementById('icon-sun').classList.toggle('hidden', !d);
-      document.getElementById('icon-moon').classList.toggle('hidden', d);
-    }
-    initTheme();
+  <style>
+    .tab-active { color: #1a0a3e; border-bottom: 2px solid #33f0b0; background: rgba(51,240,176,0.05); }
+    .dark .tab-active { color: #33f0b0; border-bottom-color: #33f0b0; background: rgba(51,240,176,0.1); }
+  </style>
 
-    const SUPABASE_URL = "https://qddxoyjtoxtdcezwuvcq.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZHhveWp0b3h0ZGNlend1dmNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MTUxNDIsImV4cCI6MjA5Nzk5MTE0Mn0.MEaMfib77T0B7HW-jI6nctc1a7WbIf1n7rKBhdc-Gm8";
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <script>
+    // Tab switching
+    function showTab(tab) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.querySelectorAll('[id^="tab-"]').forEach(t => { t.classList.remove('tab-active'); t.classList.add('text-gray-400'); });
+      document.getElementById('panel-' + tab).classList.remove('hidden');
+      const tabBtn = document.getElementById('tab-' + tab);
+      tabBtn.classList.add('tab-active');
+      tabBtn.classList.remove('text-gray-400');
+    }
+
+    let currentUser = null;
+    let currentProfile = null;
 
     async function checkUser() {
       const { data: { user } } = await sb.auth.getUser();
       if (user) {
+        currentUser = user;
         document.getElementById('auth-section').classList.add('hidden');
         document.getElementById('dashboard-section').classList.remove('hidden');
-        document.getElementById('user-welcome').innerText = `Welcome, ${user.email}`;
+        document.getElementById('user-welcome').innerText = `Hola, ${user.email}`;
+
         const { data } = await sb.from('profiles').select('*').eq('id', user.id).single();
         if (data) {
+          currentProfile = data;
           document.getElementById('username').value = data.username || '';
+          document.getElementById('display_name').value = data.display_name || '';
           document.getElementById('bio').value = data.bio || '';
+          document.getElementById('avatar_url').value = data.avatar_url || '';
+          const socials = data.social_links || {};
+          document.getElementById('social-instagram').value = socials.instagram || '';
+          document.getElementById('social-tiktok').value = socials.tiktok || '';
+          document.getElementById('social-youtube').value = socials.youtube || '';
+          document.getElementById('social-twitter').value = socials.twitter || '';
           document.getElementById('profile-link').innerText = 'https://fullnessmindset.github.io/creator-tips/profile.html?u=' + (data.username || '');
+
           if (data.stripe_connect_id) {
-            document.getElementById('stripe-btn').innerText = "Stripe Connected";
+            document.getElementById('stripe-btn').innerText = "Stripe Conectado ✓";
             document.getElementById('stripe-btn').disabled = true;
-            document.getElementById('stripe-btn').className = "w-full bg-green-600 text-white py-2 rounded-lg font-bold cursor-default";
+            document.getElementById('stripe-btn').className = "w-full bg-green-600 text-white py-3 rounded-xl font-bold cursor-default";
           }
+
+          loadMetas();
+          loadPosts();
         }
+        updateNavAuth();
       }
     }
 
     async function signUp() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
+      if (!email || !password) return showToast('Ingresa email y contraseña', 'error');
       const { data, error } = await sb.auth.signUp({ email, password });
-      if (error) return alert(error.message);
+      if (error) return showToast(error.message, 'error');
       await sb.from('profiles').insert([{ id: data.user.id, username: 'user_' + Math.floor(Math.random() * 100000) }]);
+      showToast('Cuenta creada. Revisa tu email para confirmar.', 'success');
       checkUser();
     }
 
     async function signIn() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
+      if (!email || !password) return showToast('Ingresa email y contraseña', 'error');
       const { error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) return alert(error.message);
+      if (error) return showToast(error.message, 'error');
       checkUser();
     }
 
-    async function saveProfile() {
-      const { data: { user } } = await sb.auth.getUser();
-      const username = document.getElementById('username').value.trim();
-      const bio = document.getElementById('bio').value.trim();
-      if (username.length < 3) return alert("Username must be at least 3 characters.");
-      const { error } = await sb.from('profiles').update({ username, bio, display_name: username }).eq('id', user.id);
-      if (error) return alert(error.message);
-      document.getElementById('profile-link').innerText = 'https://fullnessmindset.github.io/creator-tips/profile.html?u=' + username;
-      alert("Profile updated!");
+    async function signOut() {
+      await sb.auth.signOut();
+      location.reload();
     }
 
+    async function saveProfile() {
+      const btn = document.getElementById('save-profile-btn');
+      btn.innerText = 'Guardando...';
+      btn.disabled = true;
+      const username = document.getElementById('username').value.trim();
+      const display_name = document.getElementById('display_name').value.trim();
+      const bio = document.getElementById('bio').value.trim();
+      const avatar_url = document.getElementById('avatar_url').value.trim();
+      const social_links = {
+        instagram: document.getElementById('social-instagram').value.trim(),
+        tiktok: document.getElementById('social-tiktok').value.trim(),
+        youtube: document.getElementById('social-youtube').value.trim(),
+        twitter: document.getElementById('social-twitter').value.trim(),
+      };
+      if (username.length < 3) { btn.innerText = 'Guardar Perfil'; btn.disabled = false; return showToast('El username debe tener al menos 3 caracteres', 'error'); }
+      const { error } = await sb.from('profiles').update({ username, display_name: display_name || username, bio, avatar_url, social_links }).eq('id', currentUser.id);
+      btn.innerText = 'Guardar Perfil';
+      btn.disabled = false;
+      if (error) return showToast(error.message, 'error');
+      document.getElementById('profile-link').innerText = 'https://fullnessmindset.github.io/creator-tips/profile.html?u=' + username;
+      showToast('Perfil actualizado', 'success');
+    }
+
+    // METAS
+    async function loadMetas() {
+      const { data } = await sb.from('metas').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false });
+      const list = document.getElementById('metas-list');
+      if (!data || data.length === 0) { list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">No tienes metas aún. Crea tu primera meta arriba.</p>'; return; }
+      list.innerHTML = data.map(m => {
+        const pct = m.goal_amount_cents > 0 ? Math.min(100, Math.round(m.raised_cents / m.goal_amount_cents * 100)) : 0;
+        const raised = (m.raised_cents / 100).toFixed(2);
+        const goal = (m.goal_amount_cents / 100).toFixed(2);
+        return `<div class="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800 space-y-2">
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="font-bold text-gray-900 dark:text-white">${esc(m.title)}</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">${esc(m.description || '')}</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="toggleMeta('${m.id}', ${!m.is_active})" class="text-xs px-2 py-1 rounded ${m.is_active ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}">${m.is_active ? 'Activa' : 'Inactiva'}</button>
+              <button onclick="deleteMeta('${m.id}')" class="text-xs px-2 py-1 rounded bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">Eliminar</button>
+            </div>
+          </div>
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+            <div class="bg-creo-mint h-full rounded-full transition-all duration-500" style="width:${pct}%"></div>
+          </div>
+          <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+            <span>$${raised} / $${goal} (${pct}%)</span>
+            <span>${m.start_date} — ${m.end_date}</span>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    async function createMeta() {
+      const btn = document.getElementById('create-meta-btn');
+      btn.innerText = 'Creando...'; btn.disabled = true;
+      const title = document.getElementById('meta-title').value.trim();
+      const description = document.getElementById('meta-desc').value.trim();
+      const goal = parseFloat(document.getElementById('meta-goal').value);
+      const start_date = document.getElementById('meta-start').value;
+      const end_date = document.getElementById('meta-end').value;
+      if (!title || !goal || goal < 10 || !start_date || !end_date) {
+        btn.innerText = 'Crear Meta'; btn.disabled = false;
+        return showToast('Completa todos los campos. Meta mínima: $10', 'error');
+      }
+      const { error } = await sb.from('metas').insert([{
+        creator_id: currentUser.id, title, description,
+        goal_amount_cents: Math.round(goal * 100),
+        start_date, end_date
+      }]);
+      btn.innerText = 'Crear Meta'; btn.disabled = false;
+      if (error) return showToast(error.message, 'error');
+      document.getElementById('meta-title').value = '';
+      document.getElementById('meta-desc').value = '';
+      document.getElementById('meta-goal').value = '';
+      showToast('Meta creada', 'success');
+      loadMetas();
+    }
+
+    async function toggleMeta(id, active) {
+      await sb.from('metas').update({ is_active: active }).eq('id', id);
+      loadMetas();
+    }
+
+    async function deleteMeta(id) {
+      if (!confirm('¿Eliminar esta meta?')) return;
+      await sb.from('metas').delete().eq('id', id);
+      showToast('Meta eliminada', 'info');
+      loadMetas();
+    }
+
+    // POSTS
+    async function loadPosts() {
+      const { data } = await sb.from('posts').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false });
+      const list = document.getElementById('posts-list');
+      if (!data || data.length === 0) { list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">No tienes publicaciones aún.</p>'; return; }
+      list.innerHTML = data.map(p => `
+        <div class="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800 space-y-2">
+          <div class="flex justify-between items-start">
+            <div class="flex-1 mr-3">
+              <p class="text-sm font-medium text-gray-900 dark:text-white truncate">${esc(p.caption || 'Sin caption')}</p>
+              <p class="text-xs text-gray-400 mt-1">${p.video_type} · ${new Date(p.created_at).toLocaleDateString()}</p>
+            </div>
+            <button onclick="deletePost('${p.id}')" class="text-xs px-2 py-1 rounded bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">Eliminar</button>
+          </div>
+          <div class="rounded-lg overflow-hidden">${getEmbedHTML(p.video_url, p.video_type, 'aspect-video')}</div>
+        </div>
+      `).join('');
+    }
+
+    async function createPost() {
+      const btn = document.getElementById('create-post-btn');
+      btn.innerText = 'Publicando...'; btn.disabled = true;
+      const video_url = document.getElementById('post-url').value.trim();
+      const caption = document.getElementById('post-caption').value.trim();
+      if (!video_url) { btn.innerText = 'Publicar'; btn.disabled = false; return showToast('Ingresa la URL del video', 'error'); }
+      const video_type = detectVideoType(video_url);
+      const { error } = await sb.from('posts').insert([{ creator_id: currentUser.id, video_url, video_type, caption }]);
+      btn.innerText = 'Publicar'; btn.disabled = false;
+      if (error) return showToast(error.message, 'error');
+      document.getElementById('post-url').value = '';
+      document.getElementById('post-caption').value = '';
+      showToast('Video publicado', 'success');
+      loadPosts();
+    }
+
+    async function deletePost(id) {
+      if (!confirm('¿Eliminar este post?')) return;
+      await sb.from('posts').delete().eq('id', id);
+      showToast('Post eliminado', 'info');
+      loadPosts();
+    }
+
+    // STRIPE
     async function startStripeOnboarding() {
       const session = await sb.auth.getSession();
       const token = session.data.session?.access_token;
-      if (!token) return alert("Please sign in first.");
-      document.getElementById('stripe-btn').innerText = "Redirecting to Stripe...";
+      if (!token) return showToast('Inicia sesión primero', 'error');
+      document.getElementById('stripe-btn').innerText = "Redirigiendo a Stripe...";
       const response = await fetch(`${SUPABASE_URL}/functions/v1/stripe-onboard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -142,10 +376,18 @@
       });
       const data = await response.json();
       if (data.url) window.location.href = data.url;
-      else alert("Failed to start Stripe onboarding: " + (data.error || "Unknown error"));
+      else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); document.getElementById('stripe-btn').innerText = "Conectar Stripe"; }
     }
 
-    window.onload = checkUser;
+    // Handle #post hash for bottom nav
+    if (window.location.hash === '#post') {
+      window.addEventListener('load', () => { showTab('posts'); });
+    }
+
+    window.onload = () => {
+      checkUser();
+      renderBottomNav('dashboard');
+    };
   </script>
 </body>
 </html>
