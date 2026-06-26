@@ -32,18 +32,9 @@
   <!-- Stripe Auth Gate (Login Page) -->
   <div id="auth-gate" class="flex flex-col items-center justify-center min-h-screen px-4">
     <div class="w-full max-w-sm space-y-8">
-      <!-- CREO Logo -->
-      <div class="text-center space-y-4">
-        <svg viewBox="0 0 200 220" class="w-32 h-36 mx-auto" xmlns="http://www.w3.org/2000/svg">
-          <path d="M100 20 C55 20 20 55 20 100 C20 145 55 180 100 180 C125 180 147 168 160 150 L140 140 C131 153 117 162 100 162 C65 162 38 135 38 100 C38 65 65 38 100 38 C117 38 131 47 140 60 L130 80 C130 80 115 65 100 70 C80 77 72 97 80 115 C85 125 95 130 105 128" fill="#1a0a3e"/>
-          <ellipse cx="148" cy="42" rx="16" ry="22" transform="rotate(-30 148 42)" fill="#33f0b0" stroke="white" stroke-width="2"/>
-          <ellipse cx="164" cy="52" rx="14" ry="20" transform="rotate(-10 164 52)" fill="#33f0b0" stroke="white" stroke-width="2"/>
-        </svg>
-        <div>
-          <h1 class="text-3xl font-bold tracking-[0.3em] text-creo-purple dark:text-white">CREO</h1>
-          <p class="text-xs tracking-[0.15em] text-gray-500 dark:text-gray-400 mt-1 uppercase">Crea. Yo Creo En Ti</p>
-          <p class="text-xs font-semibold tracking-wider text-creo-purple dark:text-creo-mint mt-0.5 uppercase">Plataforma de Apoyo Economico para Creadores</p>
-        </div>
+      <!-- CREO Logo (exact image from brand) -->
+      <div class="text-center">
+        <img src="assets/logo-full.png" alt="CREO — Plataforma de Apoyo Economico para Creadores" class="w-72 mx-auto dark:brightness-0 dark:invert">
       </div>
 
       <!-- Login Card -->
@@ -53,14 +44,14 @@
           <p class="text-gray-500 dark:text-gray-400 text-sm">Authenticate with your Stripe Secret Key</p>
         </div>
         <div>
-          <label class="text-xs text-gray-500 dark:text-gray-500 uppercase tracking-wider">Stripe Secret Key</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stripe Secret Key</label>
           <input id="stripe-key" type="password" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-3 rounded-lg text-sm mt-1 font-mono text-gray-900 dark:text-white focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint focus:border-transparent outline-none" placeholder="sk_test_...">
         </div>
         <button onclick="stripeLogin()" id="login-btn" class="w-full bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple py-3 rounded-lg font-semibold transition flex items-center justify-center space-x-2">
           <span>Connect to Stripe</span>
         </button>
         <p id="auth-error" class="text-red-500 text-xs text-center hidden"></p>
-        <p class="text-gray-400 dark:text-gray-600 text-xs text-center">Your key is never stored — it stays in your browser session only.</p>
+        <p class="text-gray-400 dark:text-gray-500 text-xs text-center">Your key is never stored — it stays in your browser session only.</p>
       </div>
 
       <!-- Theme toggle on login page -->
@@ -80,11 +71,7 @@
     <!-- Top Bar -->
     <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-10 transition-colors">
       <div class="flex items-center space-x-3">
-        <svg viewBox="0 0 200 220" class="w-8 h-9" xmlns="http://www.w3.org/2000/svg">
-          <path d="M100 20 C55 20 20 55 20 100 C20 145 55 180 100 180 C125 180 147 168 160 150 L140 140 C131 153 117 162 100 162 C65 162 38 135 38 100 C38 65 65 38 100 38 C117 38 131 47 140 60 L130 80 C130 80 115 65 100 70 C80 77 72 97 80 115 C85 125 95 130 105 128" fill="#1a0a3e" class="dark:fill-white"/>
-          <ellipse cx="148" cy="42" rx="16" ry="22" transform="rotate(-30 148 42)" fill="#33f0b0"/>
-          <ellipse cx="164" cy="52" rx="14" ry="20" transform="rotate(-10 164 52)" fill="#33f0b0"/>
-        </svg>
+        <img src="assets/logo-icon.png" alt="CREO" class="w-8 h-8 rounded dark:brightness-0 dark:invert">
         <h1 class="text-lg font-bold tracking-wider text-creo-purple dark:text-white">CREO</h1>
         <span class="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline">Admin</span>
       </div>
