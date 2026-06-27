@@ -111,6 +111,7 @@
               <span class="text-xs text-gray-400">Sin portada</span>
             </div>
             <input type="file" id="cover-file" accept="image/*" onchange="uploadFile('cover-file','covers','cover_url','cover-preview')" class="mt-2 block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
+            <p class="text-[10px] text-gray-400 mt-1">JPG, PNG. Max 5MB. Recomendado: 1200×400px</p>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
@@ -496,7 +497,8 @@
       const input = document.getElementById(inputId);
       const file = input.files[0];
       if (!file) return;
-      if (file.size > 2 * 1024 * 1024) return showToast('Archivo max 2MB', 'error');
+      const maxMB = bucket === 'covers' ? 5 : 2;
+      if (file.size > maxMB * 1024 * 1024) return showToast(`Archivo max ${maxMB}MB`, 'error');
 
       const ext = file.name.split('.').pop();
       const path = `${currentUser.id}/${Date.now()}.${ext}`;

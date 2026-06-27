@@ -78,6 +78,10 @@
       </div>
       <div id="comments-list" class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
       <div id="comments-input-area" class="border-t border-white/10 px-4 py-3 hidden">
+        <div id="reply-indicator" class="hidden flex items-center justify-between mb-2 px-1">
+          <span class="text-xs text-creo-mint" id="reply-to-label">Respondiendo a...</span>
+          <button onclick="cancelReply()" class="text-white/40 hover:text-white text-xs">Cancelar</button>
+        </div>
         <div class="flex gap-2">
           <input id="comment-input" type="text" maxlength="500" placeholder="Escribe un comentario..." class="flex-1 bg-white/10 border border-white/10 rounded-full px-4 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-creo-mint">
           <button onclick="submitComment()" class="bg-creo-mint text-creo-purple font-bold px-4 py-2 rounded-full text-sm hover:bg-creo-mintDark transition">Enviar</button>
@@ -99,7 +103,10 @@
     let allLoaded = false;
     let currentUser = null;
     let userLikes = new Set();
+    let userCommentLikes = new Set();
     let activeCommentsPostId = null;
+    let replyingToCommentId = null;
+    let replyingToName = null;
 
     async function initAuth() {
       const { data: { user } } = await sb.auth.getUser();
@@ -107,14 +114,13 @@
       if (user) {
         const { data } = await sb.from('post_likes').select('post_id').eq('user_id', user.id);
         if (data) data.forEach(l => userLikes.add(l.post_id));
+        const { data: cl } = await sb.from('comment_likes').select('comment_id').eq('user_id', user.id);
+        if (cl) cl.forEach(l => userCommentLikes.add(l.comment_id));
       }
     }
 
     async function toggleLike(postId) {
-      if (!currentUser) {
-        showToast('Inicia sesión para dar like', 'error');
-        return;
-      }
+      if (!currentUser) { showToast('Inicia sesión para dar like', 'error'); return; }
       const btn = document.getElementById('like-' + postId);
       const countEl = document.getElementById('like-count-' + postId);
       btn.classList.add('like-bounce');
@@ -135,20 +141,51 @@
       countEl.textContent = data.count > 0 ? data.count : '';
     }
 
+    async function toggleCommentLike(commentId) {
+      if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
+      const { data, error } = await sb.rpc('toggle_comment_like', { p_comment_id: commentId });
+      if (error) { showToast('Error', 'error'); return; }
+      if (data.liked) userCommentLikes.add(commentId);
+      else userCommentLikes.delete(commentId);
+      openComments(activeCommentsPostId);
+    }
+
+    function startReply(commentId, displayName) {
+      replyingToCommentId = commentId;
+      replyingToName = displayName;
+      document.getElementById('reply-indicator').classList.remove('hidden');
+      document.getElementById('reply-to-label').textContent = 'Respondiendo a ' + displayName;
+      document.getElementById('comment-input').placeholder = 'Responder a ' + displayName + '...';
+      document.getElementById('comment-input').focus();
+    }
+
+    function cancelReply() {
+      replyingToCommentId = null;
+      replyingToName = null;
+      document.getElementById('reply-indicator').classList.add('hidden');
+      document.getElementById('comment-input').placeholder = 'Escribe un comentario...';
+    }
+
     async function openComments(postId) {
       activeCommentsPostId = postId;
       const drawer = document.getElementById('comments-drawer');
       drawer.classList.remove('hidden');
       document.getElementById('comments-input-area').classList.toggle('hidden', !currentUser);
+      cancelReply();
       document.getElementById('comments-list').innerHTML = '<div class="text-center py-6"><div class="inline-block w-5 h-5 border-2 border-creo-mint border-t-transparent rounded-full animate-spin"></div></div>';
 
-      const { data, error } = await sb
+      const { data } = await sb
         .from('post_comments')
         .select('*, profiles:user_id(username, display_name, avatar_url)')
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
 
       const list = document.getElementById('comments-list');
+      const topLevel = (data || []).filter(c => !c.parent_id);
+      const replies = (data || []).filter(c => c.parent_id);
+      const replyMap = {};
+      replies.forEach(r => { (replyMap[r.parent_id] = replyMap[r.parent_id] || []).push(r); });
+
       document.getElementById('comments-title').textContent = `Comentarios (${data ? data.length : 0})`;
 
       if (!data || data.length === 0) {
@@ -156,30 +193,73 @@
         return;
       }
 
-      list.innerHTML = data.map(c => {
-        const p = c.profiles || {};
-        const avatar = p.avatar_url
-          ? `<img src="${esc(p.avatar_url)}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">`
-          : `<div class="w-8 h-8 rounded-full bg-creo-mint/20 flex items-center justify-center flex-shrink-0"><span class="text-creo-mint text-xs font-bold">${esc((p.display_name || p.username || '?')[0].toUpperCase())}</span></div>`;
-        const canDelete = currentUser && currentUser.id === c.user_id;
-        return `<div class="flex gap-2 group">
+      list.innerHTML = topLevel.map(c => renderComment(c, replyMap, postId)).join('');
+      list.scrollTop = list.scrollHeight;
+    }
+
+    function renderComment(c, replyMap, postId) {
+      const p = c.profiles || {};
+      const name = p.display_name || p.username || 'Usuario';
+      const avatar = p.avatar_url
+        ? `<img src="${esc(p.avatar_url)}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">`
+        : `<div class="w-8 h-8 rounded-full bg-creo-mint/20 flex items-center justify-center flex-shrink-0"><span class="text-creo-mint text-xs font-bold">${esc(name[0].toUpperCase())}</span></div>`;
+      const canDelete = currentUser && currentUser.id === c.user_id;
+      const isLiked = userCommentLikes.has(c.id);
+      const childReplies = replyMap[c.id] || [];
+
+      return `<div class="space-y-2">
+        <div class="flex gap-2 group">
           ${avatar}
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
-              <span class="font-semibold text-xs text-creo-mint">${esc(p.display_name || p.username || 'Usuario')}</span>
+              <span class="font-semibold text-xs text-creo-mint">${esc(name)}</span>
               <span class="text-white/30 text-xs">${timeAgo(c.created_at)}</span>
               ${canDelete ? `<button onclick="deleteComment('${c.id}','${postId}')" class="ml-auto text-white/20 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition">✕</button>` : ''}
             </div>
             <p class="text-sm text-white/80 leading-relaxed">${esc(c.body)}</p>
+            <div class="flex items-center gap-4 mt-1">
+              <button onclick="toggleCommentLike('${c.id}')" class="flex items-center gap-1 text-xs ${isLiked ? 'text-red-400' : 'text-white/30 hover:text-red-400'} transition">
+                <svg class="w-3.5 h-3.5" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                ${c.like_count > 0 ? c.like_count : ''}
+              </button>
+              ${currentUser ? `<button onclick="startReply('${c.id}','${esc(name)}')" class="text-xs text-white/30 hover:text-creo-mint transition">Responder</button>` : ''}
+            </div>
           </div>
-        </div>`;
-      }).join('');
-      list.scrollTop = list.scrollHeight;
+        </div>
+        ${childReplies.length > 0 ? `<div class="ml-10 space-y-2 border-l border-white/10 pl-3">${childReplies.map(r => renderReply(r, postId)).join('')}</div>` : ''}
+      </div>`;
+    }
+
+    function renderReply(c, postId) {
+      const p = c.profiles || {};
+      const name = p.display_name || p.username || 'Usuario';
+      const avatar = p.avatar_url
+        ? `<img src="${esc(p.avatar_url)}" class="w-6 h-6 rounded-full object-cover flex-shrink-0">`
+        : `<div class="w-6 h-6 rounded-full bg-creo-mint/20 flex items-center justify-center flex-shrink-0"><span class="text-creo-mint text-[10px] font-bold">${esc(name[0].toUpperCase())}</span></div>`;
+      const canDelete = currentUser && currentUser.id === c.user_id;
+      const isLiked = userCommentLikes.has(c.id);
+
+      return `<div class="flex gap-2 group">
+        ${avatar}
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-semibold text-[11px] text-creo-mint">${esc(name)}</span>
+            <span class="text-white/30 text-[10px]">${timeAgo(c.created_at)}</span>
+            ${canDelete ? `<button onclick="deleteComment('${c.id}','${postId}')" class="ml-auto text-white/20 hover:text-red-400 text-[10px] opacity-0 group-hover:opacity-100 transition">✕</button>` : ''}
+          </div>
+          <p class="text-xs text-white/70 leading-relaxed">${esc(c.body)}</p>
+          <button onclick="toggleCommentLike('${c.id}')" class="flex items-center gap-1 mt-1 text-[10px] ${isLiked ? 'text-red-400' : 'text-white/30 hover:text-red-400'} transition">
+            <svg class="w-3 h-3" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            ${c.like_count > 0 ? c.like_count : ''}
+          </button>
+        </div>
+      </div>`;
     }
 
     function closeComments() {
       document.getElementById('comments-drawer').classList.add('hidden');
       activeCommentsPostId = null;
+      cancelReply();
     }
 
     async function submitComment() {
@@ -188,12 +268,19 @@
       if (!body) return;
       input.value = '';
 
-      const { data, error } = await sb.rpc('add_post_comment', { p_post_id: activeCommentsPostId, p_body: body });
-      if (error) { showToast('Error al comentar', 'error'); return; }
+      let result;
+      if (replyingToCommentId) {
+        result = await sb.rpc('add_comment_reply', { p_comment_id: replyingToCommentId, p_body: body });
+      } else {
+        result = await sb.rpc('add_post_comment', { p_post_id: activeCommentsPostId, p_body: body });
+      }
+
+      if (result.error) { showToast(result.error.message || 'Error al comentar', 'error'); return; }
 
       const countEl = document.getElementById('comment-count-' + activeCommentsPostId);
-      if (countEl) countEl.textContent = data.count > 0 ? data.count : '';
+      if (countEl && result.data) countEl.textContent = result.data.count > 0 ? result.data.count : '';
 
+      cancelReply();
       openComments(activeCommentsPostId);
     }
 
@@ -210,6 +297,18 @@
       if (e.key === 'Enter') submitComment();
     });
 
+    // Autoplay: play/pause videos as they scroll into view
+    const videoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    }, { threshold: 0.6 });
+
     async function loadFeed() {
       if (allLoaded) return;
 
@@ -221,15 +320,10 @@
 
       document.getElementById('feed-loading').classList.add('hidden');
 
-      if (error) {
-        showToast('Error cargando feed', 'error');
-        return;
-      }
+      if (error) { showToast('Error cargando feed', 'error'); return; }
 
       if (!data || data.length === 0) {
-        if (feedOffset === 0) {
-          document.getElementById('feed-empty').classList.remove('hidden');
-        }
+        if (feedOffset === 0) document.getElementById('feed-empty').classList.remove('hidden');
         allLoaded = true;
         document.getElementById('load-more').classList.add('hidden');
         return;
@@ -247,17 +341,19 @@
           : `<div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold text-sm">${esc((profile.display_name || profile.username || '?')[0].toUpperCase())}</span></div>`;
 
         const isLiked = userLikes.has(post.id);
+        const isDirectVideo = post.video_type === 'direct' && post.video_url && !post.video_url.includes('youtube');
+        const videoHTML = isDirectVideo
+          ? `<video src="${esc(post.video_url)}" class="w-full aspect-[9/16] max-h-[70vh] object-cover feed-video" loop muted playsinline preload="metadata"></video>`
+          : getAutoplayEmbedHTML(post.video_url, post.video_type);
 
         card.innerHTML = `
           <div class="relative">
-            <div class="w-full">${post.video_type === 'direct' && post.video_url && !post.video_url.includes('youtube') ? `<video src="${esc(post.video_url)}" class="w-full aspect-[9/16] max-h-[70vh] object-cover" controls playsinline preload="metadata"></video>` : getEmbedHTML(post.video_url, post.video_type, 'aspect-[9/16] max-h-[70vh]')}</div>
+            <div class="w-full">${videoHTML}</div>
+            ${isDirectVideo ? `<div class="absolute bottom-24 left-3 z-10"><button class="mute-toggle w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white/70 hover:text-white transition" onclick="toggleMute(this)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg></button></div>` : ''}
 
             <div class="absolute right-3 bottom-20 flex flex-col items-center gap-4">
-              <a href="profile.html?u=${esc(profile.username)}" class="block">
-                ${avatarHTML}
-              </a>
+              <a href="profile.html?u=${esc(profile.username)}" class="block">${avatarHTML}</a>
 
-              <!-- Like -->
               <button id="like-${post.id}" onclick="toggleLike('${post.id}')" class="flex flex-col items-center gap-1 text-white/70 hover:text-white transition">
                 <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
                   <svg class="w-5 h-5" fill="${isLiked ? '#33f0b0' : 'none'}" stroke="${isLiked ? '#33f0b0' : 'currentColor'}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
@@ -265,7 +361,6 @@
                 <span id="like-count-${post.id}" class="text-xs font-semibold">${post.like_count > 0 ? post.like_count : ''}</span>
               </button>
 
-              <!-- Comment -->
               <button onclick="openComments('${post.id}')" class="flex flex-col items-center gap-1 text-white/70 hover:text-white transition">
                 <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
@@ -273,14 +368,12 @@
                 <span id="comment-count-${post.id}" class="text-xs font-semibold">${post.comment_count > 0 ? post.comment_count : ''}</span>
               </button>
 
-              <!-- CREO Button -->
               <a href="profile.html?u=${esc(profile.username)}" class="creo-btn flex flex-col items-center gap-1">
                 <div class="w-12 h-12 rounded-full bg-creo-mint flex items-center justify-center shadow-lg shadow-creo-mint/30">
                   <span class="text-creo-purple font-black text-xs">CREO</span>
                 </div>
               </a>
 
-              <!-- Share -->
               <button onclick="shareCreator('${esc(profile.username)}')" class="flex flex-col items-center gap-1 text-white/70 hover:text-white transition">
                 <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
@@ -289,7 +382,6 @@
             </div>
           </div>
 
-          <!-- Bottom info -->
           <div class="p-4 space-y-2">
             <div class="flex items-center gap-2">
               <a href="profile.html?u=${esc(profile.username)}" class="font-bold text-sm hover:text-creo-mint transition">${esc(profile.display_name || profile.username)}</a>
@@ -301,6 +393,10 @@
         `;
 
         container.appendChild(card);
+
+        // Observe direct videos for autoplay
+        const video = card.querySelector('video.feed-video');
+        if (video) videoObserver.observe(video);
       });
 
       feedOffset += data.length;
@@ -310,6 +406,34 @@
       } else {
         document.getElementById('load-more').classList.remove('hidden');
       }
+    }
+
+    function getAutoplayEmbedHTML(url, type) {
+      const cls = 'aspect-[9/16] max-h-[70vh]';
+      if (type === 'youtube') {
+        const id = extractVideoId(url, 'youtube');
+        if (!id) return `<div class="w-full ${cls} bg-gray-800 flex items-center justify-center text-gray-400">Invalid YouTube URL</div>`;
+        return `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&rel=0&playsinline=1" class="w-full ${cls} rounded-xl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+      }
+      if (type === 'tiktok') {
+        const id = extractVideoId(url, 'tiktok');
+        if (!id) return `<div class="w-full ${cls} bg-gray-800 flex items-center justify-center text-gray-400">Invalid TikTok URL</div>`;
+        return `<iframe src="https://www.tiktok.com/embed/v2/${id}" class="w-full ${cls} rounded-xl" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
+      }
+      if (type === 'instagram') {
+        return `<iframe src="${url.replace(/\/$/, '')}/embed" class="w-full ${cls} rounded-xl" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
+      }
+      return `<video src="${esc(url)}" class="w-full ${cls} rounded-xl object-cover feed-video" loop muted playsinline preload="metadata"></video>`;
+    }
+
+    function toggleMute(btn) {
+      const card = btn.closest('.feed-card');
+      const video = card.querySelector('video');
+      if (!video) return;
+      video.muted = !video.muted;
+      btn.innerHTML = video.muted
+        ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>'
+        : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>';
     }
 
     function shareCreator(username) {
@@ -336,9 +460,7 @@
 
     window.addEventListener('scroll', () => {
       if (allLoaded) return;
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-        loadFeed();
-      }
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) loadFeed();
     });
 
     window.onload = async () => {
