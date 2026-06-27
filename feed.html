@@ -19,7 +19,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: { extend: { colors: { creo: { purple: '#1a0a3e', light: '#2d1b69', mint: '#33f0b0', mintDark: '#28c48e' } } } }
     }
   </script>
@@ -41,10 +40,6 @@
         <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0"><img src="assets/logo-icon.png" alt="CREO" class="w-6 h-6 rounded-full object-contain"></div>
         <h1 class="text-lg font-bold tracking-[0.15em]">CREADORES</h1>
       </div>
-      <button onclick="toggleTheme()" class="text-white/60 hover:text-white p-2 rounded-lg transition">
-        <svg id="icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        <svg id="icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-      </button>
     </div>
   </div>
 

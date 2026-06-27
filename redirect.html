@@ -7,7 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: { extend: { colors: { creo: { purple: '#1a0a3e', mint: '#33f0b0' } } } }
     }
   </script>
@@ -16,14 +15,14 @@
     @keyframes pulseRing { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
   </style>
 </head>
-<body class="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex items-center justify-center min-h-screen text-center transition-colors duration-300">
-  <div class="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-lg dark:shadow-2xl border border-gray-200 dark:border-gray-800 max-w-sm transition-colors">
+<body class="bg-white text-gray-900 flex items-center justify-center min-h-screen text-center transition-colors duration-300">
+  <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200 max-w-sm transition-colors">
     <!-- Logo -->
     <div class="mb-4">
       <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto"><img src="assets/logo-icon.png" alt="CREO" class="w-12 h-12 rounded-full object-contain"></div>
     </div>
-    <h1 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Syncing with Stripe</h1>
-    <p class="text-gray-500 dark:text-gray-400 text-sm">Please hold on while we finalize your verification...</p>
+    <h1 class="text-xl font-bold text-gray-900 mb-2">Syncing with Stripe</h1>
+    <p class="text-gray-500 text-sm">Please hold on while we finalize your verification...</p>
     <p id="status-msg" class="mt-4 text-sm font-medium"></p>
     <div class="mt-4 flex justify-center">
       <div class="relative w-6 h-6">
@@ -33,20 +32,15 @@
     </div>
   </div>
   <script>
-    (function() {
-      const saved = localStorage.getItem('creo-theme');
-      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
-    })();
-
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('status');
 
     if (status === 'success') {
       document.getElementById('status-msg').innerText = "Stripe Account Verified! Redirecting...";
-      document.getElementById('status-msg').classList.add('text-green-600', 'dark:text-green-400');
+      document.getElementById('status-msg').classList.add('text-green-600', '');
     } else if (status === 'refresh') {
       document.getElementById('status-msg').innerText = "Onboarding incomplete. Redirecting to retry...";
-      document.getElementById('status-msg').classList.add('text-yellow-600', 'dark:text-yellow-400');
+      document.getElementById('status-msg').classList.add('text-yellow-600', '');
     }
 
     setTimeout(() => { window.location.href = "https://fullnessmindset.github.io/creo/index.html"; }, 2500);

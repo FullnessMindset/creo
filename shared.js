@@ -3,25 +3,10 @@ const SUPABASE_URL = "https://qddxoyjtoxtdcezwuvcq.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZHhveWp0b3h0ZGNlend1dmNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MTUxNDIsImV4cCI6MjA5Nzk5MTE0Mn0.MEaMfib77T0B7HW-jI6nctc1a7WbIf1n7rKBhdc-Gm8";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Theme
-function initTheme() {
-  const saved = localStorage.getItem('creo-theme');
-  if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches))
-    document.documentElement.classList.add('dark');
-  updateThemeIcons();
-}
-function toggleTheme() {
-  document.documentElement.classList.toggle('dark');
-  localStorage.setItem('creo-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-  updateThemeIcons();
-}
-function updateThemeIcons() {
-  const d = document.documentElement.classList.contains('dark');
-  const sun = document.getElementById('icon-sun');
-  const moon = document.getElementById('icon-moon');
-  if (sun) sun.classList.toggle('hidden', !d);
-  if (moon) moon.classList.toggle('hidden', d);
-}
+// Theme — light only
+function initTheme() { document.documentElement.classList.remove('dark'); }
+function toggleTheme() {}
+function updateThemeIcons() {}
 
 // HTML escape
 function esc(str) {
@@ -75,7 +60,7 @@ function showToast(message, type) {
   const colors = {
     success: 'bg-green-600',
     error: 'bg-red-600',
-    info: 'bg-creo-purple dark:bg-creo-mint dark:text-creo-purple'
+    info: 'bg-creo-purple'
   };
   const toast = document.createElement('div');
   toast.id = 'creo-toast';
@@ -89,7 +74,7 @@ function showToast(message, type) {
 function renderBottomNav(activePage) {
   const nav = document.createElement('nav');
   nav.id = 'bottom-nav';
-  nav.className = 'fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 px-2 pb-[env(safe-area-inset-bottom)] transition-colors';
+  nav.className = 'fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-2 pb-[env(safe-area-inset-bottom)] transition-colors';
   const items = [
     { id: 'feed', label: 'Creadores', href: 'feed.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' },
     { id: 'explore', label: 'Explorar', href: 'explore.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>' },
@@ -104,7 +89,7 @@ function renderBottomNav(activePage) {
     a.href = item.href;
     if (item.authOnly) a.setAttribute('data-auth-only', 'true');
     const isActive = activePage === item.id;
-    a.className = `flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors ${isActive ? 'text-creo-purple dark:text-creo-mint' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'}`;
+    a.className = `flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors ${isActive ? 'text-creo-purple' : 'text-gray-400 hover:text-gray-600'}`;
     a.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg><span class="text-[10px] font-medium">${item.label}</span>`;
     inner.appendChild(a);
   });
@@ -139,7 +124,7 @@ async function loadNotificationBell() {
   bell.id = 'notif-bell';
   bell.className = 'fixed top-3 right-14 z-[60] cursor-pointer';
   bell.onclick = () => toggleNotifPanel();
-  bell.innerHTML = `<div class="relative p-2"><svg class="w-5 h-5 text-gray-500 dark:text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>${count > 0 ? `<span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">${count > 9 ? '9+' : count}</span>` : ''}</div>`;
+  bell.innerHTML = `<div class="relative p-2"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>${count > 0 ? `<span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">${count > 9 ? '9+' : count}</span>` : ''}</div>`;
   document.body.appendChild(bell);
 }
 
@@ -151,13 +136,13 @@ async function toggleNotifPanel() {
   const { data } = await sb.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20);
   panel = document.createElement('div');
   panel.id = 'notif-panel';
-  panel.className = 'fixed top-12 right-4 z-[60] w-80 max-h-96 overflow-y-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl';
+  panel.className = 'fixed top-12 right-4 z-[60] w-80 max-h-96 overflow-y-auto bg-white border border-gray-200 rounded-xl shadow-2xl';
   if (!data || data.length === 0) {
-    panel.innerHTML = '<p class="text-center text-gray-400 dark:text-white/40 text-sm py-8">Sin notificaciones</p>';
+    panel.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">Sin notificaciones</p>';
   } else {
     const icons = { like: '❤️', comment: '💬', payment: '💰', approval: '✅', rejection: '❌' };
-    panel.innerHTML = `<div class="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center"><span class="font-bold text-sm">Notificaciones</span><button onclick="markAllRead()" class="text-xs text-creo-mint hover:underline">Marcar leídas</button></div>` +
-      data.map(n => `<div class="px-3 py-2.5 border-b border-gray-100 dark:border-gray-800 ${n.is_read ? 'opacity-60' : ''} hover:bg-gray-50 dark:hover:bg-white/5 transition"><div class="flex gap-2"><span>${icons[n.type] || '🔔'}</span><div class="flex-1 min-w-0"><p class="text-sm font-medium text-gray-900 dark:text-white">${esc(n.title)}</p>${n.body ? `<p class="text-xs text-gray-500 dark:text-white/50 truncate">${esc(n.body)}</p>` : ''}<p class="text-[10px] text-gray-400 mt-0.5">${new Date(n.created_at).toLocaleDateString()}</p></div></div></div>`).join('');
+    panel.innerHTML = `<div class="p-3 border-b border-gray-200 flex justify-between items-center"><span class="font-bold text-sm">Notificaciones</span><button onclick="markAllRead()" class="text-xs text-creo-mint hover:underline">Marcar leídas</button></div>` +
+      data.map(n => `<div class="px-3 py-2.5 border-b border-gray-100 ${n.is_read ? 'opacity-60' : ''} hover:bg-gray-50 transition"><div class="flex gap-2"><span>${icons[n.type] || '🔔'}</span><div class="flex-1 min-w-0"><p class="text-sm font-medium text-gray-900">${esc(n.title)}</p>${n.body ? `<p class="text-xs text-gray-500 truncate">${esc(n.body)}</p>` : ''}<p class="text-[10px] text-gray-400 mt-0.5">${new Date(n.created_at).toLocaleDateString()}</p></div></div></div>`).join('');
   }
   document.body.appendChild(panel);
   document.addEventListener('click', closeNotifOnClickOutside);

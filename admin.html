@@ -7,7 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -23,69 +22,59 @@
     .fade-in { animation: fadeIn 0.3s ease-in; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .loader { border: 3px solid #e5e7eb; border-top: 3px solid #1a0a3e; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; display: inline-block; }
-    .dark .loader { border-color: #374151; border-top-color: #33f0b0; }
+
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
-<body class="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+<body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
 
   <!-- Stripe Auth Gate -->
   <div id="auth-gate" class="flex flex-col items-center justify-center min-h-screen px-4">
     <div class="w-full max-w-sm space-y-8">
       <div class="text-center space-y-3">
-        <img src="assets/logo-icon.png" alt="CREO" class="w-24 mx-auto rounded-2xl bg-white p-3 shadow-sm dark:shadow-lg">
-        <h1 class="text-3xl font-bold tracking-[0.3em] text-creo-purple dark:text-white">CREO</h1>
+        <img src="assets/logo-icon.png" alt="CREO" class="w-24 mx-auto rounded-2xl bg-white p-3 shadow-sm">
+        <h1 class="text-3xl font-bold tracking-[0.3em] text-creo-purple">CREO</h1>
         <div>
-          <p class="text-xs tracking-[0.15em] text-gray-500 dark:text-gray-400 uppercase">Crea. Yo Creo En Ti</p>
-          <p class="text-xs font-semibold tracking-wider text-creo-purple dark:text-creo-mint mt-0.5 uppercase">Plataforma de Apoyo Economico para Creadores</p>
+          <p class="text-xs tracking-[0.15em] text-gray-500 uppercase">Crea. Yo Creo En Ti</p>
+          <p class="text-xs font-semibold tracking-wider text-creo-purple mt-0.5 uppercase">Plataforma de Apoyo Economico para Creadores</p>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 rounded-2xl shadow-lg dark:shadow-2xl space-y-5">
+      <div class="bg-white border border-gray-200 p-8 rounded-2xl shadow-lg space-y-5">
         <div class="text-center space-y-1">
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white">Admin Access</h2>
-          <p class="text-gray-500 dark:text-gray-400 text-sm">Authenticate with your Stripe Secret Key</p>
+          <h2 class="text-xl font-bold text-gray-900">Admin Access</h2>
+          <p class="text-gray-500 text-sm">Authenticate with your Stripe Secret Key</p>
         </div>
         <div>
-          <label class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stripe Secret Key</label>
-          <input id="stripe-key" type="password" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-3 rounded-lg text-sm mt-1 font-mono text-gray-900 dark:text-white focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint focus:border-transparent outline-none" placeholder="sk_test_...">
+          <label class="text-xs text-gray-500 uppercase tracking-wider">Stripe Secret Key</label>
+          <input id="stripe-key" type="password" class="w-full bg-gray-50 border border-gray-300 p-3 rounded-lg text-sm mt-1 font-mono text-gray-900 focus:ring-2 focus:ring-creo-purple focus:border-transparent outline-none" placeholder="sk_test_...">
         </div>
-        <button onclick="stripeLogin()" id="login-btn" class="w-full bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple py-3 rounded-lg font-semibold transition flex items-center justify-center space-x-2">
+        <button onclick="stripeLogin()" id="login-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-lg font-semibold transition flex items-center justify-center space-x-2">
           <span>Connect to Stripe</span>
         </button>
         <p id="auth-error" class="text-red-500 text-xs text-center hidden"></p>
-        <p class="text-gray-400 dark:text-gray-500 text-xs text-center">Your key is never stored — it stays in your browser session only.</p>
+        <p class="text-gray-400 text-xs text-center">Your key is never stored — it stays in your browser session only.</p>
       </div>
 
-      <div class="flex justify-center">
-        <button onclick="toggleTheme()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm flex items-center space-x-2 transition">
-          <span id="theme-icon-login"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg></span>
-          <span id="theme-label-login">Dark mode</span>
-        </button>
-      </div>
     </div>
   </div>
 
   <!-- Dashboard -->
   <div id="dashboard" class="hidden">
     <!-- Top Bar -->
-    <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-10 transition-colors">
+    <div class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10 transition-colors">
       <div class="flex items-center space-x-3">
         <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0"><img src="assets/logo-icon.png" alt="CREO" class="w-6 h-6 rounded-full object-contain"></div>
-        <h1 class="text-lg font-bold tracking-wider text-creo-purple dark:text-white">CREO</h1>
-        <span class="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline">Admin</span>
+        <h1 class="text-lg font-bold tracking-wider text-creo-purple">CREO</h1>
+        <span class="text-xs text-gray-400 hidden sm:inline">Admin</span>
       </div>
       <div class="flex items-center space-x-4">
-        <span id="account-name" class="text-gray-500 dark:text-gray-400 text-sm hidden sm:inline"></span>
-        <button onclick="toggleTheme()" id="theme-toggle-dash" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition" title="Toggle theme">
-          <svg id="theme-icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-          <svg id="theme-icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-        </button>
-        <button onclick="refresh()" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white text-sm bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg transition flex items-center space-x-1">
+        <span id="account-name" class="text-gray-500 text-sm hidden sm:inline"></span>
+        <button onclick="refresh()" class="text-gray-500 hover:text-gray-700 text-sm bg-gray-100 px-3 py-1.5 rounded-lg transition flex items-center space-x-1">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span>Refresh</span>
         </button>
-        <button onclick="logout()" class="text-gray-400 hover:text-red-500 dark:hover:text-red-400 text-sm transition">Disconnect</button>
+        <button onclick="logout()" class="text-gray-400 hover:text-red-500 text-sm transition">Disconnect</button>
       </div>
     </div>
 
@@ -93,65 +82,65 @@
 
       <!-- Stats Row -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div class="stat-card bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 transition-colors">
-          <p class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Total Creators</p>
-          <p id="stat-total" class="text-3xl font-bold text-gray-900 dark:text-white mt-1">-</p>
+        <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
+          <p class="text-gray-500 text-xs uppercase tracking-wider">Total Creators</p>
+          <p id="stat-total" class="text-3xl font-bold text-gray-900 mt-1">-</p>
         </div>
-        <div class="stat-card bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 transition-colors">
-          <p class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Pending Review</p>
-          <p id="stat-pending-review" class="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">-</p>
+        <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
+          <p class="text-gray-500 text-xs uppercase tracking-wider">Pending Review</p>
+          <p id="stat-pending-review" class="text-3xl font-bold text-yellow-600 mt-1">-</p>
         </div>
-        <div class="stat-card bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 transition-colors">
-          <p class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Verified</p>
-          <p id="stat-verified" class="text-3xl font-bold text-green-600 dark:text-green-400 mt-1">-</p>
+        <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
+          <p class="text-gray-500 text-xs uppercase tracking-wider">Verified</p>
+          <p id="stat-verified" class="text-3xl font-bold text-green-600 mt-1">-</p>
         </div>
-        <div class="stat-card bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 transition-colors">
-          <p class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Platform Revenue</p>
-          <p id="stat-revenue" class="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">-</p>
+        <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
+          <p class="text-gray-500 text-xs uppercase tracking-wider">Platform Revenue</p>
+          <p id="stat-revenue" class="text-3xl font-bold text-emerald-600 mt-1">-</p>
         </div>
-        <div class="stat-card bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 transition-colors">
-          <p class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Available Balance</p>
-          <p id="stat-balance" class="text-3xl font-bold text-creo-purple dark:text-creo-mint mt-1">-</p>
+        <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
+          <p class="text-gray-500 text-xs uppercase tracking-wider">Available Balance</p>
+          <p id="stat-balance" class="text-3xl font-bold text-creo-purple mt-1">-</p>
         </div>
       </div>
 
       <!-- Tabs -->
-      <div class="flex space-x-1 bg-gray-100 dark:bg-gray-900 p-1 rounded-xl w-fit border border-gray-200 dark:border-gray-800 transition-colors">
-        <button onclick="showTab('verification')" id="tab-verification" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium bg-creo-purple dark:bg-creo-mint text-white dark:text-creo-purple transition">Verification</button>
-        <button onclick="showTab('creators')" id="tab-creators" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition">Creators</button>
-        <button onclick="showTab('transactions')" id="tab-transactions" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition">Transactions</button>
-        <button onclick="showTab('accounts')" id="tab-accounts" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition">Stripe Accounts</button>
-        <button onclick="showTab('links')" id="tab-links" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition">Quick Links</button>
+      <div class="flex space-x-1 bg-gray-100 p-1 rounded-xl w-fit border border-gray-200 transition-colors">
+        <button onclick="showTab('verification')" id="tab-verification" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium bg-creo-purple text-white transition">Verification</button>
+        <button onclick="showTab('creators')" id="tab-creators" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Creators</button>
+        <button onclick="showTab('transactions')" id="tab-transactions" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Transactions</button>
+        <button onclick="showTab('accounts')" id="tab-accounts" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Stripe Accounts</button>
+        <button onclick="showTab('links')" id="tab-links" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Quick Links</button>
       </div>
 
       <!-- Verification Review Panel -->
       <div id="panel-verification" class="fade-in">
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden transition-colors">
-          <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
-            <h2 class="font-semibold text-gray-900 dark:text-white">Creator Verification Queue</h2>
+        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden transition-colors">
+          <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="font-semibold text-gray-900">Creator Verification Queue</h2>
             <div class="flex space-x-2">
-              <button onclick="filterVerification('submitted')" id="vf-submitted" class="text-xs px-3 py-1 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 font-medium">Pending</button>
-              <button onclick="filterVerification('approved')" id="vf-approved" class="text-xs px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">Approved</button>
-              <button onclick="filterVerification('rejected')" id="vf-rejected" class="text-xs px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">Rejected</button>
-              <button onclick="filterVerification('all')" id="vf-all" class="text-xs px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">All</button>
+              <button onclick="filterVerification('submitted')" id="vf-submitted" class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 border border-yellow-200 font-medium">Pending</button>
+              <button onclick="filterVerification('approved')" id="vf-approved" class="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-500 border border-gray-200">Approved</button>
+              <button onclick="filterVerification('rejected')" id="vf-rejected" class="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-500 border border-gray-200">Rejected</button>
+              <button onclick="filterVerification('all')" id="vf-all" class="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-500 border border-gray-200">All</button>
             </div>
           </div>
-          <div id="verification-list" class="divide-y divide-gray-100 dark:divide-gray-800/50"></div>
+          <div id="verification-list" class="divide-y divide-gray-100"></div>
           <div id="no-verification" class="hidden px-5 py-12 text-center text-gray-400">No verification requests in this category.</div>
         </div>
       </div>
 
       <!-- Creators Panel -->
       <div id="panel-creators" class="hidden fade-in">
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden transition-colors">
-          <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
-            <h2 class="font-semibold text-gray-900 dark:text-white">All Creators</h2>
-            <input id="search-creators" oninput="filterCreators()" type="text" placeholder="Search..." class="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-3 py-1.5 rounded-lg text-sm w-56 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden transition-colors">
+          <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="font-semibold text-gray-900">All Creators</h2>
+            <input id="search-creators" oninput="filterCreators()" type="text" placeholder="Search..." class="bg-gray-50 border border-gray-300 px-3 py-1.5 rounded-lg text-sm w-56 text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
-                <tr class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                <tr class="text-gray-500 text-xs uppercase tracking-wider border-b border-gray-200">
                   <th class="text-left px-5 py-3">Username</th>
                   <th class="text-left px-5 py-3">Name</th>
                   <th class="text-left px-5 py-3">Status</th>
@@ -170,14 +159,14 @@
 
       <!-- Transactions Panel -->
       <div id="panel-transactions" class="hidden fade-in">
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden transition-colors">
-          <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
-            <h2 class="font-semibold text-gray-900 dark:text-white">Recent Transactions</h2>
+        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden transition-colors">
+          <div class="px-5 py-4 border-b border-gray-200">
+            <h2 class="font-semibold text-gray-900">Recent Transactions</h2>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
-                <tr class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                <tr class="text-gray-500 text-xs uppercase tracking-wider border-b border-gray-200">
                   <th class="text-left px-5 py-3">Charge ID</th>
                   <th class="text-left px-5 py-3">Amount</th>
                   <th class="text-left px-5 py-3">Platform Fee</th>
@@ -194,14 +183,14 @@
 
       <!-- Stripe Accounts Panel -->
       <div id="panel-accounts" class="hidden fade-in">
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden transition-colors">
-          <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
-            <h2 class="font-semibold text-gray-900 dark:text-white">Connected Stripe Accounts</h2>
+        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden transition-colors">
+          <div class="px-5 py-4 border-b border-gray-200">
+            <h2 class="font-semibold text-gray-900">Connected Stripe Accounts</h2>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
-                <tr class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider border-b border-gray-200 dark:border-gray-800">
+                <tr class="text-gray-500 text-xs uppercase tracking-wider border-b border-gray-200">
                   <th class="text-left px-5 py-3">Account ID</th>
                   <th class="text-left px-5 py-3">Email</th>
                   <th class="text-left px-5 py-3">Charges</th>
@@ -220,29 +209,29 @@
       <!-- Quick Links Panel -->
       <div id="panel-links" class="hidden fade-in">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <a href="https://dashboard.stripe.com/connect/accounts/overview" target="_blank" class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 hover:border-creo-purple dark:hover:border-creo-mint transition group">
-            <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-creo-purple dark:group-hover:text-creo-mint transition">Stripe Connect Dashboard</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Manage connected accounts, view payouts, and monitor activity.</p>
+          <a href="https://dashboard.stripe.com/connect/accounts/overview" target="_blank" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-creo-purple transition group">
+            <h3 class="font-semibold text-gray-900 group-hover:text-creo-purple transition">Stripe Connect Dashboard</h3>
+            <p class="text-gray-500 text-sm mt-1">Manage connected accounts, view payouts, and monitor activity.</p>
           </a>
-          <a href="https://dashboard.stripe.com/payments" target="_blank" class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 hover:border-creo-purple dark:hover:border-creo-mint transition group">
-            <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-creo-purple dark:group-hover:text-creo-mint transition">Stripe Payments</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">View all payments, refunds, and disputes.</p>
+          <a href="https://dashboard.stripe.com/payments" target="_blank" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-creo-purple transition group">
+            <h3 class="font-semibold text-gray-900 group-hover:text-creo-purple transition">Stripe Payments</h3>
+            <p class="text-gray-500 text-sm mt-1">View all payments, refunds, and disputes.</p>
           </a>
-          <a href="https://dashboard.stripe.com/identity/verification-sessions" target="_blank" class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 hover:border-creo-purple dark:hover:border-creo-mint transition group">
-            <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-creo-purple dark:group-hover:text-creo-mint transition">Stripe Identity Verifications</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Review identity verification sessions and results.</p>
+          <a href="https://dashboard.stripe.com/identity/verification-sessions" target="_blank" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-creo-purple transition group">
+            <h3 class="font-semibold text-gray-900 group-hover:text-creo-purple transition">Stripe Identity Verifications</h3>
+            <p class="text-gray-500 text-sm mt-1">Review identity verification sessions and results.</p>
           </a>
-          <a href="https://supabase.com/dashboard/project/qddxoyjtoxtdcezwuvcq" target="_blank" class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 hover:border-creo-purple dark:hover:border-creo-mint transition group">
-            <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-creo-purple dark:group-hover:text-creo-mint transition">Supabase Dashboard</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Database, auth users, edge functions, and storage.</p>
+          <a href="https://supabase.com/dashboard/project/qddxoyjtoxtdcezwuvcq" target="_blank" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-creo-purple transition group">
+            <h3 class="font-semibold text-gray-900 group-hover:text-creo-purple transition">Supabase Dashboard</h3>
+            <p class="text-gray-500 text-sm mt-1">Database, auth users, edge functions, and storage.</p>
           </a>
-          <a href="https://github.com/FullnessMindset/creo" target="_blank" class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 hover:border-creo-purple dark:hover:border-creo-mint transition group">
-            <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-creo-purple dark:group-hover:text-creo-mint transition">GitHub Repository</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Source code, deployments, and GitHub Pages settings.</p>
+          <a href="https://github.com/FullnessMindset/creo" target="_blank" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-creo-purple transition group">
+            <h3 class="font-semibold text-gray-900 group-hover:text-creo-purple transition">GitHub Repository</h3>
+            <p class="text-gray-500 text-sm mt-1">Source code, deployments, and GitHub Pages settings.</p>
           </a>
-          <a href="https://fullnessmindset.github.io/creo/feed.html" target="_blank" class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 hover:border-green-500 transition group">
-            <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition">Creadores Feed (Live)</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">The public video feed page.</p>
+          <a href="https://fullnessmindset.github.io/creo/feed.html" target="_blank" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-green-500 transition group">
+            <h3 class="font-semibold text-gray-900 group-hover:text-green-600 transition">Creadores Feed (Live)</h3>
+            <p class="text-gray-500 text-sm mt-1">The public video feed page.</p>
           </a>
         </div>
       </div>
@@ -251,73 +240,53 @@
   </div>
 
   <!-- Review Modal -->
-  <div id="review-modal" class="hidden fixed inset-0 bg-black/40 dark:bg-black/60 flex items-center justify-center z-50 p-4" onclick="if(event.target===this)closeReviewModal()">
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-colors">
-      <div class="p-6 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between sticky top-0 bg-white dark:bg-gray-900 z-10">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Review Creator Application</h3>
-        <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition">&times;</button>
+  <div id="review-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onclick="if(event.target===this)closeReviewModal()">
+    <div class="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-colors">
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
+        <h3 class="text-lg font-bold text-gray-900">Review Creator Application</h3>
+        <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-600 transition">&times;</button>
       </div>
       <div id="review-content" class="p-6 space-y-5"></div>
-      <div id="review-actions" class="p-6 border-t border-gray-200 dark:border-gray-800 space-y-3 sticky bottom-0 bg-white dark:bg-gray-900">
+      <div id="review-actions" class="p-6 border-t border-gray-200 space-y-3 sticky bottom-0 bg-white">
         <div>
-          <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">Rejection Reason (only if rejecting)</label>
-          <input id="reject-reason" type="text" placeholder="Reason for rejection..." class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-2.5 rounded-lg text-sm mt-1 text-gray-900 dark:text-white">
+          <label class="text-xs text-gray-500 uppercase">Rejection Reason (only if rejecting)</label>
+          <input id="reject-reason" type="text" placeholder="Reason for rejection..." class="w-full bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900">
         </div>
         <div class="flex space-x-3">
           <button onclick="approveCreator()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition text-sm">Approve Creator</button>
           <button onclick="rejectCreator()" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold transition text-sm">Reject</button>
-          <button onclick="closeReviewModal()" class="px-6 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 py-3 rounded-lg font-semibold transition text-sm">Cancel</button>
+          <button onclick="closeReviewModal()" class="px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold transition text-sm">Cancel</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Edit Modal -->
-  <div id="edit-modal" class="hidden fixed inset-0 bg-black/40 dark:bg-black/60 flex items-center justify-center z-50" onclick="if(event.target===this)closeModal()">
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 w-full max-w-md space-y-4 transition-colors">
-      <h3 class="text-lg font-bold text-gray-900 dark:text-white">Edit Creator</h3>
+  <div id="edit-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50" onclick="if(event.target===this)closeModal()">
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 w-full max-w-md space-y-4 transition-colors">
+      <h3 class="text-lg font-bold text-gray-900">Edit Creator</h3>
       <input type="hidden" id="edit-id">
       <div>
-        <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">Username</label>
-        <input id="edit-username" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-2.5 rounded-lg text-sm mt-1 text-gray-900 dark:text-white">
+        <label class="text-xs text-gray-500 uppercase">Username</label>
+        <input id="edit-username" class="w-full bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900">
       </div>
       <div>
-        <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">Display Name</label>
-        <input id="edit-display" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-2.5 rounded-lg text-sm mt-1 text-gray-900 dark:text-white">
+        <label class="text-xs text-gray-500 uppercase">Display Name</label>
+        <input id="edit-display" class="w-full bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900">
       </div>
       <div>
-        <label class="text-xs text-gray-500 dark:text-gray-400 uppercase">Bio</label>
-        <textarea id="edit-bio" rows="3" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 p-2.5 rounded-lg text-sm mt-1 text-gray-900 dark:text-white"></textarea>
+        <label class="text-xs text-gray-500 uppercase">Bio</label>
+        <textarea id="edit-bio" rows="3" class="w-full bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900"></textarea>
       </div>
-      <div id="edit-stripe-info" class="text-xs text-gray-500 dark:text-gray-400 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg font-mono"></div>
+      <div id="edit-stripe-info" class="text-xs text-gray-500 p-3 bg-gray-50 rounded-lg font-mono"></div>
       <div class="flex space-x-3 pt-2">
-        <button onclick="saveEdit()" class="flex-1 bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple py-2.5 rounded-lg font-semibold transition text-sm">Save Changes</button>
-        <button onclick="closeModal()" class="flex-1 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 py-2.5 rounded-lg font-semibold transition text-sm">Cancel</button>
+        <button onclick="saveEdit()" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-2.5 rounded-lg font-semibold transition text-sm">Save Changes</button>
+        <button onclick="closeModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-lg font-semibold transition text-sm">Cancel</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Theme
-    function initTheme() {
-      const saved = localStorage.getItem('creo-theme');
-      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
-      updateThemeIcons();
-    }
-    function toggleTheme() {
-      document.documentElement.classList.toggle('dark');
-      localStorage.setItem('creo-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-      updateThemeIcons();
-    }
-    function updateThemeIcons() {
-      const isDark = document.documentElement.classList.contains('dark');
-      const sun = document.getElementById('theme-icon-sun');
-      const moon = document.getElementById('theme-icon-moon');
-      if (sun && moon) { sun.classList.toggle('hidden', !isDark); moon.classList.toggle('hidden', isDark); }
-      const loginLabel = document.getElementById('theme-label-login');
-      if (loginLabel) loginLabel.textContent = isDark ? 'Light mode' : 'Dark mode';
-    }
-    initTheme();
 
     const SUPABASE_URL = "https://qddxoyjtoxtdcezwuvcq.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZHhveWp0b3h0ZGNlend1dmNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk0NzkyMDksImV4cCI6MjA2NTA1NTIwOX0.u2adJ92IS3GXDf8TRTLzhiSgSEfJgstifR_kpupdlkA";
@@ -397,13 +366,13 @@
       }
 
       document.querySelectorAll('[id^="vf-"]').forEach(b => {
-        b.className = 'text-xs px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700';
+        b.className = 'text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-500 border border-gray-200';
       });
       const activeBtn = document.getElementById('vf-' + verificationFilter);
-      if (verificationFilter === 'submitted') activeBtn.className = 'text-xs px-3 py-1 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 font-medium';
-      else if (verificationFilter === 'approved') activeBtn.className = 'text-xs px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800 font-medium';
-      else if (verificationFilter === 'rejected') activeBtn.className = 'text-xs px-3 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 font-medium';
-      else activeBtn.className = 'text-xs px-3 py-1 rounded-full bg-creo-purple/10 dark:bg-creo-mint/10 text-creo-purple dark:text-creo-mint border border-creo-purple/20 dark:border-creo-mint/20 font-medium';
+      if (verificationFilter === 'submitted') activeBtn.className = 'text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 border border-yellow-200 font-medium';
+      else if (verificationFilter === 'approved') activeBtn.className = 'text-xs px-3 py-1 rounded-full bg-green-100 text-green-700 border border-green-200 font-medium';
+      else if (verificationFilter === 'rejected') activeBtn.className = 'text-xs px-3 py-1 rounded-full bg-red-100 text-red-700 border border-red-200 font-medium';
+      else activeBtn.className = 'text-xs px-3 py-1 rounded-full bg-creo-purple/10 text-creo-purple border border-creo-purple/20 font-medium';
 
       if (!filtered.length) { container.innerHTML = ''; noMsg.classList.remove('hidden'); return; }
       noMsg.classList.add('hidden');
@@ -414,22 +383,22 @@
         const socialCount = Object.values(socials).filter(v => v && v.trim()).length;
 
         let statusBadge = '';
-        if (status === 'submitted') statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800">Pending Review</span>';
-        else if (status === 'approved') statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">Approved</span>';
-        else if (status === 'rejected') statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">Rejected</span>';
-        else statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-500 border border-gray-200 dark:border-gray-700">Not Started</span>';
+        if (status === 'submitted') statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 border border-yellow-200">Pending Review</span>';
+        else if (status === 'approved') statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">Approved</span>';
+        else if (status === 'rejected') statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200">Rejected</span>';
+        else statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 border border-gray-200">Not Started</span>';
 
-        return `<div class="px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition flex items-center justify-between">
+        return `<div class="px-5 py-4 hover:bg-gray-50 transition flex items-center justify-between">
           <div class="flex items-center space-x-4 flex-1 min-w-0">
-            <div class="w-10 h-10 rounded-full bg-creo-purple/10 dark:bg-creo-mint/10 flex items-center justify-center overflow-hidden flex-shrink-0">
-              ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-xs font-bold text-creo-purple dark:text-creo-mint">${esc((p.username || '?')[0].toUpperCase())}</span>`}
+            <div class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+              ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-xs font-bold text-creo-purple">${esc((p.username || '?')[0].toUpperCase())}</span>`}
             </div>
             <div class="min-w-0">
               <div class="flex items-center space-x-2">
-                <p class="font-medium text-gray-900 dark:text-white text-sm truncate">${esc(p.display_name || p.username)}</p>
+                <p class="font-medium text-gray-900 text-sm truncate">${esc(p.display_name || p.username)}</p>
                 ${statusBadge}
               </div>
-              <div class="flex items-center space-x-3 text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+              <div class="flex items-center space-x-3 text-xs text-gray-400 mt-0.5">
                 <span>@${esc(p.username)}</span>
                 ${p.full_name ? `<span>${esc(p.full_name)}</span>` : ''}
                 <span>${socialCount} social${socialCount !== 1 ? 's' : ''}</span>
@@ -440,7 +409,7 @@
           </div>
           <div class="flex items-center space-x-2 flex-shrink-0 ml-4">
             ${p.submitted_at ? `<span class="text-xs text-gray-400">${new Date(p.submitted_at).toLocaleDateString()}</span>` : ''}
-            <button onclick="openReview('${p.id}')" class="text-xs px-3 py-1.5 rounded-lg bg-creo-purple dark:bg-creo-mint text-white dark:text-creo-purple font-medium hover:opacity-90 transition">Review</button>
+            <button onclick="openReview('${p.id}')" class="text-xs px-3 py-1.5 rounded-lg bg-creo-purple text-white font-medium hover:opacity-90 transition">Review</button>
           </div>
         </div>`;
       }).join('');
@@ -465,75 +434,75 @@
           const res = await apiCall('identity-status', { session_id: p.stripe_identity_id });
           if (res.status) {
             const s = res.status;
-            identityInfo = s === 'verified' ? '<span class="text-green-600 dark:text-green-400 font-bold">VERIFIED</span>' :
+            identityInfo = s === 'verified' ? '<span class="text-green-600 font-bold">VERIFIED</span>' :
               s === 'requires_input' ? '<span class="text-yellow-600">Requires input</span>' :
               `<span class="text-gray-500">${esc(s)}</span>`;
           }
         } catch(e) {}
       }
-      if (p.identity_verified) identityInfo = '<span class="text-green-600 dark:text-green-400 font-bold">VERIFIED</span>';
+      if (p.identity_verified) identityInfo = '<span class="text-green-600 font-bold">VERIFIED</span>';
 
       const { data: docs } = await sbAdmin.from('verification_documents').select('*').eq('creator_id', p.id);
 
       content.innerHTML = `
         <div class="flex items-center space-x-4">
-          <div class="w-16 h-16 rounded-full bg-creo-purple/10 dark:bg-creo-mint/10 flex items-center justify-center overflow-hidden flex-shrink-0">
-            ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-xl font-bold text-creo-purple dark:text-creo-mint">${esc((p.username || '?')[0].toUpperCase())}</span>`}
+          <div class="w-16 h-16 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+            ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-xl font-bold text-creo-purple">${esc((p.username || '?')[0].toUpperCase())}</span>`}
           </div>
           <div>
-            <h4 class="text-lg font-bold text-gray-900 dark:text-white">${esc(p.display_name || p.username)}</h4>
-            <p class="text-sm text-gray-500 dark:text-gray-400">@${esc(p.username)}</p>
+            <h4 class="text-lg font-bold text-gray-900">${esc(p.display_name || p.username)}</h4>
+            <p class="text-sm text-gray-500">@${esc(p.username)}</p>
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-3">
-            <h5 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Personal Info</h5>
-            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg space-y-2 text-sm">
-              <p><span class="text-gray-400">Full Name:</span> <span class="text-gray-900 dark:text-white font-medium">${esc(p.full_name || 'Not provided')}</span></p>
-              <p><span class="text-gray-400">Phone:</span> <span class="text-gray-900 dark:text-white font-medium">${esc(p.phone || 'Not provided')}</span></p>
-              <p><span class="text-gray-400">Type:</span> <span class="text-gray-900 dark:text-white font-medium">${p.business_type === 'company' ? 'Company' : 'Personal'}</span></p>
-              ${p.business_name ? `<p><span class="text-gray-400">Business:</span> <span class="text-gray-900 dark:text-white font-medium">${esc(p.business_name)}</span></p>` : ''}
+            <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Personal Info</h5>
+            <div class="bg-gray-50 p-3 rounded-lg space-y-2 text-sm">
+              <p><span class="text-gray-400">Full Name:</span> <span class="text-gray-900 font-medium">${esc(p.full_name || 'Not provided')}</span></p>
+              <p><span class="text-gray-400">Phone:</span> <span class="text-gray-900 font-medium">${esc(p.phone || 'Not provided')}</span></p>
+              <p><span class="text-gray-400">Type:</span> <span class="text-gray-900 font-medium">${p.business_type === 'company' ? 'Company' : 'Personal'}</span></p>
+              ${p.business_name ? `<p><span class="text-gray-400">Business:</span> <span class="text-gray-900 font-medium">${esc(p.business_name)}</span></p>` : ''}
             </div>
           </div>
 
           <div class="space-y-3">
-            <h5 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Verification</h5>
-            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg space-y-2 text-sm">
+            <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Verification</h5>
+            <div class="bg-gray-50 p-3 rounded-lg space-y-2 text-sm">
               <p><span class="text-gray-400">Identity:</span> ${identityInfo}</p>
-              <p><span class="text-gray-400">Stripe:</span> ${p.stripe_connect_id ? '<span class="text-green-600 dark:text-green-400 font-medium">Connected</span>' : '<span class="text-gray-400">Not connected</span>'}</p>
-              <p><span class="text-gray-400">Submitted:</span> <span class="text-gray-900 dark:text-white">${p.submitted_at ? new Date(p.submitted_at).toLocaleString() : 'N/A'}</span></p>
+              <p><span class="text-gray-400">Stripe:</span> ${p.stripe_connect_id ? '<span class="text-green-600 font-medium">Connected</span>' : '<span class="text-gray-400">Not connected</span>'}</p>
+              <p><span class="text-gray-400">Submitted:</span> <span class="text-gray-900">${p.submitted_at ? new Date(p.submitted_at).toLocaleString() : 'N/A'}</span></p>
               ${p.rejection_reason ? `<p><span class="text-gray-400">Last rejection:</span> <span class="text-red-500">${esc(p.rejection_reason)}</span></p>` : ''}
             </div>
           </div>
         </div>
 
         <div class="space-y-3">
-          <h5 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Social Media</h5>
-          <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg space-y-1 text-sm">
-            ${socials.instagram ? `<p><span class="text-gray-400">Instagram:</span> <a href="${esc(socials.instagram)}" target="_blank" class="text-creo-purple dark:text-creo-mint hover:underline break-all">${esc(socials.instagram)}</a></p>` : ''}
-            ${socials.tiktok ? `<p><span class="text-gray-400">TikTok:</span> <a href="${esc(socials.tiktok)}" target="_blank" class="text-creo-purple dark:text-creo-mint hover:underline break-all">${esc(socials.tiktok)}</a></p>` : ''}
-            ${socials.youtube ? `<p><span class="text-gray-400">YouTube:</span> <a href="${esc(socials.youtube)}" target="_blank" class="text-creo-purple dark:text-creo-mint hover:underline break-all">${esc(socials.youtube)}</a></p>` : ''}
-            ${socials.twitter ? `<p><span class="text-gray-400">Twitter/X:</span> <a href="${esc(socials.twitter)}" target="_blank" class="text-creo-purple dark:text-creo-mint hover:underline break-all">${esc(socials.twitter)}</a></p>` : ''}
+          <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Social Media</h5>
+          <div class="bg-gray-50 p-3 rounded-lg space-y-1 text-sm">
+            ${socials.instagram ? `<p><span class="text-gray-400">Instagram:</span> <a href="${esc(socials.instagram)}" target="_blank" class="text-creo-purple hover:underline break-all">${esc(socials.instagram)}</a></p>` : ''}
+            ${socials.tiktok ? `<p><span class="text-gray-400">TikTok:</span> <a href="${esc(socials.tiktok)}" target="_blank" class="text-creo-purple hover:underline break-all">${esc(socials.tiktok)}</a></p>` : ''}
+            ${socials.youtube ? `<p><span class="text-gray-400">YouTube:</span> <a href="${esc(socials.youtube)}" target="_blank" class="text-creo-purple hover:underline break-all">${esc(socials.youtube)}</a></p>` : ''}
+            ${socials.twitter ? `<p><span class="text-gray-400">Twitter/X:</span> <a href="${esc(socials.twitter)}" target="_blank" class="text-creo-purple hover:underline break-all">${esc(socials.twitter)}</a></p>` : ''}
             ${!socials.instagram && !socials.tiktok && !socials.youtube && !socials.twitter ? '<p class="text-gray-400">No social links provided</p>' : ''}
           </div>
         </div>
 
-        ${p.bio ? `<div class="space-y-3"><h5 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bio</h5><p class="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">${esc(p.bio)}</p></div>` : ''}
+        ${p.bio ? `<div class="space-y-3"><h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Bio</h5><p class="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">${esc(p.bio)}</p></div>` : ''}
 
         ${docs && docs.length > 0 ? `
           <div class="space-y-3">
-            <h5 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Uploaded Documents (${docs.length})</h5>
+            <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Uploaded Documents (${docs.length})</h5>
             <div class="space-y-2">
-              ${docs.map(d => `<a href="${esc(d.file_url)}" target="_blank" class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm">
+              ${docs.map(d => `<a href="${esc(d.file_url)}" target="_blank" class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition text-sm">
                 <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                <div class="flex-1 min-w-0"><p class="text-gray-900 dark:text-white truncate">${esc(d.file_name || 'Document')}</p><p class="text-xs text-gray-400">${esc(d.document_type)} · ${new Date(d.uploaded_at).toLocaleDateString()}</p></div>
+                <div class="flex-1 min-w-0"><p class="text-gray-900 truncate">${esc(d.file_name || 'Document')}</p><p class="text-xs text-gray-400">${esc(d.document_type)} · ${new Date(d.uploaded_at).toLocaleDateString()}</p></div>
                 <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
               </a>`).join('')}
             </div>
           </div>` : ''}
 
-        <a href="${PROFILE_BASE}${esc(p.username)}" target="_blank" class="block text-center text-xs text-creo-purple dark:text-creo-mint hover:underline">View Public Profile →</a>
+        <a href="${PROFILE_BASE}${esc(p.username)}" target="_blank" class="block text-center text-xs text-creo-purple hover:underline">View Public Profile →</a>
       `;
 
       if (p.verification_status === 'approved') {
@@ -589,28 +558,28 @@
       if (!data.accounts || !data.accounts.length) { tbody.innerHTML = ''; document.getElementById('no-accounts').classList.remove('hidden'); return; }
       document.getElementById('no-accounts').classList.add('hidden');
       tbody.innerHTML = data.accounts.map(a => `
-        <tr class="border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition">
-          <td class="px-5 py-3 font-mono text-xs text-gray-600 dark:text-gray-300">${a.id}</td>
-          <td class="px-5 py-3 text-gray-500 dark:text-gray-400">${a.email || '-'}</td>
+        <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+          <td class="px-5 py-3 font-mono text-xs text-gray-600">${a.id}</td>
+          <td class="px-5 py-3 text-gray-500">${a.email || '-'}</td>
           <td class="px-5 py-3">${badge(a.charges_enabled)}</td>
           <td class="px-5 py-3">${badge(a.payouts_enabled)}</td>
-          <td class="px-5 py-3 text-gray-500 dark:text-gray-400">${a.country || '-'}</td>
-          <td class="px-5 py-3 text-gray-500 dark:text-gray-400">${new Date(a.created).toLocaleDateString()}</td>
+          <td class="px-5 py-3 text-gray-500">${a.country || '-'}</td>
+          <td class="px-5 py-3 text-gray-500">${new Date(a.created).toLocaleDateString()}</td>
         </tr>
       `).join('');
     }
 
     function badge(ok) {
       return ok
-        ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">Yes</span>'
-        : '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">No</span>';
+        ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">Yes</span>'
+        : '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200">No</span>';
     }
 
     function statusBadge(status) {
-      if (status === 'approved') return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">Approved</span>';
-      if (status === 'submitted') return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800">Pending</span>';
-      if (status === 'rejected') return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">Rejected</span>';
-      return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-500 border border-gray-200 dark:border-gray-700">Not Started</span>';
+      if (status === 'approved') return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">Approved</span>';
+      if (status === 'submitted') return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 border border-yellow-200">Pending</span>';
+      if (status === 'rejected') return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200">Rejected</span>';
+      return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 border border-gray-200">Not Started</span>';
     }
 
     function renderCreators(profiles) {
@@ -618,19 +587,19 @@
       if (!profiles.length) { tbody.innerHTML = ''; document.getElementById('no-creators').classList.remove('hidden'); return; }
       document.getElementById('no-creators').classList.add('hidden');
       tbody.innerHTML = profiles.map(p => `
-        <tr class="border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition">
-          <td class="px-5 py-3 font-medium text-gray-900 dark:text-white">
-            <a href="${PROFILE_BASE}${esc(p.username)}" target="_blank" class="hover:text-creo-purple dark:hover:text-creo-mint">${esc(p.username)}</a>
+        <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+          <td class="px-5 py-3 font-medium text-gray-900">
+            <a href="${PROFILE_BASE}${esc(p.username)}" target="_blank" class="hover:text-creo-purple">${esc(p.username)}</a>
           </td>
-          <td class="px-5 py-3 text-gray-500 dark:text-gray-400">${esc(p.display_name || p.full_name || '-')}</td>
+          <td class="px-5 py-3 text-gray-500">${esc(p.display_name || p.full_name || '-')}</td>
           <td class="px-5 py-3">${statusBadge(p.verification_status)}</td>
           <td class="px-5 py-3">${p.stripe_connect_id ? badge(true) : badge(false)}</td>
           <td class="px-5 py-3">${p.identity_verified ? badge(true) : badge(false)}</td>
-          <td class="px-5 py-3 text-gray-500 dark:text-gray-400">${new Date(p.created_at).toLocaleDateString()}</td>
+          <td class="px-5 py-3 text-gray-500">${new Date(p.created_at).toLocaleDateString()}</td>
           <td class="px-5 py-3 space-x-2">
-            <button onclick="openReview('${p.id}')" class="text-xs text-creo-purple dark:text-creo-mint hover:underline">Review</button>
-            <button onclick="editCreator('${p.id}')" class="text-xs text-blue-600 dark:text-blue-400 hover:underline">Edit</button>
-            <button onclick="deleteCreator('${p.id}', '${esc(p.username)}')" class="text-xs text-red-500 dark:text-red-400 hover:underline">Delete</button>
+            <button onclick="openReview('${p.id}')" class="text-xs text-creo-purple hover:underline">Review</button>
+            <button onclick="editCreator('${p.id}')" class="text-xs text-blue-600 hover:underline">Edit</button>
+            <button onclick="deleteCreator('${p.id}', '${esc(p.username)}')" class="text-xs text-red-500 hover:underline">Delete</button>
           </td>
         </tr>
       `).join('');
@@ -641,14 +610,14 @@
       if (!charges.length) { tbody.innerHTML = ''; document.getElementById('no-transactions').classList.remove('hidden'); return; }
       document.getElementById('no-transactions').classList.add('hidden');
       tbody.innerHTML = charges.map(c => `
-        <tr class="border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition">
-          <td class="px-5 py-3 text-gray-500 dark:text-gray-400 font-mono text-xs">${c.id.slice(0, 20)}...</td>
-          <td class="px-5 py-3 font-medium text-gray-900 dark:text-white">$${c.amount.toFixed(2)}</td>
-          <td class="px-5 py-3 text-emerald-600 dark:text-emerald-400 font-medium">$${c.fee.toFixed(2)}</td>
+        <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+          <td class="px-5 py-3 text-gray-500 font-mono text-xs">${c.id.slice(0, 20)}...</td>
+          <td class="px-5 py-3 font-medium text-gray-900">$${c.amount.toFixed(2)}</td>
+          <td class="px-5 py-3 text-emerald-600 font-medium">$${c.fee.toFixed(2)}</td>
           <td class="px-5 py-3">${c.status === 'succeeded'
-            ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">Succeeded</span>'
-            : '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700">' + c.status + '</span>'}</td>
-          <td class="px-5 py-3 text-gray-500 dark:text-gray-400">${new Date(c.created).toLocaleString()}</td>
+            ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">Succeeded</span>'
+            : '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">' + c.status + '</span>'}</td>
+          <td class="px-5 py-3 text-gray-500">${new Date(c.created).toLocaleString()}</td>
         </tr>
       `).join('');
     }
@@ -659,10 +628,10 @@
     }
 
     function showTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('bg-creo-purple', 'dark:bg-creo-mint', 'text-white', 'dark:text-creo-purple'); b.classList.add('text-gray-500', 'dark:text-gray-400'); });
+      document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('bg-creo-purple', '', 'text-white', ''); b.classList.add('text-gray-500', ''); });
       const active = document.getElementById('tab-' + tab);
-      active.classList.add('bg-creo-purple', 'dark:bg-creo-mint', 'text-white', 'dark:text-creo-purple');
-      active.classList.remove('text-gray-500', 'dark:text-gray-400');
+      active.classList.add('bg-creo-purple', '', 'text-white', '');
+      active.classList.remove('text-gray-500', '');
       ['verification', 'creators', 'transactions', 'accounts', 'links'].forEach(p => {
         document.getElementById('panel-' + p).classList.toggle('hidden', p !== tab);
       });

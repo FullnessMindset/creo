@@ -17,38 +17,30 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: { extend: { colors: { creo: { purple: '#1a0a3e', light: '#2d1b69', mint: '#33f0b0', mintDark: '#28c48e' } } } }
     }
   </script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+<body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
   <script src="shared.js"></script>
 
-  <!-- Theme Toggle -->
-  <div class="fixed top-4 right-4 z-50">
-    <button onclick="toggleTheme()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm transition" title="Toggle theme">
-      <svg id="icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-      <svg id="icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-    </button>
-  </div>
 
   <div class="max-w-lg mx-auto px-4 pt-6 pb-24 space-y-6">
     <!-- Logo -->
     <div class="text-center space-y-2">
       <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto"><img src="assets/logo-icon.png" alt="CREO" class="w-12 h-12 rounded-full object-contain"></div>
-      <h2 class="text-2xl font-bold tracking-[0.2em] text-creo-purple dark:text-white">CREO</h2>
-      <p class="text-xs text-gray-500 dark:text-gray-400">Panel de Creador</p>
+      <h2 class="text-2xl font-bold tracking-[0.2em] text-creo-purple">CREO</h2>
+      <p class="text-xs text-gray-500">Panel de Creador</p>
     </div>
 
     <!-- AUTH SECTION -->
-    <div id="auth-section" class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg dark:shadow-2xl border border-gray-200 dark:border-gray-800 space-y-4 transition-colors">
-      <h3 class="text-lg font-bold text-center text-gray-900 dark:text-white">Iniciar Sesión o Registrarse</h3>
-      <input id="email" type="email" placeholder="Email" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
-      <input id="password" type="password" placeholder="Contraseña" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+    <div id="auth-section" class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 space-y-4 transition-colors">
+      <h3 class="text-lg font-bold text-center text-gray-900">Iniciar Sesión o Registrarse</h3>
+      <input id="email" type="email" placeholder="Email" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+      <input id="password" type="password" placeholder="Contraseña" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
       <div class="flex space-x-2">
-        <button onclick="signUp()" class="bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple px-4 py-3 rounded-lg w-1/2 font-semibold transition">Registrarse</button>
-        <button onclick="signIn()" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-lg w-1/2 font-semibold transition">Entrar</button>
+        <button onclick="signUp()" class="bg-creo-purple hover:bg-creo-light text-white px-4 py-3 rounded-lg w-1/2 font-semibold transition">Registrarse</button>
+        <button onclick="signIn()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-lg w-1/2 font-semibold transition">Entrar</button>
       </div>
     </div>
 
@@ -59,33 +51,33 @@
 
     <!-- DASHBOARD -->
     <div id="dashboard-section" class="hidden space-y-6">
-      <div class="bg-white dark:bg-gray-900 p-4 rounded-xl shadow border border-gray-200 dark:border-gray-800 flex items-center justify-between">
-        <p id="user-welcome" class="font-medium text-gray-900 dark:text-white text-sm"></p>
+      <div class="bg-white p-4 rounded-xl shadow border border-gray-200 flex items-center justify-between">
+        <p id="user-welcome" class="font-medium text-gray-900 text-sm"></p>
         <button onclick="signOut()" class="text-xs text-gray-400 hover:text-red-500 transition">Salir</button>
       </div>
 
       <!-- STATS -->
       <div id="creator-stats" class="hidden grid grid-cols-4 gap-2">
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-3 text-center">
-          <p id="stat-posts" class="text-lg font-black text-creo-purple dark:text-creo-mint">0</p>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
+          <p id="stat-posts" class="text-lg font-black text-creo-purple">0</p>
           <p class="text-[10px] text-gray-400">Posts</p>
         </div>
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-3 text-center">
-          <p id="stat-likes" class="text-lg font-black text-creo-purple dark:text-creo-mint">0</p>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
+          <p id="stat-likes" class="text-lg font-black text-creo-purple">0</p>
           <p class="text-[10px] text-gray-400">Likes</p>
         </div>
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-3 text-center">
-          <p id="stat-metas" class="text-lg font-black text-creo-purple dark:text-creo-mint">0</p>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
+          <p id="stat-metas" class="text-lg font-black text-creo-purple">0</p>
           <p class="text-[10px] text-gray-400">Metas</p>
         </div>
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-3 text-center">
-          <p id="stat-comments" class="text-lg font-black text-creo-purple dark:text-creo-mint">0</p>
+        <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
+          <p id="stat-comments" class="text-lg font-black text-creo-purple">0</p>
           <p class="text-[10px] text-gray-400">Comments</p>
         </div>
       </div>
 
       <!-- TABS -->
-      <div class="flex bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden text-[11px]">
+      <div class="flex bg-white rounded-xl border border-gray-200 overflow-hidden text-[11px]">
         <button onclick="showTab('profile')" id="tab-profile" class="flex-1 py-3 font-semibold text-center transition tab-active">Perfil</button>
         <button onclick="showTab('verify')" id="tab-verify" class="flex-1 py-3 font-semibold text-center transition text-gray-400">Verificación</button>
         <button onclick="showTab('metas')" id="tab-metas" class="flex-1 py-3 font-semibold text-center transition text-gray-400">Mis Metas</button>
@@ -95,18 +87,18 @@
 
       <!-- TAB: Profile -->
       <div id="panel-profile" class="tab-panel space-y-4">
-        <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow border border-gray-200 dark:border-gray-800 space-y-4">
-          <h3 class="font-bold text-gray-900 dark:text-white">Información del Perfil</h3>
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+          <h3 class="font-bold text-gray-900">Información del Perfil</h3>
 
           <!-- Avatar Upload -->
           <div>
-            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Foto de Perfil</label>
+            <label class="block text-xs font-medium text-gray-500 mb-2">Foto de Perfil</label>
             <div class="flex items-center gap-4">
-              <div id="avatar-preview" class="w-20 h-20 rounded-full bg-creo-purple/10 dark:bg-creo-mint/10 flex items-center justify-center overflow-hidden border-2 border-gray-200 dark:border-gray-700">
+              <div id="avatar-preview" class="w-20 h-20 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden border-2 border-gray-200">
                 <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
               </div>
               <div class="flex-1">
-                <input type="file" id="avatar-file" accept="image/*" onchange="uploadFile('avatar-file','avatars','avatar_url','avatar-preview')" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple dark:file:bg-creo-mint/10 dark:file:text-creo-mint hover:file:opacity-80 cursor-pointer">
+                <input type="file" id="avatar-file" accept="image/*" onchange="uploadFile('avatar-file','avatars','avatar_url','avatar-preview')" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple hover:file:opacity-80 cursor-pointer">
                 <p class="text-[10px] text-gray-400 mt-1">JPG, PNG. Max 2MB</p>
               </div>
             </div>
@@ -114,62 +106,62 @@
 
           <!-- Cover Upload -->
           <div>
-            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Imagen de Portada</label>
-            <div id="cover-preview" class="w-full h-24 rounded-lg bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center overflow-hidden">
+            <label class="block text-xs font-medium text-gray-500 mb-2">Imagen de Portada</label>
+            <div id="cover-preview" class="w-full h-24 rounded-lg bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
               <span class="text-xs text-gray-400">Sin portada</span>
             </div>
-            <input type="file" id="cover-file" accept="image/*" onchange="uploadFile('cover-file','covers','cover_url','cover-preview')" class="mt-2 block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple dark:file:bg-creo-mint/10 dark:file:text-creo-mint cursor-pointer">
+            <input type="file" id="cover-file" accept="image/*" onchange="uploadFile('cover-file','covers','cover_url','cover-preview')" class="mt-2 block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Nombre de Usuario</label>
-              <input id="username" type="text" placeholder="mi_nombre" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint text-sm">
+              <label class="block text-xs font-medium text-gray-500 mb-1">Nombre de Usuario</label>
+              <input id="username" type="text" placeholder="mi_nombre" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Nombre para Mostrar</label>
-              <input id="display_name" type="text" placeholder="Tu Nombre" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint text-sm">
+              <label class="block text-xs font-medium text-gray-500 mb-1">Nombre para Mostrar</label>
+              <input id="display_name" type="text" placeholder="Tu Nombre" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Bio</label>
-            <textarea id="bio" placeholder="Cuéntale al mundo quién eres..." rows="2" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint text-sm"></textarea>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Bio</label>
+            <textarea id="bio" placeholder="Cuéntale al mundo quién eres..." rows="2" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
           </div>
 
-          <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300 pt-2">Redes Sociales <span class="text-red-500">*</span></h4>
+          <h4 class="font-semibold text-sm text-gray-700 pt-2">Redes Sociales <span class="text-red-500">*</span></h4>
           <p class="text-[10px] text-gray-400 -mt-3">Al menos 1 red social es requerida</p>
           <div class="grid grid-cols-2 gap-3">
-            <input id="social-instagram" type="url" placeholder="Instagram URL" class="border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
-            <input id="social-tiktok" type="url" placeholder="TikTok URL" class="border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
-            <input id="social-youtube" type="url" placeholder="YouTube URL" class="border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
-            <input id="social-twitter" type="url" placeholder="Twitter/X URL" class="border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+            <input id="social-instagram" type="url" placeholder="Instagram URL" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <input id="social-tiktok" type="url" placeholder="TikTok URL" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <input id="social-youtube" type="url" placeholder="YouTube URL" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <input id="social-twitter" type="url" placeholder="Twitter/X URL" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
           </div>
 
-          <button onclick="saveProfile()" id="save-profile-btn" class="w-full bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple py-3 rounded-xl font-semibold transition">Guardar Perfil</button>
+          <button onclick="saveProfile()" id="save-profile-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Perfil</button>
         </div>
 
-        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-          <p class="text-sm text-blue-800 dark:text-blue-300 mb-1 font-semibold">Tu Enlace Público:</p>
-          <p id="profile-link" class="text-xs text-creo-purple dark:text-creo-mint break-all font-mono"></p>
+        <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
+          <p class="text-sm text-blue-800 mb-1 font-semibold">Tu Enlace Público:</p>
+          <p id="profile-link" class="text-xs text-creo-purple break-all font-mono"></p>
         </div>
       </div>
 
       <!-- TAB: Verification -->
       <div id="panel-verify" class="tab-panel hidden space-y-4">
         <!-- Verification Status Card -->
-        <div id="verify-status-card" class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow border border-gray-200 dark:border-gray-800 space-y-3">
+        <div id="verify-status-card" class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-3">
           <!-- Filled dynamically -->
         </div>
 
         <!-- Verification Form -->
-        <div id="verify-form" class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow border border-gray-200 dark:border-gray-800 space-y-4">
-          <h3 class="font-bold text-gray-900 dark:text-white">Solicitud de Verificación</h3>
-          <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Para proteger a los Supporters y mantener la integridad de CREO, todos los creadores deben ser verificados antes de recibir pagos. Completa la información y envía tu solicitud.</p>
+        <div id="verify-form" class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+          <h3 class="font-bold text-gray-900">Solicitud de Verificación</h3>
+          <p class="text-xs text-gray-500 leading-relaxed">Para proteger a los Supporters y mantener la integridad de CREO, todos los creadores deben ser verificados antes de recibir pagos. Completa la información y envía tu solicitud.</p>
 
-          <div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
-            <p class="text-xs text-amber-800 dark:text-amber-300 font-semibold mb-1">Política de Contenido</p>
-            <ul class="text-[10px] text-amber-700 dark:text-amber-400 space-y-0.5">
+          <div class="p-3 bg-amber-50 rounded-lg border border-amber-200">
+            <p class="text-xs text-amber-800 font-semibold mb-1">Política de Contenido</p>
+            <ul class="text-[10px] text-amber-700 space-y-0.5">
               <li>• No se permite contenido sexual o para adultos</li>
               <li>• No se permiten metas para drogas o sustancias ilegales</li>
               <li>• No se aceptan solicitudes de donaciones — todo es apoyo voluntario</li>
@@ -178,35 +170,35 @@
             </ul>
           </div>
 
-          <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">Información Personal <span class="text-red-500">*</span></h4>
+          <h4 class="font-semibold text-sm text-gray-700">Información Personal <span class="text-red-500">*</span></h4>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-[10px] text-gray-500 dark:text-gray-400 mb-1">Nombre Completo</label>
-              <input id="v-fullname" type="text" placeholder="Nombre Apellido" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+              <label class="block text-[10px] text-gray-500 mb-1">Nombre Completo</label>
+              <input id="v-fullname" type="text" placeholder="Nombre Apellido" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             </div>
             <div>
-              <label class="block text-[10px] text-gray-500 dark:text-gray-400 mb-1">Teléfono</label>
-              <input id="v-phone" type="tel" placeholder="+1 (555) 000-0000" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+              <label class="block text-[10px] text-gray-500 mb-1">Teléfono</label>
+              <input id="v-phone" type="tel" placeholder="+1 (555) 000-0000" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             </div>
           </div>
           <div>
-            <label class="block text-[10px] text-gray-500 dark:text-gray-400 mb-1">Email de Contacto</label>
-            <input id="v-email" type="email" placeholder="tu@email.com" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+            <label class="block text-[10px] text-gray-500 mb-1">Email de Contacto</label>
+            <input id="v-email" type="email" placeholder="tu@email.com" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
           </div>
 
-          <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300 pt-2">Tipo de Cuenta</h4>
+          <h4 class="font-semibold text-sm text-gray-700 pt-2">Tipo de Cuenta</h4>
           <div class="flex gap-3">
-            <label class="flex-1 flex items-center gap-2 p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer hover:border-creo-mint transition">
+            <label class="flex-1 flex items-center gap-2 p-3 border border-gray-300 rounded-lg cursor-pointer hover:border-creo-mint transition">
               <input type="radio" name="business_type" value="personal" checked class="accent-creo-mint">
               <div>
-                <p class="text-sm font-medium text-gray-900 dark:text-white">Personal</p>
+                <p class="text-sm font-medium text-gray-900">Personal</p>
                 <p class="text-[10px] text-gray-400">Creador individual</p>
               </div>
             </label>
-            <label class="flex-1 flex items-center gap-2 p-3 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer hover:border-creo-mint transition">
+            <label class="flex-1 flex items-center gap-2 p-3 border border-gray-300 rounded-lg cursor-pointer hover:border-creo-mint transition">
               <input type="radio" name="business_type" value="company" class="accent-creo-mint">
               <div>
-                <p class="text-sm font-medium text-gray-900 dark:text-white">Empresa</p>
+                <p class="text-sm font-medium text-gray-900">Empresa</p>
                 <p class="text-[10px] text-gray-400">LLC / Negocio</p>
               </div>
             </label>
@@ -215,30 +207,30 @@
           <!-- Business fields (shown when company selected) -->
           <div id="business-fields" class="hidden space-y-3">
             <div>
-              <label class="block text-[10px] text-gray-500 dark:text-gray-400 mb-1">Nombre de la Empresa</label>
-              <input id="v-business" type="text" placeholder="Mi Empresa LLC" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+              <label class="block text-[10px] text-gray-500 mb-1">Nombre de la Empresa</label>
+              <input id="v-business" type="text" placeholder="Mi Empresa LLC" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             </div>
             <div>
-              <label class="block text-[10px] text-gray-500 dark:text-gray-400 mb-1">Documentos Legales (LLC, Licencia Comercial) <span class="text-red-500">*</span></label>
-              <input type="file" id="doc-file" accept=".pdf,.jpg,.png,.jpeg" multiple onchange="uploadDocument()" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple dark:file:bg-creo-mint/10 dark:file:text-creo-mint cursor-pointer">
+              <label class="block text-[10px] text-gray-500 mb-1">Documentos Legales (LLC, Licencia Comercial) <span class="text-red-500">*</span></label>
+              <input type="file" id="doc-file" accept=".pdf,.jpg,.png,.jpeg" multiple onchange="uploadDocument()" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
               <p class="text-[10px] text-gray-400 mt-1">PDF, JPG o PNG. Sube tus documentos de incorporación.</p>
               <div id="doc-list" class="mt-2 space-y-1"></div>
             </div>
           </div>
 
-          <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300 pt-2">Redes Sociales <span class="text-red-500">*</span></h4>
+          <h4 class="font-semibold text-sm text-gray-700 pt-2">Redes Sociales <span class="text-red-500">*</span></h4>
           <p class="text-[10px] text-gray-400 -mt-3">Requerido: al menos 2 perfiles de redes sociales activos</p>
           <p id="social-verify-note" class="text-[10px] text-gray-400">Las redes se toman de tu perfil. Guarda tu perfil primero si aún no las has agregado.</p>
 
           <!-- Identity Verification -->
-          <div class="p-4 bg-creo-purple/5 dark:bg-creo-mint/5 rounded-xl border border-creo-purple/20 dark:border-creo-mint/20 space-y-3">
-            <h4 class="font-semibold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-              <svg class="w-5 h-5 text-creo-purple dark:text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <div class="p-4 bg-creo-purple/5 rounded-xl border border-creo-purple/20 space-y-3">
+            <h4 class="font-semibold text-sm text-gray-900 flex items-center gap-2">
+              <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
               Verificación de Identidad (Stripe Identity)
             </h4>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Stripe verificará tu identidad con foto de documento + selfie. Esto garantiza que eres una persona real. <strong>Costo: $1.50 USD</strong> (cargo único al creador).</p>
+            <p class="text-xs text-gray-500">Stripe verificará tu identidad con foto de documento + selfie. Esto garantiza que eres una persona real. <strong>Costo: $1.50 USD</strong> (cargo único al creador).</p>
             <div id="identity-status" class="text-xs font-medium text-gray-500">No verificado</div>
-            <button onclick="startIdentityVerification()" id="identity-btn" class="w-full bg-creo-purple dark:bg-white text-white dark:text-creo-purple py-2 rounded-lg font-bold text-sm transition hover:opacity-90">Iniciar Verificación de Identidad — $1.50</button>
+            <button onclick="startIdentityVerification()" id="identity-btn" class="w-full bg-creo-purple text-white py-2 rounded-lg font-bold text-sm transition hover:opacity-90">Iniciar Verificación de Identidad — $1.50</button>
           </div>
 
           <button onclick="submitApplication()" id="submit-app-btn" class="w-full bg-creo-mint hover:bg-creo-mintDark text-creo-purple font-bold py-3 rounded-xl transition text-sm">Enviar Solicitud para Revisión</button>
@@ -248,50 +240,50 @@
 
       <!-- TAB: Metas -->
       <div id="panel-metas" class="tab-panel hidden space-y-4">
-        <div id="meta-locked" class="hidden bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-200 dark:border-amber-800 text-center">
-          <p class="text-sm text-amber-800 dark:text-amber-300 font-semibold">Debes ser verificado para crear metas</p>
-          <p class="text-xs text-amber-700 dark:text-amber-400 mt-1">Ve a la pestaña "Verificación" para iniciar el proceso.</p>
+        <div id="meta-locked" class="hidden bg-amber-50 p-4 rounded-xl border border-amber-200 text-center">
+          <p class="text-sm text-amber-800 font-semibold">Debes ser verificado para crear metas</p>
+          <p class="text-xs text-amber-700 mt-1">Ve a la pestaña "Verificación" para iniciar el proceso.</p>
         </div>
 
-        <div id="meta-form-container" class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow border border-gray-200 dark:border-gray-800 space-y-4">
-          <h3 class="font-bold text-gray-900 dark:text-white">Crear Nueva Meta</h3>
+        <div id="meta-form-container" class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+          <h3 class="font-bold text-gray-900">Crear Nueva Meta</h3>
 
-          <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-            <p class="text-[10px] text-blue-800 dark:text-blue-300 leading-relaxed"><strong>Recomendación:</strong> Sube screenshots de los precios del producto/herramienta que necesitas con el link directo de compra. Esto genera credibilidad y transparencia para tus Supporters.</p>
+          <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <p class="text-[10px] text-blue-800 leading-relaxed"><strong>Recomendación:</strong> Sube screenshots de los precios del producto/herramienta que necesitas con el link directo de compra. Esto genera credibilidad y transparencia para tus Supporters.</p>
           </div>
 
-          <input id="meta-title" type="text" placeholder="Título de la meta (ej: Nueva cámara para contenido)" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint text-sm">
-          <textarea id="meta-desc" placeholder="¿Qué necesitas y para qué? Describe brevemente tu meta y cómo ayudará a tu trabajo como creador..." rows="3" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint text-sm"></textarea>
+          <input id="meta-title" type="text" placeholder="Título de la meta (ej: Nueva cámara para contenido)" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          <textarea id="meta-desc" placeholder="¿Qué necesitas y para qué? Describe brevemente tu meta y cómo ayudará a tu trabajo como creador..." rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
 
           <!-- Meta Images -->
           <div>
-            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Imágenes / Screenshots de precio <span class="text-red-500">*</span></label>
-            <input type="file" id="meta-images-file" accept="image/*" multiple onchange="uploadMetaImages()" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple dark:file:bg-creo-mint/10 dark:file:text-creo-mint cursor-pointer">
+            <label class="block text-xs font-medium text-gray-500 mb-1">Imágenes / Screenshots de precio <span class="text-red-500">*</span></label>
+            <input type="file" id="meta-images-file" accept="image/*" multiple onchange="uploadMetaImages()" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
             <p class="text-[10px] text-gray-400 mt-1">Sube imágenes del producto, screenshots de precios, o evidencia visual</p>
             <div id="meta-images-preview" class="flex flex-wrap gap-2 mt-2"></div>
           </div>
 
           <!-- Product Links -->
           <div>
-            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Link de compra del producto (opcional pero recomendado)</label>
-            <input id="meta-product-link" type="url" placeholder="https://amazon.com/product..." class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+            <label class="block text-xs font-medium text-gray-500 mb-1">Link de compra del producto (opcional pero recomendado)</label>
+            <input id="meta-product-link" type="url" placeholder="https://amazon.com/product..." class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
           </div>
 
           <div class="grid grid-cols-3 gap-3">
             <div>
-              <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Meta ($) <span class="text-red-500">*</span></label>
-              <input id="meta-goal" type="number" min="10" step="1" placeholder="500" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint">
+              <label class="block text-xs text-gray-500 mb-1">Meta ($) <span class="text-red-500">*</span></label>
+              <input id="meta-goal" type="number" min="10" step="1" placeholder="500" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             </div>
             <div>
-              <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Inicio</label>
-              <input id="meta-start" type="date" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-900 dark:text-white outline-none text-xs">
+              <label class="block text-xs text-gray-500 mb-1">Inicio</label>
+              <input id="meta-start" type="date" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-gray-900 outline-none text-xs">
             </div>
             <div>
-              <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Fin</label>
-              <input id="meta-end" type="date" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg text-gray-900 dark:text-white outline-none text-xs">
+              <label class="block text-xs text-gray-500 mb-1">Fin</label>
+              <input id="meta-end" type="date" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-gray-900 outline-none text-xs">
             </div>
           </div>
-          <button onclick="createMeta()" id="create-meta-btn" class="w-full bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple py-3 rounded-xl font-semibold transition">Crear Meta</button>
+          <button onclick="createMeta()" id="create-meta-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Crear Meta</button>
         </div>
 
         <div id="metas-list" class="space-y-3"></div>
@@ -299,26 +291,26 @@
 
       <!-- TAB: Posts -->
       <div id="panel-posts" class="tab-panel hidden space-y-4">
-        <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow border border-gray-200 dark:border-gray-800 space-y-4">
-          <h3 class="font-bold text-gray-900 dark:text-white">Publicar Video</h3>
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+          <h3 class="font-bold text-gray-900">Publicar Video</h3>
 
           <!-- Post Mode Selector -->
-          <div class="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1 gap-1">
-            <button onclick="setPostMode('url')" id="pm-url" class="flex-1 py-2 text-xs font-semibold rounded-md text-center transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm">URL (YouTube, TikTok)</button>
-            <button onclick="setPostMode('upload')" id="pm-upload" class="flex-1 py-2 text-xs font-semibold rounded-md text-center transition text-gray-500 dark:text-gray-400">Subir Video</button>
-            <button onclick="setPostMode('record')" id="pm-record" class="flex-1 py-2 text-xs font-semibold rounded-md text-center transition text-gray-500 dark:text-gray-400">Grabar</button>
+          <div class="flex bg-gray-100 rounded-lg p-1 gap-1">
+            <button onclick="setPostMode('url')" id="pm-url" class="flex-1 py-2 text-xs font-semibold rounded-md text-center transition bg-white text-gray-900 shadow-sm">URL (YouTube, TikTok)</button>
+            <button onclick="setPostMode('upload')" id="pm-upload" class="flex-1 py-2 text-xs font-semibold rounded-md text-center transition text-gray-500">Subir Video</button>
+            <button onclick="setPostMode('record')" id="pm-record" class="flex-1 py-2 text-xs font-semibold rounded-md text-center transition text-gray-500">Grabar</button>
           </div>
 
           <!-- Mode: URL -->
           <div id="post-mode-url">
-            <input id="post-url" type="url" placeholder="URL del video (YouTube, TikTok, Instagram)" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint text-sm">
+            <input id="post-url" type="url" placeholder="URL del video (YouTube, TikTok, Instagram)" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           </div>
 
           <!-- Mode: Upload -->
           <div id="post-mode-upload" class="hidden space-y-3">
-            <div id="upload-drop-zone" class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 text-center cursor-pointer hover:border-creo-mint transition" onclick="document.getElementById('post-video-file').click()">
+            <div id="upload-drop-zone" class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-creo-mint transition" onclick="document.getElementById('post-video-file').click()">
               <svg class="w-10 h-10 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Toca para seleccionar un video</p>
+              <p class="text-sm text-gray-500">Toca para seleccionar un video</p>
               <p class="text-[10px] text-gray-400 mt-1">MP4, MOV, WebM. Max 50MB</p>
             </div>
             <input type="file" id="post-video-file" accept="video/*" class="hidden" onchange="handleVideoFileSelect(this)">
@@ -327,10 +319,10 @@
             </div>
             <div id="upload-progress" class="hidden">
               <div class="flex items-center gap-3">
-                <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                <div class="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                   <div id="upload-progress-bar" class="bg-creo-mint h-full rounded-full transition-all duration-300" style="width:0%"></div>
                 </div>
-                <span id="upload-progress-text" class="text-xs text-gray-500 dark:text-gray-400 font-medium">0%</span>
+                <span id="upload-progress-text" class="text-xs text-gray-500 font-medium">0%</span>
               </div>
             </div>
           </div>
@@ -352,28 +344,28 @@
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
                 Iniciar Grabación
               </button>
-              <button onclick="switchCamera()" id="switch-cam-btn" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 p-2.5 rounded-lg transition" title="Cambiar cámara">
+              <button onclick="switchCamera()" id="switch-cam-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2.5 rounded-lg transition" title="Cambiar cámara">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
               </button>
             </div>
             <p class="text-[10px] text-gray-400 text-center">Max 2 minutos. El video se sube automáticamente.</p>
           </div>
 
-          <textarea id="post-caption" placeholder="Escribe un caption..." rows="2" class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-creo-purple dark:focus:ring-creo-mint text-sm"></textarea>
-          <button onclick="createPost()" id="create-post-btn" class="w-full bg-creo-purple hover:bg-creo-light dark:bg-creo-mint dark:hover:bg-creo-mintDark text-white dark:text-creo-purple py-3 rounded-xl font-semibold transition">Publicar</button>
+          <textarea id="post-caption" placeholder="Escribe un caption..." rows="2" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+          <button onclick="createPost()" id="create-post-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Publicar</button>
         </div>
         <div id="posts-list" class="space-y-3"></div>
       </div>
 
       <!-- TAB: Stripe -->
       <div id="panel-stripe" class="tab-panel hidden space-y-4">
-        <div class="bg-amber-50 dark:bg-yellow-900/20 p-6 rounded-xl border border-amber-200 dark:border-yellow-800 space-y-3">
-          <h3 class="font-bold text-amber-800 dark:text-yellow-300">Conexión con Stripe</h3>
-          <p class="text-sm text-amber-700 dark:text-yellow-400">Conecta tu cuenta de Stripe para recibir pagos.</p>
-          <button id="stripe-btn" onclick="startStripeOnboarding()" class="w-full bg-creo-purple dark:bg-white text-white dark:text-creo-purple py-3 rounded-xl font-bold transition hover:opacity-90">Conectar Stripe</button>
+        <div class="bg-amber-50 p-6 rounded-xl border border-amber-200 space-y-3">
+          <h3 class="font-bold text-amber-800">Conexión con Stripe</h3>
+          <p class="text-sm text-amber-700">Conecta tu cuenta de Stripe para recibir pagos.</p>
+          <button id="stripe-btn" onclick="startStripeOnboarding()" class="w-full bg-creo-purple text-white py-3 rounded-xl font-bold transition hover:opacity-90">Conectar Stripe</button>
         </div>
-        <div class="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800">
-          <p class="text-xs text-gray-500 dark:text-gray-400">CREO retiene un 5% de comisión por transacción. Stripe maneja todo el procesamiento de pagos de forma segura.</p>
+        <div class="bg-white p-4 rounded-xl border border-gray-200">
+          <p class="text-xs text-gray-500">CREO retiene un 5% de comisión por transacción. Stripe maneja todo el procesamiento de pagos de forma segura.</p>
         </div>
       </div>
     </div>
@@ -381,7 +373,6 @@
 
   <style>
     .tab-active { color: #1a0a3e; border-bottom: 2px solid #33f0b0; background: rgba(51,240,176,0.05); }
-    .dark .tab-active { color: #33f0b0; border-bottom-color: #33f0b0; background: rgba(51,240,176,0.1); }
   </style>
 
   <script>
@@ -469,32 +460,32 @@
       const metaForm = document.getElementById('meta-form-container');
 
       if (profile.identity_verified) {
-        document.getElementById('identity-status').innerHTML = '<span class="text-green-600 dark:text-green-400">✓ Identidad verificada</span>';
+        document.getElementById('identity-status').innerHTML = '<span class="text-green-600">✓ Identidad verificada</span>';
         document.getElementById('identity-btn').innerText = "Verificado ✓";
         document.getElementById('identity-btn').disabled = true;
         document.getElementById('identity-btn').className = "w-full bg-green-600 text-white py-2 rounded-lg font-bold text-sm cursor-default";
       }
 
       if (status === 'approved') {
-        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center"><svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><div><p class="font-bold text-green-700 dark:text-green-400">Cuenta Verificada</p><p class="text-xs text-gray-500 dark:text-gray-400">Tu cuenta está aprobada y activa</p></div></div>';
+        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center"><svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><div><p class="font-bold text-green-700">Cuenta Verificada</p><p class="text-xs text-gray-500">Tu cuenta está aprobada y activa</p></div></div>';
         document.getElementById('verify-form').classList.add('hidden');
         banner.classList.add('hidden');
         metaLocked.classList.add('hidden');
         metaForm.classList.remove('hidden');
       } else if (status === 'submitted') {
-        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center"><svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><p class="font-bold text-yellow-700 dark:text-yellow-400">En Revisión</p><p class="text-xs text-gray-500 dark:text-gray-400">Tu solicitud está siendo revisada por nuestro equipo</p></div></div>';
+        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center"><svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><p class="font-bold text-yellow-700">En Revisión</p><p class="text-xs text-gray-500">Tu solicitud está siendo revisada por nuestro equipo</p></div></div>';
         document.getElementById('verify-form').classList.add('hidden');
-        banner.innerHTML = '<div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-xl border border-yellow-200 dark:border-yellow-800 text-center"><p class="text-sm text-yellow-800 dark:text-yellow-300 font-semibold">Tu solicitud de verificación está en revisión</p></div>';
+        banner.innerHTML = '<div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 text-center"><p class="text-sm text-yellow-800 font-semibold">Tu solicitud de verificación está en revisión</p></div>';
         banner.classList.remove('hidden');
         metaLocked.classList.remove('hidden');
         metaForm.classList.add('hidden');
       } else if (status === 'rejected') {
         const reason = profile.rejection_reason || 'No se proporcionó razón';
-        statusCard.innerHTML = `<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center"><svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div><div><p class="font-bold text-red-700 dark:text-red-400">Solicitud Rechazada</p><p class="text-xs text-gray-500 dark:text-gray-400">Razón: ${esc(reason)}</p><p class="text-xs text-gray-400 mt-1">Puedes corregir y enviar de nuevo.</p></div></div>`;
+        statusCard.innerHTML = `<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center"><svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div><div><p class="font-bold text-red-700">Solicitud Rechazada</p><p class="text-xs text-gray-500">Razón: ${esc(reason)}</p><p class="text-xs text-gray-400 mt-1">Puedes corregir y enviar de nuevo.</p></div></div>`;
         metaLocked.classList.remove('hidden');
         metaForm.classList.add('hidden');
       } else {
-        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center"><svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div><div><p class="font-bold text-gray-700 dark:text-gray-300">No Verificado</p><p class="text-xs text-gray-500 dark:text-gray-400">Completa el formulario abajo para solicitar verificación</p></div></div>';
+        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center"><svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div><div><p class="font-bold text-gray-700">No Verificado</p><p class="text-xs text-gray-500">Completa el formulario abajo para solicitar verificación</p></div></div>';
         metaLocked.classList.remove('hidden');
         metaForm.classList.add('hidden');
       }
@@ -545,7 +536,7 @@
         metaImageUrls.push(urlData.publicUrl);
 
         const thumb = document.createElement('div');
-        thumb.className = 'w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700';
+        thumb.className = 'w-16 h-16 rounded-lg overflow-hidden border border-gray-200';
         thumb.innerHTML = `<img src="${urlData.publicUrl}" class="w-full h-full object-cover">`;
         preview.appendChild(thumb);
       }
@@ -576,7 +567,7 @@
         }]);
 
         const item = document.createElement('div');
-        item.className = 'text-xs text-green-600 dark:text-green-400 flex items-center gap-1';
+        item.className = 'text-xs text-green-600 flex items-center gap-1';
         item.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> ${esc(file.name)}`;
         list.appendChild(item);
       }
@@ -694,17 +685,17 @@
         const raised = (m.raised_cents / 100).toFixed(2);
         const goal = (m.goal_amount_cents / 100).toFixed(2);
         const imgs = m.images || [];
-        return `<div class="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800 space-y-2">
+        return `<div class="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
           <div class="flex justify-between items-start">
-            <div><h4 class="font-bold text-gray-900 dark:text-white">${esc(m.title)}</h4><p class="text-xs text-gray-500 dark:text-gray-400">${esc(m.description || '')}</p></div>
+            <div><h4 class="font-bold text-gray-900">${esc(m.title)}</h4><p class="text-xs text-gray-500">${esc(m.description || '')}</p></div>
             <div class="flex gap-2">
-              <button onclick="toggleMeta('${m.id}', ${!m.is_active})" class="text-xs px-2 py-1 rounded ${m.is_active ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}">${m.is_active ? 'Activa' : 'Inactiva'}</button>
-              <button onclick="deleteMeta('${m.id}')" class="text-xs px-2 py-1 rounded bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">Eliminar</button>
+              <button onclick="toggleMeta('${m.id}', ${!m.is_active})" class="text-xs px-2 py-1 rounded ${m.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">${m.is_active ? 'Activa' : 'Inactiva'}</button>
+              <button onclick="deleteMeta('${m.id}')" class="text-xs px-2 py-1 rounded bg-red-100 text-red-600">Eliminar</button>
             </div>
           </div>
           ${imgs.length ? `<div class="flex gap-1 overflow-x-auto">${imgs.map(i => `<img src="${i}" class="w-14 h-14 rounded object-cover flex-shrink-0">`).join('')}</div>` : ''}
-          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden"><div class="bg-creo-mint h-full rounded-full transition-all duration-500" style="width:${pct}%"></div></div>
-          <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400"><span>$${raised} / $${goal} (${pct}%)</span><span>${m.start_date} — ${m.end_date}</span></div>
+          <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden"><div class="bg-creo-mint h-full rounded-full transition-all duration-500" style="width:${pct}%"></div></div>
+          <div class="flex justify-between text-xs text-gray-500"><span>$${raised} / $${goal} (${pct}%)</span><span>${m.start_date} — ${m.end_date}</span></div>
         </div>`;
       }).join('');
     }
@@ -771,8 +762,8 @@
       ['url', 'upload', 'record'].forEach(m => {
         document.getElementById('post-mode-' + m).classList.toggle('hidden', m !== mode);
         const btn = document.getElementById('pm-' + m);
-        if (m === mode) { btn.className = 'flex-1 py-2 text-xs font-semibold rounded-md text-center transition bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'; }
-        else { btn.className = 'flex-1 py-2 text-xs font-semibold rounded-md text-center transition text-gray-500 dark:text-gray-400'; }
+        if (m === mode) { btn.className = 'flex-1 py-2 text-xs font-semibold rounded-md text-center transition bg-white text-gray-900 shadow-sm'; }
+        else { btn.className = 'flex-1 py-2 text-xs font-semibold rounded-md text-center transition text-gray-500'; }
       });
       uploadedVideoUrl = null;
       recordedBlob = null;
@@ -894,10 +885,10 @@
         const videoHtml = isDirectVideo
           ? `<video src="${esc(p.video_url)}" class="w-full aspect-video rounded-lg" controls preload="metadata"></video>`
           : getEmbedHTML(p.video_url, p.video_type, 'aspect-video');
-        return `<div class="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800 space-y-2">
+        return `<div class="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
           <div class="flex justify-between items-start">
-            <div class="flex-1 mr-3"><p class="text-sm font-medium text-gray-900 dark:text-white truncate">${esc(p.caption || 'Sin caption')}</p><p class="text-xs text-gray-400 mt-1">${p.video_type} · ${new Date(p.created_at).toLocaleDateString()}</p></div>
-            <button onclick="deletePost('${p.id}')" class="text-xs px-2 py-1 rounded bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">Eliminar</button>
+            <div class="flex-1 mr-3"><p class="text-sm font-medium text-gray-900 truncate">${esc(p.caption || 'Sin caption')}</p><p class="text-xs text-gray-400 mt-1">${p.video_type} · ${new Date(p.created_at).toLocaleDateString()}</p></div>
+            <button onclick="deletePost('${p.id}')" class="text-xs px-2 py-1 rounded bg-red-100 text-red-600">Eliminar</button>
           </div>
           <div class="rounded-lg overflow-hidden">${videoHtml}</div>
         </div>`;
