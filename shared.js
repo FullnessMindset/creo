@@ -2,6 +2,9 @@
 const SUPABASE_URL = "https://qddxoyjtoxtdcezwuvcq.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZHhveWp0b3h0ZGNlend1dmNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MTUxNDIsImV4cCI6MjA5Nzk5MTE0Mn0.MEaMfib77T0B7HW-jI6nctc1a7WbIf1n7rKBhdc-Gm8";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const ADMIN_EMAIL = 'fullnessmindset@gmail.com';
+
+function isAdmin(email) { return email === ADMIN_EMAIL; }
 
 // Theme — light only
 function initTheme() { document.documentElement.classList.remove('dark'); }
@@ -105,10 +108,20 @@ async function updateNavAuth() {
   });
   if (user) {
     const { data } = await sb.from('profiles').select('username').eq('id', user.id).single();
-    const profileLink = document.querySelector('#bottom-nav a[href="index.html"]:first-of-type');
     if (data && data.username) {
       const perfil = document.querySelector('#bottom-nav a:nth-child(4)');
       if (perfil) perfil.href = 'profile.html?u=' + data.username;
+    }
+    if (isAdmin(user.email) && sessionStorage.getItem('browse_as_user')) {
+      const nav = document.querySelector('#bottom-nav .max-w-lg');
+      if (nav) {
+        const btn = document.createElement('a');
+        btn.href = '#';
+        btn.className = 'flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors text-creo-mintDark hover:text-creo-purple';
+        btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg><span class="text-[10px] font-medium">Admin</span>';
+        btn.onclick = (e) => { e.preventDefault(); sessionStorage.removeItem('browse_as_user'); window.location.href = 'admin.html'; };
+        nav.appendChild(btn);
+      }
     }
   }
 }

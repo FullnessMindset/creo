@@ -400,6 +400,10 @@
     async function checkUser() {
       const { data: { user } } = await sb.auth.getUser();
       if (user) {
+        if (isAdmin(user.email) && !sessionStorage.getItem('browse_as_user')) {
+          window.location.href = 'admin.html';
+          return;
+        }
         currentUser = user;
         document.getElementById('auth-section').classList.add('hidden');
         document.getElementById('dashboard-section').classList.remove('hidden');
@@ -647,8 +651,12 @@
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       if (!email || !password) return showToast('Ingresa email y contraseña', 'error');
-      const { error } = await sb.auth.signInWithPassword({ email, password });
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (error) return showToast(error.message, 'error');
+      if (isAdmin(data.user.email) && !sessionStorage.getItem('browse_as_user')) {
+        window.location.href = 'admin.html';
+        return;
+      }
       checkUser();
     }
 
