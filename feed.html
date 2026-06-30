@@ -352,13 +352,13 @@
         const isLiked = userLikes.has(post.id);
         const isDirectVideo = post.video_type === 'direct' && post.video_url && !post.video_url.includes('youtube');
         const videoHTML = isDirectVideo
-          ? `<video src="${esc(post.video_url)}" class="w-full aspect-[9/16] max-h-[70vh] object-cover feed-video" loop muted playsinline preload="metadata"></video>`
+          ? `<video src="${esc(post.video_url)}" class="w-full aspect-[9/16] max-h-[70vh] object-cover feed-video" loop playsinline preload="metadata"></video>`
           : getAutoplayEmbedHTML(post.video_url, post.video_type);
 
         card.innerHTML = `
           <div class="relative">
             <div class="w-full">${videoHTML}</div>
-            ${isDirectVideo ? `<div class="absolute bottom-24 left-3 z-10"><button class="mute-toggle w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white/70 hover:text-white transition" onclick="toggleMute(this)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg></button></div>` : ''}
+            ${isDirectVideo ? `<div class="absolute bottom-24 left-3 z-10"><button class="mute-toggle w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white/70 hover:text-white transition" onclick="toggleMute(this)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg></button></div>` : ''}
 
             <div class="absolute right-3 bottom-20 flex flex-col items-center gap-4">
               <a href="profile.html?u=${esc(profile.username)}" class="block">${avatarHTML}</a>
@@ -422,7 +422,7 @@
       if (type === 'youtube') {
         const id = extractVideoId(url, 'youtube');
         if (!id) return `<div class="w-full ${cls} bg-gray-800 flex items-center justify-center text-gray-400">Invalid YouTube URL</div>`;
-        return `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&rel=0&playsinline=1" class="w-full ${cls} rounded-xl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+        return `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=0&loop=1&playlist=${id}&rel=0&playsinline=1" class="w-full ${cls} rounded-xl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
       }
       if (type === 'tiktok') {
         const id = extractVideoId(url, 'tiktok');
@@ -432,7 +432,7 @@
       if (type === 'instagram') {
         return `<iframe src="${url.replace(/\/$/, '')}/embed" class="w-full ${cls} rounded-xl" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
       }
-      return `<video src="${esc(url)}" class="w-full ${cls} rounded-xl object-cover feed-video" loop muted playsinline preload="metadata"></video>`;
+      return `<video src="${esc(url)}" class="w-full ${cls} rounded-xl object-cover feed-video" loop playsinline preload="metadata"></video>`;
     }
 
     function toggleMute(btn) {
