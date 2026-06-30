@@ -152,6 +152,8 @@
             <input id="social-tiktok" type="url" placeholder="TikTok URL" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             <input id="social-youtube" type="url" placeholder="YouTube URL" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             <input id="social-twitter" type="url" placeholder="Twitter/X URL" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <input id="social-facebook" type="url" placeholder="Facebook URL" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <input id="social-linkedin" type="url" placeholder="LinkedIn URL" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
           </div>
 
           <button onclick="saveProfile()" id="save-profile-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Perfil</button>
@@ -447,6 +449,8 @@
           document.getElementById('social-tiktok').value = socials.tiktok || '';
           document.getElementById('social-youtube').value = socials.youtube || '';
           document.getElementById('social-twitter').value = socials.twitter || '';
+          document.getElementById('social-facebook').value = socials.facebook || '';
+          document.getElementById('social-linkedin').value = socials.linkedin || '';
           document.getElementById('profile-link').innerText = 'https://fullnessmindset.github.io/creo/profile.html?u=' + (data.username || '');
           document.getElementById('v-email').value = user.email;
           document.getElementById('v-fullname').value = data.full_name || '';
@@ -702,6 +706,8 @@
         tiktok: document.getElementById('social-tiktok').value.trim(),
         youtube: document.getElementById('social-youtube').value.trim(),
         twitter: document.getElementById('social-twitter').value.trim(),
+        facebook: document.getElementById('social-facebook').value.trim(),
+        linkedin: document.getElementById('social-linkedin').value.trim(),
       };
       const hasSocial = Object.values(social_links).some(v => v);
       if (username.length < 3) { btn.innerText = 'Guardar Perfil'; btn.disabled = false; return showToast('Username mínimo 3 caracteres', 'error'); }
