@@ -137,6 +137,7 @@
         <button onclick="showTab('business')" id="tab-business" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">Negocio</button>
         <button onclick="showTab('stripe')" id="tab-stripe" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">Stripe</button>
         <button onclick="showTab('branding')" id="tab-branding" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">Mi Branding</button>
+        <button onclick="showTab('deals')" id="tab-deals" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400 hidden">Brand Deals</button>
       </div>
 
       <!-- TAB: Profile -->
@@ -647,6 +648,84 @@
         </div>
       </div>
 
+      <!-- TAB: Brand Deals (Creators: manage incoming deals / Business: create campaigns) -->
+      <div id="panel-deals" class="tab-panel hidden space-y-4">
+        <!-- Creator view: incoming deal requests -->
+        <div id="deals-creator-view">
+          <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+              <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              Mis Brand Deals
+            </h3>
+            <p class="text-xs text-gray-500">Deals de marcas y empresas. Acepta, completa y recibe pagos directamente a tu Stripe.</p>
+            <div id="deals-no-stripe" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700">
+              Conecta tu cuenta de Stripe para poder aceptar Brand Deals. <button onclick="showTab('stripe')" class="underline font-semibold">Conectar Stripe →</button>
+            </div>
+            <div id="my-deal-requests" class="space-y-3"></div>
+            <div id="no-deal-requests" class="hidden text-center py-6">
+              <p class="text-xs text-gray-400">No tienes solicitudes de Brand Deals aún.</p>
+              <a href="explore.html" class="text-xs text-creo-purple underline font-semibold mt-1 inline-block">Explorar Brand Deals →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Business view: create and manage campaigns -->
+        <div id="deals-business-view" class="hidden">
+          <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+              <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+              Crear Brand Deal
+            </h3>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Título del Deal *</label>
+                <input id="deal-title" type="text" placeholder="Ej: Review de producto en TikTok" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
+                <textarea id="deal-description" rows="2" placeholder="Describe la campaña..." class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple"></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Requisitos / Instrucciones *</label>
+                <textarea id="deal-requirements" rows="3" placeholder="1. Hacer un video de 60 segundos...&#10;2. Mencionar la marca...&#10;3. Publicar en TikTok e Instagram..." class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple"></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Presupuesto por creador (USD) * <span class="text-gray-400">mínimo $5</span></label>
+                <input id="deal-budget" type="number" min="5" step="0.01" placeholder="50.00" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Máximo de creadores</label>
+                <input id="deal-max-creators" type="number" min="1" value="1" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Términos y Condiciones *</label>
+                <textarea id="deal-terms" rows="4" placeholder="Escribe los términos legales del deal. El creador deberá aceptarlos antes de participar..." class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple"></textarea>
+              </div>
+              <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-[11px] text-gray-500 space-y-1">
+                <p>Al crear un Brand Deal:</p>
+                <p>• El creador recibirá el pago directo a su Stripe al completar el trabajo</p>
+                <p>• CREO retiene un 7% de comisión de plataforma</p>
+                <p>• CREO no se hace responsable por disputas entre marca y creador</p>
+                <p>• Estafadores serán rastreados y expulsados permanentemente</p>
+              </div>
+              <button onclick="createBrandDeal()" id="create-deal-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                Publicar Brand Deal
+              </button>
+            </div>
+          </div>
+
+          <!-- My active campaigns -->
+          <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4 mt-4">
+            <h3 class="font-bold text-gray-900 text-sm">Mis Campañas Activas</h3>
+            <div id="my-campaigns" class="space-y-3"></div>
+            <div id="no-campaigns" class="hidden text-center py-4">
+              <p class="text-xs text-gray-400">No tienes campañas activas</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -676,6 +755,7 @@
       if (tab === 'story') loadMyStories();
       if (tab === 'business') loadMyBusinessLinks();
       if (tab === 'branding') loadBrandingPanel();
+      if (tab === 'deals') loadMyDeals();
     }
 
     // ===== BRANDING PANEL =====
@@ -914,6 +994,19 @@
       // Show/hide stripe panels based on account type
       const upgradePanel = document.getElementById('cocreator-upgrade');
       const regularStripe = document.getElementById('stripe-connect-regular');
+
+      // Show Brand Deals tab for creators and businesses
+      const dealsTab = document.getElementById('tab-deals');
+      if (profile.account_type === 'business') {
+        dealsTab.classList.remove('hidden');
+        document.getElementById('deals-creator-view').classList.add('hidden');
+        document.getElementById('deals-business-view').classList.remove('hidden');
+      } else if (profile.account_type !== 'co-creator') {
+        dealsTab.classList.remove('hidden');
+        document.getElementById('deals-creator-view').classList.remove('hidden');
+        document.getElementById('deals-business-view').classList.add('hidden');
+        if (!profile.stripe_connect_id) document.getElementById('deals-no-stripe').classList.remove('hidden');
+      }
 
       if (profile.account_type === 'co-creator') {
         statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center"><svg class="w-6 h-6 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><div><p class="font-bold text-creo-mintDark">Co-Creador</p><p class="text-xs text-gray-500">Puedes editar tu perfil, compartir tu historia y promover tu negocio</p></div></div>';
@@ -1811,6 +1904,307 @@
       if (overlay) overlay.remove();
       window.history.replaceState({}, '', window.location.pathname);
       showTab('profile');
+    }
+
+    // ===== BRAND DEALS =====
+    const SUPABASE_FUNC_URL = 'https://qddxoyjtoxtdcezwuvcq.supabase.co/functions/v1';
+
+    async function loadMyDeals() {
+      if (!currentUser) return;
+      const isBusiness = currentProfile?.account_type === 'business';
+
+      if (isBusiness) {
+        await loadMyCampaigns();
+        return;
+      }
+
+      const { data, error } = await sb
+        .from('brand_deal_requests')
+        .select('*, deal:deal_id(title, description, requirements, budget_per_creator_cents, terms_conditions, brand:brand_id(username, display_name, avatar_url))')
+        .eq('creator_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      const container = document.getElementById('my-deal-requests');
+      const noDeals = document.getElementById('no-deal-requests');
+
+      if (error || !data || !data.length) {
+        container.innerHTML = '';
+        noDeals.classList.remove('hidden');
+        return;
+      }
+      noDeals.classList.add('hidden');
+
+      container.innerHTML = data.map(req => {
+        const deal = req.deal;
+        if (!deal) return '';
+        const brandName = deal.brand?.display_name || deal.brand?.username || 'Marca';
+        const budgetUsd = (deal.budget_per_creator_cents / 100).toFixed(2);
+        const statusLabels = {
+          pending: ['Pendiente', 'bg-yellow-100 text-yellow-700'],
+          accepted: ['Aceptado', 'bg-blue-100 text-blue-700'],
+          rejected: ['Rechazado', 'bg-red-100 text-red-700'],
+          submitted: ['Enviado', 'bg-purple-100 text-purple-700'],
+          approved: ['Aprobado', 'bg-green-100 text-green-700'],
+          paid: ['Pagado', 'bg-green-200 text-green-800'],
+          disputed: ['Disputado', 'bg-red-200 text-red-800'],
+          cancelled: ['Cancelado', 'bg-gray-100 text-gray-600']
+        };
+        const [label, cls] = statusLabels[req.status] || ['Desconocido', 'bg-gray-100 text-gray-500'];
+
+        let actions = '';
+        if (req.status === 'pending') {
+          actions = `
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-[11px] text-gray-500 max-h-24 overflow-y-auto mb-2">
+              <strong>Términos:</strong><br>${esc(deal.terms_conditions)}
+            </div>
+            <div class="flex gap-2">
+              <button onclick="acceptDeal('${req.id}')" class="flex-1 bg-creo-purple text-white py-2 rounded-lg text-xs font-bold hover:opacity-90 transition">Aceptar Contrato</button>
+              <button onclick="rejectDeal('${req.id}')" class="flex-1 bg-gray-200 text-gray-600 py-2 rounded-lg text-xs font-bold hover:bg-gray-300 transition">Rechazar</button>
+            </div>`;
+        } else if (req.status === 'accepted') {
+          actions = `
+            <div class="space-y-2">
+              <p class="text-[11px] text-gray-500"><strong>Requisitos:</strong></p>
+              <p class="text-[11px] text-gray-500 whitespace-pre-line">${esc(deal.requirements)}</p>
+              <input id="submit-url-${req.id}" type="url" placeholder="URL del contenido publicado" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-xs text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              <textarea id="submit-notes-${req.id}" rows="2" placeholder="Notas adicionales (opcional)" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-xs text-gray-900 outline-none"></textarea>
+              <button onclick="submitDealWork('${req.id}')" class="w-full bg-creo-mint text-creo-purple py-2 rounded-lg text-xs font-bold hover:opacity-90 transition">Enviar Trabajo</button>
+            </div>`;
+        } else if (req.status === 'paid') {
+          actions = `<p class="text-xs text-green-600 font-semibold text-center">Pago recibido en tu Stripe</p>`;
+        }
+
+        return `<div class="border border-gray-200 rounded-xl p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="font-bold text-sm">${esc(deal.title)}</p>
+              <p class="text-xs text-gray-400">por ${esc(brandName)}</p>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-semibold px-2 py-1 rounded-full ${cls}">${label}</span>
+              <p class="text-xs font-bold text-green-600 mt-1">$${budgetUsd}</p>
+            </div>
+          </div>
+          ${actions}
+        </div>`;
+      }).join('');
+    }
+
+    async function acceptDeal(requestId) {
+      if (!confirm('Al aceptar, te comprometes a cumplir los términos y condiciones del deal. ¿Continuar?')) return;
+      const { error } = await sb.rpc('accept_brand_deal', { p_request_id: requestId });
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      showToast('Deal aceptado. Revisa los requisitos y envía tu trabajo.', 'success');
+      loadMyDeals();
+    }
+
+    async function rejectDeal(requestId) {
+      const { error } = await sb.rpc('reject_brand_deal', { p_request_id: requestId });
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      showToast('Deal rechazado', 'success');
+      loadMyDeals();
+    }
+
+    async function submitDealWork(requestId) {
+      const url = document.getElementById('submit-url-' + requestId)?.value?.trim();
+      const notes = document.getElementById('submit-notes-' + requestId)?.value?.trim();
+      if (!url) { showToast('Ingresa la URL del contenido publicado', 'error'); return; }
+      const { error } = await sb.rpc('submit_brand_deal_work', { p_request_id: requestId, p_url: url, p_notes: notes || null });
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      showToast('Trabajo enviado. La marca lo revisará.', 'success');
+      loadMyDeals();
+    }
+
+    // ===== BUSINESS: Create and manage brand deals =====
+    async function createBrandDeal() {
+      if (!currentUser) return;
+      const title = document.getElementById('deal-title').value.trim();
+      const description = document.getElementById('deal-description').value.trim();
+      const requirements = document.getElementById('deal-requirements').value.trim();
+      const budgetStr = document.getElementById('deal-budget').value;
+      const maxCreators = parseInt(document.getElementById('deal-max-creators').value) || 1;
+      const terms = document.getElementById('deal-terms').value.trim();
+
+      if (!title) { showToast('Agrega un título', 'error'); return; }
+      if (!requirements) { showToast('Agrega los requisitos', 'error'); return; }
+      if (!budgetStr || parseFloat(budgetStr) < 5) { showToast('El presupuesto mínimo es $5', 'error'); return; }
+      if (!terms) { showToast('Agrega los términos y condiciones', 'error'); return; }
+
+      const budgetCents = Math.round(parseFloat(budgetStr) * 100);
+      const btn = document.getElementById('create-deal-btn');
+      btn.disabled = true; btn.textContent = 'Creando...';
+
+      const { error } = await sb.from('brand_deals').insert([{
+        brand_id: currentUser.id,
+        title,
+        description: description || null,
+        requirements,
+        budget_per_creator_cents: budgetCents,
+        terms_conditions: terms,
+        max_creators: maxCreators
+      }]);
+
+      btn.disabled = false; btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> Publicar Brand Deal';
+
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      showToast('Brand Deal publicado', 'success');
+      document.getElementById('deal-title').value = '';
+      document.getElementById('deal-description').value = '';
+      document.getElementById('deal-requirements').value = '';
+      document.getElementById('deal-budget').value = '';
+      document.getElementById('deal-max-creators').value = '1';
+      document.getElementById('deal-terms').value = '';
+      loadMyCampaigns();
+    }
+
+    async function loadMyCampaigns() {
+      if (!currentUser) return;
+      const { data, error } = await sb
+        .from('brand_deals')
+        .select('*')
+        .eq('brand_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      const container = document.getElementById('my-campaigns');
+      const noCampaigns = document.getElementById('no-campaigns');
+
+      if (error || !data || !data.length) {
+        container.innerHTML = '';
+        noCampaigns.classList.remove('hidden');
+        return;
+      }
+      noCampaigns.classList.add('hidden');
+
+      const campaignHtml = [];
+      for (const deal of data) {
+        const budgetUsd = (deal.budget_per_creator_cents / 100).toFixed(2);
+        const statusColors = { active: 'bg-green-100 text-green-700', paused: 'bg-yellow-100 text-yellow-700', completed: 'bg-blue-100 text-blue-700', cancelled: 'bg-red-100 text-red-700' };
+        const [cls] = [statusColors[deal.status] || 'bg-gray-100 text-gray-500'];
+
+        const { data: requests } = await sb
+          .from('brand_deal_requests')
+          .select('*, creator:creator_id(username, display_name, avatar_url)')
+          .eq('deal_id', deal.id)
+          .order('created_at', { ascending: false });
+
+        const reqHtml = (requests || []).map(r => {
+          const cName = r.creator?.display_name || r.creator?.username || 'Creador';
+          const rStatusLabels = {
+            pending: ['Pendiente', 'text-yellow-600'],
+            accepted: ['Aceptado', 'text-blue-600'],
+            submitted: ['Trabajo Enviado', 'text-purple-600'],
+            approved: ['Aprobado - Pagar', 'text-green-600'],
+            paid: ['Pagado', 'text-green-700'],
+            rejected: ['Rechazado', 'text-red-500']
+          };
+          const [rLabel, rCls] = rStatusLabels[r.status] || ['', 'text-gray-500'];
+
+          let rActions = '';
+          if (r.status === 'submitted') {
+            rActions = `
+              <div class="mt-1 text-[11px]">
+                <a href="${esc(r.submission_url)}" target="_blank" class="text-creo-purple underline">Ver contenido</a>
+                ${r.submission_notes ? `<p class="text-gray-400 mt-0.5">Nota: ${esc(r.submission_notes)}</p>` : ''}
+                <div class="flex gap-2 mt-2">
+                  <button onclick="approveDealWork('${r.id}')" class="flex-1 bg-green-500 text-white py-1.5 rounded-lg text-xs font-bold hover:opacity-90">Aprobar</button>
+                  <button onclick="disputeDealWork('${r.id}')" class="flex-1 bg-red-100 text-red-600 py-1.5 rounded-lg text-xs font-bold hover:bg-red-200">Disputar</button>
+                </div>
+              </div>`;
+          } else if (r.status === 'approved') {
+            rActions = `<button onclick="payCreator('${r.id}', ${deal.budget_per_creator_cents})" class="mt-1 w-full bg-creo-mint text-creo-purple py-1.5 rounded-lg text-xs font-bold hover:opacity-90">Pagar $${budgetUsd}</button>`;
+          }
+
+          return `<div class="border-t border-gray-100 pt-2 mt-2">
+            <div class="flex items-center justify-between">
+              <p class="text-xs font-semibold">${esc(cName)}</p>
+              <span class="text-[10px] font-semibold ${rCls}">${rLabel}</span>
+            </div>
+            ${rActions}
+          </div>`;
+        }).join('');
+
+        campaignHtml.push(`<div class="border border-gray-200 rounded-xl p-4 space-y-1">
+          <div class="flex items-center justify-between">
+            <p class="font-bold text-sm">${esc(deal.title)}</p>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${cls}">${deal.status}</span>
+          </div>
+          <p class="text-xs text-gray-400">$${budgetUsd} / creador • max ${deal.max_creators}</p>
+          ${reqHtml}
+          <div class="flex gap-2 mt-2">
+            <button onclick="sendDealToCreator('${deal.id}')" class="flex-1 text-xs bg-creo-purple text-white py-1.5 rounded-lg font-semibold hover:opacity-90">Enviar a Creador</button>
+            ${deal.status === 'active' ? `<button onclick="pauseDeal('${deal.id}')" class="text-xs bg-gray-200 text-gray-600 py-1.5 px-3 rounded-lg font-semibold hover:bg-gray-300">Pausar</button>` : ''}
+          </div>
+        </div>`);
+      }
+      container.innerHTML = campaignHtml.join('');
+    }
+
+    async function approveDealWork(requestId) {
+      const { error } = await sb.rpc('approve_brand_deal_work', { p_request_id: requestId });
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      showToast('Trabajo aprobado. Procede al pago.', 'success');
+      loadMyCampaigns();
+    }
+
+    async function disputeDealWork(requestId) {
+      if (!confirm('¿Disputar este trabajo? El creador será notificado.')) return;
+      await sb.from('brand_deal_requests').update({ status: 'disputed' }).eq('id', requestId);
+      showToast('Deal disputado', 'success');
+      loadMyCampaigns();
+    }
+
+    async function payCreator(requestId, amountCents) {
+      const { data: req } = await sb.from('brand_deal_requests').select('*, creator:creator_id(stripe_connect_id, display_name, username)').eq('id', requestId).single();
+      if (!req || !req.creator?.stripe_connect_id) { showToast('El creador no tiene Stripe conectado', 'error'); return; }
+
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { showToast('Inicia sesión', 'error'); return; }
+
+      try {
+        const resp = await fetch(SUPABASE_FUNC_URL + '/create-brand-deal-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({
+            request_id: requestId,
+            creator_connect_id: req.creator.stripe_connect_id,
+            amount_cents: amountCents,
+            creator_name: req.creator.display_name || req.creator.username,
+            success_url: window.location.href,
+            cancel_url: window.location.href
+          })
+        });
+        const result = await resp.json();
+        if (result.url) window.location.href = result.url;
+        else showToast('Error al crear pago: ' + (result.error || 'desconocido'), 'error');
+      } catch (e) { showToast('Error de conexión', 'error'); }
+    }
+
+    async function sendDealToCreator(dealId) {
+      const username = prompt('Ingresa el @username del creador:');
+      if (!username) return;
+      const clean = username.replace('@', '').trim();
+      const { data: creator } = await sb.from('profiles').select('id, stripe_connect_id').eq('username', clean).single();
+      if (!creator) { showToast('Creador no encontrado', 'error'); return; }
+      if (!creator.stripe_connect_id) { showToast('Este creador no tiene Stripe conectado', 'error'); return; }
+
+      const { error } = await sb.from('brand_deal_requests').insert([{
+        deal_id: dealId,
+        creator_id: creator.id,
+        brand_id: currentUser.id
+      }]);
+      if (error) {
+        if (error.code === '23505') showToast('Ya enviaste este deal a este creador', 'error');
+        else showToast('Error: ' + error.message, 'error');
+        return;
+      }
+      showToast('Deal enviado a @' + clean, 'success');
+      loadMyCampaigns();
+    }
+
+    async function pauseDeal(dealId) {
+      await sb.from('brand_deals').update({ status: 'paused' }).eq('id', dealId);
+      showToast('Campaña pausada', 'success');
+      loadMyCampaigns();
     }
 
     window.onload = () => {
