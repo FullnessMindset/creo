@@ -69,7 +69,7 @@
           <label class="block text-xs font-medium text-gray-500 mb-1">Tipo de cuenta</label>
           <select id="reg-account-type" class="w-full border border-gray-300 bg-white p-2 rounded-lg text-sm text-gray-900 outline-none">
             <option value="creator">Creador — Recauda fondos y comparte tu historia</option>
-            <option value="co-creator">Co-Creador — Apoya, promociona tu negocio (gratis, sin Stripe)</option>
+            <option value="co-creator">Co-Creador — Quiero ayudar a otros a crear</option>
           </select>
           <script>document.getElementById('reg-account-type').addEventListener('change', function() { document.getElementById('cocreator-info').classList.toggle('hidden', this.value !== 'co-creator'); });</script>
           <p id="cocreator-info" class="hidden text-[10px] text-creo-mintDark mt-1">Los co-creadores pueden editar su perfil, compartir su historia y promover su negocio sin necesidad de verificación con Stripe.</p>
