@@ -1543,13 +1543,24 @@
     async function toggleFollow() {
       const { data: { user } } = await sb.auth.getUser();
       if (!user) { showToast('Inicia sesión para seguir', 'error'); return; }
-      const { data, error } = await sb.rpc('toggle_follow', { p_following_id: creatorProfile.id });
-      if (error) { showToast(error.message || 'Error', 'error'); return; }
-      isFollowing = data.followed;
-      document.getElementById('follower-count').textContent = data.follower_count || 0;
-      updateFollowButton();
-      if (isFollowing) {
-        createNotification(creatorProfile.id, 'follow', 'Tienes un nuevo seguidor', null, 'profile.html?u=' + creatorProfile.username);
+      try {
+        const { data, error } = await sb.rpc('toggle_follow', { p_following_id: creatorProfile.id });
+        if (error) {
+          if (error.message && error.message.includes('toggle_follow')) {
+            showToast('Función de seguimiento no disponible aún', 'info');
+          } else {
+            showToast(error.message || 'Error', 'error');
+          }
+          return;
+        }
+        isFollowing = data.followed;
+        document.getElementById('follower-count').textContent = data.follower_count || 0;
+        updateFollowButton();
+        if (isFollowing) {
+          createNotification(creatorProfile.id, 'follow', 'Tienes un nuevo seguidor', null, 'profile.html?u=' + creatorProfile.username);
+        }
+      } catch (e) {
+        showToast('Seguimiento no disponible aún', 'info');
       }
     }
 
@@ -1909,7 +1920,6 @@
       renderBottomNav('profile');
       updateNavAuth();
       loadNotificationBell();
-      addMessagesNavItem();
       checkMetaSupportEligibility();
       const status = urlParams.get('status');
       if (status === 'completed') showToast('¡Gracias por tu apoyo!', 'success');

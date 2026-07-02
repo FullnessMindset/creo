@@ -127,20 +127,28 @@
         </div>
       </div>
 
-      <!-- TABS -->
+      <!-- TABS — main row -->
       <div class="flex glass rounded-xl overflow-x-auto text-[11px] no-scrollbar">
-        <button onclick="showTab('profile')" id="tab-profile" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition tab-active">Perfil</button>
-        <button onclick="showTab('verify')" id="tab-verify" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">Verificación</button>
-        <button onclick="showTab('metas')" id="tab-metas" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">Mis Metas</button>
-        <button onclick="showTab('posts')" id="tab-posts" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">Mis Posts</button>
-        <button onclick="showTab('story')" id="tab-story" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">Historia</button>
-        <button onclick="showTab('business')" id="tab-business" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">Negocio</button>
-        <button onclick="showTab('stripe')" id="tab-stripe" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">Stripe</button>
-        <button onclick="showTab('branding')" id="tab-branding" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">Mi Branding</button>
-        <button onclick="showTab('events')" id="tab-events" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">Eventos</button>
-        <button onclick="showTab('livestream')" id="tab-livestream" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">En Vivo</button>
-        <button onclick="showTab('creoellos')" id="tab-creoellos" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">Yo Creo en Ellos</button>
-        <button onclick="showTab('deals')" id="tab-deals" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400 hidden">Brand Deals</button>
+        <button onclick="showTab('profile')" id="tab-profile" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition tab-active">👤 Perfil</button>
+        <button onclick="showTab('story')" id="tab-story" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">📖 Historia</button>
+        <button onclick="showTab('posts')" id="tab-posts" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">📸 Posts</button>
+        <button onclick="showTab('metas')" id="tab-metas" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">🎯 Metas</button>
+        <button onclick="showTab('creoellos')" id="tab-creoellos" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">💜 Creo en Ellos</button>
+        <!-- Herramientas dropdown -->
+        <div class="relative flex-shrink-0">
+          <button onclick="toggleHerramientas()" id="tab-herramientas" class="px-3 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1">
+            🛠️ Herramientas <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="herramientas-menu" class="hidden absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-200 z-50 min-w-[180px] py-1 text-[12px]">
+            <button onclick="showTab('verify');closeHerramientas()" id="tab-verify" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">✅ Verificación</button>
+            <button onclick="showTab('stripe');closeHerramientas()" id="tab-stripe" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💳 Stripe</button>
+            <button onclick="showTab('branding');closeHerramientas()" id="tab-branding" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎨 Mi Branding</button>
+            <button onclick="showTab('business');closeHerramientas()" id="tab-business" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💼 Negocio</button>
+            <button onclick="showTab('events');closeHerramientas()" id="tab-events" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">📅 Eventos</button>
+            <button onclick="showTab('livestream');closeHerramientas()" id="tab-livestream" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">📡 En Vivo</button>
+            <button onclick="showTab('deals');closeHerramientas()" id="tab-deals" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🤝 Brand Deals</button>
+          </div>
+        </div>
       </div>
 
       <!-- TAB: Profile -->
@@ -1010,13 +1018,32 @@
   </style>
 
   <script>
+    function toggleHerramientas() {
+      document.getElementById('herramientas-menu').classList.toggle('hidden');
+    }
+    function closeHerramientas() {
+      document.getElementById('herramientas-menu').classList.add('hidden');
+    }
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#tab-herramientas') && !e.target.closest('#herramientas-menu')) closeHerramientas();
+    });
+
+    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'business', 'events', 'livestream', 'deals'];
+
     function showTab(tab) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-      document.querySelectorAll('[id^="tab-"]').forEach(t => { t.classList.remove('tab-active'); t.classList.add('text-gray-400'); });
+      // Reset main row tabs only
+      document.querySelectorAll('.flex.glass.rounded-xl > button[id^="tab-"]').forEach(t => { t.classList.remove('tab-active'); t.classList.add('text-gray-400'); });
       document.getElementById('panel-' + tab).classList.remove('hidden');
       const tabBtn = document.getElementById('tab-' + tab);
-      tabBtn.classList.add('tab-active');
-      tabBtn.classList.remove('text-gray-400');
+      if (HERRAMIENTAS_TABS.includes(tab)) {
+        const herrBtn = document.getElementById('tab-herramientas');
+        herrBtn.classList.add('tab-active');
+        herrBtn.classList.remove('text-gray-400');
+      } else if (tabBtn) {
+        tabBtn.classList.add('tab-active');
+        tabBtn.classList.remove('text-gray-400');
+      }
       if (tab === 'story') loadMyStories();
       if (tab === 'business') loadMyBusinessLinks();
       if (tab === 'branding') loadBrandingPanel();
@@ -3217,7 +3244,6 @@
       checkUser().then(() => { showOnboarding(); });
       renderBottomNav('dashboard');
       loadNotificationBell();
-      addMessagesNavItem();
     };
   </script>
 </body>
