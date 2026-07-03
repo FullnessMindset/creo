@@ -398,9 +398,14 @@
                 <p class="text-[10px] text-gray-400">${timeAgo(post.created_at)}</p>
               </div>
             </div>
-            ${isOwner ? `<button onclick="deletePost('${post.id}')" class="text-gray-300 hover:text-red-400 transition p-1" title="Eliminar">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            </button>` : ''}
+            ${isOwner ? `<div class="flex items-center gap-1">
+              <button onclick="editCommunityPost('${post.id}')" class="text-gray-300 hover:text-blue-400 transition p-1" title="Editar">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+              <button onclick="deletePost('${post.id}')" class="text-gray-300 hover:text-red-400 transition p-1" title="Eliminar">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>` : ''}
           </div>
           <!-- Content -->
           ${post.title ? `<h3 class="text-base font-bold text-gray-900">${esc(post.title)}</h3>` : ''}
@@ -596,7 +601,7 @@
               <a href="profile.html?u=${esc(ca?.username || '')}" class="text-xs font-bold text-gray-900 hover:text-creo-purple">${esc(cName)}</a>
               <div class="flex items-center gap-2">
                 <span class="text-[10px] text-gray-400">${timeAgo(c.created_at)}</span>
-                ${isOwner ? `<button onclick="deleteComment('${c.id}')" class="text-gray-300 hover:text-red-400 text-[10px]">✕</button>` : ''}
+                ${isOwner ? `<button onclick="editComment('${c.id}', this)" class="text-gray-300 hover:text-blue-400 text-[10px]">✎</button><button onclick="deleteComment('${c.id}')" class="text-gray-300 hover:text-red-400 text-[10px]">✕</button>` : ''}
               </div>
             </div>
             <p class="text-sm text-gray-700 mt-0.5">${linkify(esc(c.body))}</p>
@@ -621,6 +626,27 @@
       if (!confirm('¿Eliminar comentario?')) return;
       await sb.from('community_comments').delete().eq('id', id);
       if (activeCommentPostId) loadComments(activeCommentPostId);
+    }
+
+    function editComment(id, btnEl) {
+      const commentDiv = btnEl.closest('.flex.gap-2');
+      const bodyP = commentDiv.querySelector('p');
+      const oldText = bodyP.textContent;
+      bodyP.innerHTML = `<textarea id="edit-comment-${id}" class="w-full border border-gray-300 bg-white p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" rows="2">${esc(oldText)}</textarea>
+        <div class="flex gap-2 mt-1">
+          <button onclick="saveCommentEdit('${id}')" class="text-xs px-3 py-1 bg-creo-purple text-white rounded-lg">Guardar</button>
+          <button onclick="loadComments(activeCommentPostId)" class="text-xs px-3 py-1 bg-gray-200 text-gray-600 rounded-lg">Cancelar</button>
+        </div>`;
+    }
+
+    async function saveCommentEdit(id) {
+      const textarea = document.getElementById('edit-comment-' + id);
+      const body = textarea.value.trim();
+      if (!body) return showToast('El comentario no puede estar vacío', 'error');
+      const { error } = await sb.from('community_comments').update({ body }).eq('id', id);
+      if (error) return showToast('Error: ' + error.message, 'error');
+      showToast('Comentario actualizado', 'success');
+      loadComments(activeCommentPostId);
     }
 
     // Share
@@ -667,6 +693,76 @@
       const el = document.getElementById('post-' + id);
       if (el) el.remove();
       showToast('Publicación eliminada', 'success');
+    }
+
+    // Edit community post
+    async function editCommunityPost(id) {
+      const { data: post } = await sb.from('community_posts').select('*').eq('id', id).single();
+      if (!post) return showToast('No se encontró la publicación', 'error');
+      let existing = document.getElementById('edit-community-modal');
+      if (existing) existing.remove();
+      const media = post.media_urls || [];
+      const mediaPreview = media.length > 0 ? `<div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Media actual (${media.length} archivo${media.length !== 1 ? 's' : ''})</label>
+        <div class="flex gap-2 overflow-x-auto py-1">${media.map((m, i) => {
+          const isVid = /\.(mp4|webm|mov)$/i.test(m);
+          return isVid
+            ? `<div class="relative flex-shrink-0"><video src="${esc(m)}" class="w-16 h-16 rounded-lg object-cover"></video><button onclick="removeCommunityMedia('${id}', ${i})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button></div>`
+            : `<div class="relative flex-shrink-0"><img src="${esc(m)}" class="w-16 h-16 rounded-lg object-cover"><button onclick="removeCommunityMedia('${id}', ${i})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button></div>`;
+        }).join('')}</div>
+      </div>` : '';
+      const modal = document.createElement('div');
+      modal.id = 'edit-community-modal';
+      modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4';
+      modal.innerHTML = `
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('edit-community-modal').remove()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-lg text-gray-900">Editar Publicación</h3>
+            <button onclick="document.getElementById('edit-community-modal').remove()" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Titulo (opcional)</label>
+            <input id="edit-cp-title" type="text" value="${esc(post.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Contenido</label>
+            <textarea id="edit-cp-body" rows="4" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(post.body || '')}</textarea>
+          </div>
+          ${mediaPreview}
+          <input type="hidden" id="edit-cp-media" value='${JSON.stringify(media)}'>
+          <div class="flex gap-3">
+            <button onclick="saveCommunityPostEdit('${post.id}')" id="save-cp-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Cambios</button>
+            <button onclick="document.getElementById('edit-community-modal').remove()" class="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition">Cancelar</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+    }
+
+    function removeCommunityMedia(postId, idx) {
+      const input = document.getElementById('edit-cp-media');
+      const media = JSON.parse(input.value);
+      media.splice(idx, 1);
+      input.value = JSON.stringify(media);
+      editCommunityPost(postId);
+    }
+
+    async function saveCommunityPostEdit(id) {
+      const btn = document.getElementById('save-cp-btn');
+      btn.textContent = 'Guardando...'; btn.disabled = true;
+      const title = document.getElementById('edit-cp-title').value.trim();
+      const body = document.getElementById('edit-cp-body').value.trim();
+      const media_urls = JSON.parse(document.getElementById('edit-cp-media').value || '[]');
+      const { error } = await sb.from('community_posts').update({ title: title || null, body: body || null, media_urls, updated_at: new Date().toISOString() }).eq('id', id);
+      btn.textContent = 'Guardar Cambios'; btn.disabled = false;
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      document.getElementById('edit-community-modal').remove();
+      showToast('Publicación actualizada', 'success');
+      document.getElementById('community-feed').innerHTML = '';
+      feedPage = 0; feedDone = false;
+      loadFeed();
     }
 
     // Lightbox

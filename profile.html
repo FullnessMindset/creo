@@ -1348,12 +1348,13 @@
         (myLikes || []).forEach(l => storyLikesSet.add(l.story_id));
       }
 
+      const isOwner = user && creatorProfile && user.id === creatorProfile.id;
+
       const list = document.getElementById('stories-list');
       list.innerHTML = stories.map(s => {
         const mediaArr = s.media_urls || [];
         const liked = storyLikesSet.has(s.id);
 
-        // Main video section (autoplay on scroll)
         const mainVideoHTML = s.main_video_url ? `
           <div class="relative rounded-2xl overflow-hidden bg-black">
             <video src="${esc(s.main_video_url)}" class="w-full aspect-video object-cover story-autoplay-video" muted playsinline preload="metadata" loop></video>
@@ -1367,7 +1368,6 @@
             </div>
           </div>` : '';
 
-        // Supplementary media (images, handwritten letters, audio)
         const suppMediaHTML = mediaArr.length ? `
           <div class="space-y-2">
             <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">📎 Archivos adjuntos</p>
@@ -1384,12 +1384,22 @@
                 if (isVid) {
                   return `<video src="${esc(url)}" controls class="w-full aspect-video object-cover rounded-xl bg-black"></video>`;
                 }
-                return `<img src="${esc(url)}" class="w-full ${mediaArr.length === 1 ? 'aspect-auto max-h-80' : 'aspect-square'} object-cover rounded-xl cursor-pointer hover:opacity-90 transition shadow-sm" onclick="window.open('${esc(url)}','_blank')" title="Carta escrita a mano / foto del equipo antiguo">`;
+                return `<img src="${esc(url)}" class="w-full ${mediaArr.length === 1 ? 'aspect-auto max-h-80' : 'aspect-square'} object-cover rounded-xl cursor-pointer hover:opacity-90 transition shadow-sm" onclick="window.open('${esc(url)}','_blank')">`;
               }).join('')}
             </div>
           </div>` : '';
 
-        return `<div class="glass rounded-2xl overflow-hidden shadow-xl">
+        const ownerActions = isOwner ? `
+          <div class="flex items-center gap-1">
+            <button onclick="editProfileStory('${s.id}')" class="p-1.5 rounded-full hover:bg-gray-100 transition" title="Editar">
+              <svg class="w-4 h-4 text-gray-400 hover:text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </button>
+            <button onclick="deleteProfileStory('${s.id}')" class="p-1.5 rounded-full hover:bg-red-50 transition" title="Eliminar">
+              <svg class="w-4 h-4 text-gray-400 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>` : '';
+
+        return `<div class="glass rounded-2xl overflow-hidden shadow-xl" id="story-card-${s.id}">
           <!-- Story header with avatar -->
           <div class="p-4 pb-2 flex items-center gap-3">
             <div class="w-10 h-10 rounded-full overflow-hidden bg-creo-purple/10 flex items-center justify-center flex-shrink-0">
@@ -1399,6 +1409,7 @@
               <p class="font-semibold text-sm text-gray-900">${esc(creatorProfile?.display_name || creatorProfile?.username || '')}</p>
               <p class="text-[10px] text-gray-400">${timeAgo(s.created_at)}</p>
             </div>
+            ${ownerActions}
           </div>
           <!-- Title & Description -->
           <div class="px-4 space-y-1">
@@ -1533,6 +1544,104 @@
       if (countEl && data?.count != null) countEl.textContent = data.count > 0 ? data.count : '';
       if (creatorProfile) createNotification(creatorProfile.id, 'comment', 'Nuevo comentario en tu historia', body, 'profile.html?u=' + creatorProfile.username);
       loadStoryComments(storyId);
+    }
+
+    // ===== STORY CRUD (owner only) =====
+    let profileStoriesCache = [];
+
+    async function editProfileStory(id) {
+      const { data: s, error } = await sb.from('creator_stories').select('*').eq('id', id).single();
+      if (error || !s) { showToast('No se pudo cargar la historia', 'error'); return; }
+
+      let existing = document.getElementById('edit-story-modal');
+      if (existing) existing.remove();
+
+      const mediaArr = s.media_urls || [];
+      const mediaPreview = mediaArr.map((url, idx) => {
+        const isImg = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
+        const isVid = /\.(mp4|webm|mov)$/i.test(url);
+        const isAudio = /\.(mp3|wav|ogg|m4a)$/i.test(url);
+        let preview = '';
+        if (isImg) preview = `<img src="${esc(url)}" class="w-full h-20 object-cover rounded">`;
+        else if (isVid) preview = `<video src="${esc(url)}" class="w-full h-20 object-cover rounded"></video>`;
+        else if (isAudio) preview = `<div class="h-20 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-500">Audio</div>`;
+        else preview = `<div class="h-20 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-500">Archivo</div>`;
+        return `<div class="relative">
+          ${preview}
+          <button onclick="removeStoryMedia('${id}', ${idx})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600">×</button>
+        </div>`;
+      }).join('');
+
+      const modal = document.createElement('div');
+      modal.id = 'edit-story-modal';
+      modal.className = 'fixed inset-0 z-[100] flex items-end sm:items-center justify-center';
+      modal.innerHTML = `
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('edit-story-modal').remove()"></div>
+        <div class="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto animate-slide-up">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-lg text-gray-900">Editar Historia</h3>
+            <button onclick="document.getElementById('edit-story-modal').remove()" class="text-gray-400 hover:text-gray-600 p-1">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="space-y-3">
+            <div>
+              <label class="text-xs font-semibold text-gray-600">Titulo</label>
+              <input id="edit-story-title" type="text" value="${esc(s.title || '')}" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-gray-600">Descripcion</label>
+              <textarea id="edit-story-description" rows="3" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">${esc(s.description || '')}</textarea>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-gray-600">Contenido</label>
+              <textarea id="edit-story-content" rows="4" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">${esc(s.content || '')}</textarea>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-gray-600">URL de Video Principal</label>
+              <input id="edit-story-video" type="url" value="${esc(s.main_video_url || '')}" placeholder="https://youtube.com/..." class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">
+            </div>
+            ${mediaArr.length > 0 ? `<div>
+              <label class="text-xs font-semibold text-gray-600 mb-1 block">Media adjunta</label>
+              <div id="edit-story-media-grid" class="grid grid-cols-3 gap-2">${mediaPreview}</div>
+            </div>` : ''}
+          </div>
+          <button onclick="saveProfileStoryEdit('${id}')" class="w-full bg-creo-mint text-creo-purple py-2.5 rounded-xl font-bold hover:opacity-90 transition text-sm">Guardar Cambios</button>
+        </div>`;
+      document.body.appendChild(modal);
+    }
+
+    async function removeStoryMedia(storyId, idx) {
+      const { data: s } = await sb.from('creator_stories').select('media_urls').eq('id', storyId).single();
+      if (!s) return;
+      const arr = [...(s.media_urls || [])];
+      arr.splice(idx, 1);
+      await sb.from('creator_stories').update({ media_urls: arr }).eq('id', storyId);
+      editProfileStory(storyId);
+    }
+
+    async function saveProfileStoryEdit(id) {
+      const title = document.getElementById('edit-story-title').value.trim();
+      const description = document.getElementById('edit-story-description').value.trim();
+      const content = document.getElementById('edit-story-content').value.trim();
+      const main_video_url = document.getElementById('edit-story-video').value.trim();
+
+      const updates = { title, description, content, main_video_url: main_video_url || null };
+      const { error } = await sb.from('creator_stories').update(updates).eq('id', id);
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+
+      document.getElementById('edit-story-modal').remove();
+      showToast('Historia actualizada', 'success');
+      loadCreatorStories(creatorProfile.id);
+    }
+
+    async function deleteProfileStory(id) {
+      if (!confirm('¿Eliminar esta historia? Esta acción no se puede deshacer.')) return;
+      const { error } = await sb.from('creator_stories').delete().eq('id', id);
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      const card = document.getElementById('story-card-' + id);
+      if (card) card.remove();
+      showToast('Historia eliminada', 'success');
     }
 
     // ===== BUSINESS LINKS =====

@@ -929,61 +929,146 @@
       <div id="panel-deals" class="tab-panel hidden space-y-4">
         <!-- Creator view: incoming deal requests -->
         <div id="deals-creator-view">
+          <!-- Stats bar -->
+          <div class="grid grid-cols-4 gap-2 mb-4">
+            <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
+              <p class="text-lg font-bold text-amber-600" id="cd-stat-active">0</p>
+              <p class="text-[10px] text-gray-400">Activos</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
+              <p class="text-lg font-bold text-blue-600" id="cd-stat-submitted">0</p>
+              <p class="text-[10px] text-gray-400">Enviados</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
+              <p class="text-lg font-bold text-green-600" id="cd-stat-paid">0</p>
+              <p class="text-[10px] text-gray-400">Pagados</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
+              <p class="text-lg font-bold text-creo-purple" id="cd-stat-earned">$0</p>
+              <p class="text-[10px] text-gray-400">Ganado</p>
+            </div>
+          </div>
+
           <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
-            <h3 class="font-bold text-gray-900 flex items-center gap-2">
-              <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              Mis Brand Deals
-            </h3>
-            <p class="text-xs text-gray-500">Deals de marcas y empresas. Acepta, completa y recibe pagos directamente a tu Stripe.</p>
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Mis Brand Deals
+              </h3>
+              <a href="explore.html" class="text-xs text-creo-purple font-semibold hover:underline">Buscar Deals</a>
+            </div>
+
+            <!-- Filter pills -->
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+              <button onclick="filterCreatorDeals('all')" class="cd-filter-pill text-xs px-3 py-1.5 rounded-full border font-semibold transition whitespace-nowrap bg-creo-purple text-white border-creo-purple" data-filter="all">Todos</button>
+              <button onclick="filterCreatorDeals('pending')" class="cd-filter-pill text-xs px-3 py-1.5 rounded-full border font-semibold transition whitespace-nowrap bg-white text-gray-600 border-gray-300" data-filter="pending">Pendientes</button>
+              <button onclick="filterCreatorDeals('accepted')" class="cd-filter-pill text-xs px-3 py-1.5 rounded-full border font-semibold transition whitespace-nowrap bg-white text-gray-600 border-gray-300" data-filter="accepted">Aceptados</button>
+              <button onclick="filterCreatorDeals('submitted')" class="cd-filter-pill text-xs px-3 py-1.5 rounded-full border font-semibold transition whitespace-nowrap bg-white text-gray-600 border-gray-300" data-filter="submitted">Enviados</button>
+              <button onclick="filterCreatorDeals('approved')" class="cd-filter-pill text-xs px-3 py-1.5 rounded-full border font-semibold transition whitespace-nowrap bg-white text-gray-600 border-gray-300" data-filter="approved">Aprobados</button>
+              <button onclick="filterCreatorDeals('paid')" class="cd-filter-pill text-xs px-3 py-1.5 rounded-full border font-semibold transition whitespace-nowrap bg-white text-gray-600 border-gray-300" data-filter="paid">Pagados</button>
+              <button onclick="filterCreatorDeals('disputed')" class="cd-filter-pill text-xs px-3 py-1.5 rounded-full border font-semibold transition whitespace-nowrap bg-white text-gray-600 border-gray-300" data-filter="disputed">Disputados</button>
+            </div>
+
             <div id="deals-no-stripe" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700">
-              Conecta tu cuenta de Stripe para poder aceptar Brand Deals. <button onclick="showTab('stripe')" class="underline font-semibold">Conectar Stripe →</button>
+              Conecta tu cuenta de Stripe para poder aceptar Brand Deals. <button onclick="showTab('stripe')" class="underline font-semibold">Conectar Stripe</button>
             </div>
             <div id="my-deal-requests" class="space-y-3"></div>
             <div id="no-deal-requests" class="hidden text-center py-6">
-              <p class="text-xs text-gray-400">No tienes solicitudes de Brand Deals aún.</p>
-              <a href="explore.html" class="text-xs text-creo-purple underline font-semibold mt-1 inline-block">Explorar Brand Deals →</a>
+              <svg class="w-12 h-12 text-gray-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              <p class="text-sm font-semibold text-gray-500">No tienes Brand Deals aún</p>
+              <p class="text-xs text-gray-400 mt-1">Explora las ofertas de marcas y empresas</p>
+              <a href="explore.html" class="inline-block mt-3 px-4 py-2 bg-creo-purple text-white text-xs font-semibold rounded-lg hover:opacity-90 transition">Explorar Brand Deals</a>
             </div>
           </div>
         </div>
 
         <!-- Business view: create and manage campaigns -->
         <div id="deals-business-view" class="hidden">
-          <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+          <!-- Business stats bar -->
+          <div class="grid grid-cols-4 gap-2 mb-4">
+            <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
+              <p class="text-lg font-bold text-amber-600" id="bd-stat-campaigns">0</p>
+              <p class="text-[10px] text-gray-400">Campanas</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
+              <p class="text-lg font-bold text-blue-600" id="bd-stat-requests">0</p>
+              <p class="text-[10px] text-gray-400">Solicitudes</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
+              <p class="text-lg font-bold text-green-600" id="bd-stat-completed">0</p>
+              <p class="text-[10px] text-gray-400">Completados</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-3 text-center">
+              <p class="text-lg font-bold text-creo-purple" id="bd-stat-spent">$0</p>
+              <p class="text-[10px] text-gray-400">Invertido</p>
+            </div>
+          </div>
+
+          <!-- Sub-tabs: Create / My Campaigns -->
+          <div class="flex gap-1 bg-gray-100 rounded-xl p-1 mb-4">
+            <button onclick="showBizDealTab('create')" id="biz-tab-create" class="flex-1 py-2 text-xs font-semibold rounded-lg transition bg-white text-gray-900 shadow-sm">Crear Deal</button>
+            <button onclick="showBizDealTab('campaigns')" id="biz-tab-campaigns" class="flex-1 py-2 text-xs font-semibold rounded-lg transition text-gray-500">Mis Campanas</button>
+            <button onclick="showBizDealTab('requests')" id="biz-tab-requests" class="flex-1 py-2 text-xs font-semibold rounded-lg transition text-gray-500">Solicitudes</button>
+          </div>
+
+          <!-- Create Deal Form -->
+          <div id="biz-panel-create" class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
             <h3 class="font-bold text-gray-900 flex items-center gap-2">
               <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
               Crear Brand Deal
             </h3>
             <div class="space-y-3">
               <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Título del Deal *</label>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Titulo del Deal *</label>
                 <input id="deal-title" type="text" placeholder="Ej: Review de producto en TikTok" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
               </div>
               <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
-                <textarea id="deal-description" rows="2" placeholder="Describe la campaña..." class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple"></textarea>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Descripcion</label>
+                <textarea id="deal-description" rows="2" placeholder="Describe la campana..." class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple"></textarea>
               </div>
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Requisitos / Instrucciones *</label>
                 <textarea id="deal-requirements" rows="3" placeholder="1. Hacer un video de 60 segundos...&#10;2. Mencionar la marca...&#10;3. Publicar en TikTok e Instagram..." class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple"></textarea>
               </div>
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Presupuesto por creador (USD) * <span class="text-gray-400">mínimo $5</span></label>
-                <input id="deal-budget" type="number" min="5" step="0.01" placeholder="50.00" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Presupuesto / creador (USD) *</label>
+                  <input id="deal-budget" type="number" min="5" step="0.01" placeholder="50.00" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Max Creadores</label>
+                  <input id="deal-max-creators" type="number" min="1" value="1" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+                </div>
               </div>
               <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Máximo de creadores</label>
-                <input id="deal-max-creators" type="number" min="1" value="1" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Categoria</label>
+                <select id="deal-category" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+                  <option value="">Seleccionar categoria...</option>
+                  <option value="review">Review de Producto</option>
+                  <option value="unboxing">Unboxing</option>
+                  <option value="tutorial">Tutorial / How-To</option>
+                  <option value="mention">Mencion en Video</option>
+                  <option value="dedicated">Video Dedicado</option>
+                  <option value="social">Post en Redes Sociales</option>
+                  <option value="story">Historia / Story</option>
+                  <option value="ugc">UGC (Contenido Generado)</option>
+                  <option value="other">Otro</option>
+                </select>
               </div>
               <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Términos y Condiciones *</label>
-                <textarea id="deal-terms" rows="4" placeholder="Escribe los términos legales del deal. El creador deberá aceptarlos antes de participar..." class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple"></textarea>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Fecha Limite de Entrega</label>
+                <input id="deal-deadline" type="date" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Terminos y Condiciones *</label>
+                <textarea id="deal-terms" rows="4" placeholder="Escribe los terminos legales del deal..." class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple"></textarea>
               </div>
               <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-[11px] text-gray-500 space-y-1">
-                <p>Al crear un Brand Deal:</p>
-                <p>• El creador recibirá el pago directo a su Stripe al completar el trabajo</p>
-                <p>• CREO retiene un 7% de comisión de plataforma</p>
-                <p>• CREO no se hace responsable por disputas entre marca y creador</p>
-                <p>• Estafadores serán rastreados y expulsados permanentemente</p>
+                <p class="font-semibold text-gray-700">Al crear un Brand Deal:</p>
+                <p>&#8226; El creador recibe el pago directo a su Stripe al completar</p>
+                <p>&#8226; CREO retiene un 7% de comision de plataforma</p>
+                <p>&#8226; Puedes enviar el deal a creadores especificos o hacerlo publico</p>
+                <p>&#8226; Disputas se resuelven con evidencia proporcionada por ambas partes</p>
               </div>
               <button onclick="createBrandDeal()" id="create-deal-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
@@ -992,12 +1077,40 @@
             </div>
           </div>
 
-          <!-- My active campaigns -->
-          <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4 mt-4">
-            <h3 class="font-bold text-gray-900 text-sm">Mis Campañas Activas</h3>
+          <!-- My Campaigns Panel -->
+          <div id="biz-panel-campaigns" class="hidden bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-gray-900 text-sm">Mis Campanas</h3>
+              <div class="flex gap-1">
+                <button onclick="filterBizCampaigns('all')" class="bc-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-creo-purple text-white" data-f="all">Todas</button>
+                <button onclick="filterBizCampaigns('active')" class="bc-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-gray-100 text-gray-500" data-f="active">Activas</button>
+                <button onclick="filterBizCampaigns('paused')" class="bc-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-gray-100 text-gray-500" data-f="paused">Pausadas</button>
+                <button onclick="filterBizCampaigns('completed')" class="bc-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-gray-100 text-gray-500" data-f="completed">Cerradas</button>
+              </div>
+            </div>
             <div id="my-campaigns" class="space-y-3"></div>
             <div id="no-campaigns" class="hidden text-center py-4">
-              <p class="text-xs text-gray-400">No tienes campañas activas</p>
+              <svg class="w-10 h-10 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              <p class="text-xs text-gray-400">No tienes campanas aun</p>
+              <button onclick="showBizDealTab('create')" class="text-xs text-creo-purple underline font-semibold mt-1">Crear tu primer Brand Deal</button>
+            </div>
+          </div>
+
+          <!-- All Requests Panel -->
+          <div id="biz-panel-requests" class="hidden bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-gray-900 text-sm">Todas las Solicitudes</h3>
+              <div class="flex gap-1">
+                <button onclick="filterBizRequests('all')" class="br-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-creo-purple text-white" data-f="all">Todas</button>
+                <button onclick="filterBizRequests('pending')" class="br-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-gray-100 text-gray-500" data-f="pending">Pendientes</button>
+                <button onclick="filterBizRequests('accepted')" class="br-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-gray-100 text-gray-500" data-f="accepted">Aceptados</button>
+                <button onclick="filterBizRequests('submitted')" class="br-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-gray-100 text-gray-500" data-f="submitted">Enviados</button>
+                <button onclick="filterBizRequests('paid')" class="br-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-gray-100 text-gray-500" data-f="paid">Pagados</button>
+              </div>
+            </div>
+            <div id="biz-all-requests" class="space-y-3"></div>
+            <div id="no-biz-requests" class="hidden text-center py-4">
+              <p class="text-xs text-gray-400">No hay solicitudes</p>
             </div>
           </div>
         </div>
@@ -1642,6 +1755,7 @@
       const imgs = m.images || [];
       const badge = isDummy ? ' <span class="text-[10px]">🤖</span>' : '';
       const actions = isDummy ? '' : `<div class="flex gap-2">
+        <button onclick="editMeta('${m.id}')" class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-600">Editar</button>
         <button onclick="toggleMeta('${m.id}', ${!m.is_active})" class="text-xs px-2 py-1 rounded ${m.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">${m.is_active ? 'Activa' : 'Inactiva'}</button>
         <button onclick="deleteMeta('${m.id}')" class="text-xs px-2 py-1 rounded bg-red-100 text-red-600">Eliminar</button>
       </div>`;
@@ -1668,9 +1782,11 @@
       const { data } = await sb.from('metas').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false });
       const list = document.getElementById('metas-list');
       if (!data || data.length === 0) {
+        myMetasCache = [];
         list.innerHTML = DUMMY_METAS.map(m => renderMetaCard(m, true)).join('');
         return;
       }
+      myMetasCache = data;
       // Sync DB fund_status back to localStorage stages
       const stages = getMetaStages();
       data.forEach(m => {
@@ -1756,7 +1872,82 @@
     }
 
     async function toggleMeta(id, active) { await sb.from('metas').update({ is_active: active }).eq('id', id); loadMetas(); }
-    async function deleteMeta(id) { if (!confirm('¿Eliminar?')) return; await sb.from('metas').delete().eq('id', id); loadMetas(); }
+    async function deleteMeta(id) { if (!confirm('¿Eliminar esta meta?')) return; await sb.from('metas').delete().eq('id', id); showToast('Meta eliminada', 'success'); loadMetas(); }
+
+    function editMeta(id) {
+      const m = myMetasCache.find(x => x.id === id);
+      if (!m) return;
+      let existing = document.getElementById('edit-meta-modal');
+      if (existing) existing.remove();
+      const modal = document.createElement('div');
+      modal.id = 'edit-meta-modal';
+      modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4';
+      modal.innerHTML = `
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('edit-meta-modal').remove()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-lg text-gray-900">Editar Meta</h3>
+            <button onclick="document.getElementById('edit-meta-modal').remove()" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Titulo</label>
+            <input id="edit-meta-title" type="text" value="${esc(m.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripcion</label>
+            <textarea id="edit-meta-desc" rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(m.description || '')}</textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Meta ($)</label>
+              <input id="edit-meta-goal" type="number" step="0.01" min="1" value="${(m.goal_amount_cents / 100).toFixed(2)}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Estado</label>
+              <select id="edit-meta-active" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+                <option value="true" ${m.is_active ? 'selected' : ''}>Activa</option>
+                <option value="false" ${!m.is_active ? 'selected' : ''}>Inactiva</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Fecha Inicio</label>
+              <input id="edit-meta-start" type="date" value="${m.start_date || ''}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Fecha Fin</label>
+              <input id="edit-meta-end" type="date" value="${m.end_date || ''}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="saveMetaEdit('${m.id}')" id="save-meta-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Cambios</button>
+            <button onclick="document.getElementById('edit-meta-modal').remove()" class="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition">Cancelar</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+    }
+
+    async function saveMetaEdit(id) {
+      const btn = document.getElementById('save-meta-btn');
+      btn.textContent = 'Guardando...'; btn.disabled = true;
+      const title = document.getElementById('edit-meta-title').value.trim();
+      const description = document.getElementById('edit-meta-desc').value.trim();
+      const goal_amount_cents = Math.round(parseFloat(document.getElementById('edit-meta-goal').value) * 100);
+      const is_active = document.getElementById('edit-meta-active').value === 'true';
+      const start_date = document.getElementById('edit-meta-start').value;
+      const end_date = document.getElementById('edit-meta-end').value;
+      if (!title) { btn.textContent = 'Guardar Cambios'; btn.disabled = false; return showToast('El titulo es requerido', 'error'); }
+      if (goal_amount_cents < 100) { btn.textContent = 'Guardar Cambios'; btn.disabled = false; return showToast('La meta debe ser al menos $1', 'error'); }
+      const { error } = await sb.from('metas').update({ title, description: description || null, goal_amount_cents, is_active, start_date, end_date }).eq('id', id).eq('creator_id', currentUser.id);
+      btn.textContent = 'Guardar Cambios'; btn.disabled = false;
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      document.getElementById('edit-meta-modal').remove();
+      showToast('Meta actualizada', 'success');
+      loadMetas();
+    }
 
     // ===== 3-STAGE FUND RELEASE =====
     const META_STAGE_KEY = 'creo-meta-stages';
@@ -2247,6 +2438,10 @@
       stopCamera();
     }
 
+    let myPostsCache = [];
+    let myMetasCache = [];
+    let myBizLinksCache = [];
+
     const DUMMY_POSTS = [
       { id:'dp1', caption:'Mi proceso creativo para el mural del centro 🎨', video_type:'youtube', video_url:'https://youtube.com/watch?v=demo1', created_at:'2026-06-28T10:00:00Z', isDummy:true },
       { id:'dp2', caption:'Tutorial rápido: cómo mezclar colores acrílicos', video_type:'tiktok', video_url:'https://tiktok.com/@demo/video/123', created_at:'2026-06-25T15:30:00Z', isDummy:true },
@@ -2254,7 +2449,10 @@
 
     function renderPostCard(p, isDummy) {
       const badge = isDummy ? ' <span class="text-[10px]">🤖</span>' : '';
-      const deleteBtn = isDummy ? '' : `<button onclick="deletePost('${p.id}')" class="text-xs px-2 py-1 rounded bg-red-100 text-red-600">Eliminar</button>`;
+      const deleteBtn = isDummy ? '' : `<div class="flex gap-1">
+        <button onclick="editPost('${p.id}')" class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-600">Editar</button>
+        <button onclick="deletePost('${p.id}')" class="text-xs px-2 py-1 rounded bg-red-100 text-red-600">Eliminar</button>
+      </div>`;
       const isDirectVideo = p.video_type === 'direct' && p.video_url && !p.video_url.includes('youtube') && !p.video_url.includes('tiktok');
       const videoHtml = isDummy
         ? `<div class="w-full aspect-video rounded-lg bg-gray-100 flex items-center justify-center"><svg class="w-12 h-12 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>`
@@ -2274,9 +2472,11 @@
       const { data } = await sb.from('posts').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false });
       const list = document.getElementById('posts-list');
       if (!data || data.length === 0) {
+        myPostsCache = [];
         list.innerHTML = DUMMY_POSTS.map(p => renderPostCard(p, true)).join('');
         return;
       }
+      myPostsCache = data;
       list.innerHTML = data.map(p => renderPostCard(p, false)).join('');
     }
 
@@ -2331,7 +2531,54 @@
       }
     }
 
-    async function deletePost(id) { if (!confirm('¿Eliminar?')) return; await sb.from('posts').delete().eq('id', id); loadPosts(); }
+    async function deletePost(id) { if (!confirm('¿Eliminar?')) return; await sb.from('posts').delete().eq('id', id); showToast('Post eliminado', 'success'); loadPosts(); }
+
+    function editPost(id) {
+      const p = myPostsCache.find(x => x.id === id);
+      if (!p) return;
+      let existing = document.getElementById('edit-post-modal');
+      if (existing) existing.remove();
+      const modal = document.createElement('div');
+      modal.id = 'edit-post-modal';
+      modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4';
+      modal.innerHTML = `
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('edit-post-modal').remove()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-lg text-gray-900">Editar Post</h3>
+            <button onclick="document.getElementById('edit-post-modal').remove()" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Caption</label>
+            <textarea id="edit-post-caption" rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(p.caption || '')}</textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">URL del Video</label>
+            <input id="edit-post-url" type="text" value="${esc(p.video_url || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          </div>
+          <div class="flex gap-3">
+            <button onclick="savePostEdit('${p.id}')" id="save-post-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Cambios</button>
+            <button onclick="document.getElementById('edit-post-modal').remove()" class="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition">Cancelar</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+    }
+
+    async function savePostEdit(id) {
+      const btn = document.getElementById('save-post-btn');
+      btn.textContent = 'Guardando...'; btn.disabled = true;
+      const caption = document.getElementById('edit-post-caption').value.trim();
+      const video_url = document.getElementById('edit-post-url').value.trim();
+      const video_type = detectVideoType(video_url);
+      const { error } = await sb.from('posts').update({ caption, video_url, video_type }).eq('id', id).eq('creator_id', currentUser.id);
+      btn.textContent = 'Guardar Cambios'; btn.disabled = false;
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      document.getElementById('edit-post-modal').remove();
+      showToast('Post actualizado', 'success');
+      loadPosts();
+    }
 
     // STATS
     async function loadCreatorStats(userId) {
@@ -2587,7 +2834,8 @@
       if (!currentUser) return;
       const { data } = await sb.from('business_links').select('*').eq('creator_id', currentUser.id).order('sort_order', { ascending: true });
       const list = document.getElementById('my-biz-list');
-      if (!data || data.length === 0) { list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">No tienes enlaces de negocio aún.</p>'; return; }
+      if (!data || data.length === 0) { myBizLinksCache = []; list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">No tienes enlaces de negocio aún.</p>'; return; }
+      myBizLinksCache = data;
       list.innerHTML = data.map((l, i) => `<div class="bg-white p-4 rounded-xl border border-gray-200 flex gap-3 items-center">
         ${l.image_url ? `<img src="${esc(l.image_url)}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0">` : `<div class="w-12 h-12 rounded-lg bg-creo-purple/10 flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/></svg></div>`}
         <div class="flex-1 min-w-0">
@@ -2595,6 +2843,7 @@
           <p class="text-[10px] text-gray-400 truncate">${esc(l.url)}</p>
           ${l.description ? `<p class="text-xs text-gray-500 truncate">${esc(l.description)}</p>` : ''}
         </div>
+        <button onclick="editBusinessLink('${l.id}')" class="text-blue-500 hover:text-blue-700 text-xs px-2 py-1 bg-blue-50 rounded flex-shrink-0">✎</button>
         <button onclick="deleteBusinessLink('${l.id}')" class="text-red-500 hover:text-red-700 text-xs px-2 py-1 bg-red-50 rounded flex-shrink-0">✕</button>
       </div>`).join('');
     }
@@ -2626,7 +2875,61 @@
     }
 
     async function deleteBusinessLink(id) {
+      if (!confirm('¿Eliminar este enlace?')) return;
       await sb.from('business_links').delete().eq('id', id).eq('creator_id', currentUser.id);
+      showToast('Enlace eliminado', 'success');
+      loadMyBusinessLinks();
+    }
+
+    function editBusinessLink(id) {
+      const l = myBizLinksCache.find(x => x.id === id);
+      if (!l) return;
+      let existing = document.getElementById('edit-biz-modal');
+      if (existing) existing.remove();
+      const modal = document.createElement('div');
+      modal.id = 'edit-biz-modal';
+      modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4';
+      modal.innerHTML = `
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('edit-biz-modal').remove()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-lg text-gray-900">Editar Enlace</h3>
+            <button onclick="document.getElementById('edit-biz-modal').remove()" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Titulo</label>
+            <input id="edit-biz-title" type="text" value="${esc(l.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">URL</label>
+            <input id="edit-biz-url" type="text" value="${esc(l.url || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripcion</label>
+            <textarea id="edit-biz-desc" rows="2" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(l.description || '')}</textarea>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="saveBusinessLinkEdit('${l.id}')" id="save-biz-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Cambios</button>
+            <button onclick="document.getElementById('edit-biz-modal').remove()" class="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition">Cancelar</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+    }
+
+    async function saveBusinessLinkEdit(id) {
+      const btn = document.getElementById('save-biz-btn');
+      btn.textContent = 'Guardando...'; btn.disabled = true;
+      const title = document.getElementById('edit-biz-title').value.trim();
+      const url = document.getElementById('edit-biz-url').value.trim();
+      const description = document.getElementById('edit-biz-desc').value.trim();
+      if (!title || !url) { btn.textContent = 'Guardar Cambios'; btn.disabled = false; return showToast('Titulo y URL son requeridos', 'error'); }
+      const { error } = await sb.from('business_links').update({ title, url, description: description || null }).eq('id', id).eq('creator_id', currentUser.id);
+      btn.textContent = 'Guardar Cambios'; btn.disabled = false;
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      document.getElementById('edit-biz-modal').remove();
+      showToast('Enlace actualizado', 'success');
       loadMyBusinessLinks();
     }
 
@@ -3059,80 +3362,137 @@
 
     // ===== BRAND DEALS =====
     const SUPABASE_FUNC_URL = 'https://qddxoyjtoxtdcezwuvcq.supabase.co/functions/v1';
+    let creatorDealsCache = [];
+    let bizCampaignsCache = [];
+    let bizAllRequestsCache = [];
+    let currentCreatorFilter = 'all';
+    let currentBizCampaignFilter = 'all';
+    let currentBizRequestFilter = 'all';
 
-    async function loadMyDeals() {
-      if (!currentUser) return;
-      const isBusiness = currentProfile?.account_type === 'business';
+    // ---- Business sub-tabs ----
+    function showBizDealTab(tab) {
+      ['create','campaigns','requests'].forEach(t => {
+        const panel = document.getElementById('biz-panel-' + t);
+        const btn = document.getElementById('biz-tab-' + t);
+        if (t === tab) {
+          panel.classList.remove('hidden');
+          btn.className = btn.className.replace('text-gray-500', 'bg-white text-gray-900 shadow-sm');
+        } else {
+          panel.classList.add('hidden');
+          btn.className = btn.className.replace('bg-white text-gray-900 shadow-sm', 'text-gray-500');
+        }
+      });
+      if (tab === 'campaigns') loadMyCampaigns();
+      if (tab === 'requests') loadBizAllRequests();
+    }
 
-      if (isBusiness) {
-        await loadMyCampaigns();
-        return;
-      }
+    // ---- Creator filter pills ----
+    function filterCreatorDeals(status) {
+      currentCreatorFilter = status;
+      document.querySelectorAll('.cd-filter-pill').forEach(btn => {
+        if (btn.dataset.filter === status) {
+          btn.className = 'cd-filter-pill text-xs px-3 py-1.5 rounded-full border font-semibold transition whitespace-nowrap bg-creo-purple text-white border-creo-purple';
+        } else {
+          btn.className = 'cd-filter-pill text-xs px-3 py-1.5 rounded-full border font-semibold transition whitespace-nowrap bg-white text-gray-600 border-gray-300';
+        }
+      });
+      renderCreatorDeals();
+    }
 
-      const { data, error } = await sb
-        .from('brand_deal_requests')
-        .select('*, deal:deal_id(title, description, requirements, budget_per_creator_cents, terms_conditions, brand:brand_id(username, display_name, avatar_url))')
-        .eq('creator_id', currentUser.id)
-        .order('created_at', { ascending: false });
-
+    function renderCreatorDeals() {
+      const filtered = currentCreatorFilter === 'all' ? creatorDealsCache : creatorDealsCache.filter(r => r.status === currentCreatorFilter);
       const container = document.getElementById('my-deal-requests');
       const noDeals = document.getElementById('no-deal-requests');
 
-      if (error || !data || !data.length) {
+      if (!filtered.length) {
         container.innerHTML = '';
         noDeals.classList.remove('hidden');
         return;
       }
       noDeals.classList.add('hidden');
 
-      container.innerHTML = data.map(req => {
+      container.innerHTML = filtered.map(req => {
         const deal = req.deal;
         if (!deal) return '';
         const brandName = deal.brand?.display_name || deal.brand?.username || 'Marca';
+        const brandAvatar = deal.brand?.avatar_url
+          ? `<img src="${esc(deal.brand.avatar_url)}" class="w-8 h-8 rounded-full object-cover">`
+          : `<div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center"><span class="text-amber-600 font-bold text-xs">${esc(brandName[0])}</span></div>`;
         const budgetUsd = (deal.budget_per_creator_cents / 100).toFixed(2);
         const statusLabels = {
-          pending: ['Pendiente', 'bg-yellow-100 text-yellow-700'],
-          accepted: ['Aceptado', 'bg-blue-100 text-blue-700'],
-          rejected: ['Rechazado', 'bg-red-100 text-red-700'],
-          submitted: ['Enviado', 'bg-purple-100 text-purple-700'],
-          approved: ['Aprobado', 'bg-green-100 text-green-700'],
-          paid: ['Pagado', 'bg-green-200 text-green-800'],
-          disputed: ['Disputado', 'bg-red-200 text-red-800'],
-          cancelled: ['Cancelado', 'bg-gray-100 text-gray-600']
+          pending: ['Pendiente', 'bg-yellow-100 text-yellow-700', 'border-yellow-200'],
+          accepted: ['Aceptado', 'bg-blue-100 text-blue-700', 'border-blue-200'],
+          rejected: ['Rechazado', 'bg-red-100 text-red-700', 'border-red-200'],
+          submitted: ['Trabajo Enviado', 'bg-purple-100 text-purple-700', 'border-purple-200'],
+          approved: ['Aprobado', 'bg-green-100 text-green-700', 'border-green-200'],
+          paid: ['Pagado', 'bg-green-200 text-green-800', 'border-green-300'],
+          disputed: ['Disputado', 'bg-red-200 text-red-800', 'border-red-300'],
+          cancelled: ['Cancelado', 'bg-gray-100 text-gray-600', 'border-gray-200']
         };
-        const [label, cls] = statusLabels[req.status] || ['Desconocido', 'bg-gray-100 text-gray-500'];
+        const [label, cls, borderCls] = statusLabels[req.status] || ['?', 'bg-gray-100 text-gray-500', 'border-gray-200'];
+        const timeStr = new Date(req.created_at).toLocaleDateString();
 
         let actions = '';
         if (req.status === 'pending') {
           actions = `
-            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-[11px] text-gray-500 max-h-24 overflow-y-auto mb-2">
-              <strong>Términos:</strong><br>${esc(deal.terms_conditions)}
-            </div>
-            <div class="flex gap-2">
-              <button onclick="acceptDeal('${req.id}')" class="flex-1 bg-creo-purple text-white py-2 rounded-lg text-xs font-bold hover:opacity-90 transition">Aceptar Contrato</button>
-              <button onclick="rejectDeal('${req.id}')" class="flex-1 bg-gray-200 text-gray-600 py-2 rounded-lg text-xs font-bold hover:bg-gray-300 transition">Rechazar</button>
+            <div class="mt-3 space-y-2">
+              <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-[11px] text-gray-500 max-h-32 overflow-y-auto">
+                <p class="font-semibold text-gray-700 mb-1">Terminos del Contrato:</p>
+                <p class="whitespace-pre-line">${esc(deal.terms_conditions)}</p>
+              </div>
+              <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-[11px] text-gray-600">
+                <p class="font-semibold text-amber-700 mb-1">Requisitos:</p>
+                <p class="whitespace-pre-line">${esc(deal.requirements)}</p>
+              </div>
+              ${deal.description ? `<p class="text-[11px] text-gray-500">${esc(deal.description)}</p>` : ''}
+              <div class="flex gap-2">
+                <button onclick="acceptDeal('${req.id}')" class="flex-1 bg-creo-purple text-white py-2.5 rounded-lg text-xs font-bold hover:opacity-90 transition">Aceptar Contrato</button>
+                <button onclick="rejectDeal('${req.id}')" class="flex-1 bg-gray-200 text-gray-600 py-2.5 rounded-lg text-xs font-bold hover:bg-gray-300 transition">Rechazar</button>
+              </div>
             </div>`;
         } else if (req.status === 'accepted') {
+          const deadlineStr = deal.deadline ? `<p class="text-[10px] text-red-500 font-semibold mt-1">Fecha limite: ${deal.deadline}</p>` : '';
           actions = `
-            <div class="space-y-2">
-              <p class="text-[11px] text-gray-500"><strong>Requisitos:</strong></p>
-              <p class="text-[11px] text-gray-500 whitespace-pre-line">${esc(deal.requirements)}</p>
+            <div class="mt-3 space-y-2">
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-[11px] text-gray-600">
+                <p class="font-semibold text-blue-700 mb-1">Requisitos a cumplir:</p>
+                <p class="whitespace-pre-line">${esc(deal.requirements)}</p>
+                ${deadlineStr}
+              </div>
               <input id="submit-url-${req.id}" type="url" placeholder="URL del contenido publicado" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-xs text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
               <textarea id="submit-notes-${req.id}" rows="2" placeholder="Notas adicionales (opcional)" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-xs text-gray-900 outline-none"></textarea>
-              <button onclick="submitDealWork('${req.id}')" class="w-full bg-creo-mint text-creo-purple py-2 rounded-lg text-xs font-bold hover:opacity-90 transition">Enviar Trabajo</button>
+              <button onclick="submitDealWork('${req.id}')" class="w-full bg-creo-mint text-creo-purple py-2.5 rounded-lg text-xs font-bold hover:opacity-90 transition">Enviar Trabajo Completado</button>
             </div>`;
+        } else if (req.status === 'submitted') {
+          actions = `<div class="mt-2 bg-purple-50 border border-purple-200 rounded-lg p-3 text-center">
+            <p class="text-xs text-purple-700 font-semibold">Trabajo enviado — esperando revision de la marca</p>
+            <a href="${esc(req.submission_url || '#')}" target="_blank" class="text-[11px] text-creo-purple underline mt-1 inline-block">Ver mi envio</a>
+          </div>`;
+        } else if (req.status === 'approved') {
+          actions = `<div class="mt-2 bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+            <p class="text-xs text-green-700 font-semibold">Trabajo aprobado — pago en proceso</p>
+          </div>`;
         } else if (req.status === 'paid') {
-          actions = `<p class="text-xs text-green-600 font-semibold text-center">Pago recibido en tu Stripe</p>`;
+          actions = `<div class="mt-2 bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+            <svg class="w-6 h-6 text-green-500 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <p class="text-xs text-green-700 font-semibold">$${budgetUsd} recibido en tu Stripe</p>
+          </div>`;
+        } else if (req.status === 'disputed') {
+          actions = `<div class="mt-2 bg-red-50 border border-red-200 rounded-lg p-3">
+            <p class="text-xs text-red-700 font-semibold text-center">Deal disputado por la marca</p>
+            <p class="text-[11px] text-red-600 mt-1 text-center">Contacta soporte si crees que es un error</p>
+          </div>`;
         }
 
-        return `<div class="border border-gray-200 rounded-xl p-4 space-y-2">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="font-bold text-sm">${esc(deal.title)}</p>
-              <p class="text-xs text-gray-400">por ${esc(brandName)}</p>
+        return `<div class="border ${borderCls} rounded-xl p-4 space-y-1 transition hover:shadow-sm">
+          <div class="flex items-center gap-3">
+            ${brandAvatar}
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-sm truncate">${esc(deal.title)}</p>
+              <p class="text-[10px] text-gray-400">por ${esc(brandName)} · ${timeStr}</p>
             </div>
-            <div class="text-right">
-              <span class="text-xs font-semibold px-2 py-1 rounded-full ${cls}">${label}</span>
+            <div class="text-right flex-shrink-0">
+              <span class="text-[10px] font-semibold px-2 py-1 rounded-full ${cls}">${label}</span>
               <p class="text-xs font-bold text-green-600 mt-1">$${budgetUsd}</p>
             </div>
           </div>
@@ -3141,11 +3501,37 @@
       }).join('');
     }
 
+    async function loadMyDeals() {
+      if (!currentUser) return;
+      const isBusiness = currentProfile?.account_type === 'business';
+      if (isBusiness) { await loadMyCampaigns(); await loadBizAllRequests(); return; }
+
+      const { data } = await sb
+        .from('brand_deal_requests')
+        .select('*, deal:deal_id(title, description, requirements, budget_per_creator_cents, terms_conditions, deadline, category, brand:brand_id(username, display_name, avatar_url))')
+        .eq('creator_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      creatorDealsCache = data || [];
+
+      // Update stats
+      const active = creatorDealsCache.filter(r => ['pending','accepted'].includes(r.status)).length;
+      const submitted = creatorDealsCache.filter(r => r.status === 'submitted').length;
+      const paid = creatorDealsCache.filter(r => r.status === 'paid').length;
+      const earned = creatorDealsCache.filter(r => r.status === 'paid').reduce((sum, r) => sum + (r.deal?.budget_per_creator_cents || 0), 0);
+      document.getElementById('cd-stat-active').textContent = active;
+      document.getElementById('cd-stat-submitted').textContent = submitted;
+      document.getElementById('cd-stat-paid').textContent = paid;
+      document.getElementById('cd-stat-earned').textContent = '$' + (earned / 100).toFixed(0);
+
+      renderCreatorDeals();
+    }
+
     async function acceptDeal(requestId) {
-      if (!confirm('Al aceptar, te comprometes a cumplir los términos y condiciones del deal. ¿Continuar?')) return;
+      if (!confirm('Al aceptar, te comprometes a cumplir los terminos y condiciones del deal. ¿Continuar?')) return;
       const { error } = await sb.rpc('accept_brand_deal', { p_request_id: requestId });
       if (error) { showToast('Error: ' + error.message, 'error'); return; }
-      showToast('Deal aceptado. Revisa los requisitos y envía tu trabajo.', 'success');
+      showToast('Deal aceptado. Revisa los requisitos y envia tu trabajo.', 'success');
       loadMyDeals();
     }
 
@@ -3162,7 +3548,7 @@
       if (!url) { showToast('Ingresa la URL del contenido publicado', 'error'); return; }
       const { error } = await sb.rpc('submit_brand_deal_work', { p_request_id: requestId, p_url: url, p_notes: notes || null });
       if (error) { showToast('Error: ' + error.message, 'error'); return; }
-      showToast('Trabajo enviado. La marca lo revisará.', 'success');
+      showToast('Trabajo enviado. La marca lo revisara.', 'success');
       loadMyDeals();
     }
 
@@ -3175,11 +3561,13 @@
       const budgetStr = document.getElementById('deal-budget').value;
       const maxCreators = parseInt(document.getElementById('deal-max-creators').value) || 1;
       const terms = document.getElementById('deal-terms').value.trim();
+      const category = document.getElementById('deal-category')?.value || null;
+      const deadline = document.getElementById('deal-deadline')?.value || null;
 
-      if (!title) { showToast('Agrega un título', 'error'); return; }
+      if (!title) { showToast('Agrega un titulo', 'error'); return; }
       if (!requirements) { showToast('Agrega los requisitos', 'error'); return; }
-      if (!budgetStr || parseFloat(budgetStr) < 5) { showToast('El presupuesto mínimo es $5', 'error'); return; }
-      if (!terms) { showToast('Agrega los términos y condiciones', 'error'); return; }
+      if (!budgetStr || parseFloat(budgetStr) < 5) { showToast('El presupuesto minimo es $5', 'error'); return; }
+      if (!terms) { showToast('Agrega los terminos y condiciones', 'error'); return; }
 
       const budgetCents = Math.round(parseFloat(budgetStr) * 100);
       const btn = document.getElementById('create-deal-btn');
@@ -3192,7 +3580,9 @@
         requirements,
         budget_per_creator_cents: budgetCents,
         terms_conditions: terms,
-        max_creators: maxCreators
+        max_creators: maxCreators,
+        category: category || null,
+        deadline: deadline || null
       }]);
 
       btn.disabled = false; btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> Publicar Brand Deal';
@@ -3205,112 +3595,259 @@
       document.getElementById('deal-budget').value = '';
       document.getElementById('deal-max-creators').value = '1';
       document.getElementById('deal-terms').value = '';
-      loadMyCampaigns();
+      if (document.getElementById('deal-category')) document.getElementById('deal-category').value = '';
+      if (document.getElementById('deal-deadline')) document.getElementById('deal-deadline').value = '';
+      showBizDealTab('campaigns');
     }
 
-    async function loadMyCampaigns() {
-      if (!currentUser) return;
-      const { data, error } = await sb
-        .from('brand_deals')
-        .select('*')
-        .eq('brand_id', currentUser.id)
-        .order('created_at', { ascending: false });
+    // ---- Business campaign filters ----
+    function filterBizCampaigns(status) {
+      currentBizCampaignFilter = status;
+      document.querySelectorAll('.bc-filter').forEach(btn => {
+        btn.className = btn.dataset.f === status
+          ? 'bc-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-creo-purple text-white'
+          : 'bc-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-gray-100 text-gray-500';
+      });
+      renderBizCampaigns();
+    }
 
+    function renderBizCampaigns() {
+      const filtered = currentBizCampaignFilter === 'all' ? bizCampaignsCache : bizCampaignsCache.filter(d => d.status === currentBizCampaignFilter);
       const container = document.getElementById('my-campaigns');
       const noCampaigns = document.getElementById('no-campaigns');
 
-      if (error || !data || !data.length) {
-        container.innerHTML = '';
-        noCampaigns.classList.remove('hidden');
-        return;
-      }
+      if (!filtered.length) { container.innerHTML = ''; noCampaigns.classList.remove('hidden'); return; }
       noCampaigns.classList.add('hidden');
 
-      const campaignHtml = [];
-      for (const deal of data) {
+      container.innerHTML = filtered.map(deal => {
         const budgetUsd = (deal.budget_per_creator_cents / 100).toFixed(2);
         const statusColors = { active: 'bg-green-100 text-green-700', paused: 'bg-yellow-100 text-yellow-700', completed: 'bg-blue-100 text-blue-700', cancelled: 'bg-red-100 text-red-700' };
-        const [cls] = [statusColors[deal.status] || 'bg-gray-100 text-gray-500'];
+        const cls = statusColors[deal.status] || 'bg-gray-100 text-gray-500';
+        const reqs = deal._requests || [];
+        const pendingCount = reqs.filter(r => r.status === 'pending').length;
+        const submittedCount = reqs.filter(r => r.status === 'submitted').length;
+        const paidCount = reqs.filter(r => r.status === 'paid').length;
+        const categoryLabel = deal.category ? `<span class="text-[10px] px-1.5 py-0.5 bg-amber-50 text-amber-600 rounded">${esc(deal.category)}</span>` : '';
 
-        const { data: requests } = await sb
-          .from('brand_deal_requests')
-          .select('*, creator:creator_id(username, display_name, avatar_url)')
-          .eq('deal_id', deal.id)
-          .order('created_at', { ascending: false });
-
-        const reqHtml = (requests || []).map(r => {
+        const reqHtml = reqs.map(r => {
           const cName = r.creator?.display_name || r.creator?.username || 'Creador';
+          const cAvatar = r.creator?.avatar_url
+            ? `<img src="${esc(r.creator.avatar_url)}" class="w-6 h-6 rounded-full object-cover">`
+            : `<div class="w-6 h-6 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-creo-purple font-bold text-[10px]">${esc(cName[0])}</span></div>`;
           const rStatusLabels = {
-            pending: ['Pendiente', 'text-yellow-600'],
-            accepted: ['Aceptado', 'text-blue-600'],
-            submitted: ['Trabajo Enviado', 'text-purple-600'],
-            approved: ['Aprobado - Pagar', 'text-green-600'],
-            paid: ['Pagado', 'text-green-700'],
-            rejected: ['Rechazado', 'text-red-500']
+            pending: ['Pendiente', 'text-yellow-600 bg-yellow-50'],
+            accepted: ['Aceptado', 'text-blue-600 bg-blue-50'],
+            submitted: ['Trabajo Enviado', 'text-purple-600 bg-purple-50'],
+            approved: ['Aprobado', 'text-green-600 bg-green-50'],
+            paid: ['Pagado', 'text-green-700 bg-green-100'],
+            rejected: ['Rechazado', 'text-red-500 bg-red-50'],
+            disputed: ['Disputado', 'text-red-700 bg-red-100']
           };
-          const [rLabel, rCls] = rStatusLabels[r.status] || ['', 'text-gray-500'];
+          const [rLabel, rCls] = rStatusLabels[r.status] || ['?', 'text-gray-500 bg-gray-50'];
 
           let rActions = '';
           if (r.status === 'submitted') {
-            rActions = `
-              <div class="mt-1 text-[11px]">
-                <a href="${esc(r.submission_url)}" target="_blank" class="text-creo-purple underline">Ver contenido</a>
-                ${r.submission_notes ? `<p class="text-gray-400 mt-0.5">Nota: ${esc(r.submission_notes)}</p>` : ''}
-                <div class="flex gap-2 mt-2">
-                  <button onclick="approveDealWork('${r.id}')" class="flex-1 bg-green-500 text-white py-1.5 rounded-lg text-xs font-bold hover:opacity-90">Aprobar</button>
-                  <button onclick="disputeDealWork('${r.id}')" class="flex-1 bg-red-100 text-red-600 py-1.5 rounded-lg text-xs font-bold hover:bg-red-200">Disputar</button>
-                </div>
-              </div>`;
+            rActions = `<div class="mt-2 space-y-1">
+              <a href="${esc(r.submission_url)}" target="_blank" class="text-creo-purple underline text-[11px] font-semibold">Ver contenido enviado</a>
+              ${r.submission_notes ? `<p class="text-[10px] text-gray-400">Nota: ${esc(r.submission_notes)}</p>` : ''}
+              <div class="flex gap-2 mt-1">
+                <button onclick="approveDealWork('${r.id}')" class="flex-1 bg-green-500 text-white py-1.5 rounded-lg text-[11px] font-bold hover:opacity-90">Aprobar</button>
+                <button onclick="requestRevision('${r.id}')" class="flex-1 bg-amber-100 text-amber-700 py-1.5 rounded-lg text-[11px] font-bold hover:bg-amber-200">Revision</button>
+                <button onclick="disputeDealWork('${r.id}')" class="flex-1 bg-red-100 text-red-600 py-1.5 rounded-lg text-[11px] font-bold hover:bg-red-200">Disputar</button>
+              </div>
+            </div>`;
           } else if (r.status === 'approved') {
-            rActions = `<button onclick="payCreator('${r.id}', ${deal.budget_per_creator_cents})" class="mt-1 w-full bg-creo-mint text-creo-purple py-1.5 rounded-lg text-xs font-bold hover:opacity-90">Pagar $${budgetUsd}</button>`;
+            rActions = `<button onclick="payCreator('${r.id}', ${deal.budget_per_creator_cents})" class="mt-1 w-full bg-creo-mint text-creo-purple py-2 rounded-lg text-xs font-bold hover:opacity-90">Pagar $${budgetUsd} a ${esc(cName)}</button>`;
           }
 
-          return `<div class="border-t border-gray-100 pt-2 mt-2">
-            <div class="flex items-center justify-between">
-              <p class="text-xs font-semibold">${esc(cName)}</p>
-              <span class="text-[10px] font-semibold ${rCls}">${rLabel}</span>
+          return `<div class="border-t border-gray-100 pt-3 mt-3">
+            <div class="flex items-center gap-2">
+              ${cAvatar}
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold truncate">${esc(cName)}</p>
+                <p class="text-[10px] text-gray-400">${new Date(r.created_at).toLocaleDateString()}</p>
+              </div>
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${rCls}">${rLabel}</span>
             </div>
             ${rActions}
           </div>`;
         }).join('');
 
-        campaignHtml.push(`<div class="border border-gray-200 rounded-xl p-4 space-y-1">
+        return `<div class="border border-gray-200 rounded-xl p-4 space-y-1">
           <div class="flex items-center justify-between">
-            <p class="font-bold text-sm">${esc(deal.title)}</p>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <p class="font-bold text-sm truncate">${esc(deal.title)}</p>
+                ${categoryLabel}
+              </div>
+              <div class="flex items-center gap-3 mt-0.5">
+                <span class="text-[10px] text-gray-400">$${budgetUsd}/creador</span>
+                <span class="text-[10px] text-gray-400">max ${deal.max_creators}</span>
+                ${deal.deadline ? `<span class="text-[10px] text-red-400">limite: ${deal.deadline}</span>` : ''}
+              </div>
+            </div>
             <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${cls}">${deal.status}</span>
           </div>
-          <p class="text-xs text-gray-400">$${budgetUsd} / creador • max ${deal.max_creators}</p>
+          ${reqs.length > 0 ? `<div class="flex gap-3 mt-1">
+            ${pendingCount ? `<span class="text-[10px] text-yellow-600">${pendingCount} pendiente${pendingCount > 1 ? 's' : ''}</span>` : ''}
+            ${submittedCount ? `<span class="text-[10px] text-purple-600">${submittedCount} enviado${submittedCount > 1 ? 's' : ''}</span>` : ''}
+            ${paidCount ? `<span class="text-[10px] text-green-600">${paidCount} pagado${paidCount > 1 ? 's' : ''}</span>` : ''}
+          </div>` : ''}
           ${reqHtml}
-          <div class="flex gap-2 mt-2">
+          <div class="flex gap-2 mt-3 pt-2 border-t border-gray-100">
             <button onclick="sendDealToCreator('${deal.id}')" class="flex-1 text-xs bg-creo-purple text-white py-1.5 rounded-lg font-semibold hover:opacity-90">Enviar a Creador</button>
-            ${deal.status === 'active' ? `<button onclick="pauseDeal('${deal.id}')" class="text-xs bg-gray-200 text-gray-600 py-1.5 px-3 rounded-lg font-semibold hover:bg-gray-300">Pausar</button>` : ''}
+            <button onclick="editBrandDeal('${deal.id}')" class="text-xs bg-blue-100 text-blue-600 py-1.5 px-3 rounded-lg font-semibold hover:bg-blue-200">Editar</button>
+            ${deal.status === 'active' ? `<button onclick="pauseDeal('${deal.id}')" class="text-xs bg-yellow-100 text-yellow-700 py-1.5 px-3 rounded-lg font-semibold hover:bg-yellow-200">Pausar</button>` : ''}
+            ${deal.status === 'paused' ? `<button onclick="resumeDeal('${deal.id}')" class="text-xs bg-green-100 text-green-700 py-1.5 px-3 rounded-lg font-semibold hover:bg-green-200">Reanudar</button>` : ''}
+            <button onclick="deleteBrandDeal('${deal.id}')" class="text-xs bg-red-100 text-red-600 py-1.5 px-2 rounded-lg font-semibold hover:bg-red-200">✕</button>
           </div>
-        </div>`);
-      }
-      container.innerHTML = campaignHtml.join('');
+        </div>`;
+      }).join('');
+    }
+
+    async function loadMyCampaigns() {
+      if (!currentUser) return;
+      const { data } = await sb
+        .from('brand_deals')
+        .select('*')
+        .eq('brand_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      if (!data) { bizCampaignsCache = []; renderBizCampaigns(); return; }
+
+      // Load requests for all campaigns in one query
+      const dealIds = data.map(d => d.id);
+      const { data: allReqs } = dealIds.length > 0
+        ? await sb.from('brand_deal_requests').select('*, creator:creator_id(username, display_name, avatar_url)').in('deal_id', dealIds).order('created_at', { ascending: false })
+        : { data: [] };
+
+      // Attach requests to their deals
+      const reqsByDeal = {};
+      (allReqs || []).forEach(r => {
+        if (!reqsByDeal[r.deal_id]) reqsByDeal[r.deal_id] = [];
+        reqsByDeal[r.deal_id].push(r);
+      });
+      data.forEach(d => d._requests = reqsByDeal[d.id] || []);
+      bizCampaignsCache = data;
+
+      // Update stats
+      const totalReqs = allReqs?.length || 0;
+      const completed = (allReqs || []).filter(r => r.status === 'paid').length;
+      const spent = (allReqs || []).filter(r => r.status === 'paid').reduce((sum, r) => {
+        const deal = data.find(d => d.id === r.deal_id);
+        return sum + (deal?.budget_per_creator_cents || 0);
+      }, 0);
+      document.getElementById('bd-stat-campaigns').textContent = data.length;
+      document.getElementById('bd-stat-requests').textContent = totalReqs;
+      document.getElementById('bd-stat-completed').textContent = completed;
+      document.getElementById('bd-stat-spent').textContent = '$' + (spent / 100).toFixed(0);
+
+      renderBizCampaigns();
+    }
+
+    // ---- Business: All Requests view ----
+    function filterBizRequests(status) {
+      currentBizRequestFilter = status;
+      document.querySelectorAll('.br-filter').forEach(btn => {
+        btn.className = btn.dataset.f === status
+          ? 'br-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-creo-purple text-white'
+          : 'br-filter text-[10px] px-2 py-1 rounded-full font-semibold bg-gray-100 text-gray-500';
+      });
+      renderBizRequests();
+    }
+
+    function renderBizRequests() {
+      const filtered = currentBizRequestFilter === 'all' ? bizAllRequestsCache : bizAllRequestsCache.filter(r => r.status === currentBizRequestFilter);
+      const container = document.getElementById('biz-all-requests');
+      const noReqs = document.getElementById('no-biz-requests');
+      if (!filtered.length) { container.innerHTML = ''; noReqs.classList.remove('hidden'); return; }
+      noReqs.classList.add('hidden');
+
+      container.innerHTML = filtered.map(r => {
+        const cName = r.creator?.display_name || r.creator?.username || 'Creador';
+        const cAvatar = r.creator?.avatar_url
+          ? `<img src="${esc(r.creator.avatar_url)}" class="w-8 h-8 rounded-full object-cover">`
+          : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-creo-purple font-bold text-xs">${esc(cName[0])}</span></div>`;
+        const dealTitle = r.deal?.title || 'Deal';
+        const budgetUsd = r.deal?.budget_per_creator_cents ? ((r.deal.budget_per_creator_cents / 100).toFixed(2)) : '?';
+        const rStatusLabels = {
+          pending: ['Pendiente', 'bg-yellow-100 text-yellow-700'],
+          accepted: ['Aceptado', 'bg-blue-100 text-blue-700'],
+          submitted: ['Trabajo Enviado', 'bg-purple-100 text-purple-700'],
+          approved: ['Aprobado', 'bg-green-100 text-green-700'],
+          paid: ['Pagado', 'bg-green-200 text-green-800'],
+          rejected: ['Rechazado', 'bg-red-100 text-red-700'],
+          disputed: ['Disputado', 'bg-red-200 text-red-800']
+        };
+        const [rLabel, rCls] = rStatusLabels[r.status] || ['?', 'bg-gray-100 text-gray-500'];
+
+        let actions = '';
+        if (r.status === 'submitted') {
+          actions = `<div class="mt-2 space-y-1">
+            <a href="${esc(r.submission_url)}" target="_blank" class="text-creo-purple underline text-[11px] font-semibold">Ver contenido</a>
+            ${r.submission_notes ? `<p class="text-[10px] text-gray-400">Nota: ${esc(r.submission_notes)}</p>` : ''}
+            <div class="flex gap-2 mt-1">
+              <button onclick="approveDealWork('${r.id}')" class="flex-1 bg-green-500 text-white py-1.5 rounded-lg text-[11px] font-bold">Aprobar</button>
+              <button onclick="requestRevision('${r.id}')" class="flex-1 bg-amber-100 text-amber-700 py-1.5 rounded-lg text-[11px] font-bold">Revision</button>
+              <button onclick="disputeDealWork('${r.id}')" class="flex-1 bg-red-100 text-red-600 py-1.5 rounded-lg text-[11px] font-bold">Disputar</button>
+            </div>
+          </div>`;
+        } else if (r.status === 'approved') {
+          actions = `<button onclick="payCreator('${r.id}', ${r.deal?.budget_per_creator_cents || 0})" class="mt-1 w-full bg-creo-mint text-creo-purple py-2 rounded-lg text-xs font-bold hover:opacity-90">Pagar $${budgetUsd}</button>`;
+        }
+
+        return `<div class="border border-gray-200 rounded-xl p-3 space-y-1">
+          <div class="flex items-center gap-2">
+            ${cAvatar}
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-bold truncate">${esc(cName)}</p>
+              <p class="text-[10px] text-gray-400 truncate">${esc(dealTitle)} · $${budgetUsd}</p>
+            </div>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${rCls}">${rLabel}</span>
+          </div>
+          ${actions}
+        </div>`;
+      }).join('');
+    }
+
+    async function loadBizAllRequests() {
+      if (!currentUser) return;
+      const { data } = await sb
+        .from('brand_deal_requests')
+        .select('*, creator:creator_id(username, display_name, avatar_url), deal:deal_id(title, budget_per_creator_cents)')
+        .eq('brand_id', currentUser.id)
+        .order('created_at', { ascending: false });
+      bizAllRequestsCache = data || [];
+      renderBizRequests();
     }
 
     async function approveDealWork(requestId) {
       const { error } = await sb.rpc('approve_brand_deal_work', { p_request_id: requestId });
       if (error) { showToast('Error: ' + error.message, 'error'); return; }
       showToast('Trabajo aprobado. Procede al pago.', 'success');
-      loadMyCampaigns();
+      loadMyCampaigns(); loadBizAllRequests();
+    }
+
+    async function requestRevision(requestId) {
+      const reason = prompt('Razon de la revision (que debe corregir el creador):');
+      if (!reason) return;
+      await sb.from('brand_deal_requests').update({ status: 'accepted', revision_notes: reason }).eq('id', requestId);
+      showToast('Revision solicitada al creador', 'success');
+      loadMyCampaigns(); loadBizAllRequests();
     }
 
     async function disputeDealWork(requestId) {
-      if (!confirm('¿Disputar este trabajo? El creador será notificado.')) return;
+      if (!confirm('¿Disputar este trabajo? El creador sera notificado.')) return;
       await sb.from('brand_deal_requests').update({ status: 'disputed' }).eq('id', requestId);
       showToast('Deal disputado', 'success');
-      loadMyCampaigns();
+      loadMyCampaigns(); loadBizAllRequests();
     }
 
     async function payCreator(requestId, amountCents) {
       const { data: req } = await sb.from('brand_deal_requests').select('*, creator:creator_id(stripe_connect_id, display_name, username)').eq('id', requestId).single();
       if (!req || !req.creator?.stripe_connect_id) { showToast('El creador no tiene Stripe conectado', 'error'); return; }
-
       const { data: { session } } = await sb.auth.getSession();
-      if (!session) { showToast('Inicia sesión', 'error'); return; }
-
+      if (!session) { showToast('Inicia sesion', 'error'); return; }
       try {
         const resp = await fetch(SUPABASE_FUNC_URL + '/create-brand-deal-payment', {
           method: 'POST',
@@ -3327,7 +3864,7 @@
         const result = await resp.json();
         if (result.url) window.location.href = result.url;
         else showToast('Error al crear pago: ' + (result.error || 'desconocido'), 'error');
-      } catch (e) { showToast('Error de conexión', 'error'); }
+      } catch (e) { showToast('Error de conexion', 'error'); }
     }
 
     async function sendDealToCreator(dealId) {
@@ -3337,12 +3874,7 @@
       const { data: creator } = await sb.from('profiles').select('id, stripe_connect_id').eq('username', clean).single();
       if (!creator) { showToast('Creador no encontrado', 'error'); return; }
       if (!creator.stripe_connect_id) { showToast('Este creador no tiene Stripe conectado', 'error'); return; }
-
-      const { error } = await sb.from('brand_deal_requests').insert([{
-        deal_id: dealId,
-        creator_id: creator.id,
-        brand_id: currentUser.id
-      }]);
+      const { error } = await sb.from('brand_deal_requests').insert([{ deal_id: dealId, creator_id: creator.id, brand_id: currentUser.id }]);
       if (error) {
         if (error.code === '23505') showToast('Ya enviaste este deal a este creador', 'error');
         else showToast('Error: ' + error.message, 'error');
@@ -3354,7 +3886,106 @@
 
     async function pauseDeal(dealId) {
       await sb.from('brand_deals').update({ status: 'paused' }).eq('id', dealId);
-      showToast('Campaña pausada', 'success');
+      showToast('Campana pausada', 'success');
+      loadMyCampaigns();
+    }
+
+    async function resumeDeal(dealId) {
+      await sb.from('brand_deals').update({ status: 'active' }).eq('id', dealId);
+      showToast('Campana reactivada', 'success');
+      loadMyCampaigns();
+    }
+
+    async function deleteBrandDeal(dealId) {
+      if (!confirm('¿Eliminar esta campana? Esta accion no se puede deshacer.')) return;
+      const { error } = await sb.from('brand_deals').delete().eq('id', dealId).eq('brand_id', currentUser.id);
+      if (error) return showToast('Error: ' + error.message, 'error');
+      showToast('Campana eliminada', 'success');
+      loadMyCampaigns();
+    }
+
+    async function editBrandDeal(dealId) {
+      const { data: deal } = await sb.from('brand_deals').select('*').eq('id', dealId).single();
+      if (!deal) return showToast('No se encontro la campana', 'error');
+      let existing = document.getElementById('edit-deal-modal');
+      if (existing) existing.remove();
+      const modal = document.createElement('div');
+      modal.id = 'edit-deal-modal';
+      modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4';
+      modal.innerHTML = `
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('edit-deal-modal').remove()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-lg text-gray-900">Editar Brand Deal</h3>
+            <button onclick="document.getElementById('edit-deal-modal').remove()" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Titulo</label>
+            <input id="edit-deal-title" type="text" value="${esc(deal.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripcion</label>
+            <textarea id="edit-deal-desc" rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(deal.description || '')}</textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Requisitos</label>
+            <textarea id="edit-deal-req" rows="2" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(deal.requirements || '')}</textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Presupuesto ($)</label>
+              <input id="edit-deal-budget" type="number" step="0.01" min="5" value="${(deal.budget_per_creator_cents / 100).toFixed(2)}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Max Creadores</label>
+              <input id="edit-deal-max" type="number" min="1" value="${deal.max_creators || 1}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Fecha Limite</label>
+            <input id="edit-deal-deadline" type="date" value="${deal.deadline || ''}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Terminos y Condiciones</label>
+            <textarea id="edit-deal-terms" rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(deal.terms_conditions || '')}</textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Estado</label>
+            <select id="edit-deal-status" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+              <option value="active" ${deal.status === 'active' ? 'selected' : ''}>Activa</option>
+              <option value="paused" ${deal.status === 'paused' ? 'selected' : ''}>Pausada</option>
+              <option value="completed" ${deal.status === 'completed' ? 'selected' : ''}>Completada</option>
+              <option value="cancelled" ${deal.status === 'cancelled' ? 'selected' : ''}>Cancelada</option>
+            </select>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="saveBrandDealEdit('${deal.id}')" id="save-deal-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Cambios</button>
+            <button onclick="document.getElementById('edit-deal-modal').remove()" class="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition">Cancelar</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+    }
+
+    async function saveBrandDealEdit(id) {
+      const btn = document.getElementById('save-deal-btn');
+      btn.textContent = 'Guardando...'; btn.disabled = true;
+      const title = document.getElementById('edit-deal-title').value.trim();
+      const description = document.getElementById('edit-deal-desc').value.trim();
+      const requirements = document.getElementById('edit-deal-req').value.trim();
+      const budget_per_creator_cents = Math.round(parseFloat(document.getElementById('edit-deal-budget').value) * 100);
+      const max_creators = parseInt(document.getElementById('edit-deal-max').value) || 1;
+      const terms_conditions = document.getElementById('edit-deal-terms').value.trim();
+      const deadline = document.getElementById('edit-deal-deadline')?.value || null;
+      const status = document.getElementById('edit-deal-status')?.value || 'active';
+      if (!title || !requirements) { btn.textContent = 'Guardar Cambios'; btn.disabled = false; return showToast('Titulo y requisitos son requeridos', 'error'); }
+      if (budget_per_creator_cents < 500) { btn.textContent = 'Guardar Cambios'; btn.disabled = false; return showToast('El presupuesto minimo es $5', 'error'); }
+      const { error } = await sb.from('brand_deals').update({ title, description: description || null, requirements, budget_per_creator_cents, max_creators, terms_conditions, deadline, status }).eq('id', id).eq('brand_id', currentUser.id);
+      btn.textContent = 'Guardar Cambios'; btn.disabled = false;
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      document.getElementById('edit-deal-modal').remove();
+      showToast('Brand Deal actualizado', 'success');
       loadMyCampaigns();
     }
 

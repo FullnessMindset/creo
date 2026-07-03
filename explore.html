@@ -28,9 +28,8 @@
     .story-grid-item img, .story-grid-item video { width: 100%; height: 100%; object-fit: cover; }
     .story-grid-item .overlay { position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0,0,0,0.7)); pointer-events: none; }
     .story-grid-item:hover .overlay { background: linear-gradient(transparent 30%, rgba(0,0,0,0.8)); }
-    .pill-active { background-color: #1a0a3e; color: white; }
-    .pill-inactive { background-color: rgba(255,255,255,0.8); color: #6b7280; border: 1px solid #e5e7eb; }
-    .pill-inactive:hover { background-color: #f3f4f6; }
+    @keyframes slide-up { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .animate-slide-up { animation: slide-up 0.3s ease-out; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
@@ -54,53 +53,20 @@
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         <input id="search-input" type="text" placeholder="Buscar creadores, historias..." class="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-creo-mint text-gray-900 placeholder-gray-400 dark-aware-input" oninput="handleSearch(this.value)">
       </div>
-      <!-- Pills -->
-      <div class="flex gap-2">
-        <button onclick="switchTab('creators')" id="pill-creators" class="px-4 py-1.5 rounded-full text-xs font-semibold transition pill-active">Creadores</button>
-        <button onclick="switchTab('cocreators')" id="pill-cocreators" class="px-4 py-1.5 rounded-full text-xs font-semibold transition pill-inactive">Co-creadores</button>
-        <button onclick="switchTab('deals')" id="pill-deals" class="px-4 py-1.5 rounded-full text-xs font-semibold transition pill-inactive hidden">Brand Deals</button>
-      </div>
     </div>
   </div>
 
   <!-- Content -->
-  <div class="max-w-2xl mx-auto pt-40 pb-20 px-4 space-y-5">
-
-    <!-- PANEL: Creators (default) -->
-    <div id="panel-creators">
-      <!-- Featured creators row -->
-      <div class="mb-5">
-        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Creadores Destacados</h2>
-        <div class="featured-scroll" id="featured-creators"></div>
-      </div>
-
-      <!-- Stories grid (Instagram-style) -->
-      <div>
-        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Historias de Creadores</h2>
-        <div class="story-grid" id="stories-grid"></div>
-        <div id="stories-loading" class="text-center py-8">
-          <div class="inline-block w-6 h-6 border-2 border-creo-mint border-t-transparent rounded-full animate-spin"></div>
-        </div>
-        <p id="no-stories" class="hidden text-center text-gray-400 text-xs py-8">Aún no hay historias publicadas</p>
-      </div>
+  <div class="max-w-2xl mx-auto pt-28 pb-20 px-0">
+    <!-- Stories grid (Instagram-style) -->
+    <div class="story-grid" id="stories-grid"></div>
+    <div id="stories-loading" class="text-center py-8">
+      <div class="inline-block w-6 h-6 border-2 border-creo-mint border-t-transparent rounded-full animate-spin"></div>
     </div>
-
-    <!-- PANEL: Co-creators -->
-    <div id="panel-cocreators" class="hidden space-y-3">
-      <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Co-Creadores</h2>
-      <div id="cocreator-list" class="space-y-3"></div>
-      <p id="no-cocreators" class="hidden text-center text-gray-400 text-xs py-8">No hay co-creadores aún</p>
-    </div>
-
-    <!-- PANEL: Brand Deals -->
-    <div id="panel-deals" class="hidden space-y-3">
-      <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Brand Deals Disponibles</h2>
-      <div id="deals-list" class="space-y-3"></div>
-      <p id="no-deals" class="hidden text-center text-gray-400 text-xs py-8">No hay brand deals disponibles</p>
-    </div>
+    <p id="no-stories" class="hidden text-center text-gray-400 text-xs py-8">Aún no hay historias publicadas</p>
 
     <!-- Search results -->
-    <div id="search-results" class="hidden space-y-3">
+    <div id="search-results" class="hidden px-4 space-y-3">
       <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Resultados</h2>
       <div id="search-results-list" class="space-y-3"></div>
       <p id="no-search" class="hidden text-center text-gray-400 text-xs py-8">No se encontraron resultados</p>
@@ -113,18 +79,51 @@
       <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
     <div id="story-viewer-content" class="w-full h-full flex items-center justify-center"></div>
-    <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+    <!-- Right-side social buttons (TikTok-style) -->
+    <div class="absolute right-3 bottom-32 flex flex-col items-center gap-5 z-10">
+      <button id="sv-like-btn" onclick="toggleStoryLike()" class="flex flex-col items-center gap-1 text-white/80 hover:text-red-500 transition">
+        <svg id="sv-like-icon" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        <span id="sv-like-count" class="text-[10px] font-bold">0</span>
+      </button>
+      <button onclick="openStoryComments()" class="flex flex-col items-center gap-1 text-white/80 hover:text-creo-mint transition">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        <span id="sv-comment-count" class="text-[10px] font-bold">0</span>
+      </button>
+      <button onclick="shareStory()" class="flex flex-col items-center gap-1 text-white/80 hover:text-creo-mint transition">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+        <span class="text-[10px] font-bold">Compartir</span>
+      </button>
+    </div>
+    <!-- Bottom info bar -->
+    <div class="absolute bottom-0 left-0 right-16 p-4 bg-gradient-to-t from-black/80 to-transparent">
       <div class="max-w-lg mx-auto">
         <div class="flex items-center gap-3 mb-2">
-          <div id="sv-avatar" class="w-10 h-10 rounded-full overflow-hidden bg-white/20"></div>
+          <a id="sv-profile-link" href="#">
+            <div id="sv-avatar" class="w-10 h-10 rounded-full overflow-hidden bg-white/20"></div>
+          </a>
           <div>
             <p id="sv-name" class="font-bold text-white text-sm"></p>
             <p id="sv-username" class="text-white/60 text-xs"></p>
           </div>
-          <a id="sv-profile-link" href="#" class="ml-auto text-creo-mint text-xs font-bold hover:underline">Ver perfil →</a>
         </div>
         <p id="sv-title" class="text-white font-bold text-sm mb-1"></p>
         <p id="sv-description" class="text-white/80 text-xs line-clamp-3"></p>
+      </div>
+    </div>
+    <!-- Comment panel (slides up) -->
+    <div id="story-comments-panel" class="fixed bottom-0 left-0 right-0 z-[110] hidden transform translate-y-full transition-transform duration-300" style="max-height:60vh">
+      <div class="bg-gray-900 rounded-t-2xl border-t border-gray-700 flex flex-col" style="max-height:60vh">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+          <h3 class="text-white font-bold text-sm">Comentarios</h3>
+          <button onclick="closeStoryComments()" class="text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>
+        <div id="story-comments-list" class="flex-1 overflow-y-auto px-4 py-3 space-y-3" style="max-height:40vh"></div>
+        <div class="px-4 py-3 border-t border-gray-700">
+          <div class="flex gap-2">
+            <input id="story-comment-input" type="text" placeholder="Escribe un comentario..." class="flex-1 bg-gray-800 text-white text-sm rounded-full px-4 py-2 focus:outline-none focus:ring-1 focus:ring-creo-mint placeholder-gray-500">
+            <button onclick="submitStoryComment()" class="bg-creo-mint text-creo-purple px-4 py-2 rounded-full text-sm font-bold hover:opacity-90 transition">Enviar</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -134,22 +133,8 @@
     let allStories = [];
     let exploreUser = null;
     let exploreProfile = null;
-    let currentTab = 'creators';
-
-    // ===== TABS =====
-    function switchTab(tab) {
-      currentTab = tab;
-      ['creators', 'cocreators', 'deals'].forEach(t => {
-        document.getElementById('panel-' + t).classList.toggle('hidden', t !== tab);
-        const pill = document.getElementById('pill-' + t);
-        if (t === tab) { pill.className = pill.className.replace('pill-inactive', 'pill-active'); }
-        else { pill.className = pill.className.replace('pill-active', 'pill-inactive'); }
-      });
-      document.getElementById('search-results').classList.add('hidden');
-      document.getElementById('search-input').value = '';
-      if (tab === 'cocreators') loadCocreators();
-      if (tab === 'deals') loadDeals();
-    }
+    let currentStoryIdx = -1;
+    let storyLiked = false;
 
     // ===== SEARCH =====
     let searchTimer = null;
@@ -159,10 +144,11 @@
         q = q.trim().toLowerCase();
         if (!q) {
           document.getElementById('search-results').classList.add('hidden');
-          document.getElementById('panel-' + currentTab).classList.remove('hidden');
+          document.getElementById('stories-grid').classList.remove('hidden');
+          document.getElementById('stories-loading').classList.add('hidden');
           return;
         }
-        document.getElementById('panel-' + currentTab).classList.add('hidden');
+        document.getElementById('stories-grid').classList.add('hidden');
         document.getElementById('search-results').classList.remove('hidden');
 
         const results = allCreators.filter(c => {
@@ -176,27 +162,6 @@
         document.getElementById('no-search').classList.toggle('hidden', results.length > 0);
         list.innerHTML = results.map(renderCreatorCard).join('');
       }, 250);
-    }
-
-    // ===== FEATURED CREATORS =====
-    function renderFeaturedCreators(creators) {
-      const featured = creators.filter(c => c.verification_status === 'approved').slice(0, 15);
-      const all = featured.length > 0 ? featured : creators.slice(0, 15);
-      const container = document.getElementById('featured-creators');
-      container.innerHTML = all.map(c => {
-        const name = c.display_name || c.username || '?';
-        const verified = c.verification_status === 'approved';
-        const avatar = c.avatar_url
-          ? `<img src="${esc(c.avatar_url)}" class="w-16 h-16 rounded-full object-cover ${verified ? 'ring-2 ring-creo-mint ring-offset-2' : 'ring-1 ring-gray-200'}">`
-          : `<div class="w-16 h-16 rounded-full ${verified ? 'bg-creo-mint/20 ring-2 ring-creo-mint ring-offset-2' : 'bg-gray-200 ring-1 ring-gray-200'} flex items-center justify-center"><span class="font-bold text-lg ${verified ? 'text-creo-mint' : 'text-gray-400'}">${esc(name[0].toUpperCase())}</span></div>`;
-        return `<a href="profile.html?u=${esc(c.username)}" class="flex flex-col items-center gap-1 flex-shrink-0 w-[72px] group">
-          <div class="relative">
-            ${avatar}
-            ${verified ? '<div class="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm"><svg class="w-4 h-4 text-creo-mint" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg></div>' : ''}
-          </div>
-          <span class="text-[10px] text-gray-600 truncate w-full text-center group-hover:text-creo-purple transition">${esc(name)}</span>
-        </a>`;
-      }).join('');
     }
 
     // ===== STORIES GRID =====
@@ -267,9 +232,11 @@
     }
 
     // ===== STORY VIEWER =====
-    function openStoryViewer(idx) {
+    async function openStoryViewer(idx) {
       const s = allStories[idx];
       if (!s) return;
+      currentStoryIdx = idx;
+      storyLiked = false;
       const p = s.profile;
       const viewer = document.getElementById('story-viewer');
 
@@ -290,16 +257,16 @@
         const isYT = /youtube|youtu\.be/.test(s.main_video_url);
         if (isYT) {
           const vid = s.main_video_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
-          content.innerHTML = vid ? `<iframe src="https://www.youtube.com/embed/${vid[1]}?autoplay=1&rel=0" class="w-full h-full max-w-lg max-h-[80vh] rounded-xl" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>` : '';
+          content.innerHTML = vid ? `<iframe src="https://www.youtube.com/embed/${vid[1]}?autoplay=1&rel=0" class="w-full h-full" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>` : '';
         } else {
-          content.innerHTML = `<video src="${esc(s.main_video_url)}" controls autoplay class="max-w-full max-h-[80vh] rounded-xl"></video>`;
+          content.innerHTML = `<video src="${esc(s.main_video_url)}" controls autoplay playsinline class="w-full h-full object-contain"></video>`;
         }
       } else if (s.media_urls && s.media_urls.length > 0) {
         const first = s.media_urls[0];
         const isVid = /\.(mp4|webm|mov)$/i.test(first);
         content.innerHTML = isVid
-          ? `<video src="${esc(first)}" controls autoplay class="max-w-full max-h-[80vh] rounded-xl"></video>`
-          : `<img src="${esc(first)}" class="max-w-full max-h-[80vh] object-contain rounded-xl">`;
+          ? `<video src="${esc(first)}" controls autoplay playsinline class="w-full h-full object-contain"></video>`
+          : `<img src="${esc(first)}" class="w-full h-full object-contain">`;
       } else {
         content.innerHTML = `<div class="max-w-md mx-auto p-8 text-center text-white space-y-4">
           <h3 class="text-xl font-bold">${esc(s.title || 'Mi Historia')}</h3>
@@ -309,17 +276,150 @@
 
       viewer.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
+      loadStoryInteractions(s.id);
+    }
+
+    async function loadStoryInteractions(storyId) {
+      const { count: likeCount } = await sb.from('story_likes').select('*', { count: 'exact', head: true }).eq('story_id', storyId);
+      document.getElementById('sv-like-count').textContent = likeCount || 0;
+
+      const { count: commentCount } = await sb.from('story_comments').select('*', { count: 'exact', head: true }).eq('story_id', storyId);
+      document.getElementById('sv-comment-count').textContent = commentCount || 0;
+
+      if (exploreUser) {
+        const { data: myLike } = await sb.from('story_likes').select('id').eq('story_id', storyId).eq('user_id', exploreUser.id).maybeSingle();
+        storyLiked = !!myLike;
+        updateLikeBtn();
+      }
+    }
+
+    function updateLikeBtn() {
+      const icon = document.getElementById('sv-like-icon');
+      const btn = document.getElementById('sv-like-btn');
+      if (storyLiked) {
+        icon.setAttribute('fill', 'currentColor');
+        btn.classList.add('text-red-500');
+        btn.classList.remove('text-white/80');
+      } else {
+        icon.setAttribute('fill', 'none');
+        btn.classList.remove('text-red-500');
+        btn.classList.add('text-white/80');
+      }
+    }
+
+    async function toggleStoryLike() {
+      if (!exploreUser) { showToast('Inicia sesión para dar Creo', 'error'); return; }
+      const s = allStories[currentStoryIdx];
+      if (!s) return;
+
+      if (storyLiked) {
+        await sb.from('story_likes').delete().eq('story_id', s.id).eq('user_id', exploreUser.id);
+        storyLiked = false;
+        const el = document.getElementById('sv-like-count');
+        el.textContent = Math.max(0, parseInt(el.textContent) - 1);
+      } else {
+        await sb.from('story_likes').insert([{ story_id: s.id, user_id: exploreUser.id }]);
+        storyLiked = true;
+        const el = document.getElementById('sv-like-count');
+        el.textContent = parseInt(el.textContent) + 1;
+      }
+      updateLikeBtn();
+    }
+
+    function openStoryComments() {
+      const panel = document.getElementById('story-comments-panel');
+      panel.classList.remove('hidden');
+      setTimeout(() => panel.style.transform = 'translateY(0)', 10);
+      loadStoryCommentsList();
+    }
+
+    function closeStoryComments() {
+      const panel = document.getElementById('story-comments-panel');
+      panel.style.transform = 'translateY(100%)';
+      setTimeout(() => panel.classList.add('hidden'), 300);
+    }
+
+    async function loadStoryCommentsList() {
+      const s = allStories[currentStoryIdx];
+      if (!s) return;
+      const list = document.getElementById('story-comments-list');
+      list.innerHTML = '<div class="text-center py-4"><div class="inline-block w-5 h-5 border-2 border-creo-mint border-t-transparent rounded-full animate-spin"></div></div>';
+
+      const { data } = await sb.from('story_comments')
+        .select('*, profile:user_id(username, display_name, avatar_url)')
+        .eq('story_id', s.id)
+        .order('created_at', { ascending: true });
+
+      if (!data || data.length === 0) {
+        list.innerHTML = '<p class="text-gray-500 text-xs text-center py-4">Sé el primero en comentar</p>';
+        return;
+      }
+
+      list.innerHTML = data.map(c => {
+        const cp = c.profile;
+        const cName = cp?.display_name || cp?.username || '?';
+        const cAvatar = cp?.avatar_url
+          ? `<img src="${esc(cp.avatar_url)}" class="w-8 h-8 rounded-full object-cover">`
+          : `<div class="w-8 h-8 rounded-full bg-creo-purple/30 flex items-center justify-center"><span class="text-white text-xs font-bold">${esc(cName[0])}</span></div>`;
+        const isOwner = exploreUser && c.user_id === exploreUser.id;
+        return `<div class="flex gap-2">
+          ${cAvatar}
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-xs font-bold">${esc(cName)}</p>
+            <p class="text-gray-300 text-xs">${esc(c.body)}</p>
+          </div>
+          ${isOwner ? `<button onclick="deleteStoryComment('${c.id}')" class="text-gray-500 hover:text-red-400 flex-shrink-0"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    async function submitStoryComment() {
+      if (!exploreUser) { showToast('Inicia sesión para comentar', 'error'); return; }
+      const s = allStories[currentStoryIdx];
+      if (!s) return;
+      const input = document.getElementById('story-comment-input');
+      const body = input.value.trim();
+      if (!body) return;
+
+      await sb.from('story_comments').insert([{ story_id: s.id, user_id: exploreUser.id, body }]);
+      input.value = '';
+      loadStoryCommentsList();
+      const el = document.getElementById('sv-comment-count');
+      el.textContent = parseInt(el.textContent) + 1;
+    }
+
+    async function deleteStoryComment(commentId) {
+      if (!confirm('¿Eliminar comentario?')) return;
+      await sb.from('story_comments').delete().eq('id', commentId);
+      loadStoryCommentsList();
+      const el = document.getElementById('sv-comment-count');
+      el.textContent = Math.max(0, parseInt(el.textContent) - 1);
+    }
+
+    async function shareStory() {
+      const s = allStories[currentStoryIdx];
+      if (!s) return;
+      const url = window.location.origin + window.location.pathname;
+      const name = s.profile?.display_name || s.profile?.username || 'Creador';
+      if (navigator.share) {
+        try { await navigator.share({ title: s.title || 'Historia de ' + name, url }); } catch(e) {}
+      } else {
+        await navigator.clipboard.writeText(url);
+        showToast('Link copiado al portapapeles', 'success');
+      }
     }
 
     function closeStoryViewer() {
       document.getElementById('story-viewer').classList.add('hidden');
       document.getElementById('story-viewer-content').innerHTML = '';
+      closeStoryComments();
       document.body.style.overflow = '';
+      currentStoryIdx = -1;
     }
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStoryViewer(); });
 
-    // ===== CREATOR CARDS (for search / co-creators) =====
+    // ===== CREATOR CARDS (for search) =====
     function renderCreatorCard(p) {
       const name = p.display_name || p.username || '?';
       const avatar = p.avatar_url
@@ -347,53 +447,6 @@
       </a>`;
     }
 
-    // ===== CO-CREATORS =====
-    async function loadCocreators() {
-      const list = document.getElementById('cocreator-list');
-      if (list.innerHTML) return;
-      const { data } = await sb.from('profiles')
-        .select('id, username, display_name, avatar_url, bio, verification_status')
-        .eq('account_type', 'co-creator')
-        .not('username', 'is', null)
-        .order('created_at', { ascending: false });
-      if (!data || data.length === 0) { document.getElementById('no-cocreators').classList.remove('hidden'); return; }
-      list.innerHTML = data.map(renderCreatorCard).join('');
-    }
-
-    // ===== BRAND DEALS =====
-    async function loadDeals() {
-      const list = document.getElementById('deals-list');
-      if (list.innerHTML) return;
-      const { data } = await sb.from('brand_deals')
-        .select('*, brand:brand_id(username, display_name, avatar_url)')
-        .eq('status', 'active')
-        .order('created_at', { ascending: false });
-      if (!data || data.length === 0) { document.getElementById('no-deals').classList.remove('hidden'); return; }
-      list.innerHTML = data.map(deal => {
-        const budgetUsd = (deal.budget_per_creator_cents / 100).toFixed(2);
-        const brandName = deal.brand?.display_name || deal.brand?.username || 'Marca';
-        const brandAvatar = deal.brand?.avatar_url
-          ? `<img src="${esc(deal.brand.avatar_url)}" class="w-10 h-10 rounded-full object-cover border-2 border-amber-400">`
-          : `<div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center border-2 border-amber-400"><span class="text-amber-600 font-bold text-sm">${esc(brandName[0])}</span></div>`;
-        const dk = isDark();
-        return `<div class="p-4 ${dk ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-xl border space-y-3">
-          <div class="flex items-center gap-3">
-            ${brandAvatar}
-            <div class="flex-1 min-w-0">
-              <p class="font-bold text-sm truncate">${esc(deal.title)}</p>
-              <p class="text-xs text-gray-400">por ${esc(brandName)}</p>
-            </div>
-            <span class="text-sm font-bold text-green-600">$${budgetUsd}</span>
-          </div>
-          ${deal.description ? `<p class="text-xs text-gray-500 line-clamp-2">${esc(deal.description)}</p>` : ''}
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] text-gray-400">${deal.max_creators} creador(es) max</span>
-            <button onclick="event.stopPropagation()" class="px-4 py-1.5 bg-creo-purple text-white text-xs font-semibold rounded-lg hover:opacity-90 transition">Ver Detalles</button>
-          </div>
-        </div>`;
-      }).join('');
-    }
-
     // ===== INIT =====
     async function init() {
       const { data: { user } } = await sb.auth.getUser();
@@ -401,9 +454,6 @@
         exploreUser = user;
         const { data: prof } = await sb.from('profiles').select('account_type, stripe_connect_id').eq('id', user.id).single();
         exploreProfile = prof;
-        if (prof && (prof.account_type === 'creator' || !prof.account_type)) {
-          document.getElementById('pill-deals').classList.remove('hidden');
-        }
       }
 
       const { data: creators } = await sb.from('profiles')
@@ -412,10 +462,7 @@
         .or('account_type.is.null,account_type.eq.creator')
         .order('created_at', { ascending: false });
 
-      if (creators) {
-        allCreators = creators;
-        renderFeaturedCreators(creators);
-      }
+      if (creators) allCreators = creators;
 
       loadStories();
       renderBottomNav('explore');
