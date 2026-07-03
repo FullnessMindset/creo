@@ -1333,7 +1333,7 @@
     async function uploadBrandAvatar() {
       const file = document.getElementById('brand-avatar-file').files[0];
       if (!file || !currentProfile) return;
-      const url = await uploadToStorage(file, 'avatars', currentProfile.id);
+      const url = await uploadToStorage(file, 'avatars', 5);
       if (!url) return;
       const { error } = await sb.from('profiles').update({ avatar_url: url }).eq('id', currentProfile.id);
       if (error) { showToast('Error al guardar avatar', 'error'); return; }
@@ -1345,7 +1345,7 @@
     async function uploadBrandCover() {
       const file = document.getElementById('brand-cover-file').files[0];
       if (!file || !currentProfile) return;
-      const url = await uploadToStorage(file, 'covers', currentProfile.id);
+      const url = await uploadToStorage(file, 'covers', 10);
       if (!url) return;
       const { error } = await sb.from('profiles').update({ cover_url: url }).eq('id', currentProfile.id);
       if (error) { showToast('Error al guardar portada', 'error'); return; }

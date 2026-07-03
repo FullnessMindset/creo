@@ -610,7 +610,7 @@
 
       let docsHtml = '';
       try {
-        const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const { data: docs } = await supabaseAdmin.from('verification_documents').select('*').eq('creator_id', p.id);
         if (docs && docs.length > 0) {
           docsHtml = `

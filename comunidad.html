@@ -269,7 +269,7 @@
     // Stories bar
     async function loadStories() {
       try {
-        const { data } = await sb.from('stories').select('*, profile:creator_id(username, display_name, avatar_url)')
+        const { data } = await sb.from('creator_stories').select('*, profile:creator_id(username, display_name, avatar_url)')
           .eq('share_to_community', true).order('created_at', { ascending: false }).limit(20);
         if (!data || data.length === 0) return;
         const list = document.getElementById('stories-list');

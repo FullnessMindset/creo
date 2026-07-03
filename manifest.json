@@ -2,7 +2,7 @@
   "name": "CREO — Apoya a tu Creador Favorito",
   "short_name": "CREO",
   "description": "Plataforma para apoyar creadores con tips, metas y suscripciones mensuales",
-  "start_url": "/creo/feed.html",
+  "start_url": "/creo/explore.html",
   "display": "standalone",
   "background_color": "#1a0a3e",
   "theme_color": "#1a0a3e",
