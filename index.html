@@ -522,6 +522,10 @@
           </label>
           <button onclick="createStory()" id="create-story-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Publicar Historia</button>
         </div>
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-gray-900">Historias Publicadas</h3>
+          <span id="stories-count" class="text-xs text-gray-400"></span>
+        </div>
         <div id="my-stories-list" class="space-y-3"></div>
       </div>
 
@@ -2394,29 +2398,126 @@
       { id:'ds2', content:'Preparando todo para el workshop del próximo viernes. ¿Quién se apunta? 🙋‍♀️', media_urls:[], created_at:'2026-06-28T09:15:00Z', like_count:15, comment_count:3, isDummy:true },
     ];
 
-    function renderStoryCard(s, isDummy) {
-      const badge = isDummy ? ' <span class="text-[10px]">🤖</span>' : '';
+    function renderStoryCard(s) {
       const mediaArr = s.media_urls || [];
-      const deleteBtn = isDummy ? '' : `<button onclick="deleteStory('${s.id}')" class="text-red-500 hover:text-red-700 text-xs px-2 py-1 bg-red-50 rounded">Eliminar</button>`;
-      return `<div class="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
-        <p class="text-sm text-gray-700">${esc(s.content || '')}${badge}</p>
-        ${mediaArr.length ? `<div class="flex gap-1 overflow-x-auto">${mediaArr.map(u => `<img src="${u}" class="w-14 h-14 rounded object-cover flex-shrink-0">`).join('')}</div>` : ''}
-        <div class="flex justify-between items-center text-xs text-gray-400">
-          <span>${timeAgo(s.created_at)} · ❤️ ${s.like_count || 0} · 💬 ${s.comment_count || 0}</span>
-          ${deleteBtn}
+      const hasVideo = !!s.main_video_url;
+      const isYT = hasVideo && /youtube|youtu\.be/.test(s.main_video_url);
+      let videoThumb = '';
+      if (hasVideo) {
+        if (isYT) {
+          const vid = s.main_video_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+          videoThumb = vid ? `<img src="https://img.youtube.com/vi/${vid[1]}/mqdefault.jpg" class="w-full aspect-video object-cover rounded-lg">` : '';
+        } else {
+          videoThumb = `<video src="${esc(s.main_video_url)}" class="w-full aspect-video object-cover rounded-lg" preload="metadata"></video>`;
+        }
+      }
+      const date = new Date(s.created_at).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' });
+
+      return `<div class="bg-white p-4 rounded-xl border border-gray-200 space-y-3" id="story-card-${s.id}">
+        ${s.title ? `<h4 class="font-bold text-gray-900 text-sm">${esc(s.title)}</h4>` : ''}
+        ${s.content || s.description ? `<p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">${esc(s.content || s.description)}</p>` : ''}
+        ${videoThumb ? `<div class="relative cursor-pointer" onclick="window.open('${esc(s.main_video_url)}','_blank')">
+          ${videoThumb}
+          <div class="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg"><svg class="w-10 h-10 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>` : ''}
+        ${mediaArr.length ? `<div class="flex gap-2 overflow-x-auto pb-1" style="scrollbar-width:none">${mediaArr.map(u => {
+          const isAudio = /\.(mp3|wav|ogg|webm)$/i.test(u);
+          if (isAudio) return `<audio controls src="${esc(u)}" class="flex-shrink-0 h-10"></audio>`;
+          const isVid = /\.(mp4|webm|mov)$/i.test(u);
+          if (isVid) return `<video src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover flex-shrink-0" preload="metadata"></video>`;
+          return `<img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:opacity-80" onclick="window.open('${esc(u)}','_blank')">`;
+        }).join('')}</div>` : ''}
+        <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+          <span class="text-[11px] text-gray-400">${date}</span>
+          <div class="flex items-center gap-2">
+            <button onclick="editStory('${s.id}')" class="text-xs text-creo-purple hover:text-creo-light font-semibold px-3 py-1 bg-creo-purple/5 rounded-lg transition">Editar</button>
+            <button onclick="deleteStory('${s.id}')" class="text-xs text-red-500 hover:text-red-700 font-semibold px-3 py-1 bg-red-50 rounded-lg transition">Eliminar</button>
+          </div>
         </div>
       </div>`;
     }
+
+    let myStoriesCache = [];
 
     async function loadMyStories() {
       if (!currentUser) return;
       const { data } = await sb.from('creator_stories').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false });
       const list = document.getElementById('my-stories-list');
+      const countEl = document.getElementById('stories-count');
       if (!data || data.length === 0) {
-        list.innerHTML = DUMMY_STORIES.map(s => renderStoryCard(s, true)).join('');
+        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-6">Aún no has publicado historias</p>';
+        if (countEl) countEl.textContent = '';
+        myStoriesCache = [];
         return;
       }
-      list.innerHTML = data.map(s => renderStoryCard(s, false)).join('');
+      myStoriesCache = data;
+      if (countEl) countEl.textContent = data.length + ' historia' + (data.length !== 1 ? 's' : '');
+      list.innerHTML = data.map(s => renderStoryCard(s)).join('');
+    }
+
+    function editStory(id) {
+      const s = myStoriesCache.find(x => x.id === id);
+      if (!s) return;
+      let existing = document.getElementById('edit-story-modal');
+      if (existing) existing.remove();
+
+      const modal = document.createElement('div');
+      modal.id = 'edit-story-modal';
+      modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4';
+      modal.innerHTML = `
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('edit-story-modal').remove()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-lg text-gray-900">Editar Historia</h3>
+            <button onclick="document.getElementById('edit-story-modal').remove()" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Título</label>
+            <input id="edit-story-title" type="text" value="${esc(s.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
+            <textarea id="edit-story-content" rows="5" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(s.content || s.description || '')}</textarea>
+          </div>
+          ${s.main_video_url ? `<div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Video actual</label>
+            <div class="flex items-center gap-2 bg-gray-50 rounded-lg p-2">
+              <svg class="w-5 h-5 text-creo-purple flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              <span class="text-xs text-gray-600 truncate flex-1">${esc(s.main_video_url)}</span>
+              <button onclick="document.getElementById('edit-remove-video').value='1';this.parentElement.style.opacity='0.3'" class="text-red-400 hover:text-red-600 text-xs">✕</button>
+            </div>
+            <input type="hidden" id="edit-remove-video" value="0">
+          </div>` : ''}
+          <div class="flex gap-3">
+            <button onclick="saveStoryEdit('${s.id}')" id="save-story-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Cambios</button>
+            <button onclick="document.getElementById('edit-story-modal').remove()" class="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition">Cancelar</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+    }
+
+    async function saveStoryEdit(id) {
+      const btn = document.getElementById('save-story-btn');
+      btn.textContent = 'Guardando...'; btn.disabled = true;
+      const title = document.getElementById('edit-story-title').value.trim();
+      const content = document.getElementById('edit-story-content').value.trim();
+      const removeVideo = document.getElementById('edit-remove-video')?.value === '1';
+
+      const updates = {
+        title: title || null,
+        description: content || null,
+        content: content || null
+      };
+      if (removeVideo) updates.main_video_url = null;
+
+      const { error } = await sb.from('creator_stories').update(updates).eq('id', id).eq('creator_id', currentUser.id);
+      btn.textContent = 'Guardar Cambios'; btn.disabled = false;
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      document.getElementById('edit-story-modal').remove();
+      showToast('Historia actualizada', 'success');
+      loadMyStories();
     }
 
     async function createStory() {
@@ -2474,8 +2575,10 @@
     }
 
     async function deleteStory(id) {
-      if (!confirm('¿Eliminar esta historia?')) return;
-      await sb.from('creator_stories').delete().eq('id', id).eq('creator_id', currentUser.id);
+      if (!confirm('¿Eliminar esta historia? Esta acción no se puede deshacer.')) return;
+      const { error } = await sb.from('creator_stories').delete().eq('id', id).eq('creator_id', currentUser.id);
+      if (error) { showToast('Error al eliminar', 'error'); return; }
+      showToast('Historia eliminada', 'success');
       loadMyStories();
     }
 
