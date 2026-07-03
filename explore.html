@@ -26,6 +26,8 @@
     .story-grid-item > img, .story-grid-item > video { width: 100%; height: 100%; object-fit: cover; }
     .story-grid-item .overlay { position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0,0,0,0.7)); pointer-events: none; }
     .story-grid-item:hover .overlay { background: linear-gradient(transparent 30%, rgba(0,0,0,0.8)); }
+    #story-scroll-container { scrollbar-width: none; -ms-overflow-style: none; }
+    #story-scroll-container::-webkit-scrollbar { display: none; }
     @keyframes slide-up { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .animate-slide-up { animation: slide-up 0.3s ease-out; }
   </style>
@@ -71,43 +73,12 @@
     </div>
   </div>
 
-  <!-- Story viewer modal -->
+  <!-- Story viewer modal — TikTok-style vertical scroll -->
   <div id="story-viewer" class="fixed inset-0 z-[100] hidden bg-black">
-    <button onclick="closeStoryViewer()" class="absolute top-4 right-4 z-10 text-white/70 hover:text-white">
+    <button onclick="closeStoryViewer()" class="fixed top-4 right-4 z-[120] text-white/70 hover:text-white">
       <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
-    <div id="story-viewer-content" class="w-full h-full flex items-center justify-center"></div>
-    <!-- Right-side social buttons (TikTok-style) -->
-    <div class="absolute right-3 bottom-32 flex flex-col items-center gap-5 z-10">
-      <button id="sv-like-btn" onclick="toggleStoryLike()" class="flex flex-col items-center gap-1 text-white/80 hover:text-red-500 transition">
-        <svg id="sv-like-icon" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-        <span id="sv-like-count" class="text-[10px] font-bold">0</span>
-      </button>
-      <button onclick="openStoryComments()" class="flex flex-col items-center gap-1 text-white/80 hover:text-creo-mint transition">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        <span id="sv-comment-count" class="text-[10px] font-bold">0</span>
-      </button>
-      <button onclick="shareStory()" class="flex flex-col items-center gap-1 text-white/80 hover:text-creo-mint transition">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-        <span class="text-[10px] font-bold">Compartir</span>
-      </button>
-    </div>
-    <!-- Bottom info bar -->
-    <div class="absolute bottom-0 left-0 right-16 p-4 bg-gradient-to-t from-black/80 to-transparent">
-      <div class="max-w-lg mx-auto">
-        <div class="flex items-center gap-3 mb-2">
-          <a id="sv-profile-link" href="#">
-            <div id="sv-avatar" class="w-10 h-10 rounded-full overflow-hidden bg-white/20"></div>
-          </a>
-          <div>
-            <p id="sv-name" class="font-bold text-white text-sm"></p>
-            <p id="sv-username" class="text-white/60 text-xs"></p>
-          </div>
-        </div>
-        <p id="sv-title" class="text-white font-bold text-sm mb-1"></p>
-        <p id="sv-description" class="text-white/80 text-xs line-clamp-3"></p>
-      </div>
-    </div>
+    <div id="story-scroll-container" class="w-full h-full overflow-y-scroll snap-y snap-mandatory"></div>
     <!-- Comment panel (slides up) -->
     <div id="story-comments-panel" class="fixed bottom-0 left-0 right-0 z-[110] hidden transform translate-y-full transition-transform duration-300" style="max-height:60vh">
       <div class="bg-gray-900 rounded-t-2xl border-t border-gray-700 flex flex-col" style="max-height:60vh">
@@ -229,72 +200,149 @@
       }).join('');
     }
 
-    // ===== STORY VIEWER =====
-    async function openStoryViewer(idx) {
-      const s = allStories[idx];
-      if (!s) return;
-      currentStoryIdx = idx;
-      storyLiked = false;
-      const p = s.profile;
-      const viewer = document.getElementById('story-viewer');
+    // ===== STORY VIEWER (TikTok-style vertical scroll) =====
+    let storyObserver = null;
 
+    function buildStorySlide(s, i) {
+      const p = s.profile;
       const name = p?.display_name || p?.username || '?';
       const avatar = p?.avatar_url
-        ? `<img src="${esc(p.avatar_url)}" class="w-full h-full object-cover">`
-        : `<div class="w-full h-full bg-creo-purple/30 flex items-center justify-center"><span class="text-white font-bold">${esc(name[0])}</span></div>`;
+        ? `<img src="${esc(p.avatar_url)}" class="w-10 h-10 rounded-full object-cover">`
+        : `<div class="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center"><span class="text-white font-bold">${esc(name[0])}</span></div>`;
 
-      document.getElementById('sv-avatar').innerHTML = avatar;
-      document.getElementById('sv-name').textContent = name;
-      document.getElementById('sv-username').textContent = '@' + (p?.username || '');
-      document.getElementById('sv-profile-link').href = 'profile.html?u=' + (p?.username || '');
-      document.getElementById('sv-title').textContent = s.title || '';
-      document.getElementById('sv-description').textContent = s.description || s.content || '';
-
-      const content = document.getElementById('story-viewer-content');
+      let media = '';
       if (s.main_video_url) {
         const isYT = /youtube|youtu\.be/.test(s.main_video_url);
         if (isYT) {
           const vid = s.main_video_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
-          content.innerHTML = vid ? `<iframe src="https://www.youtube.com/embed/${vid[1]}?autoplay=1&rel=0" class="w-full h-full" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>` : '';
+          media = vid ? `<iframe data-src="https://www.youtube.com/embed/${vid[1]}?rel=0" class="w-full h-full" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>` : '';
         } else {
-          content.innerHTML = `<video src="${esc(s.main_video_url)}" controls autoplay playsinline class="w-full h-full object-contain"></video>`;
+          media = `<video data-src="${esc(s.main_video_url)}" controls playsinline preload="none" class="w-full h-full object-contain"></video>`;
         }
       } else if (s.media_urls && s.media_urls.length > 0) {
         const first = s.media_urls[0];
         const isVid = /\.(mp4|webm|mov)$/i.test(first);
-        content.innerHTML = isVid
-          ? `<video src="${esc(first)}" controls autoplay playsinline class="w-full h-full object-contain"></video>`
+        media = isVid
+          ? `<video data-src="${esc(first)}" controls playsinline preload="none" class="w-full h-full object-contain"></video>`
           : `<img src="${esc(first)}" class="w-full h-full object-contain">`;
       } else {
-        content.innerHTML = `<div class="max-w-md mx-auto p-8 text-center text-white space-y-4">
+        media = `<div class="w-full h-full flex items-center justify-center"><div class="max-w-md p-8 text-center text-white space-y-4">
           <h3 class="text-xl font-bold">${esc(s.title || 'Mi Historia')}</h3>
           <p class="text-sm text-white/80 leading-relaxed">${esc(s.description || s.content || '')}</p>
-        </div>`;
+        </div></div>`;
       }
 
-      viewer.classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-      loadStoryInteractions(s.id);
+      const verified = p?.verification_status === 'approved';
+      const badge = verified ? '<svg class="w-4 h-4 text-creo-mint" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' : '';
+
+      return `<div class="story-slide snap-start w-full flex-shrink-0 relative bg-black" data-story-idx="${i}" data-story-id="${s.id}" style="height:100vh;height:100dvh">
+        <div class="w-full h-full flex items-center justify-center">${media}</div>
+        <div class="absolute right-3 bottom-32 flex flex-col items-center gap-5 z-10">
+          <button onclick="toggleStoryLike(${i})" class="sv-like-btn flex flex-col items-center gap-1 text-white/80 hover:text-red-500 transition" data-idx="${i}">
+            <svg class="sv-like-icon w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            <span class="sv-like-count text-[10px] font-bold">0</span>
+          </button>
+          <button onclick="openStoryComments()" class="flex flex-col items-center gap-1 text-white/80 hover:text-creo-mint transition">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <span class="sv-comment-count text-[10px] font-bold">0</span>
+          </button>
+          <button onclick="shareStory()" class="flex flex-col items-center gap-1 text-white/80 hover:text-creo-mint transition">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+            <span class="text-[10px] font-bold">Compartir</span>
+          </button>
+        </div>
+        <div class="absolute bottom-0 left-0 right-16 p-4 bg-gradient-to-t from-black/80 to-transparent">
+          <div class="max-w-lg mx-auto">
+            <div class="flex items-center gap-3 mb-2">
+              <a href="profile.html?u=${esc(p?.username || '')}">${avatar}</a>
+              <div class="flex items-center gap-1">
+                <p class="font-bold text-white text-sm">${esc(name)}</p>
+                ${badge}
+              </div>
+              <span class="text-white/60 text-xs">@${esc(p?.username || '')}</span>
+            </div>
+            <p class="text-white font-bold text-sm mb-1">${esc(s.title || '')}</p>
+            <p class="text-white/80 text-xs line-clamp-2">${esc(s.description || s.content || '')}</p>
+          </div>
+        </div>
+      </div>`;
     }
 
-    async function loadStoryInteractions(storyId) {
+    function openStoryViewer(idx) {
+      const viewer = document.getElementById('story-viewer');
+      const container = document.getElementById('story-scroll-container');
+      container.innerHTML = allStories.map((s, i) => buildStorySlide(s, i)).join('');
+      viewer.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+
+      const targetSlide = container.children[idx];
+      if (targetSlide) targetSlide.scrollIntoView({ behavior: 'instant' });
+
+      currentStoryIdx = idx;
+      storyLiked = false;
+      setupStoryObserver();
+    }
+
+    function setupStoryObserver() {
+      if (storyObserver) storyObserver.disconnect();
+      const container = document.getElementById('story-scroll-container');
+      storyObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            const idx = parseInt(entry.target.dataset.storyIdx);
+            if (idx !== currentStoryIdx) {
+              pauseSlideMedia(currentStoryIdx);
+              currentStoryIdx = idx;
+              storyLiked = false;
+            }
+            activateSlide(entry.target, idx);
+          }
+        }
+      }, { root: container, threshold: 0.5 });
+
+      for (const slide of container.children) {
+        storyObserver.observe(slide);
+      }
+    }
+
+    function activateSlide(slide, idx) {
+      const s = allStories[idx];
+      if (!s) return;
+      const vid = slide.querySelector('video[data-src]');
+      if (vid) { vid.src = vid.dataset.src; vid.removeAttribute('data-src'); vid.play().catch(()=>{}); }
+      const iframe = slide.querySelector('iframe[data-src]');
+      if (iframe) { iframe.src = iframe.dataset.src; iframe.removeAttribute('data-src'); }
+      loadSlideInteractions(slide, s.id);
+    }
+
+    function pauseSlideMedia(idx) {
+      const container = document.getElementById('story-scroll-container');
+      const slide = container.children[idx];
+      if (!slide) return;
+      const vid = slide.querySelector('video');
+      if (vid) vid.pause();
+      const iframe = slide.querySelector('iframe[src]');
+      if (iframe && iframe.src) { iframe.dataset.src = iframe.src; iframe.src = ''; }
+    }
+
+    async function loadSlideInteractions(slide, storyId) {
       const { count: likeCount } = await sb.from('story_likes').select('*', { count: 'exact', head: true }).eq('story_id', storyId);
-      document.getElementById('sv-like-count').textContent = likeCount || 0;
+      slide.querySelector('.sv-like-count').textContent = likeCount || 0;
 
       const { count: commentCount } = await sb.from('story_comments').select('*', { count: 'exact', head: true }).eq('story_id', storyId);
-      document.getElementById('sv-comment-count').textContent = commentCount || 0;
+      slide.querySelector('.sv-comment-count').textContent = commentCount || 0;
 
       if (exploreUser) {
         const { data: myLike } = await sb.from('story_likes').select('id').eq('story_id', storyId).eq('user_id', exploreUser.id).maybeSingle();
         storyLiked = !!myLike;
-        updateLikeBtn();
+        updateSlideLikeBtn(slide, storyLiked);
       }
     }
 
-    function updateLikeBtn() {
-      const icon = document.getElementById('sv-like-icon');
-      const btn = document.getElementById('sv-like-btn');
-      if (storyLiked) {
+    function updateSlideLikeBtn(slide, liked) {
+      const icon = slide.querySelector('.sv-like-icon');
+      const btn = slide.querySelector('.sv-like-btn');
+      if (liked) {
         icon.setAttribute('fill', 'currentColor');
         btn.classList.add('text-red-500');
         btn.classList.remove('text-white/80');
@@ -305,23 +353,25 @@
       }
     }
 
-    async function toggleStoryLike() {
+    async function toggleStoryLike(idx) {
       if (!exploreUser) { showToast('Inicia sesión para dar Creo', 'error'); return; }
-      const s = allStories[currentStoryIdx];
+      const s = allStories[idx != null ? idx : currentStoryIdx];
       if (!s) return;
+      const container = document.getElementById('story-scroll-container');
+      const slide = container.children[idx != null ? idx : currentStoryIdx];
 
       if (storyLiked) {
         await sb.from('story_likes').delete().eq('story_id', s.id).eq('user_id', exploreUser.id);
         storyLiked = false;
-        const el = document.getElementById('sv-like-count');
+        const el = slide.querySelector('.sv-like-count');
         el.textContent = Math.max(0, parseInt(el.textContent) - 1);
       } else {
         await sb.from('story_likes').insert([{ story_id: s.id, user_id: exploreUser.id }]);
         storyLiked = true;
-        const el = document.getElementById('sv-like-count');
+        const el = slide.querySelector('.sv-like-count');
         el.textContent = parseInt(el.textContent) + 1;
       }
-      updateLikeBtn();
+      updateSlideLikeBtn(slide, storyLiked);
     }
 
     function openStoryComments() {
@@ -408,8 +458,10 @@
     }
 
     function closeStoryViewer() {
+      if (storyObserver) { storyObserver.disconnect(); storyObserver = null; }
+      pauseSlideMedia(currentStoryIdx);
       document.getElementById('story-viewer').classList.add('hidden');
-      document.getElementById('story-viewer-content').innerHTML = '';
+      document.getElementById('story-scroll-container').innerHTML = '';
       closeStoryComments();
       document.body.style.overflow = '';
       currentStoryIdx = -1;
