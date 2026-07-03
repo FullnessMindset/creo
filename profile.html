@@ -64,9 +64,10 @@
     /* Branding transition */
     .brand-transition { transition: background-color 0.3s, color 0.3s; }
 
-    /* Yo Creo en Ellos scroll */
+    /* Yo Creo en Ellos — compact cards */
     #creo-en-ellos-scroll::-webkit-scrollbar { display: none; }
-    .creo-ellos-card { min-width: 260px; max-width: 300px; scroll-snap-align: start; flex-shrink: 0; }
+    .creo-ellos-card { flex-shrink: 0; cursor: pointer; }
+    #creo-popup .animate-slide-up { animation: slide-up 0.2s ease-out; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
@@ -170,37 +171,69 @@
     </div>
 
     <!-- CREATOR POSTS — Horizontal scroll -->
-    <div id="posts-section" class="hidden space-y-4">
-      <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
-        <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-        Publicaciones
-      </h2>
+    <div id="posts-section" class="hidden space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
+          <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          Publicaciones
+        </h2>
+        <button onclick="toggleFullPosts()" id="full-posts-btn" class="text-xs font-semibold text-creo-purple hover:text-creo-light transition flex items-center gap-1">
+          Ver todo <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
       <div id="creator-posts-scroll"></div>
+      <div id="creator-posts-full" class="hidden grid grid-cols-1 gap-4"></div>
     </div>
 
-    <!-- MI META — Below posts -->
+    <!-- MI META -->
     <div id="metas-section">
       <div id="metas-container" class="space-y-4"></div>
       <div id="no-metas" class="hidden"></div>
     </div>
 
-    <!-- BUSINESS LINKS -->
+    <!-- COMPLETED METAS — progress/history -->
+    <div id="completed-metas-inline" class="hidden space-y-4">
+      <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
+        <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Metas Alcanzadas
+      </h2>
+      <div id="completed-metas-inline-list" class="space-y-3"></div>
+    </div>
+
+    <!-- MIS CREACIONES — product/website links (up to 10) -->
     <div id="business-section" class="hidden space-y-4">
       <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
-        <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        Mi Negocio
+        <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        Mis Creaciones
       </h2>
       <div id="business-links-list" class="grid gap-3"></div>
     </div>
 
-    <!-- YO CREO EN ELLOS — creators this user supports -->
-    <div id="creo-en-ellos-section" class="hidden space-y-4">
-      <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
-        <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+    <!-- YO CREO EN ELLOS — thin compact section -->
+    <div id="creo-en-ellos-section" class="hidden space-y-2">
+      <h2 class="section-title text-sm font-bold text-gray-900 flex items-center gap-2">
+        <img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="CREO">
         Yo Creo en Ellos
       </h2>
-      <p class="text-xs text-gray-500">Conoce las Historias de los creadores que apoyo</p>
-      <div id="creo-en-ellos-scroll" class="flex gap-4 overflow-x-auto pb-3 scroll-smooth snap-x snap-mandatory" style="scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+      <div id="creo-en-ellos-scroll" class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+    </div>
+
+    <!-- Creo en Ellos hover popup -->
+    <div id="creo-popup" class="fixed z-[200] hidden pointer-events-none">
+      <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden w-72 pointer-events-auto animate-slide-up">
+        <div id="creo-popup-cover" class="h-20 bg-gradient-to-r from-creo-purple to-creo-light"></div>
+        <div class="px-4 pb-4 -mt-6 text-center">
+          <div id="creo-popup-avatar" class="w-12 h-12 rounded-full bg-creo-purple/10 border-2 border-white shadow mx-auto flex items-center justify-center overflow-hidden">
+            <span id="creo-popup-initials" class="text-sm font-bold text-creo-purple"></span>
+            <img id="creo-popup-avatar-img" class="w-full h-full object-cover hidden" alt="">
+          </div>
+          <p id="creo-popup-name" class="text-sm font-bold text-gray-900 mt-2"></p>
+          <p id="creo-popup-username" class="text-[10px] text-gray-400"></p>
+          <p id="creo-popup-bio" class="text-[11px] text-gray-600 mt-1 line-clamp-3"></p>
+          <div id="creo-popup-story" class="hidden mt-2 text-[11px] text-gray-500 italic line-clamp-2 border-t border-gray-100 pt-2"></div>
+          <a id="creo-popup-link" href="#" class="mt-2 inline-block text-[10px] font-semibold text-creo-purple hover:text-creo-light transition">Ver perfil →</a>
+        </div>
+      </div>
     </div>
 
     <!-- REPORT MODAL -->
@@ -439,14 +472,6 @@
   </style>
 
   <!-- Completed Metas History -->
-  <div id="completed-metas-section" class="hidden max-w-2xl mx-auto px-4 mb-6 space-y-4">
-    <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
-      <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      Metas Alcanzadas
-    </h2>
-    <div id="completed-metas-list" class="space-y-3"></div>
-  </div>
-
   <footer class="max-w-2xl mx-auto px-4 pb-24 text-center text-xs text-gray-400 leading-relaxed space-y-2">
     <p><span class="font-semibold text-creo-purple tracking-wider">CREO</span> — Los pagos son voluntarios, no reembolsables y no deducibles de impuestos. Los creadores son responsables de sus propios impuestos.</p>
     <p class="space-x-3">
@@ -1588,9 +1613,9 @@
         .limit(20);
       if (error || !data || data.length === 0) return;
 
-      const section = document.getElementById('completed-metas-section');
+      const section = document.getElementById('completed-metas-inline');
       section.classList.remove('hidden');
-      const list = document.getElementById('completed-metas-list');
+      const list = document.getElementById('completed-metas-inline-list');
       list.innerHTML = data.map(m => {
         const pct = m.goal_amount_cents > 0 ? Math.min(100, Math.round(m.raised_cents / m.goal_amount_cents * 100)) : 0;
         const raised = (m.raised_cents / 100).toFixed(2);
@@ -1679,6 +1704,24 @@
           });
         }, { threshold: 0.5, root: scroll });
         postVideos.forEach(v => obs.observe(v));
+      }
+    }
+
+    let postsFullView = false;
+    function toggleFullPosts() {
+      postsFullView = !postsFullView;
+      const scroll = document.getElementById('creator-posts-scroll');
+      const full = document.getElementById('creator-posts-full');
+      const btn = document.getElementById('full-posts-btn');
+      if (postsFullView) {
+        scroll.classList.add('hidden');
+        full.classList.remove('hidden');
+        full.innerHTML = scroll.innerHTML.replace(/post-card/g, 'post-card-full');
+        btn.innerHTML = 'Slider <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>';
+      } else {
+        scroll.classList.remove('hidden');
+        full.classList.add('hidden');
+        btn.innerHTML = 'Ver todo <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>';
       }
     }
 
@@ -1808,58 +1851,96 @@
 
     // ===== YO CREO EN ELLOS =====
     const DUMMY_CREATORS = [
-      { username: 'maria_arte', display_name: 'María Arte', avatar_url: '', content: 'Soy pintora y muralista. Creo arte urbano que transforma comunidades. Mi meta es pintar 100 murales en Latinoamérica.', isDummy: true },
-      { username: 'carlos_music', display_name: 'Carlos Beats', avatar_url: '', content: 'Productor musical independiente. Compongo beats y enseño producción musical a jóvenes de bajos recursos.', isDummy: true },
-      { username: 'luna_cocina', display_name: 'Luna Cocina', avatar_url: '', content: 'Chef vegana compartiendo recetas fáciles y nutritivas. Mi sueño es abrir un comedor comunitario.', isDummy: true },
-      { username: 'tech_omar', display_name: 'Omar Tech', avatar_url: '', content: 'Desarrollador web enseñando programación gratis en español. Quiero crear la mejor academia tech latina.', isDummy: true },
-      { username: 'fit_ana', display_name: 'Ana Fitness', avatar_url: '', content: 'Entrenadora personal y nutricionista. Ayudo a personas a transformar su salud con rutinas desde casa.', isDummy: true }
+      { username: 'maria_arte', display_name: 'María Arte', avatar_url: '', bio: 'Pintora y muralista. Arte urbano que transforma comunidades.', isDummy: true },
+      { username: 'carlos_music', display_name: 'Carlos Beats', avatar_url: '', bio: 'Productor musical independiente. Enseña producción a jóvenes.', isDummy: true },
+      { username: 'luna_cocina', display_name: 'Luna Cocina', avatar_url: '', bio: 'Chef vegana. Recetas fáciles y nutritivas para todos.', isDummy: true },
+      { username: 'tech_omar', display_name: 'Omar Tech', avatar_url: '', bio: 'Desarrollador web. Programación gratis en español.', isDummy: true },
+      { username: 'fit_ana', display_name: 'Ana Fitness', avatar_url: '', bio: 'Entrenadora personal. Rutinas desde casa para todos.', isDummy: true }
     ];
 
     function renderCreoEllosCard(p, isDummy) {
-      const avatar = p.avatar_url || '';
       const name = p.display_name || p.username;
-      const preview = (p.content || '').slice(0, 100) + ((p.content || '').length > 100 ? '...' : '');
-      const badge = isDummy ? '<span title="Demo data" class="text-[10px]">🤖</span>' : '';
       const initials = name[0].toUpperCase();
-      const colors = ['bg-pink-100 text-pink-600', 'bg-blue-100 text-blue-600', 'bg-green-100 text-green-600', 'bg-amber-100 text-amber-600', 'bg-purple-100 text-purple-600'];
-      const colorClass = colors[Math.abs(name.charCodeAt(0)) % colors.length];
+      const avatar = p.avatar_url;
+      const badge = isDummy ? ' 🤖' : '';
+      const bio = (p.bio || p.content || '').slice(0, 60) + ((p.bio || p.content || '').length > 60 ? '...' : '');
+      const dataAttrs = `data-creo-user="${esc(p.username)}" data-creo-name="${esc(name)}" data-creo-avatar="${esc(avatar || '')}" data-creo-bio="${esc(p.bio || p.content || '')}" data-creo-dummy="${isDummy}"`;
 
-      return `<a href="${isDummy ? '#' : 'profile.html?u=' + encodeURIComponent(p.username)}" class="creo-ellos-card glass rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all no-underline block" ${isDummy ? 'onclick="event.preventDefault();showToast(\'Demo: este perfil es de ejemplo\',\'info\')"' : ''}>
-        <div class="bg-gradient-to-br from-creo-purple/10 to-creo-mint/10 h-24 flex items-center justify-center">
-          <span class="text-3xl font-bold text-creo-purple/30">${esc(initials)}</span>
+      return `<div class="creo-ellos-card flex items-center gap-2 px-3 py-2 rounded-xl glass hover:shadow-md transition-all" ${dataAttrs} onmouseenter="showCreoPopup(event,this)" onmouseleave="hideCreoPopup()" onclick="${isDummy ? "event.preventDefault();showToast('Demo: perfil de ejemplo','info')" : "window.location.href='profile.html?u='+encodeURIComponent('"+esc(p.username)+"')"}">
+        ${avatar ? `<img src="${esc(avatar)}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">` : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center flex-shrink-0 text-xs font-bold text-creo-purple">${esc(initials)}</div>`}
+        <div class="min-w-0">
+          <p class="text-[11px] font-bold text-gray-900 truncate leading-tight">${esc(name)}${badge}</p>
+          <p class="text-[9px] text-gray-400 truncate leading-tight">${esc(bio)}</p>
         </div>
-        <div class="p-4 space-y-2">
-          <div class="flex items-center gap-2">
-            ${avatar ? `<img src="${esc(avatar)}" class="w-8 h-8 rounded-full object-cover">` : `<div class="w-8 h-8 rounded-full ${colorClass} flex items-center justify-center text-xs font-bold">${esc(initials)}</div>`}
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-bold text-gray-900 flex items-center gap-1">${esc(name)} ${badge}</p>
-              <p class="text-[10px] text-gray-400">@${esc(p.username)}</p>
-            </div>
-          </div>
-          ${preview ? `<p class="text-xs text-gray-600 leading-relaxed">${esc(preview)}</p>` : ''}
-        </div>
-      </a>`;
+      </div>`;
     }
+
+    let creoPopupTimeout = null;
+    function showCreoPopup(e, el) {
+      clearTimeout(creoPopupTimeout);
+      const popup = document.getElementById('creo-popup');
+      const name = el.dataset.creoName;
+      const username = el.dataset.creoUser;
+      const avatar = el.dataset.creoAvatar;
+      const bio = el.dataset.creoBio;
+      const isDummy = el.dataset.creoDummy === 'true';
+
+      document.getElementById('creo-popup-name').textContent = name;
+      document.getElementById('creo-popup-username').textContent = '@' + username;
+      document.getElementById('creo-popup-bio').textContent = bio || '';
+      document.getElementById('creo-popup-initials').textContent = name[0].toUpperCase();
+      document.getElementById('creo-popup-link').href = isDummy ? '#' : 'profile.html?u=' + encodeURIComponent(username);
+
+      const img = document.getElementById('creo-popup-avatar-img');
+      const initSpan = document.getElementById('creo-popup-initials');
+      if (avatar) { img.src = avatar; img.classList.remove('hidden'); initSpan.classList.add('hidden'); }
+      else { img.classList.add('hidden'); initSpan.classList.remove('hidden'); }
+
+      // Fetch story for real users
+      const storyDiv = document.getElementById('creo-popup-story');
+      storyDiv.classList.add('hidden');
+      if (!isDummy) {
+        sb.from('profiles').select('id').eq('username', username).single().then(({ data: prof }) => {
+          if (!prof) return;
+          sb.from('creator_stories').select('content').eq('creator_id', prof.id).order('created_at', { ascending: false }).limit(1).single().then(({ data: story }) => {
+            if (story && story.content) {
+              storyDiv.textContent = '"' + story.content.slice(0, 120) + (story.content.length > 120 ? '...' : '') + '"';
+              storyDiv.classList.remove('hidden');
+            }
+          });
+        });
+      }
+
+      const rect = el.getBoundingClientRect();
+      popup.style.left = Math.min(rect.left, window.innerWidth - 300) + 'px';
+      popup.style.top = (rect.bottom + 8) + 'px';
+      popup.classList.remove('hidden');
+    }
+
+    function hideCreoPopup() {
+      creoPopupTimeout = setTimeout(() => {
+        document.getElementById('creo-popup').classList.add('hidden');
+      }, 200);
+    }
+    document.getElementById('creo-popup')?.addEventListener('mouseenter', () => clearTimeout(creoPopupTimeout));
+    document.getElementById('creo-popup')?.addEventListener('mouseleave', () => hideCreoPopup());
 
     async function loadCreoEnEllos(creatorId) {
       let curatedCreators = [];
 
-      // 1. Try curated list from creo_en_ellos column
       const { data: prof } = await sb.from('profiles').select('creo_en_ellos').eq('id', creatorId).single();
       if (prof && prof.creo_en_ellos && Array.isArray(prof.creo_en_ellos) && prof.creo_en_ellos.length > 0) {
-        curatedCreators = prof.creo_en_ellos.map(c => ({ ...c, content: c.bio || '', isDummy: false }));
+        curatedCreators = prof.creo_en_ellos.map(c => ({ ...c, isDummy: false }));
       }
 
-      // 2. If no curated list, fall back to follows
       if (curatedCreators.length === 0) {
-        const { data: follows } = await sb.from('follows').select('following_id').eq('follower_id', creatorId);
-        if (follows && follows.length > 0) {
-          const followedIds = follows.map(f => f.following_id);
-          const { data: profiles } = await sb.from('profiles').select('id, username, display_name, avatar_url, bio').in('id', followedIds).limit(10);
-          if (profiles && profiles.length > 0) {
-            curatedCreators = profiles.map(p => ({ ...p, content: p.bio || '', isDummy: false }));
+        try {
+          const { data: follows } = await sb.from('follows').select('following_id').eq('follower_id', creatorId);
+          if (follows && follows.length > 0) {
+            const { data: profiles } = await sb.from('profiles').select('id, username, display_name, avatar_url, bio').in('id', follows.map(f => f.following_id)).limit(10);
+            if (profiles && profiles.length > 0) curatedCreators = profiles.map(p => ({ ...p, isDummy: false }));
           }
-        }
+        } catch (e) {}
       }
 
       document.getElementById('creo-en-ellos-section').classList.remove('hidden');
@@ -1870,13 +1951,6 @@
       const dummyCards = DUMMY_CREATORS.slice(0, needed).map(p => renderCreoEllosCard(p, true));
 
       scroll.innerHTML = [...realCards, ...dummyCards].join('');
-
-      scroll.addEventListener('wheel', (e) => {
-        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-          e.preventDefault();
-          scroll.scrollBy({ left: e.deltaY, behavior: 'auto' });
-        }
-      }, { passive: false });
     }
 
     // ===== ADMIN IMPERSONATION =====
