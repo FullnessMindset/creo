@@ -63,12 +63,12 @@
     #creator-posts-scroll::-webkit-scrollbar { display: none; }
     #creator-posts-scroll > .post-card {
       scroll-snap-align: center;
-      min-width: 280px;
-      max-width: 340px;
+      min-width: calc(100% - 2rem);
+      max-width: 100%;
       flex-shrink: 0;
     }
     @media (min-width: 640px) {
-      #creator-posts-scroll > .post-card { min-width: 400px; max-width: 480px; }
+      #creator-posts-scroll > .post-card { min-width: calc(100% - 2rem); max-width: 100%; }
     }
 
     /* Branding transition */
@@ -1781,6 +1781,12 @@
       const font = colors.font || 'Inter';
       const bgMedia = colors.bgMedia || '';
 
+      // CSS custom properties for dynamic elements (posts, etc.)
+      document.documentElement.style.setProperty('--brand-section-bg', sectionBg);
+      document.documentElement.style.setProperty('--brand-text-color', textColor);
+      document.documentElement.style.setProperty('--brand-button-color', buttonColor);
+      document.documentElement.style.setProperty('--brand-btn-text-color', btnTextColor);
+
       // Page background
       document.body.style.backgroundColor = bgColor;
       document.body.style.color = textColor;
@@ -1844,10 +1850,11 @@
         }
       });
 
-      // Meta contribute buttons
-      document.querySelectorAll('[id^="meta-btn-"]').forEach(el => {
+      // Meta contribute buttons + Creamos buttons
+      document.querySelectorAll('[id^="meta-btn-"], .creamos-btn').forEach(el => {
         el.style.backgroundColor = buttonColor;
         el.style.color = btnTextColor;
+        el.style.borderColor = 'transparent';
       });
 
       // Payment tab buttons
