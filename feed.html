@@ -47,12 +47,12 @@
 
     /* Landscape / Desktop: horizontal scroll */
     @media (orientation: landscape) {
-      body { overflow: hidden; padding-bottom: 0 !important; }
+      body { overflow: hidden; }
       #feed-scroll {
         scroll-snap-type: x mandatory;
         overflow-x: auto;
         overflow-y: hidden;
-        height: 100vh;
+        height: calc(100vh - 3.5rem);
         max-width: none;
         padding: 0 2rem;
         display: flex;
