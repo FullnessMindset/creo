@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CREO — Comunidad</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a0a3e">
+  <meta name="description" content="CREO — El muro de la comunidad de creadores">
+  <meta property="og:title" content="CREO — Comunidad">
+  <meta property="og:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
+  <link rel="icon" href="assets/logo-icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/logo-icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { creo: { purple: '#1a0a3e', light: '#2d1b69', mint: '#33f0b0', mintDark: '#28c48e' } } } }
+    }
+  </script>
+  <style>
+    body { overscroll-behavior: contain; }
+    .glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
+    .glass-dark { background: rgba(26,10,62,0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); }
+    .media-grid-1 { display: grid; grid-template-columns: 1fr; gap: 2px; }
+    .media-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    .media-grid-3 { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px; }
+    .media-grid-3 > :first-child { grid-row: 1 / 3; }
+    .media-grid-4 { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px; }
+    .compose-overlay { position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+    .media-preview-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; scrollbar-width: none; }
+    .media-preview-scroll::-webkit-scrollbar { display: none; }
+    .welcome-gradient { background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 50%, #33f0b0 100%); }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
+  <script src="shared.js"></script>
+
+  <div class="max-w-2xl mx-auto px-4 pt-4 pb-24 space-y-4">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow">
+          <img src="assets/logo-icon.png" alt="CREO" class="w-7 h-7 rounded-full object-contain">
+        </div>
+        <h1 class="text-xl font-bold text-creo-purple tracking-wider">Comunidad</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleTheme()" id="theme-toggle-btn" class="p-2 rounded-full hover:bg-gray-100 transition">
+          <svg class="w-5 h-5 text-gray-500 theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <svg class="w-5 h-5 text-gray-300 theme-icon-moon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Stories bar -->
+    <div id="stories-bar" class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" style="scrollbar-width: none;">
+      <div id="stories-list" class="flex gap-3"></div>
+    </div>
+
+    <!-- Compose box (auth only) -->
+    <div id="compose-box" class="hidden glass rounded-2xl p-4 space-y-3">
+      <div class="flex items-center gap-3">
+        <div id="compose-avatar" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0"></div>
+        <button onclick="openCompose()" class="flex-1 text-left text-gray-400 text-sm bg-gray-100 rounded-full px-4 py-2.5 hover:bg-gray-200 transition">¿Qué quieres compartir?</button>
+      </div>
+      <div class="flex justify-around border-t border-gray-100 pt-3">
+        <button onclick="openCompose('video')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-creo-purple transition">
+          <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg>
+          Video
+        </button>
+        <button onclick="openCompose('photo')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-creo-purple transition">
+          <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          Foto
+        </button>
+        <button onclick="openCompose('text')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-creo-purple transition">
+          <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 18H6v-2h8v2zm2-4H6v-2h10v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          Texto
+        </button>
+      </div>
+    </div>
+
+    <!-- Welcome admin post (first-time) -->
+    <div id="welcome-post" class="hidden">
+      <div class="welcome-gradient rounded-2xl overflow-hidden shadow-xl">
+        <div class="p-6 text-white space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center backdrop-blur">
+              <img src="assets/logo-icon.png" alt="CREO" class="w-8 h-8 rounded-full">
+            </div>
+            <div>
+              <p class="font-bold text-sm">CREO</p>
+              <p class="text-white/60 text-xs">Equipo CREO</p>
+            </div>
+          </div>
+          <h3 class="text-lg font-bold">¡Bienvenido a la Comunidad de Creadores! 🎨</h3>
+          <p class="text-sm text-white/90 leading-relaxed">
+            CREO es la plataforma donde los creadores como tú pueden recibir apoyo real de su comunidad y de empresas que creen en su talento.
+            Ya seas artista, músico, emprendedor, escritor o cualquier tipo de creador — aquí tu trabajo tiene valor.
+          </p>
+          <p class="text-sm text-white/80 leading-relaxed">
+            ¿Te gustaría recibir apoyo de otros creadores y empresas para cumplir tus metas, seguir haciendo tu arte, crecer tu negocio o simplemente seguir creando?
+          </p>
+          <div class="flex gap-3 pt-2">
+            <button onclick="acceptWelcome()" class="flex-1 bg-white text-creo-purple font-bold py-3 rounded-xl hover:bg-gray-100 transition text-sm">
+              ¡Sí, quiero verificarme! ✨
+            </button>
+            <button onclick="dismissWelcome()" class="px-4 py-3 text-white/70 hover:text-white border border-white/30 rounded-xl transition text-sm">
+              Ahora no
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feed -->
+    <div id="community-feed" class="space-y-4"></div>
+    <div id="feed-loading" class="hidden text-center py-8">
+      <div class="inline-flex items-center gap-2 text-gray-400 text-sm">
+        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+        Cargando...
+      </div>
+    </div>
+    <p id="feed-empty" class="hidden text-center text-gray-400 text-sm py-12">Aún no hay publicaciones. ¡Sé el primero en compartir!</p>
+    <div id="feed-end" class="hidden text-center text-gray-300 text-xs py-6">— Has visto todo —</div>
+  </div>
+
+  <!-- Compose Modal -->
+  <div id="compose-modal" class="fixed inset-0 z-[90] hidden">
+    <div class="compose-overlay" onclick="closeCompose()"></div>
+    <div class="fixed inset-x-0 bottom-0 z-[91] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl max-h-[85vh] overflow-y-auto" id="compose-panel">
+      <div class="p-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+        <button onclick="closeCompose()" class="text-gray-400 hover:text-gray-600 text-sm">Cancelar</button>
+        <span class="font-bold text-sm text-gray-900">Nueva publicación</span>
+        <button onclick="submitPost()" id="compose-submit" class="bg-creo-purple text-white font-bold px-5 py-2 rounded-full text-sm hover:bg-creo-light transition disabled:opacity-50" disabled>Publicar</button>
+      </div>
+      <div class="p-4 space-y-4">
+        <div class="flex items-start gap-3">
+          <div id="compose-modal-avatar" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0"></div>
+          <div class="flex-1 space-y-3">
+            <input id="compose-title" type="text" placeholder="Título (opcional)" class="w-full text-base font-bold text-gray-900 outline-none placeholder-gray-300 bg-transparent">
+            <textarea id="compose-body" placeholder="¿Qué quieres compartir con la comunidad?" rows="4" class="w-full text-sm text-gray-700 outline-none placeholder-gray-400 bg-transparent resize-none" oninput="checkComposeValid()"></textarea>
+          </div>
+        </div>
+        <!-- Media preview -->
+        <div id="compose-media-preview" class="hidden media-preview-scroll"></div>
+        <!-- Media controls -->
+        <div class="flex items-center gap-3 border-t border-gray-100 pt-3">
+          <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-green-600 transition">
+            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+            Foto
+            <input type="file" accept="image/*" multiple class="hidden" onchange="handleComposeMedia(event, 'photo')">
+          </label>
+          <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition">
+            <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg>
+            Video
+            <input type="file" accept="video/*" class="hidden" onchange="handleComposeMedia(event, 'video')">
+          </label>
+          <span id="compose-emoji-btn" class="cursor-pointer text-xl hover:scale-110 transition ml-auto">😊</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comments modal -->
+  <div id="comments-modal" class="fixed inset-0 z-[95] hidden">
+    <div class="compose-overlay" onclick="closeComments()"></div>
+    <div class="fixed inset-x-0 bottom-0 z-[96] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col" id="comments-panel">
+      <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+        <span class="font-bold text-sm text-gray-900">Comentarios</span>
+        <button onclick="closeComments()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="comments-list" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+      <div class="p-3 border-t border-gray-100 flex items-center gap-2">
+        <span id="comment-emoji-btn" class="cursor-pointer text-lg">😊</span>
+        <input id="comment-input" type="text" placeholder="Escribe un comentario..." class="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-creo-mint">
+        <button onclick="submitComment()" class="bg-creo-mint text-creo-purple font-bold px-4 py-2 rounded-full text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share modal -->
+  <div id="share-modal" class="fixed inset-0 z-[95] hidden">
+    <div class="compose-overlay" onclick="closeShareModal()"></div>
+    <div class="fixed inset-x-0 bottom-0 z-[96] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-sm text-gray-900">Compartir publicación</span>
+        <button onclick="closeShareModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <textarea id="share-body" placeholder="Añade un comentario..." rows="2" class="w-full text-sm bg-gray-100 rounded-xl px-4 py-3 outline-none resize-none"></textarea>
+      <div id="share-preview" class="border border-gray-200 rounded-xl p-3 bg-gray-50"></div>
+      <button onclick="submitShare()" class="w-full bg-creo-purple text-white font-bold py-3 rounded-xl hover:bg-creo-light transition">Compartir al muro</button>
+    </div>
+  </div>
+
+  <!-- Lightbox for media -->
+  <div id="media-lightbox" class="fixed inset-0 z-[100] hidden bg-black/95 flex items-center justify-center" onclick="closeLightbox()">
+    <button class="absolute top-4 right-4 text-white/70 hover:text-white z-10">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <div id="lightbox-content" class="max-w-full max-h-full" onclick="event.stopPropagation()"></div>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let currentProfile = null;
+    let feedPage = 0;
+    let feedLoading = false;
+    let feedDone = false;
+    let activeCommentPostId = null;
+    let sharePostId = null;
+    let composeMediaFiles = [];
+    let composeType = 'text';
+    const PAGE_SIZE = 15;
+
+    async function init() {
+      const { data: { user } } = await sb.auth.getUser();
+      currentUser = user;
+      if (user) {
+        const { data: prof } = await sb.from('profiles').select('*').eq('id', user.id).single();
+        currentProfile = prof;
+        document.getElementById('compose-box').classList.remove('hidden');
+        const avatarHtml = prof?.avatar_url
+          ? `<img src="${esc(prof.avatar_url)}" class="w-full h-full object-cover">`
+          : `<span class="text-creo-purple font-bold">${esc((prof?.display_name || prof?.username || 'U')[0].toUpperCase())}</span>`;
+        document.getElementById('compose-avatar').innerHTML = avatarHtml;
+        document.getElementById('compose-modal-avatar').innerHTML = avatarHtml;
+        checkWelcomePost();
+      }
+      loadFeed();
+      loadStories();
+      renderBottomNav('comunidad');
+      updateNavAuth();
+      loadNotificationBell();
+      window.addEventListener('scroll', onScroll);
+      document.getElementById('comment-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitComment(); });
+    }
+
+    // Welcome post logic
+    async function checkWelcomePost() {
+      if (!currentProfile) return;
+      if (currentProfile.community_intro_seen) return;
+      if (currentProfile.community_intro_dismissed_at) {
+        const dismissed = new Date(currentProfile.community_intro_dismissed_at);
+        const threeMonths = 90 * 24 * 60 * 60 * 1000;
+        if (Date.now() - dismissed.getTime() < threeMonths) return;
+      }
+      document.getElementById('welcome-post').classList.remove('hidden');
+    }
+
+    async function acceptWelcome() {
+      await sb.from('profiles').update({ community_intro_seen: true }).eq('id', currentUser.id);
+      document.getElementById('welcome-post').classList.add('hidden');
+      window.location.href = 'index.html#verify';
+    }
+
+    async function dismissWelcome() {
+      await sb.from('profiles').update({ community_intro_dismissed_at: new Date().toISOString() }).eq('id', currentUser.id);
+      document.getElementById('welcome-post').classList.add('hidden');
+      showToast('¡Sin problema! Disfruta la comunidad', 'info');
+    }
+
+    // Stories bar
+    async function loadStories() {
+      try {
+        const { data } = await sb.from('stories').select('*, profile:creator_id(username, display_name, avatar_url)')
+          .eq('share_to_community', true).order('created_at', { ascending: false }).limit(20);
+        if (!data || data.length === 0) return;
+        const list = document.getElementById('stories-list');
+        const seen = new Set();
+        list.innerHTML = data.filter(s => {
+          if (seen.has(s.creator_id)) return false;
+          seen.add(s.creator_id);
+          return true;
+        }).map(s => {
+          const p = s.profile;
+          const name = p?.display_name || p?.username || '?';
+          const avatar = p?.avatar_url
+            ? `<img src="${esc(p.avatar_url)}" class="w-14 h-14 rounded-full object-cover ring-2 ring-creo-mint ring-offset-2">`
+            : `<div class="w-14 h-14 rounded-full bg-creo-purple/10 flex items-center justify-center ring-2 ring-creo-mint ring-offset-2"><span class="text-creo-purple font-bold">${esc(name[0].toUpperCase())}</span></div>`;
+          return `<a href="profile.html?u=${esc(p?.username || '')}" class="flex flex-col items-center gap-1 flex-shrink-0 w-16">
+            ${avatar}
+            <span class="text-[10px] text-gray-500 truncate w-full text-center">${esc(name)}</span>
+          </a>`;
+        }).join('');
+      } catch(e) {}
+    }
+
+    // Feed loading
+    async function loadFeed() {
+      if (feedLoading || feedDone) return;
+      feedLoading = true;
+      document.getElementById('feed-loading').classList.remove('hidden');
+
+      try {
+        const { data, error } = await sb.from('community_posts')
+          .select('*, author:author_id(id, username, display_name, avatar_url, verification_status), shared_post:shared_post_id(*, author:author_id(id, username, display_name, avatar_url))')
+          .order('created_at', { ascending: false })
+          .range(feedPage * PAGE_SIZE, (feedPage + 1) * PAGE_SIZE - 1);
+
+        if (error) throw error;
+        if (!data || data.length < PAGE_SIZE) feedDone = true;
+        if (feedPage === 0 && (!data || data.length === 0)) {
+          document.getElementById('feed-empty').classList.remove('hidden');
+        }
+        if (data && data.length > 0) {
+          document.getElementById('feed-empty').classList.add('hidden');
+          const likesMap = {};
+          if (currentUser) {
+            const postIds = data.map(p => p.id);
+            const { data: likes } = await sb.from('community_likes').select('post_id').eq('user_id', currentUser.id).in('post_id', postIds);
+            (likes || []).forEach(l => likesMap[l.post_id] = true);
+          }
+          const countPromises = data.map(p => sb.from('community_likes').select('id', { count: 'exact', head: true }).eq('post_id', p.id));
+          const commentCountPromises = data.map(p => sb.from('community_comments').select('id', { count: 'exact', head: true }).eq('post_id', p.id));
+          const [likeCounts, commentCounts] = await Promise.all([Promise.all(countPromises), Promise.all(commentCountPromises)]);
+
+          const feed = document.getElementById('community-feed');
+          data.forEach((post, i) => {
+            feed.insertAdjacentHTML('beforeend', renderPost(post, likesMap[post.id], likeCounts[i].count || 0, commentCounts[i].count || 0));
+          });
+          feedPage++;
+        }
+        if (feedDone) document.getElementById('feed-end').classList.remove('hidden');
+      } catch(e) {
+        console.error('Feed error:', e);
+        if (feedPage === 0) document.getElementById('feed-empty').classList.remove('hidden');
+      }
+      feedLoading = false;
+      document.getElementById('feed-loading').classList.add('hidden');
+    }
+
+    function onScroll() {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 400) loadFeed();
+    }
+
+    function renderPost(post, liked, likeCount, commentCount) {
+      const a = post.author;
+      if (!a) return '';
+      const name = a.display_name || a.username || 'Usuario';
+      const avatar = a.avatar_url
+        ? `<img src="${esc(a.avatar_url)}" class="w-full h-full object-cover">`
+        : `<span class="text-creo-purple font-bold text-sm">${esc(name[0].toUpperCase())}</span>`;
+      const verified = a.verification_status === 'approved' ? '<svg class="w-4 h-4 text-creo-mint flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' : '';
+      const isOwner = currentUser && currentUser.id === post.author_id;
+
+      let mediaHtml = '';
+      const media = post.media_urls || [];
+      if (media.length > 0) {
+        const gridClass = media.length === 1 ? 'media-grid-1' : media.length === 2 ? 'media-grid-2' : media.length === 3 ? 'media-grid-3' : 'media-grid-4';
+        const shown = media.slice(0, 4);
+        mediaHtml = `<div class="${gridClass} rounded-xl overflow-hidden">${shown.map((m, idx) => {
+          const isVideo = /\.(mp4|webm|mov)$/i.test(m) || /video/i.test(post.post_type);
+          if (isVideo) return `<div class="relative aspect-video bg-black cursor-pointer" onclick="openLightbox('${esc(m)}', true)">
+            <video src="${esc(m)}" class="w-full h-full object-cover" preload="metadata"></video>
+            <div class="absolute inset-0 flex items-center justify-center"><svg class="w-12 h-12 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>`;
+          return `<img src="${esc(m)}" class="w-full ${media.length === 1 ? 'max-h-96' : 'aspect-square'} object-cover cursor-pointer hover:opacity-95 transition" onclick="openLightbox('${esc(m)}', false)">`;
+        }).join('')}${media.length > 4 ? `<div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">+${media.length - 4}</div>` : ''}</div>`;
+      }
+
+      let sharedHtml = '';
+      if (post.shared_post && post.shared_post.author) {
+        const sp = post.shared_post;
+        const sa = sp.author;
+        const sName = sa.display_name || sa.username || '?';
+        const sAvatar = sa.avatar_url ? `<img src="${esc(sa.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-xs">${esc(sName[0])}</span>`;
+        const sMedia = (sp.media_urls || []).length > 0 ? `<img src="${esc(sp.media_urls[0])}" class="w-full max-h-48 object-cover rounded-lg mt-2">` : '';
+        sharedHtml = `<div class="border border-gray-200 rounded-xl p-3 bg-gray-50/50 mt-2">
+          <div class="flex items-center gap-2 mb-2">
+            <a href="profile.html?u=${esc(sa.username || '')}" class="w-6 h-6 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden">${sAvatar}</a>
+            <a href="profile.html?u=${esc(sa.username || '')}" class="text-xs font-semibold text-gray-900 hover:text-creo-purple">${esc(sName)}</a>
+            <span class="text-[10px] text-gray-400">${timeAgo(sp.created_at)}</span>
+          </div>
+          ${sp.title ? `<p class="text-sm font-bold text-gray-900 mb-1">${esc(sp.title)}</p>` : ''}
+          ${sp.body ? `<p class="text-sm text-gray-700">${linkify(esc(sp.body))}</p>` : ''}
+          ${sMedia}
+        </div>`;
+      }
+
+      return `<div class="glass rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition" id="post-${post.id}">
+        <div class="p-4 space-y-3">
+          <!-- Author header -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <a href="profile.html?u=${esc(a.username || '')}" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-creo-mint transition">${avatar}</a>
+              <div>
+                <div class="flex items-center gap-1">
+                  <a href="profile.html?u=${esc(a.username || '')}" class="font-bold text-sm text-gray-900 hover:text-creo-purple transition">${esc(name)}</a>
+                  ${verified}
+                </div>
+                <p class="text-[10px] text-gray-400">${timeAgo(post.created_at)}</p>
+              </div>
+            </div>
+            ${isOwner ? `<button onclick="deletePost('${post.id}')" class="text-gray-300 hover:text-red-400 transition p-1" title="Eliminar">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>` : ''}
+          </div>
+          <!-- Content -->
+          ${post.title ? `<h3 class="text-base font-bold text-gray-900">${esc(post.title)}</h3>` : ''}
+          ${post.body ? `<p class="text-sm text-gray-800 leading-relaxed whitespace-pre-line">${linkify(esc(post.body))}</p>` : ''}
+          ${mediaHtml}
+          ${sharedHtml}
+          <!-- Actions -->
+          <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+            <button onclick="toggleLike('${post.id}', this)" class="flex items-center gap-1.5 text-sm transition ${liked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}">
+              <svg class="w-5 h-5" fill="${liked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+              <span class="like-count">${likeCount}</span>
+            </button>
+            <button onclick="openComments('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-purple transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              <span>${commentCount}</span>
+            </button>
+            <button onclick="openShareModal('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-mint transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+              Compartir
+            </button>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function linkify(text) {
+      return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" class="text-creo-mint hover:underline">$1</a>');
+    }
+
+    function timeAgo(date) {
+      const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+      if (s < 60) return 'ahora';
+      if (s < 3600) return Math.floor(s / 60) + 'm';
+      if (s < 86400) return Math.floor(s / 3600) + 'h';
+      if (s < 604800) return Math.floor(s / 86400) + 'd';
+      return new Date(date).toLocaleDateString('es');
+    }
+
+    // Compose
+    function openCompose(type) {
+      composeType = type || 'text';
+      composeMediaFiles = [];
+      document.getElementById('compose-media-preview').innerHTML = '';
+      document.getElementById('compose-media-preview').classList.add('hidden');
+      document.getElementById('compose-title').value = '';
+      document.getElementById('compose-body').value = '';
+      document.getElementById('compose-submit').disabled = true;
+      document.getElementById('compose-modal').classList.remove('hidden');
+      document.getElementById('compose-body').focus();
+      createEmojiPicker('compose-body', 'compose-emoji-btn');
+    }
+
+    function closeCompose() {
+      document.getElementById('compose-modal').classList.add('hidden');
+      composeMediaFiles = [];
+    }
+
+    function checkComposeValid() {
+      const body = document.getElementById('compose-body').value.trim();
+      document.getElementById('compose-submit').disabled = !body && composeMediaFiles.length === 0;
+    }
+
+    function handleComposeMedia(e, type) {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
+      composeType = type;
+      files.forEach(f => {
+        if (composeMediaFiles.length >= 10) return;
+        composeMediaFiles.push(f);
+      });
+      renderMediaPreviews();
+      checkComposeValid();
+    }
+
+    function renderMediaPreviews() {
+      const container = document.getElementById('compose-media-preview');
+      container.innerHTML = '';
+      if (composeMediaFiles.length === 0) { container.classList.add('hidden'); return; }
+      container.classList.remove('hidden');
+      composeMediaFiles.forEach((f, i) => {
+        const url = URL.createObjectURL(f);
+        const isVideo = f.type.startsWith('video');
+        container.innerHTML += `<div class="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
+          ${isVideo ? `<video src="${url}" class="w-full h-full object-cover"></video>` : `<img src="${url}" class="w-full h-full object-cover">`}
+          <button onclick="removeComposeMedia(${i})" class="absolute top-0.5 right-0.5 w-5 h-5 bg-black/60 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-500">✕</button>
+        </div>`;
+      });
+    }
+
+    function removeComposeMedia(idx) {
+      composeMediaFiles.splice(idx, 1);
+      renderMediaPreviews();
+      checkComposeValid();
+    }
+
+    async function submitPost() {
+      if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
+      const title = document.getElementById('compose-title').value.trim();
+      const body = document.getElementById('compose-body').value.trim();
+      if (!body && composeMediaFiles.length === 0) return;
+
+      const btn = document.getElementById('compose-submit');
+      btn.disabled = true;
+      btn.textContent = 'Publicando...';
+
+      try {
+        let mediaUrls = [];
+        for (const file of composeMediaFiles) {
+          const url = await uploadToStorage(file, 'community-media', 50);
+          if (url) mediaUrls.push(url);
+        }
+
+        const postType = composeMediaFiles.length > 0
+          ? (composeMediaFiles[0].type.startsWith('video') ? 'video' : 'photo')
+          : 'text';
+
+        const { error } = await sb.from('community_posts').insert({
+          author_id: currentUser.id,
+          post_type: postType,
+          title: title || null,
+          body: body || null,
+          media_urls: mediaUrls.length > 0 ? mediaUrls : []
+        });
+
+        if (error) throw error;
+        closeCompose();
+        showToast('¡Publicado!', 'success');
+        document.getElementById('community-feed').innerHTML = '';
+        feedPage = 0;
+        feedDone = false;
+        loadFeed();
+      } catch(e) {
+        showToast('Error al publicar: ' + (e.message || e), 'error');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Publicar';
+    }
+
+    // Likes
+    async function toggleLike(postId, btn) {
+      if (!currentUser) { showToast('Inicia sesión para dar like', 'info'); return; }
+      const countEl = btn.querySelector('.like-count');
+      const isLiked = btn.classList.contains('text-red-500');
+      if (isLiked) {
+        btn.classList.remove('text-red-500');
+        btn.classList.add('text-gray-500');
+        btn.querySelector('svg').setAttribute('fill', 'none');
+        countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1);
+        await sb.from('community_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+      } else {
+        btn.classList.add('text-red-500');
+        btn.classList.remove('text-gray-500');
+        btn.querySelector('svg').setAttribute('fill', 'currentColor');
+        countEl.textContent = parseInt(countEl.textContent) + 1;
+        await sb.from('community_likes').insert({ post_id: postId, user_id: currentUser.id });
+      }
+    }
+
+    // Comments
+    async function openComments(postId) {
+      activeCommentPostId = postId;
+      document.getElementById('comments-modal').classList.remove('hidden');
+      createEmojiPicker('comment-input', 'comment-emoji-btn');
+      loadComments(postId);
+    }
+
+    function closeComments() {
+      document.getElementById('comments-modal').classList.add('hidden');
+      activeCommentPostId = null;
+    }
+
+    async function loadComments(postId) {
+      const list = document.getElementById('comments-list');
+      list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Cargando...</p>';
+      const { data } = await sb.from('community_comments')
+        .select('*, author:author_id(id, username, display_name, avatar_url)')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true })
+        .limit(100);
+      if (!data || data.length === 0) {
+        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-8">Sin comentarios aún</p>';
+        return;
+      }
+      list.innerHTML = data.map(c => {
+        const ca = c.author;
+        const cName = ca?.display_name || ca?.username || '?';
+        const cAvatar = ca?.avatar_url ? `<img src="${esc(ca.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-xs">${esc(cName[0])}</span>`;
+        const isOwner = currentUser && currentUser.id === c.author_id;
+        return `<div class="flex gap-2">
+          <a href="profile.html?u=${esc(ca?.username || '')}" class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0">${cAvatar}</a>
+          <div class="flex-1 bg-gray-100 rounded-2xl rounded-tl-sm px-3 py-2">
+            <div class="flex items-center justify-between">
+              <a href="profile.html?u=${esc(ca?.username || '')}" class="text-xs font-bold text-gray-900 hover:text-creo-purple">${esc(cName)}</a>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] text-gray-400">${timeAgo(c.created_at)}</span>
+                ${isOwner ? `<button onclick="deleteComment('${c.id}')" class="text-gray-300 hover:text-red-400 text-[10px]">✕</button>` : ''}
+              </div>
+            </div>
+            <p class="text-sm text-gray-700 mt-0.5">${linkify(esc(c.body))}</p>
+          </div>
+        </div>`;
+      }).join('');
+      list.scrollTop = list.scrollHeight;
+    }
+
+    async function submitComment() {
+      if (!currentUser || !activeCommentPostId) { showToast('Inicia sesión', 'info'); return; }
+      const input = document.getElementById('comment-input');
+      const body = input.value.trim();
+      if (!body) return;
+      input.value = '';
+      const { error } = await sb.from('community_comments').insert({ post_id: activeCommentPostId, author_id: currentUser.id, body });
+      if (error) { showToast('Error', 'error'); return; }
+      loadComments(activeCommentPostId);
+    }
+
+    async function deleteComment(id) {
+      if (!confirm('¿Eliminar comentario?')) return;
+      await sb.from('community_comments').delete().eq('id', id);
+      if (activeCommentPostId) loadComments(activeCommentPostId);
+    }
+
+    // Share
+    function openShareModal(postId) {
+      if (!currentUser) { showToast('Inicia sesión', 'info'); return; }
+      sharePostId = postId;
+      const postEl = document.getElementById('post-' + postId);
+      const preview = document.getElementById('share-preview');
+      const titleEl = postEl?.querySelector('h3');
+      const bodyEl = postEl?.querySelector('.whitespace-pre-line');
+      preview.innerHTML = `<p class="text-xs text-gray-500"><span class="font-semibold">${titleEl ? esc(titleEl.textContent) : 'Publicación compartida'}</span></p>
+        ${bodyEl ? `<p class="text-xs text-gray-400 truncate mt-1">${esc(bodyEl.textContent.slice(0, 80))}</p>` : ''}`;
+      document.getElementById('share-body').value = '';
+      document.getElementById('share-modal').classList.remove('hidden');
+    }
+
+    function closeShareModal() {
+      document.getElementById('share-modal').classList.add('hidden');
+      sharePostId = null;
+    }
+
+    async function submitShare() {
+      if (!currentUser || !sharePostId) return;
+      const body = document.getElementById('share-body').value.trim();
+      const { error } = await sb.from('community_posts').insert({
+        author_id: currentUser.id,
+        post_type: 'share_post',
+        body: body || null,
+        shared_post_id: sharePostId
+      });
+      if (error) { showToast('Error al compartir', 'error'); return; }
+      closeShareModal();
+      showToast('¡Compartido!', 'success');
+      document.getElementById('community-feed').innerHTML = '';
+      feedPage = 0;
+      feedDone = false;
+      loadFeed();
+    }
+
+    // Delete post
+    async function deletePost(id) {
+      if (!confirm('¿Eliminar esta publicación?')) return;
+      await sb.from('community_posts').delete().eq('id', id);
+      const el = document.getElementById('post-' + id);
+      if (el) el.remove();
+      showToast('Publicación eliminada', 'success');
+    }
+
+    // Lightbox
+    function openLightbox(url, isVideo) {
+      const lb = document.getElementById('media-lightbox');
+      const content = document.getElementById('lightbox-content');
+      if (isVideo) {
+        content.innerHTML = `<video src="${esc(url)}" controls autoplay class="max-w-full max-h-[90vh] rounded-xl"></video>`;
+      } else {
+        content.innerHTML = `<img src="${esc(url)}" class="max-w-full max-h-[90vh] rounded-xl object-contain">`;
+      }
+      lb.classList.remove('hidden');
+    }
+
+    function closeLightbox() {
+      document.getElementById('media-lightbox').classList.add('hidden');
+      document.getElementById('lightbox-content').innerHTML = '';
+    }
+
+    init();
+  </script>
+</body>
+</html>

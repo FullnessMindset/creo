@@ -68,16 +68,11 @@
         <div>
           <label class="block text-xs font-medium text-gray-500 mb-1">Tipo de cuenta</label>
           <select id="reg-account-type" class="w-full border border-gray-300 bg-white p-2 rounded-lg text-sm text-gray-900 outline-none">
-            <option value="creator">Creador — Recauda fondos y comparte tu historia</option>
-            <option value="co-creator">Co-Creador — Quiero ayudar a otros a crear</option>
+            <option value="creator">Creador — Comparte tu historia y recibe apoyo</option>
+            <option value="empresa">Empresa — Busco creadores para apoyar</option>
           </select>
-          <script>document.getElementById('reg-account-type').addEventListener('change', function() { document.getElementById('cocreator-info').classList.toggle('hidden', this.value !== 'co-creator'); });</script>
-          <p id="cocreator-info" class="hidden text-[10px] text-creo-mintDark mt-1">Los co-creadores pueden editar su perfil, compartir su historia y promover su negocio sin necesidad de verificación con Stripe.</p>
-        </div>
-        <div class="bg-creo-purple/5 border border-creo-purple/20 rounded-lg p-3 text-[11px] text-gray-600 leading-relaxed">
-          🏢 <strong>¿Eres una Empresa o Institución?</strong><br>
-          <a href="registro-empresa.html" class="text-creo-purple underline font-semibold">Regístrate como empresa aquí →</a>
-          <span class="text-gray-400 ml-1">Portal exclusivo de Brand Deals.</span>
+          <script>document.getElementById('reg-account-type').addEventListener('change', function() { document.getElementById('empresa-info').classList.toggle('hidden', this.value !== 'empresa'); });</script>
+          <p id="empresa-info" class="hidden text-[10px] text-creo-mintDark mt-1">Las empresas pueden buscar creadores, ofrecer Brand Deals y apoyar metas. Tendrás acceso al portal de empresas.</p>
         </div>
       </div>
       <div class="flex space-x-2">
@@ -518,6 +513,13 @@
             <div id="story-media-preview" class="flex flex-wrap gap-2 mt-2"></div>
           </div>
 
+          <label class="flex items-center gap-2 cursor-pointer bg-creo-purple/5 border border-creo-purple/20 rounded-xl p-3">
+            <input type="checkbox" id="story-share-community" class="accent-creo-mint w-4 h-4">
+            <div>
+              <span class="text-sm font-semibold text-gray-900">Compartir en el Muro de Comunidad</span>
+              <p class="text-[10px] text-gray-500">Tu historia aparecerá en el feed de la comunidad</p>
+            </div>
+          </label>
           <button onclick="createStory()" id="create-story-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Publicar Historia</button>
         </div>
         <div id="my-stories-list" class="space-y-3"></div>
@@ -1558,8 +1560,9 @@
       if (error) return showToast(error.message, 'error');
       const language = document.getElementById('reg-language')?.value || 'es';
       const accountType = document.getElementById('reg-account-type')?.value || 'creator';
-      const isCocreator = accountType === 'co-creator';
-      await sb.from('profiles').insert([{ id: data.user.id, username: 'user_' + Math.floor(Math.random() * 100000), verification_status: isCocreator ? 'not_required' : 'approved', account_type: accountType, accepted_terms: true, accepted_conduct: true, language }]);
+      const isEmpresa = accountType === 'empresa';
+      await sb.from('profiles').insert([{ id: data.user.id, username: 'user_' + Math.floor(Math.random() * 100000), verification_status: 'pending', account_type: accountType, accepted_terms: true, accepted_conduct: true, language }]);
+      if (isEmpresa) { window.location.href = 'registro-empresa.html'; return; }
       showToast('Cuenta creada. Revisa tu email para confirmar.', 'success');
       checkUser();
     }
@@ -2436,6 +2439,7 @@
         const url = await uploadToStorage(file, bucket, 10);
         if (url) media_urls.push(url);
       }
+      const shareToCommunity = document.getElementById('story-share-community')?.checked || false;
       const { error } = await sb.from('creator_stories').insert({
         creator_id: currentUser.id,
         title: title || null,
@@ -2446,13 +2450,26 @@
       });
       btn.innerText = 'Publicar Historia'; btn.disabled = false;
       if (error) return showToast(error.message, 'error');
+      if (shareToCommunity) {
+        const communityMedia = [];
+        if (mainVideoUrl) communityMedia.push(mainVideoUrl);
+        media_urls.forEach(u => communityMedia.push(u));
+        await sb.from('community_posts').insert({
+          author_id: currentUser.id,
+          post_type: communityMedia.length > 0 ? 'video' : 'text',
+          title: title ? '📖 ' + title : '📖 Mi Historia',
+          body: content || null,
+          media_urls: communityMedia
+        });
+      }
       document.getElementById('story-title').value = '';
       document.getElementById('story-content').value = '';
       document.getElementById('story-main-video-file').value = '';
       document.getElementById('story-media-files').value = '';
       document.getElementById('story-video-preview').classList.add('hidden');
       document.getElementById('story-media-preview').innerHTML = '';
-      showToast('Historia publicada', 'success');
+      document.getElementById('story-share-community').checked = false;
+      showToast(shareToCommunity ? 'Historia publicada y compartida en la comunidad' : 'Historia publicada', 'success');
       loadMyStories();
     }
 
