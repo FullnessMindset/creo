@@ -27,6 +27,16 @@
     .glass-mint { background: rgba(51,240,176,0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(51,240,176,0.3); }
     .pay-tab-active { color: #1a0a3e; border-bottom: 2px solid #33f0b0; background: rgba(51,240,176,0.08); }
     .meta-media-card { position: relative; overflow: hidden; border-radius: 1rem; }
+    .meta-media-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 0; }
+    .meta-media-slider::-webkit-scrollbar { display: none; }
+    .meta-media-slider .meta-slide { flex: 0 0 100%; scroll-snap-align: start; min-width: 100%; }
+    .meta-media-card .slider-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 15; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.5); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; backdrop-filter: blur(4px); }
+    .meta-media-card:hover .slider-arrow { opacity: 1; }
+    .meta-media-card .slider-arrow.left { left: 8px; }
+    .meta-media-card .slider-arrow.right { right: 8px; }
+    .meta-dots { display: flex; gap: 4px; justify-content: center; position: absolute; bottom: 52px; left: 0; right: 0; z-index: 15; }
+    .meta-dots .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.5); transition: all 0.2s; }
+    .meta-dots .dot.active { background: white; transform: scale(1.3); }
     .meta-progress-overlay { position: absolute; bottom: 0; left: 0; right: 0; z-index: 10; }
     .verified-ring { box-shadow: 0 0 0 3px rgba(51,240,176,0.4), 0 0 12px rgba(51,240,176,0.2); }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
@@ -638,19 +648,24 @@
 
         // Media section with progress bar overlay
         const mediaSection = images.length ? `
-          <div class="meta-media-card">
-            <div class="grid ${images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-1">
+          <div class="meta-media-card" id="meta-media-${m.id}">
+            <div class="meta-media-slider" onscroll="updateMetaDots('${m.id}')">
               ${images.map((img, i) => {
                 const isVideo = /\.(mp4|webm|mov)$/i.test(img) || /youtube|tiktok|youtu\.be/i.test(img);
                 if (isVideo) {
-                  return `<div class="relative aspect-video bg-gray-900 rounded-lg overflow-hidden cursor-pointer" onclick="openMetaPost('${m.id}', ${i})">
+                  return `<div class="meta-slide relative aspect-video bg-gray-900 cursor-pointer" onclick="openMetaPost('${m.id}', ${i})">
                     <video src="${img}" class="w-full h-full object-cover" preload="metadata"></video>
                     <div class="absolute inset-0 flex items-center justify-center bg-black/20"><svg class="w-12 h-12 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                   </div>`;
                 }
-                return `<img src="${img}" class="w-full ${images.length === 1 ? 'aspect-video' : 'aspect-square'} object-cover ${i === 0 && images.length === 1 ? 'rounded-xl' : 'rounded-lg'} cursor-pointer hover:opacity-90 transition" onclick="openMetaPost('${m.id}', ${i})">`;
+                return `<div class="meta-slide cursor-pointer" onclick="openMetaPost('${m.id}', ${i})"><img src="${img}" class="w-full aspect-video object-cover" alt=""></div>`;
               }).join('')}
             </div>
+            ${images.length > 1 ? `
+              <button class="slider-arrow left" onclick="slideMetaMedia('${m.id}',-1)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
+              <button class="slider-arrow right" onclick="slideMetaMedia('${m.id}',1)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+              <div class="meta-dots" id="dots-${m.id}">${images.map((_, i) => `<span class="dot${i === 0 ? ' active' : ''}"></span>`).join('')}</div>
+            ` : ''}
             <!-- Progress overlay on media -->
             <div class="meta-progress-overlay p-3">
               <div class="glass-dark rounded-xl p-3">
@@ -868,6 +883,21 @@
     }
 
     // Meta post modal
+    function slideMetaMedia(metaId, dir) {
+      const slider = document.querySelector(`#meta-media-${metaId} .meta-media-slider`);
+      if (!slider) return;
+      const slideW = slider.offsetWidth;
+      slider.scrollBy({ left: dir * slideW, behavior: 'smooth' });
+    }
+
+    function updateMetaDots(metaId) {
+      const slider = document.querySelector(`#meta-media-${metaId} .meta-media-slider`);
+      const dotsEl = document.getElementById(`dots-${metaId}`);
+      if (!slider || !dotsEl) return;
+      const idx = Math.round(slider.scrollLeft / slider.offsetWidth);
+      dotsEl.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+
     let activeMetaId = null;
 
     function openMetaPost(metaId, mediaIndex) {
