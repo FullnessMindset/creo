@@ -1547,30 +1547,15 @@
     }
 
     // ===== STORY CRUD (owner only) =====
-    let profileStoriesCache = [];
+    let editStoryData = null;
 
     async function editProfileStory(id) {
       const { data: s, error } = await sb.from('creator_stories').select('*').eq('id', id).single();
       if (error || !s) { showToast('No se pudo cargar la historia', 'error'); return; }
+      editStoryData = { ...s, media_urls: [...(s.media_urls || [])] };
 
       let existing = document.getElementById('edit-story-modal');
       if (existing) existing.remove();
-
-      const mediaArr = s.media_urls || [];
-      const mediaPreview = mediaArr.map((url, idx) => {
-        const isImg = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
-        const isVid = /\.(mp4|webm|mov)$/i.test(url);
-        const isAudio = /\.(mp3|wav|ogg|m4a)$/i.test(url);
-        let preview = '';
-        if (isImg) preview = `<img src="${esc(url)}" class="w-full h-20 object-cover rounded">`;
-        else if (isVid) preview = `<video src="${esc(url)}" class="w-full h-20 object-cover rounded"></video>`;
-        else if (isAudio) preview = `<div class="h-20 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-500">Audio</div>`;
-        else preview = `<div class="h-20 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-500">Archivo</div>`;
-        return `<div class="relative">
-          ${preview}
-          <button onclick="removeStoryMedia('${id}', ${idx})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600">×</button>
-        </div>`;
-      }).join('');
 
       const modal = document.createElement('div');
       modal.id = 'edit-story-modal';
@@ -1597,38 +1582,161 @@
               <label class="text-xs font-semibold text-gray-600">Contenido</label>
               <textarea id="edit-story-content" rows="4" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">${esc(s.content || '')}</textarea>
             </div>
+
+            <!-- Main Video -->
             <div>
-              <label class="text-xs font-semibold text-gray-600">URL de Video Principal</label>
-              <input id="edit-story-video" type="url" value="${esc(s.main_video_url || '')}" placeholder="https://youtube.com/..." class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">
+              <label class="text-xs font-semibold text-gray-600">Video Principal</label>
+              <div id="edit-story-video-preview" class="mt-1">
+                ${s.main_video_url ? renderEditVideoPreview(s.main_video_url) : '<p class="text-xs text-gray-400 italic">Sin video principal</p>'}
+              </div>
+              <div class="flex gap-2 mt-2">
+                <input id="edit-story-video-url" type="url" value="${esc(s.main_video_url || '')}" placeholder="URL de YouTube o video directo..." class="flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">
+                <button onclick="updateEditVideoPreview()" class="px-3 py-2 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold hover:bg-gray-200 transition">Aplicar</button>
+              </div>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="text-[10px] text-gray-400">o sube un archivo:</span>
+                <label class="cursor-pointer px-3 py-1.5 bg-creo-purple/10 text-creo-purple rounded-lg text-xs font-semibold hover:opacity-80 transition">
+                  Subir Video
+                  <input type="file" accept="video/*" class="hidden" onchange="uploadEditMainVideo(this)">
+                </label>
+                ${s.main_video_url ? `<button onclick="removeEditMainVideo()" class="px-3 py-1.5 bg-red-50 text-red-500 rounded-lg text-xs font-semibold hover:bg-red-100 transition">Eliminar Video</button>` : ''}
+              </div>
             </div>
-            ${mediaArr.length > 0 ? `<div>
-              <label class="text-xs font-semibold text-gray-600 mb-1 block">Media adjunta</label>
-              <div id="edit-story-media-grid" class="grid grid-cols-3 gap-2">${mediaPreview}</div>
-            </div>` : ''}
+
+            <!-- Media adjunta -->
+            <div>
+              <label class="text-xs font-semibold text-gray-600">Media Adjunta (imagenes, videos, audio)</label>
+              <div id="edit-story-media-grid" class="grid grid-cols-3 gap-2 mt-2"></div>
+              <div class="flex items-center gap-2 mt-2">
+                <label class="cursor-pointer px-3 py-1.5 bg-creo-mint/20 text-creo-purple rounded-lg text-xs font-semibold hover:opacity-80 transition flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                  Agregar Imagenes
+                  <input type="file" accept="image/*" multiple class="hidden" onchange="uploadEditMedia(this, 'image')">
+                </label>
+                <label class="cursor-pointer px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-semibold hover:opacity-80 transition flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                  Agregar Videos
+                  <input type="file" accept="video/*" multiple class="hidden" onchange="uploadEditMedia(this, 'video')">
+                </label>
+                <label class="cursor-pointer px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg text-xs font-semibold hover:opacity-80 transition flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
+                  Audio
+                  <input type="file" accept="audio/*" class="hidden" onchange="uploadEditMedia(this, 'audio')">
+                </label>
+              </div>
+              <div id="edit-story-upload-status" class="hidden mt-2 text-xs text-creo-purple font-semibold"></div>
+            </div>
           </div>
-          <button onclick="saveProfileStoryEdit('${id}')" class="w-full bg-creo-mint text-creo-purple py-2.5 rounded-xl font-bold hover:opacity-90 transition text-sm">Guardar Cambios</button>
+          <button onclick="saveProfileStoryEdit('${id}')" id="save-story-btn" class="w-full bg-creo-mint text-creo-purple py-2.5 rounded-xl font-bold hover:opacity-90 transition text-sm">Guardar Cambios</button>
         </div>`;
       document.body.appendChild(modal);
+      renderEditMediaGrid();
     }
 
-    async function removeStoryMedia(storyId, idx) {
-      const { data: s } = await sb.from('creator_stories').select('media_urls').eq('id', storyId).single();
-      if (!s) return;
-      const arr = [...(s.media_urls || [])];
-      arr.splice(idx, 1);
-      await sb.from('creator_stories').update({ media_urls: arr }).eq('id', storyId);
-      editProfileStory(storyId);
+    function renderEditVideoPreview(url) {
+      if (!url) return '<p class="text-xs text-gray-400 italic">Sin video principal</p>';
+      const isYT = /youtube|youtu\.be/.test(url);
+      if (isYT) {
+        const vid = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+        return vid ? `<div class="relative rounded-xl overflow-hidden bg-black"><img src="https://img.youtube.com/vi/${vid[1]}/mqdefault.jpg" class="w-full h-32 object-cover"><div class="absolute inset-0 flex items-center justify-center"><div class="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"><svg class="w-5 h-5 text-red-600 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div>` : '';
+      }
+      return `<video src="${esc(url)}" class="w-full h-32 object-cover rounded-xl bg-black" preload="metadata"></video>`;
+    }
+
+    function updateEditVideoPreview() {
+      const url = document.getElementById('edit-story-video-url').value.trim();
+      editStoryData.main_video_url = url || null;
+      document.getElementById('edit-story-video-preview').innerHTML = renderEditVideoPreview(url);
+    }
+
+    function removeEditMainVideo() {
+      editStoryData.main_video_url = null;
+      document.getElementById('edit-story-video-url').value = '';
+      document.getElementById('edit-story-video-preview').innerHTML = '<p class="text-xs text-gray-400 italic">Sin video principal</p>';
+    }
+
+    async function uploadEditMainVideo(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const status = document.getElementById('edit-story-upload-status');
+      status.classList.remove('hidden');
+      status.textContent = 'Subiendo video principal...';
+      const url = await uploadToStorage(file, 'stories', 50);
+      status.classList.add('hidden');
+      if (!url) return;
+      editStoryData.main_video_url = url;
+      document.getElementById('edit-story-video-url').value = url;
+      document.getElementById('edit-story-video-preview').innerHTML = renderEditVideoPreview(url);
+      showToast('Video subido', 'success');
+    }
+
+    function renderEditMediaGrid() {
+      const grid = document.getElementById('edit-story-media-grid');
+      if (!grid) return;
+      const mediaArr = editStoryData.media_urls || [];
+      if (mediaArr.length === 0) {
+        grid.innerHTML = '<p class="text-xs text-gray-400 italic col-span-3">Sin archivos adjuntos</p>';
+        return;
+      }
+      grid.innerHTML = mediaArr.map((url, idx) => {
+        const isImg = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
+        const isVid = /\.(mp4|webm|mov)$/i.test(url);
+        const isAudio = /\.(mp3|wav|ogg|m4a|webm)$/i.test(url) && !isVid;
+        let preview = '';
+        if (isImg) preview = `<img src="${esc(url)}" class="w-full h-24 object-cover rounded-lg">`;
+        else if (isVid) preview = `<video src="${esc(url)}" class="w-full h-24 object-cover rounded-lg bg-black" preload="metadata"></video>`;
+        else if (isAudio) preview = `<div class="h-24 bg-gray-100 rounded-lg flex flex-col items-center justify-center gap-1"><svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg><span class="text-[9px] text-gray-500">Audio</span></div>`;
+        else preview = `<div class="h-24 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-500">Archivo</div>`;
+        return `<div class="relative group">
+          ${preview}
+          <button onclick="removeEditMediaItem(${idx})" class="absolute -top-1.5 -right-1.5 w-6 h-6 bg-red-500 text-white rounded-full text-sm flex items-center justify-center hover:bg-red-600 shadow-md opacity-80 group-hover:opacity-100 transition">×</button>
+        </div>`;
+      }).join('');
+    }
+
+    function removeEditMediaItem(idx) {
+      editStoryData.media_urls.splice(idx, 1);
+      renderEditMediaGrid();
+    }
+
+    async function uploadEditMedia(input, type) {
+      const files = Array.from(input.files);
+      if (!files.length) return;
+      const status = document.getElementById('edit-story-upload-status');
+      status.classList.remove('hidden');
+      let uploaded = 0;
+
+      for (const file of files) {
+        uploaded++;
+        status.textContent = `Subiendo ${type} ${uploaded}/${files.length}...`;
+        const maxMB = type === 'video' ? 50 : 10;
+        const url = await uploadToStorage(file, 'stories', maxMB);
+        if (url) editStoryData.media_urls.push(url);
+      }
+
+      status.classList.add('hidden');
+      input.value = '';
+      renderEditMediaGrid();
+      showToast(`${uploaded} archivo(s) subido(s)`, 'success');
     }
 
     async function saveProfileStoryEdit(id) {
+      const btn = document.getElementById('save-story-btn');
+      btn.textContent = 'Guardando...'; btn.disabled = true;
+
       const title = document.getElementById('edit-story-title').value.trim();
       const description = document.getElementById('edit-story-description').value.trim();
       const content = document.getElementById('edit-story-content').value.trim();
-      const main_video_url = document.getElementById('edit-story-video').value.trim();
+      const main_video_url = editStoryData.main_video_url;
+      const media_urls = editStoryData.media_urls;
 
-      const updates = { title, description, content, main_video_url: main_video_url || null };
+      const updates = { title, description, content, main_video_url: main_video_url || null, media_urls };
       const { error } = await sb.from('creator_stories').update(updates).eq('id', id);
-      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      if (error) {
+        showToast('Error: ' + error.message, 'error');
+        btn.textContent = 'Guardar Cambios'; btn.disabled = false;
+        return;
+      }
 
       document.getElementById('edit-story-modal').remove();
       showToast('Historia actualizada', 'success');
