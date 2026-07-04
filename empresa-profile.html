@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CREO — Perfil de Empresa</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a0a3e">
+  <meta name="description" content="CREO — Perfil de empresa y oportunidades de Brand Deals para creadores">
+  <meta property="og:title" content="CREO — Perfil de Empresa">
+  <meta property="og:description" content="Descubre oportunidades de colaboracion con esta empresa en CREO">
+  <meta property="og:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
+  <meta property="og:type" content="profile">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="assets/logo-icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/logo-icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { creo: { purple: '#1a0a3e', light: '#2d1b69', mint: '#33f0b0', mintDark: '#28c48e' } } } }
+    }
+  </script>
+  <style>
+    .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
+    .glass-dark { background: rgba(26,10,62,0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); }
+    .glass-mint { background: rgba(51,240,176,0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(51,240,176,0.3); }
+
+    #cover-section { height: 200px; }
+    @media (min-width: 640px) { #cover-section { height: 280px; } }
+    @media (min-width: 1024px) { #cover-section { height: 320px; } }
+
+    .guideline-media-scroll { display: flex; gap: 0.75rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 0.25rem 0; }
+    .guideline-media-scroll::-webkit-scrollbar { display: none; }
+    .guideline-media-scroll > * { scroll-snap-align: start; flex-shrink: 0; }
+
+    .modal-overlay { background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+    @keyframes slide-up { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .animate-slide-up { animation: slide-up 0.25s ease-out; }
+
+    .deal-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+    .deal-card { transition: transform 0.2s, box-shadow 0.2s; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
+  <script src="shared.js"></script>
+
+  <div class="max-w-2xl mx-auto px-4 pt-0 pb-24 space-y-6">
+
+    <!-- Cover Image -->
+    <div id="cover-section" class="rounded-b-2xl overflow-hidden bg-gradient-to-r from-creo-purple to-creo-light relative">
+      <img id="cover-img" class="w-full h-full object-cover hidden" alt="Cover">
+      <button id="btn-edit-cover" class="hidden absolute top-3 right-3 bg-white/80 hover:bg-white text-creo-purple rounded-full p-2 shadow transition" onclick="editCover()" title="Cambiar portada">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </button>
+    </div>
+
+    <!-- Profile Header -->
+    <div class="glass p-6 rounded-2xl shadow-xl text-center space-y-3 -mt-10 relative z-10" id="profile-header-card">
+      <!-- Avatar -->
+      <div class="relative mx-auto w-28 h-28 -mt-20 z-10">
+        <div id="avatar-container" class="w-28 h-28 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
+          <svg id="avatar-placeholder" class="w-14 h-14 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          <img id="avatar-img" class="w-full h-full object-cover hidden" alt="Logo">
+        </div>
+        <!-- Handshake badge -->
+        <div id="verified-badge" class="hidden absolute -bottom-0.5 -right-0.5 w-7 h-7 rounded-full bg-white shadow flex items-center justify-center ring-2 ring-creo-mint" title="Empresa Verificada">
+          <span class="text-base leading-none">&#129309;</span>
+        </div>
+      </div>
+
+      <div>
+        <h1 id="profile-name" class="text-2xl font-bold text-gray-900">Cargando...</h1>
+        <p id="profile-username" class="text-sm text-creo-purple font-medium"></p>
+      </div>
+      <div id="profile-category" class="hidden">
+        <span class="inline-flex items-center gap-1 text-xs font-semibold bg-creo-purple/10 text-creo-purple px-3 py-1 rounded-full">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+          <span id="category-text"></span>
+        </span>
+      </div>
+      <div id="profile-website" class="hidden">
+        <a id="website-link" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-sm text-creo-mint hover:text-creo-mintDark font-medium transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          <span id="website-text"></span>
+        </a>
+      </div>
+      <button id="btn-edit-profile" class="hidden mt-2 text-sm text-creo-purple hover:text-creo-light font-medium transition" onclick="editProfileModal()">
+        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        Editar Perfil
+      </button>
+    </div>
+
+    <!-- About / Su Historia -->
+    <div class="bg-white rounded-2xl shadow-md p-6 space-y-3 relative" id="about-section">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+          Su Historia
+        </h2>
+        <button id="btn-edit-about" class="hidden text-sm text-creo-purple hover:text-creo-light font-medium" onclick="editAboutModal()">Editar</button>
+      </div>
+      <p id="about-text" class="text-gray-600 text-sm leading-relaxed whitespace-pre-line"></p>
+    </div>
+
+    <!-- Active Brand Deals -->
+    <div id="deals-section" class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Brand Deals Activos
+        </h2>
+        <button id="btn-add-deal" class="hidden text-sm bg-creo-mint text-creo-purple font-semibold px-3 py-1 rounded-full hover:bg-creo-mintDark transition" onclick="addDealModal()">+ Nuevo Deal</button>
+      </div>
+      <div id="deals-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Deals rendered here -->
+      </div>
+      <p id="deals-empty" class="hidden text-center text-gray-400 text-sm py-8">No hay brand deals activos en este momento.</p>
+    </div>
+
+    <!-- Brand Guidelines / Instrucciones -->
+    <div id="guidelines-section" class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            Como Colaborar con Nosotros
+          </h2>
+          <p class="text-xs text-gray-400 mt-0.5">Guia para creadores &mdash; conoce nuestra marca antes de crear contenido</p>
+        </div>
+        <button id="btn-add-guideline" class="hidden text-sm bg-creo-purple text-white font-semibold px-3 py-1 rounded-full hover:bg-creo-light transition" onclick="addGuidelineModal()">+ Modulo</button>
+      </div>
+      <div id="guidelines-list" class="space-y-4">
+        <!-- Guidelines rendered here -->
+      </div>
+      <p id="guidelines-empty" class="hidden text-center text-gray-400 text-sm py-8">Esta empresa aun no ha publicado guias de marca.</p>
+    </div>
+
+  </div>
+
+  <!-- Application Modal -->
+  <div id="apply-modal" class="fixed inset-0 z-[80] hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeApplyModal()"></div>
+    <div class="absolute bottom-0 left-0 right-0 max-w-lg mx-auto bg-white rounded-t-2xl shadow-2xl p-6 space-y-4 animate-slide-up max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-gray-900">Aplicar a Brand Deal</h3>
+        <button onclick="closeApplyModal()" class="text-gray-400 hover:text-gray-600 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="apply-deal-summary" class="glass-mint rounded-xl p-4 space-y-1"></div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Por que eres el creador ideal para esta colaboracion?</label>
+        <textarea id="apply-message" rows="5" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint focus:border-transparent resize-none" placeholder="Cuentale a la empresa por que deberian trabajar contigo..."></textarea>
+      </div>
+      <button id="btn-submit-apply" onclick="submitApplication()" class="w-full bg-creo-mint text-creo-purple font-bold py-3 rounded-xl hover:bg-creo-mintDark transition">
+        Enviar Aplicacion
+      </button>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div id="edit-profile-modal" class="fixed inset-0 z-[80] hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeEditProfileModal()"></div>
+    <div class="absolute bottom-0 left-0 right-0 max-w-lg mx-auto bg-white rounded-t-2xl shadow-2xl p-6 space-y-4 animate-slide-up max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-gray-900">Editar Perfil</h3>
+        <button onclick="closeEditProfileModal()" class="text-gray-400 hover:text-gray-600 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre de la Empresa</label>
+          <input id="edit-display-name" type="text" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Categoria</label>
+          <input id="edit-category" type="text" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint" placeholder="Ej: Cafe, Tecnologia, Moda...">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Sitio Web</label>
+          <input id="edit-website" type="url" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint" placeholder="https://...">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Historia / Bio</label>
+          <textarea id="edit-bio" rows="4" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint resize-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Logo / Avatar</label>
+          <input id="edit-avatar-file" type="file" accept="image/*" class="w-full text-sm">
+        </div>
+      </div>
+      <button onclick="saveProfile()" class="w-full bg-creo-purple text-white font-bold py-3 rounded-xl hover:bg-creo-light transition">Guardar Cambios</button>
+    </div>
+  </div>
+
+  <!-- Edit About Modal -->
+  <div id="edit-about-modal" class="fixed inset-0 z-[80] hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeEditAboutModal()"></div>
+    <div class="absolute bottom-0 left-0 right-0 max-w-lg mx-auto bg-white rounded-t-2xl shadow-2xl p-6 space-y-4 animate-slide-up max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-gray-900">Editar Historia</h3>
+        <button onclick="closeEditAboutModal()" class="text-gray-400 hover:text-gray-600 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <textarea id="edit-about-text" rows="6" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint resize-none"></textarea>
+      <button onclick="saveAbout()" class="w-full bg-creo-purple text-white font-bold py-3 rounded-xl hover:bg-creo-light transition">Guardar</button>
+    </div>
+  </div>
+
+  <!-- Deal Editor Modal -->
+  <div id="deal-modal" class="fixed inset-0 z-[80] hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeDealModal()"></div>
+    <div class="absolute bottom-0 left-0 right-0 max-w-lg mx-auto bg-white rounded-t-2xl shadow-2xl p-6 space-y-4 animate-slide-up max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 id="deal-modal-title" class="text-lg font-bold text-gray-900">Nuevo Brand Deal</h3>
+        <button onclick="closeDealModal()" class="text-gray-400 hover:text-gray-600 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="space-y-3">
+        <input id="deal-edit-title" type="text" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint" placeholder="Titulo del deal">
+        <textarea id="deal-edit-desc" rows="3" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint resize-none" placeholder="Descripcion..."></textarea>
+        <div class="grid grid-cols-2 gap-3">
+          <input id="deal-edit-compensation" type="text" class="border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint" placeholder="Compensacion (ej: $500)">
+          <input id="deal-edit-spots" type="number" min="1" class="border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint" placeholder="Espacios">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Imagen de portada</label>
+          <input id="deal-edit-cover" type="file" accept="image/*" class="w-full text-sm">
+        </div>
+      </div>
+      <input type="hidden" id="deal-edit-id" value="">
+      <button onclick="saveDeal()" class="w-full bg-creo-mint text-creo-purple font-bold py-3 rounded-xl hover:bg-creo-mintDark transition">Guardar Deal</button>
+    </div>
+  </div>
+
+  <!-- Guideline Editor Modal -->
+  <div id="guideline-modal" class="fixed inset-0 z-[80] hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closeGuidelineModal()"></div>
+    <div class="absolute bottom-0 left-0 right-0 max-w-lg mx-auto bg-white rounded-t-2xl shadow-2xl p-6 space-y-4 animate-slide-up max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 id="guideline-modal-title" class="text-lg font-bold text-gray-900">Nuevo Modulo de Guia</h3>
+        <button onclick="closeGuidelineModal()" class="text-gray-400 hover:text-gray-600 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="space-y-3">
+        <input id="guide-edit-title" type="text" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint" placeholder="Titulo del modulo">
+        <textarea id="guide-edit-desc" rows="4" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint resize-none" placeholder="Descripcion / instrucciones..."></textarea>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Agregar imagenes o videos</label>
+          <input id="guide-edit-media" type="file" accept="image/*,video/*" multiple class="w-full text-sm">
+        </div>
+        <div id="guide-existing-media" class="hidden">
+          <p class="text-xs text-gray-500 mb-1">Medios actuales:</p>
+          <div id="guide-media-preview" class="flex gap-2 flex-wrap"></div>
+        </div>
+        <input id="guide-edit-order" type="number" min="0" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-creo-mint" placeholder="Orden (0, 1, 2...)">
+      </div>
+      <input type="hidden" id="guide-edit-id" value="">
+      <button onclick="saveGuideline()" class="w-full bg-creo-purple text-white font-bold py-3 rounded-xl hover:bg-creo-light transition">Guardar Modulo</button>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       CREO — Empresa Profile Page
+       ============================================================ */
+
+    // ---------- State ----------
+    let businessProfile = null;
+    let businessDeals = [];
+    let brandGuidelines = [];
+    let isOwner = false;
+    let currentUser = null;
+    let applyingDealId = null;
+
+    // ---------- Demo Data ----------
+    const DEMO_PROFILE = {
+      id: 'demo-business-001',
+      username: 'cafeorganico_luna',
+      display_name: 'Cafe Organico Luna',
+      bio: 'Somos una empresa familiar dedicada al cafe organico desde 2010. Cultivamos en las montanas de Oaxaca con respeto por la tierra y las comunidades locales.\n\nNuestra mision es llevar el mejor cafe de especialidad a cada hogar, apoyando a los productores locales y cuidando el medio ambiente con practicas de cultivo sostenible.',
+      avatar_url: 'https://picsum.photos/seed/cafelogo/200/200',
+      cover_url: 'https://picsum.photos/seed/cafebanner/1200/400',
+      verification_status: 'verified',
+      account_type: 'business',
+      company_website: 'https://cafeorganico-luna.com',
+      company_category: 'Cafe y Gastronomia'
+    };
+
+    const DEMO_DEALS = [
+      {
+        id: 'demo-deal-001',
+        business_id: 'demo-business-001',
+        title: 'Reseña de Cafe de Temporada',
+        description: 'Buscamos creadores que amen el cafe para que prueben nuestra nueva edicion de temporada y compartan su experiencia autentica con su audiencia.',
+        compensation: '$300 USD + producto gratis',
+        spots_total: 5,
+        spots_remaining: 3,
+        cover_url: 'https://picsum.photos/seed/cafedeal1/600/400',
+        status: 'active',
+        created_at: '2026-06-15T10:00:00Z'
+      },
+      {
+        id: 'demo-deal-002',
+        business_id: 'demo-business-001',
+        title: 'Serie de Recetas con Cafe',
+        description: 'Crea 3 videos de recetas usando nuestro cafe cold brew como ingrediente principal. Queremos contenido creativo y original que muestre versatilidad.',
+        compensation: '$750 USD',
+        spots_total: 2,
+        spots_remaining: 1,
+        cover_url: 'https://picsum.photos/seed/cafedeal2/600/400',
+        status: 'active',
+        created_at: '2026-06-20T14:00:00Z'
+      }
+    ];
+
+    const DEMO_GUIDELINES = [
+      {
+        id: 'demo-guide-001',
+        business_id: 'demo-business-001',
+        title: 'Nuestra Historia',
+        description: 'Cafe Organico Luna nacio en 2010 cuando nuestra familia decidio compartir el cafe que cultivabamos para nosotros mismos. Desde la Sierra Mixe de Oaxaca, nuestros granos viajan directamente del productor a tu taza.\n\nCuando crees contenido sobre nosotros, queremos que captures esa esencia: lo artesanal, lo familiar, y el amor por el proceso.',
+        media_urls: [
+          'https://picsum.photos/seed/cafehistory1/600/400',
+          'https://picsum.photos/seed/cafehistory2/600/400'
+        ],
+        sort_order: 0,
+        created_at: '2026-05-01T08:00:00Z'
+      },
+      {
+        id: 'demo-guide-002',
+        business_id: 'demo-business-001',
+        title: 'Valores de Marca',
+        description: 'Nuestros tres pilares son: Sostenibilidad, Comunidad y Calidad. Cada grano que producimos respeta estos valores.\n\n1. Sostenibilidad: Cultivo bajo sombra, sin pesticidas.\n2. Comunidad: Precio justo a productores locales.\n3. Calidad: Tostado artesanal en lotes pequenos.\n\nEl contenido que crees debe reflejar al menos uno de estos valores de forma natural.',
+        media_urls: [
+          'https://picsum.photos/seed/cafevalues/600/400'
+        ],
+        sort_order: 1,
+        created_at: '2026-05-01T08:30:00Z'
+      },
+      {
+        id: 'demo-guide-003',
+        business_id: 'demo-business-001',
+        title: 'Estilo Visual',
+        description: 'Nuestra estetica se basa en tonos calidos, luz natural y escenarios organicos. Evita filtros excesivos o iluminacion artificial dura.\n\nColores preferidos: terracota, verde bosque, crema.\nEvitar: neon, colores saturados, fondos blancos esteriles.\n\nSiempre incluye nuestro empaque visible en al menos una toma.',
+        media_urls: [
+          'https://picsum.photos/seed/cafestyle1/600/400',
+          'https://picsum.photos/seed/cafestyle2/600/400',
+          'https://picsum.photos/seed/cafestyle3/600/400'
+        ],
+        sort_order: 2,
+        created_at: '2026-05-01T09:00:00Z'
+      }
+    ];
+
+    // ---------- Init ----------
+    async function init() {
+      const params = new URLSearchParams(location.search);
+      const profileId = params.get('id');
+      const profileUsername = params.get('u');
+
+      // Check current user
+      try {
+        const { data: { user } } = await sb.auth.getUser();
+        currentUser = user;
+      } catch (e) { currentUser = null; }
+
+      if (profileId) {
+        await loadBusinessProfile(profileId);
+      } else if (profileUsername) {
+        await loadBusinessProfileByUsername(profileUsername);
+      } else {
+        // No params — try loading own business profile or show demo
+        if (currentUser) {
+          await loadBusinessProfile(currentUser.id);
+        } else {
+          loadDemoData();
+        }
+      }
+    }
+
+    async function loadBusinessProfile(id) {
+      try {
+        const { data, error } = await sb.from('profiles').select('*').eq('id', id).eq('account_type', 'business').single();
+        if (error || !data) { loadDemoData(); return; }
+        businessProfile = data;
+        isOwner = currentUser && currentUser.id === data.id;
+        renderProfile();
+        await Promise.all([loadBusinessDeals(id), loadBrandGuidelines(id)]);
+      } catch (e) {
+        console.error('loadBusinessProfile error:', e);
+        loadDemoData();
+      }
+    }
+
+    async function loadBusinessProfileByUsername(username) {
+      try {
+        const { data, error } = await sb.from('profiles').select('*').eq('username', username).eq('account_type', 'business').single();
+        if (error || !data) { loadDemoData(); return; }
+        businessProfile = data;
+        isOwner = currentUser && currentUser.id === data.id;
+        renderProfile();
+        await Promise.all([loadBusinessDeals(data.id), loadBrandGuidelines(data.id)]);
+      } catch (e) {
+        console.error('loadBusinessProfileByUsername error:', e);
+        loadDemoData();
+      }
+    }
+
+    async function loadBusinessDeals(businessId) {
+      try {
+        const { data, error } = await sb.from('brand_deals').select('*').eq('business_id', businessId).eq('status', 'active').order('created_at', { ascending: false });
+        if (error || !data) { businessDeals = []; } else { businessDeals = data; }
+      } catch (e) {
+        console.error('loadBusinessDeals error:', e);
+        businessDeals = [];
+      }
+      renderDeals();
+    }
+
+    async function loadBrandGuidelines(businessId) {
+      try {
+        const { data, error } = await sb.from('brand_guidelines').select('*').eq('business_id', businessId).order('sort_order', { ascending: true });
+        if (error || !data) { brandGuidelines = []; } else { brandGuidelines = data; }
+      } catch (e) {
+        console.error('loadBrandGuidelines error:', e);
+        brandGuidelines = [];
+      }
+      renderGuidelines();
+    }
+
+    function loadDemoData() {
+      businessProfile = DEMO_PROFILE;
+      businessDeals = DEMO_DEALS;
+      brandGuidelines = DEMO_GUIDELINES;
+      isOwner = false;
+      renderProfile();
+      renderDeals();
+      renderGuidelines();
+    }
+
+    // ---------- Render Profile ----------
+    function renderProfile() {
+      const p = businessProfile;
+      if (!p) return;
+
+      // Cover
+      const coverEl = document.getElementById('cover-img');
+      if (p.cover_url) {
+        coverEl.src = p.cover_url;
+        coverEl.classList.remove('hidden');
+      }
+
+      // Avatar
+      const avatarImg = document.getElementById('avatar-img');
+      const avatarPlaceholder = document.getElementById('avatar-placeholder');
+      if (p.avatar_url) {
+        avatarImg.src = p.avatar_url;
+        avatarImg.classList.remove('hidden');
+        avatarPlaceholder.classList.add('hidden');
+      }
+
+      // Badge
+      if (p.verification_status === 'verified') {
+        document.getElementById('verified-badge').classList.remove('hidden');
+      }
+
+      // Name and username
+      document.getElementById('profile-name').textContent = p.display_name || p.username || 'Empresa';
+      document.getElementById('profile-username').textContent = '@' + (p.username || '');
+
+      // Category
+      if (p.company_category) {
+        document.getElementById('profile-category').classList.remove('hidden');
+        document.getElementById('category-text').textContent = p.company_category;
+      }
+
+      // Website
+      if (p.company_website) {
+        document.getElementById('profile-website').classList.remove('hidden');
+        const link = document.getElementById('website-link');
+        link.href = p.company_website;
+        const display = p.company_website.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        document.getElementById('website-text').textContent = display;
+      }
+
+      // Bio
+      document.getElementById('about-text').textContent = p.bio || 'Esta empresa aun no ha agregado su historia.';
+
+      // OG tags
+      document.title = 'CREO — ' + (p.display_name || 'Empresa');
+
+      // Owner controls
+      if (isOwner) {
+        document.getElementById('btn-edit-profile').classList.remove('hidden');
+        document.getElementById('btn-edit-cover').classList.remove('hidden');
+        document.getElementById('btn-edit-about').classList.remove('hidden');
+        document.getElementById('btn-add-deal').classList.remove('hidden');
+        document.getElementById('btn-add-guideline').classList.remove('hidden');
+      }
+    }
+
+    // ---------- Render Deals ----------
+    function renderDeals() {
+      const grid = document.getElementById('deals-grid');
+      const empty = document.getElementById('deals-empty');
+      grid.innerHTML = '';
+
+      if (!businessDeals.length) {
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      businessDeals.forEach(deal => {
+        const card = document.createElement('div');
+        card.className = 'deal-card bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100';
+        const coverSrc = deal.cover_url || 'https://picsum.photos/seed/deal' + deal.id + '/600/400';
+        const spotsColor = deal.spots_remaining <= 1 ? 'text-red-500' : 'text-creo-mint';
+
+        let ownerBtns = '';
+        if (isOwner) {
+          ownerBtns = `
+            <div class="flex gap-2 mt-2">
+              <button onclick="editDeal('${deal.id}')" class="flex-1 text-xs text-creo-purple border border-creo-purple/30 rounded-lg py-1.5 hover:bg-creo-purple/5 transition">Editar</button>
+              <button onclick="deleteDeal('${deal.id}')" class="flex-1 text-xs text-red-500 border border-red-200 rounded-lg py-1.5 hover:bg-red-50 transition">Eliminar</button>
+            </div>`;
+        }
+
+        card.innerHTML = `
+          <div class="aspect-[3/2] overflow-hidden">
+            <img src="${esc(coverSrc)}" alt="${esc(deal.title)}" class="w-full h-full object-cover">
+          </div>
+          <div class="p-4 space-y-2">
+            <h3 class="font-bold text-gray-900 text-sm leading-tight">${esc(deal.title)}</h3>
+            <p class="text-xs text-gray-500 line-clamp-2">${esc(deal.description)}</p>
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-semibold text-creo-purple">${esc(deal.compensation)}</span>
+              <span class="${spotsColor} font-medium">${deal.spots_remaining} espacio${deal.spots_remaining !== 1 ? 's' : ''}</span>
+            </div>
+            ${isOwner ? ownerBtns : `<button onclick="openApplyModal('${deal.id}')" class="w-full mt-2 bg-creo-mint text-creo-purple font-bold text-sm py-2.5 rounded-xl hover:bg-creo-mintDark transition">Aplicar</button>`}
+          </div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    // ---------- Render Guidelines ----------
+    function renderGuidelines() {
+      const list = document.getElementById('guidelines-list');
+      const empty = document.getElementById('guidelines-empty');
+      list.innerHTML = '';
+
+      if (!brandGuidelines.length) {
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      brandGuidelines.forEach((guide, idx) => {
+        const el = document.createElement('div');
+        el.className = 'bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100';
+
+        const mediaUrls = guide.media_urls || [];
+        let mediaHTML = '';
+        if (mediaUrls.length) {
+          const items = mediaUrls.map(url => {
+            const isVideo = /\.(mp4|webm|mov)$/i.test(url) || /youtube|tiktok|vimeo/i.test(url);
+            if (isVideo) {
+              const vtype = typeof detectVideoType === 'function' ? detectVideoType(url) : 'direct';
+              if (vtype === 'direct') {
+                return `<div class="w-64 h-44 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100"><video src="${esc(url)}" class="w-full h-full object-cover rounded-xl" controls></video></div>`;
+              } else {
+                const embed = typeof getEmbedHTML === 'function' ? getEmbedHTML(url, vtype, 'aspect-video') : `<iframe src="${esc(url)}" class="w-full aspect-video rounded-xl" frameborder="0" allowfullscreen></iframe>`;
+                return `<div class="w-64 h-44 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100">${embed}</div>`;
+              }
+            }
+            return `<div class="w-64 h-44 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100"><img src="${esc(url)}" alt="" class="w-full h-full object-cover" loading="lazy"></div>`;
+          }).join('');
+          mediaHTML = `<div class="guideline-media-scroll px-4 pb-4">${items}</div>`;
+        }
+
+        let ownerBtns = '';
+        if (isOwner) {
+          ownerBtns = `
+            <div class="flex gap-2 px-4 pb-4">
+              <button onclick="editGuideline('${guide.id}')" class="flex-1 text-xs text-creo-purple border border-creo-purple/30 rounded-lg py-1.5 hover:bg-creo-purple/5 transition">Editar</button>
+              <button onclick="deleteGuideline('${guide.id}')" class="flex-1 text-xs text-red-500 border border-red-200 rounded-lg py-1.5 hover:bg-red-50 transition">Eliminar</button>
+            </div>`;
+        }
+
+        el.innerHTML = `
+          <div class="p-4 pb-2">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span class="text-creo-purple font-bold text-sm">${idx + 1}</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="font-bold text-gray-900 text-sm">${esc(guide.title)}</h3>
+                <p class="text-xs text-gray-500 mt-1 whitespace-pre-line leading-relaxed">${esc(guide.description)}</p>
+              </div>
+            </div>
+          </div>
+          ${mediaHTML}
+          ${ownerBtns}`;
+        list.appendChild(el);
+      });
+    }
+
+    // ---------- Apply to Deal ----------
+    function openApplyModal(dealId) {
+      if (!currentUser) {
+        showToast('Inicia sesion para aplicar', 'error');
+        return;
+      }
+      const deal = businessDeals.find(d => d.id === dealId);
+      if (!deal) return;
+      applyingDealId = dealId;
+
+      const summary = document.getElementById('apply-deal-summary');
+      summary.innerHTML = `
+        <p class="font-bold text-gray-900 text-sm">${esc(deal.title)}</p>
+        <p class="text-xs text-gray-600">${esc(deal.compensation)}</p>
+        <p class="text-xs text-creo-mint font-medium">${deal.spots_remaining} espacio${deal.spots_remaining !== 1 ? 's' : ''} disponible${deal.spots_remaining !== 1 ? 's' : ''}</p>`;
+
+      document.getElementById('apply-message').value = '';
+      document.getElementById('apply-modal').classList.remove('hidden');
+    }
+
+    function closeApplyModal() {
+      document.getElementById('apply-modal').classList.add('hidden');
+      applyingDealId = null;
+    }
+
+    async function submitApplication() {
+      if (!currentUser || !applyingDealId) { showToast('Inicia sesion', 'error'); return; }
+      const msg = document.getElementById('apply-message').value.trim();
+      if (!msg) { showToast('Escribe un mensaje', 'error'); return; }
+
+      const btn = document.getElementById('btn-submit-apply');
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      try {
+        const { error } = await sb.from('deal_applications').insert({
+          deal_id: applyingDealId,
+          creator_id: currentUser.id,
+          business_id: businessProfile.id,
+          message: msg,
+          status: 'pending'
+        });
+        if (error) throw error;
+        showToast('Aplicacion enviada con exito', 'success');
+        closeApplyModal();
+      } catch (e) {
+        console.error('submitApplication error:', e);
+        showToast('Error al enviar: ' + (e.message || ''), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enviar Aplicacion';
+      }
+    }
+
+    // ---------- Owner: Edit Profile ----------
+    function editProfileModal() {
+      if (!isOwner) return;
+      document.getElementById('edit-display-name').value = businessProfile.display_name || '';
+      document.getElementById('edit-category').value = businessProfile.company_category || '';
+      document.getElementById('edit-website').value = businessProfile.company_website || '';
+      document.getElementById('edit-bio').value = businessProfile.bio || '';
+      document.getElementById('edit-profile-modal').classList.remove('hidden');
+    }
+
+    function closeEditProfileModal() {
+      document.getElementById('edit-profile-modal').classList.add('hidden');
+    }
+
+    async function saveProfile() {
+      if (!isOwner) return;
+      const updates = {
+        display_name: document.getElementById('edit-display-name').value.trim(),
+        company_category: document.getElementById('edit-category').value.trim(),
+        company_website: document.getElementById('edit-website').value.trim(),
+        bio: document.getElementById('edit-bio').value.trim()
+      };
+
+      // Handle avatar upload
+      const file = document.getElementById('edit-avatar-file').files[0];
+      if (file) {
+        const url = await uploadToStorage(file, 'avatars', 5);
+        if (url) updates.avatar_url = url;
+      }
+
+      try {
+        const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
+        if (error) throw error;
+        Object.assign(businessProfile, updates);
+        renderProfile();
+        closeEditProfileModal();
+        showToast('Perfil actualizado', 'success');
+      } catch (e) {
+        showToast('Error: ' + (e.message || ''), 'error');
+      }
+    }
+
+    // ---------- Owner: Edit Cover ----------
+    function editCover() {
+      if (!isOwner) return;
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = async () => {
+        const file = input.files[0];
+        if (!file) return;
+        const url = await uploadToStorage(file, 'covers', 10);
+        if (!url) return;
+        try {
+          const { error } = await sb.from('profiles').update({ cover_url: url }).eq('id', currentUser.id);
+          if (error) throw error;
+          businessProfile.cover_url = url;
+          document.getElementById('cover-img').src = url;
+          document.getElementById('cover-img').classList.remove('hidden');
+          showToast('Portada actualizada', 'success');
+        } catch (e) {
+          showToast('Error: ' + (e.message || ''), 'error');
+        }
+      };
+      input.click();
+    }
+
+    // ---------- Owner: Edit About ----------
+    function editAboutModal() {
+      if (!isOwner) return;
+      document.getElementById('edit-about-text').value = businessProfile.bio || '';
+      document.getElementById('edit-about-modal').classList.remove('hidden');
+    }
+
+    function closeEditAboutModal() {
+      document.getElementById('edit-about-modal').classList.add('hidden');
+    }
+
+    async function saveAbout() {
+      if (!isOwner) return;
+      const bio = document.getElementById('edit-about-text').value.trim();
+      try {
+        const { error } = await sb.from('profiles').update({ bio }).eq('id', currentUser.id);
+        if (error) throw error;
+        businessProfile.bio = bio;
+        document.getElementById('about-text').textContent = bio;
+        closeEditAboutModal();
+        showToast('Historia actualizada', 'success');
+      } catch (e) {
+        showToast('Error: ' + (e.message || ''), 'error');
+      }
+    }
+
+    // ---------- Owner: Deals CRUD ----------
+    function addDealModal() {
+      if (!isOwner) return;
+      document.getElementById('deal-modal-title').textContent = 'Nuevo Brand Deal';
+      document.getElementById('deal-edit-id').value = '';
+      document.getElementById('deal-edit-title').value = '';
+      document.getElementById('deal-edit-desc').value = '';
+      document.getElementById('deal-edit-compensation').value = '';
+      document.getElementById('deal-edit-spots').value = '';
+      document.getElementById('deal-modal').classList.remove('hidden');
+    }
+
+    function editDeal(dealId) {
+      if (!isOwner) return;
+      const deal = businessDeals.find(d => d.id === dealId);
+      if (!deal) return;
+      document.getElementById('deal-modal-title').textContent = 'Editar Brand Deal';
+      document.getElementById('deal-edit-id').value = deal.id;
+      document.getElementById('deal-edit-title').value = deal.title || '';
+      document.getElementById('deal-edit-desc').value = deal.description || '';
+      document.getElementById('deal-edit-compensation').value = deal.compensation || '';
+      document.getElementById('deal-edit-spots').value = deal.spots_remaining || '';
+      document.getElementById('deal-modal').classList.remove('hidden');
+    }
+
+    function closeDealModal() {
+      document.getElementById('deal-modal').classList.add('hidden');
+    }
+
+    async function saveDeal() {
+      if (!isOwner) return;
+      const id = document.getElementById('deal-edit-id').value;
+      const title = document.getElementById('deal-edit-title').value.trim();
+      const description = document.getElementById('deal-edit-desc').value.trim();
+      const compensation = document.getElementById('deal-edit-compensation').value.trim();
+      const spots = parseInt(document.getElementById('deal-edit-spots').value) || 1;
+
+      if (!title) { showToast('Agrega un titulo', 'error'); return; }
+
+      let cover_url = null;
+      const file = document.getElementById('deal-edit-cover').files[0];
+      if (file) {
+        cover_url = await uploadToStorage(file, 'deals', 10);
+      }
+
+      const payload = {
+        business_id: currentUser.id,
+        title, description, compensation,
+        spots_remaining: spots,
+        spots_total: spots,
+        status: 'active'
+      };
+      if (cover_url) payload.cover_url = cover_url;
+
+      try {
+        if (id) {
+          const { error } = await sb.from('brand_deals').update(payload).eq('id', id);
+          if (error) throw error;
+        } else {
+          const { error } = await sb.from('brand_deals').insert(payload);
+          if (error) throw error;
+        }
+        closeDealModal();
+        showToast(id ? 'Deal actualizado' : 'Deal creado', 'success');
+        await loadBusinessDeals(currentUser.id);
+      } catch (e) {
+        showToast('Error: ' + (e.message || ''), 'error');
+      }
+    }
+
+    async function deleteDeal(dealId) {
+      if (!isOwner) return;
+      if (!confirm('Eliminar este brand deal?')) return;
+      try {
+        const { error } = await sb.from('brand_deals').delete().eq('id', dealId);
+        if (error) throw error;
+        showToast('Deal eliminado', 'success');
+        await loadBusinessDeals(currentUser.id);
+      } catch (e) {
+        showToast('Error: ' + (e.message || ''), 'error');
+      }
+    }
+
+    // ---------- Owner: Guidelines CRUD ----------
+    function addGuidelineModal() {
+      if (!isOwner) return;
+      document.getElementById('guideline-modal-title').textContent = 'Nuevo Modulo de Guia';
+      document.getElementById('guide-edit-id').value = '';
+      document.getElementById('guide-edit-title').value = '';
+      document.getElementById('guide-edit-desc').value = '';
+      document.getElementById('guide-edit-order').value = brandGuidelines.length;
+      document.getElementById('guide-existing-media').classList.add('hidden');
+      document.getElementById('guideline-modal').classList.remove('hidden');
+    }
+
+    function editGuideline(guideId) {
+      if (!isOwner) return;
+      const guide = brandGuidelines.find(g => g.id === guideId);
+      if (!guide) return;
+      document.getElementById('guideline-modal-title').textContent = 'Editar Modulo';
+      document.getElementById('guide-edit-id').value = guide.id;
+      document.getElementById('guide-edit-title').value = guide.title || '';
+      document.getElementById('guide-edit-desc').value = guide.description || '';
+      document.getElementById('guide-edit-order').value = guide.sort_order ?? 0;
+
+      // Show existing media
+      const mediaUrls = guide.media_urls || [];
+      const container = document.getElementById('guide-existing-media');
+      const preview = document.getElementById('guide-media-preview');
+      if (mediaUrls.length) {
+        preview.innerHTML = mediaUrls.map(url =>
+          `<div class="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+            <img src="${esc(url)}" class="w-full h-full object-cover" alt="">
+          </div>`
+        ).join('');
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+      }
+
+      document.getElementById('guideline-modal').classList.remove('hidden');
+    }
+
+    function closeGuidelineModal() {
+      document.getElementById('guideline-modal').classList.add('hidden');
+    }
+
+    async function saveGuideline() {
+      if (!isOwner) return;
+      const id = document.getElementById('guide-edit-id').value;
+      const title = document.getElementById('guide-edit-title').value.trim();
+      const description = document.getElementById('guide-edit-desc').value.trim();
+      const sort_order = parseInt(document.getElementById('guide-edit-order').value) || 0;
+
+      if (!title) { showToast('Agrega un titulo', 'error'); return; }
+
+      // Upload new media files
+      const files = document.getElementById('guide-edit-media').files;
+      let newMediaUrls = [];
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadToStorage(files[i], 'guidelines', 50);
+        if (url) newMediaUrls.push(url);
+      }
+
+      // Merge with existing media if editing
+      let media_urls = newMediaUrls;
+      if (id) {
+        const existing = brandGuidelines.find(g => g.id === id);
+        if (existing && existing.media_urls) {
+          media_urls = [...existing.media_urls, ...newMediaUrls];
+        }
+      }
+
+      const payload = {
+        business_id: currentUser.id,
+        title, description, media_urls, sort_order
+      };
+
+      try {
+        if (id) {
+          const { error } = await sb.from('brand_guidelines').update(payload).eq('id', id);
+          if (error) throw error;
+        } else {
+          const { error } = await sb.from('brand_guidelines').insert(payload);
+          if (error) throw error;
+        }
+        closeGuidelineModal();
+        showToast(id ? 'Modulo actualizado' : 'Modulo creado', 'success');
+        await loadBrandGuidelines(currentUser.id);
+      } catch (e) {
+        showToast('Error: ' + (e.message || ''), 'error');
+      }
+    }
+
+    async function deleteGuideline(guideId) {
+      if (!isOwner) return;
+      if (!confirm('Eliminar este modulo de guia?')) return;
+      try {
+        const { error } = await sb.from('brand_guidelines').delete().eq('id', guideId);
+        if (error) throw error;
+        showToast('Modulo eliminado', 'success');
+        await loadBrandGuidelines(currentUser.id);
+      } catch (e) {
+        showToast('Error: ' + (e.message || ''), 'error');
+      }
+    }
+
+    // ---------- Boot ----------
+    init();
+    renderBottomNav('');
+    initTheme();
+    updateNavAuth();
+  </script>
+</body>
+</html>
