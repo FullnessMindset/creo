@@ -1575,12 +1575,14 @@
               <input id="edit-story-title" type="text" value="${esc(s.title || '')}" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">
             </div>
             <div>
-              <label class="text-xs font-semibold text-gray-600">Descripcion</label>
-              <textarea id="edit-story-description" rows="3" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">${esc(s.description || '')}</textarea>
+              <label class="text-xs font-semibold text-gray-600">Resumen para "Yo Creo en Ti"</label>
+              <p class="text-[10px] text-gray-400 mb-1">Este texto aparece cuando alguien te destaca en su sección "Yo Creo en Ellos". Escribe algo breve que inspire a otros a apoyarte.</p>
+              <textarea id="edit-story-description" rows="3" placeholder="Ej: Soy músico independiente creando mi primer álbum..." class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">${esc(s.description || '')}</textarea>
             </div>
             <div>
-              <label class="text-xs font-semibold text-gray-600">Contenido</label>
-              <textarea id="edit-story-content" rows="4" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">${esc(s.content || '')}</textarea>
+              <label class="text-xs font-semibold text-gray-600">Tu Historia Completa</label>
+              <p class="text-[10px] text-gray-400 mb-1">El contenido completo de tu historia. Aquí cuentas tu camino, tu visión y por qué haces lo que haces.</p>
+              <textarea id="edit-story-content" rows="4" placeholder="Cuéntale al mundo tu historia..." class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">${esc(s.content || '')}</textarea>
             </div>
 
             <!-- Main Video -->
