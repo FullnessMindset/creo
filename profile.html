@@ -191,6 +191,63 @@
           Ver todo <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
       </div>
+      <!-- Owner-only: Create Post -->
+      <div id="profile-compose-card" class="hidden bg-white rounded-xl border border-gray-200 shadow p-4 space-y-3">
+        <input id="profile-post-title" type="text" placeholder="Título (opcional)" class="w-full border border-gray-200 bg-gray-50 p-2.5 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple font-semibold">
+        <textarea id="profile-post-body" placeholder="¿Qué quieres compartir?" rows="2" class="w-full border border-gray-200 bg-gray-50 p-2.5 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple resize-none"></textarea>
+        <!-- Type pills -->
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="setProfilePostType('normal')" class="profile-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-creo-purple text-white" data-type="normal">Normal</button>
+          <button onclick="setProfilePostType('evento')" class="profile-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="evento">📅 Evento</button>
+          <button onclick="setProfilePostType('en_vivo')" class="profile-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="en_vivo">📡 En Vivo</button>
+        </div>
+        <div id="profile-evento-fields" class="hidden space-y-2">
+          <div class="grid grid-cols-2 gap-2">
+            <input id="profile-event-date" type="date" class="border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+            <input id="profile-event-time" type="time" class="border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+          </div>
+          <input id="profile-event-link" type="url" placeholder="Enlace (Zoom, Meet, URL)" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+        </div>
+        <div id="profile-envivo-fields" class="hidden space-y-2">
+          <select id="profile-live-platform" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+            <option value="browser">Desde el navegador</option>
+            <option value="youtube">YouTube Live</option>
+            <option value="twitch">Twitch</option>
+            <option value="instagram">Instagram Live</option>
+            <option value="custom">Otro enlace</option>
+          </select>
+          <input id="profile-live-url" type="url" placeholder="URL del stream" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+        </div>
+        <div id="profile-post-media-preview" class="hidden flex gap-2 overflow-x-auto"></div>
+        <!-- Media buttons -->
+        <div class="flex items-center gap-3 flex-wrap">
+          <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-green-600 transition">
+            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+            Foto
+            <input type="file" accept="image/*" multiple class="hidden" onchange="handleProfilePostMedia(this)">
+          </label>
+          <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition">
+            <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg>
+            Video
+            <input type="file" accept="video/*" class="hidden" onchange="handleProfilePostMedia(this)">
+          </label>
+          <button onclick="startProfilePostRec('video')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition">
+            <svg class="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
+            Grabar Video
+          </button>
+          <button onclick="startProfilePostRec('audio')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-amber-500 transition">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
+            Grabar Audio
+          </button>
+        </div>
+        <!-- Comunidad checkbox -->
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="profile-post-to-comunidad" checked class="w-4 h-4 rounded border-gray-300 text-creo-purple focus:ring-creo-purple">
+          <span class="text-xs text-gray-600">Publicar también en la Comunidad</span>
+        </label>
+        <div id="profile-post-status" class="hidden text-xs text-creo-purple font-semibold"></div>
+        <button onclick="createProfilePost()" id="profile-post-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-2.5 rounded-xl font-semibold transition text-sm">Publicar</button>
+      </div>
       <div id="creator-posts-scroll"></div>
       <div id="creator-posts-full" class="hidden grid grid-cols-1 gap-4"></div>
     </div>
@@ -2036,12 +2093,21 @@
 
     // ===== CREATOR POSTS (horizontal scroll) =====
     async function loadCreatorPosts(creatorId) {
+      const user = (await sb.auth.getUser()).data.user;
+      const isOwner = user && user.id === creatorId;
+
+      if (isOwner) {
+        document.getElementById('posts-section').classList.remove('hidden');
+        document.getElementById('profile-compose-card').classList.remove('hidden');
+      }
+
       const { data: posts, error } = await sb.from('community_posts')
         .select('*')
         .eq('author_id', creatorId)
         .order('created_at', { ascending: false })
         .limit(20);
-      if (error || !posts || posts.length === 0) return;
+      if ((!posts || posts.length === 0) && !isOwner) return;
+      if (!posts || posts.length === 0) return;
 
       document.getElementById('posts-section').classList.remove('hidden');
       const scroll = document.getElementById('creator-posts-scroll');
@@ -2108,6 +2174,176 @@
         scroll.classList.remove('hidden');
         full.classList.add('hidden');
         btn.innerHTML = 'Ver todo <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>';
+      }
+    }
+
+    // ===== PROFILE POST CREATION =====
+    let profilePostType = 'normal';
+    let profilePostMediaFiles = [];
+
+    function setProfilePostType(type) {
+      profilePostType = type;
+      document.querySelectorAll('.profile-post-type-pill').forEach(b => {
+        if (b.dataset.type === type) { b.className = 'profile-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-creo-purple text-white'; }
+        else { b.className = 'profile-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200'; }
+      });
+      document.getElementById('profile-evento-fields').classList.toggle('hidden', type !== 'evento');
+      document.getElementById('profile-envivo-fields').classList.toggle('hidden', type !== 'en_vivo');
+    }
+
+    function handleProfilePostMedia(input) {
+      profilePostMediaFiles.push(...Array.from(input.files));
+      input.value = '';
+      renderProfilePostMedia();
+    }
+
+    function renderProfilePostMedia() {
+      const c = document.getElementById('profile-post-media-preview');
+      if (profilePostMediaFiles.length === 0) { c.classList.add('hidden'); return; }
+      c.classList.remove('hidden');
+      c.innerHTML = profilePostMediaFiles.map((f, i) => {
+        const url = URL.createObjectURL(f);
+        const isVid = f.type.startsWith('video');
+        const isAudio = f.type.startsWith('audio');
+        let preview = '';
+        if (isVid) preview = `<video src="${url}" class="w-full h-full object-cover"></video>`;
+        else if (isAudio) preview = `<div class="w-full h-full bg-gray-100 flex items-center justify-center"><svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg></div>`;
+        else preview = `<img src="${url}" class="w-full h-full object-cover">`;
+        return `<div class="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
+          ${preview}
+          <button onclick="profilePostMediaFiles.splice(${i},1);renderProfilePostMedia()" class="absolute top-0.5 right-0.5 w-5 h-5 bg-black/60 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-500">✕</button>
+        </div>`;
+      }).join('');
+    }
+
+    function startProfilePostRec(type) {
+      const isVideo = type === 'video';
+      navigator.mediaDevices.getUserMedia(isVideo ? { video: { facingMode: 'user' }, audio: true } : { audio: true }).then(stream => {
+        const modal = document.createElement('div');
+        modal.id = 'profile-rec-modal';
+        modal.className = 'fixed inset-0 z-[200] flex items-center justify-center';
+        modal.innerHTML = `
+          <div class="absolute inset-0 bg-black/70" onclick="cancelProfileRec()"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl p-5 w-80 space-y-4 z-10">
+            <h3 class="font-bold text-center text-gray-900">${isVideo ? 'Grabando Video' : 'Grabando Audio'}</h3>
+            ${isVideo ? '<video id="profile-rec-preview" autoplay playsinline muted class="w-full rounded-xl bg-black aspect-video"></video>' :
+            '<div class="flex items-center justify-center py-6"><div class="w-16 h-16 rounded-full bg-red-500 animate-pulse flex items-center justify-center"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg></div></div>'}
+            <p id="profile-rec-timer" class="text-center text-sm font-mono text-gray-500">00:00</p>
+            <div class="flex gap-2">
+              <button onclick="cancelProfileRec()" class="flex-1 py-2 rounded-xl border text-sm font-semibold text-gray-600 hover:bg-gray-50">Cancelar</button>
+              <button onclick="saveProfileRec('${type}')" class="flex-1 py-2 rounded-xl bg-creo-mint text-creo-purple text-sm font-bold hover:opacity-90">Guardar</button>
+            </div>
+          </div>`;
+        document.body.appendChild(modal);
+        if (isVideo) document.getElementById('profile-rec-preview').srcObject = stream;
+        const mimeType = isVideo
+          ? (MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm')
+          : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg');
+        window._profRecChunks = [];
+        window._profRecorder = new MediaRecorder(stream, { mimeType });
+        window._profRecorder.ondataavailable = e => { if (e.data.size > 0) window._profRecChunks.push(e.data); };
+        window._profRecorder.start(100);
+        window._profRecStream = stream;
+        let secs = 0;
+        window._profRecTimer = setInterval(() => {
+          secs++;
+          const el = document.getElementById('profile-rec-timer');
+          if (el) el.textContent = String(Math.floor(secs/60)).padStart(2,'0') + ':' + String(secs%60).padStart(2,'0');
+        }, 1000);
+      }).catch(err => showToast('No se pudo acceder: ' + err.message, 'error'));
+    }
+
+    function cancelProfileRec() {
+      if (window._profRecorder && window._profRecorder.state !== 'inactive') window._profRecorder.stop();
+      clearInterval(window._profRecTimer);
+      if (window._profRecStream) window._profRecStream.getTracks().forEach(t => t.stop());
+      window._profRecChunks = [];
+      const m = document.getElementById('profile-rec-modal');
+      if (m) m.remove();
+    }
+
+    async function saveProfileRec(type) {
+      if (!window._profRecorder) return;
+      clearInterval(window._profRecTimer);
+      const done = new Promise(r => { window._profRecorder.onstop = r; window._profRecorder.stop(); });
+      await done;
+      window._profRecStream.getTracks().forEach(t => t.stop());
+      const isVid = type === 'video';
+      const blob = new Blob(window._profRecChunks, { type: isVid ? 'video/webm' : 'audio/webm' });
+      const file = new File([blob], (isVid ? 'video-' : 'audio-') + Date.now() + '.webm', { type: blob.type });
+      profilePostMediaFiles.push(file);
+      renderProfilePostMedia();
+      window._profRecChunks = [];
+      const m = document.getElementById('profile-rec-modal');
+      if (m) m.remove();
+      showToast('Grabación lista', 'success');
+    }
+
+    async function createProfilePost() {
+      const btn = document.getElementById('profile-post-btn');
+      btn.innerText = 'Publicando...'; btn.disabled = true;
+      const title = document.getElementById('profile-post-title').value.trim();
+      const body = document.getElementById('profile-post-body').value.trim();
+      const toComunidad = document.getElementById('profile-post-to-comunidad').checked;
+
+      if (!body && profilePostMediaFiles.length === 0) {
+        btn.innerText = 'Publicar'; btn.disabled = false;
+        return showToast('Escribe algo o agrega media', 'error');
+      }
+
+      try {
+        const status = document.getElementById('profile-post-status');
+        let mediaUrls = [];
+        if (profilePostMediaFiles.length > 0) {
+          status.classList.remove('hidden');
+          for (let i = 0; i < profilePostMediaFiles.length; i++) {
+            status.textContent = `Subiendo ${i+1}/${profilePostMediaFiles.length}...`;
+            const maxMB = profilePostMediaFiles[i].type.startsWith('video') ? 50 : 10;
+            const url = await uploadToStorage(profilePostMediaFiles[i], 'community-media', maxMB);
+            if (url) mediaUrls.push(url);
+          }
+          status.classList.add('hidden');
+        }
+
+        let postType;
+        if (profilePostType === 'evento') postType = 'evento';
+        else if (profilePostType === 'en_vivo') postType = 'en_vivo';
+        else if (profilePostMediaFiles.length > 0) postType = profilePostMediaFiles[0].type.startsWith('video') ? 'video' : 'photo';
+        else postType = 'text';
+
+        const user = (await sb.auth.getUser()).data.user;
+        const insertData = {
+          author_id: user.id,
+          post_type: postType,
+          title: title || null,
+          body: body || null,
+          media_urls: mediaUrls.length > 0 ? mediaUrls : [],
+          profile_only: !toComunidad
+        };
+
+        if (profilePostType === 'evento') {
+          insertData.event_date = document.getElementById('profile-event-date').value || null;
+          insertData.event_time = document.getElementById('profile-event-time').value || null;
+          insertData.event_link = document.getElementById('profile-event-link').value || null;
+        } else if (profilePostType === 'en_vivo') {
+          insertData.live_platform = document.getElementById('profile-live-platform').value || null;
+          insertData.live_url = document.getElementById('profile-live-url').value || null;
+        }
+
+        const { error } = await sb.from('community_posts').insert(insertData);
+        btn.innerText = 'Publicar'; btn.disabled = false;
+        if (error) return showToast(error.message, 'error');
+
+        document.getElementById('profile-post-title').value = '';
+        document.getElementById('profile-post-body').value = '';
+        profilePostMediaFiles = [];
+        renderProfilePostMedia();
+        setProfilePostType('normal');
+        showToast(toComunidad ? '¡Publicado en tu perfil y Comunidad!' : '¡Publicado solo en tu perfil!', 'success');
+        loadCreatorPosts(user.id);
+      } catch (e) {
+        btn.innerText = 'Publicar'; btn.disabled = false;
+        showToast('Error: ' + e.message, 'error');
       }
     }
 

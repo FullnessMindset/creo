@@ -144,8 +144,33 @@
         </div>
         <!-- Media preview -->
         <div id="compose-media-preview" class="hidden media-preview-scroll"></div>
+        <!-- Post type selector -->
+        <div id="compose-type-pills" class="flex gap-2 flex-wrap">
+          <button onclick="setComposeType('normal')" class="compose-type-pill active px-3 py-1.5 rounded-full text-xs font-semibold transition bg-creo-purple text-white" data-type="normal">Normal</button>
+          <button onclick="setComposeType('evento')" class="compose-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="evento">📅 Evento</button>
+          <button onclick="setComposeType('en_vivo')" class="compose-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="en_vivo">📡 En Vivo</button>
+        </div>
+        <!-- Evento fields -->
+        <div id="compose-evento-fields" class="hidden space-y-2">
+          <div class="grid grid-cols-2 gap-2">
+            <input id="compose-event-date" type="date" class="border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+            <input id="compose-event-time" type="time" class="border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+          </div>
+          <input id="compose-event-link" type="url" placeholder="Enlace (Zoom, Meet, URL)" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+        </div>
+        <!-- En Vivo fields -->
+        <div id="compose-envivo-fields" class="hidden space-y-2">
+          <select id="compose-live-platform" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+            <option value="browser">Desde el navegador</option>
+            <option value="youtube">YouTube Live</option>
+            <option value="twitch">Twitch</option>
+            <option value="instagram">Instagram Live</option>
+            <option value="custom">Otro enlace</option>
+          </select>
+          <input id="compose-live-url" type="url" placeholder="URL del stream" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+        </div>
         <!-- Media controls -->
-        <div class="flex items-center gap-3 border-t border-gray-100 pt-3">
+        <div class="flex items-center gap-3 border-t border-gray-100 pt-3 flex-wrap">
           <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-green-600 transition">
             <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
             Foto
@@ -156,6 +181,14 @@
             Video
             <input type="file" accept="video/*" class="hidden" onchange="handleComposeMedia(event, 'video')">
           </label>
+          <button onclick="startComposeRecording('video')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition">
+            <svg class="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
+            Grabar Video
+          </button>
+          <button onclick="startComposeRecording('audio')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-amber-500 transition">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
+            Grabar Audio
+          </button>
           <span id="compose-emoji-btn" class="cursor-pointer text-xl hover:scale-110 transition ml-auto">😊</span>
         </div>
       </div>
@@ -301,6 +334,7 @@
       try {
         const { data, error } = await sb.from('community_posts')
           .select('*, author:author_id(id, username, display_name, avatar_url, verification_status), shared_post:shared_post_id(*, author:author_id(id, username, display_name, avatar_url))')
+          .or('profile_only.is.null,profile_only.eq.false')
           .order('created_at', { ascending: false })
           .range(feedPage * PAGE_SIZE, (feedPage + 1) * PAGE_SIZE - 1);
 
@@ -408,6 +442,21 @@
             </div>` : ''}
           </div>
           <!-- Content -->
+          ${post.post_type === 'evento' ? `<div class="flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-xl px-3 py-2">
+            <span class="text-lg">📅</span>
+            <div class="flex-1">
+              <p class="text-xs font-bold text-purple-700">Evento</p>
+              ${post.event_date ? `<p class="text-[10px] text-purple-600">${post.event_date}${post.event_time ? ' · ' + post.event_time : ''}</p>` : ''}
+            </div>
+            ${post.event_link ? `<a href="${esc(post.event_link)}" target="_blank" class="text-xs font-bold text-creo-purple hover:underline">Unirse</a>` : ''}
+          </div>` : ''}
+          ${post.post_type === 'en_vivo' ? `<div class="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+            <div class="flex-1">
+              <p class="text-xs font-bold text-red-600">En Vivo${post.live_platform ? ' · ' + esc(post.live_platform) : ''}</p>
+            </div>
+            ${post.live_url ? `<a href="${esc(post.live_url)}" target="_blank" class="text-xs font-bold text-red-600 hover:underline">Ver</a>` : ''}
+          </div>` : ''}
           ${post.title ? `<h3 class="text-base font-bold text-gray-900">${esc(post.title)}</h3>` : ''}
           ${post.body ? `<p class="text-sm text-gray-800 leading-relaxed whitespace-pre-line">${linkify(esc(post.body))}</p>` : ''}
           ${mediaHtml}
@@ -444,16 +493,94 @@
       return new Date(date).toLocaleDateString('es');
     }
 
+    let composePostType = 'normal';
+
+    function setComposeType(type) {
+      composePostType = type;
+      document.querySelectorAll('.compose-type-pill').forEach(b => {
+        if (b.dataset.type === type) { b.className = 'compose-type-pill active px-3 py-1.5 rounded-full text-xs font-semibold transition bg-creo-purple text-white'; }
+        else { b.className = 'compose-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200'; }
+      });
+      document.getElementById('compose-evento-fields').classList.toggle('hidden', type !== 'evento');
+      document.getElementById('compose-envivo-fields').classList.toggle('hidden', type !== 'en_vivo');
+    }
+
+    function startComposeRecording(type) {
+      const isVideo = type === 'video';
+      navigator.mediaDevices.getUserMedia(isVideo ? { video: { facingMode: 'user' }, audio: true } : { audio: true }).then(stream => {
+        const modal = document.createElement('div');
+        modal.id = 'compose-rec-modal';
+        modal.className = 'fixed inset-0 z-[200] flex items-center justify-center';
+        modal.innerHTML = `
+          <div class="absolute inset-0 bg-black/70" onclick="cancelComposeRec()"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl p-5 w-80 space-y-4 z-10">
+            <h3 class="font-bold text-center text-gray-900">${isVideo ? 'Grabando Video' : 'Grabando Audio'}</h3>
+            ${isVideo ? '<video id="compose-rec-preview" autoplay playsinline muted class="w-full rounded-xl bg-black aspect-video"></video>' :
+            '<div class="flex items-center justify-center py-6"><div class="w-16 h-16 rounded-full bg-red-500 animate-pulse flex items-center justify-center"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg></div></div>'}
+            <p id="compose-rec-timer" class="text-center text-sm font-mono text-gray-500">00:00</p>
+            <div class="flex gap-2">
+              <button onclick="cancelComposeRec()" class="flex-1 py-2 rounded-xl border text-sm font-semibold text-gray-600 hover:bg-gray-50">Cancelar</button>
+              <button onclick="saveComposeRec('${type}')" class="flex-1 py-2 rounded-xl bg-creo-mint text-creo-purple text-sm font-bold hover:opacity-90">Guardar</button>
+            </div>
+          </div>`;
+        document.body.appendChild(modal);
+        if (isVideo) document.getElementById('compose-rec-preview').srcObject = stream;
+        const mimeType = isVideo
+          ? (MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm')
+          : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg');
+        window._compRecChunks = [];
+        window._compRecorder = new MediaRecorder(stream, { mimeType });
+        window._compRecorder.ondataavailable = e => { if (e.data.size > 0) window._compRecChunks.push(e.data); };
+        window._compRecorder.start(100);
+        window._compRecStream = stream;
+        let secs = 0;
+        window._compRecTimer = setInterval(() => {
+          secs++;
+          const el = document.getElementById('compose-rec-timer');
+          if (el) el.textContent = String(Math.floor(secs/60)).padStart(2,'0') + ':' + String(secs%60).padStart(2,'0');
+        }, 1000);
+      }).catch(err => showToast('No se pudo acceder: ' + err.message, 'error'));
+    }
+
+    function cancelComposeRec() {
+      if (window._compRecorder && window._compRecorder.state !== 'inactive') window._compRecorder.stop();
+      clearInterval(window._compRecTimer);
+      if (window._compRecStream) window._compRecStream.getTracks().forEach(t => t.stop());
+      window._compRecChunks = [];
+      const m = document.getElementById('compose-rec-modal');
+      if (m) m.remove();
+    }
+
+    async function saveComposeRec(type) {
+      if (!window._compRecorder) return;
+      clearInterval(window._compRecTimer);
+      const done = new Promise(r => { window._compRecorder.onstop = r; window._compRecorder.stop(); });
+      await done;
+      window._compRecStream.getTracks().forEach(t => t.stop());
+      const isVid = type === 'video';
+      const blob = new Blob(window._compRecChunks, { type: isVid ? 'video/webm' : 'audio/webm' });
+      const file = new File([blob], (isVid ? 'video-' : 'audio-') + Date.now() + '.webm', { type: blob.type });
+      composeMediaFiles.push(file);
+      renderMediaPreviews();
+      checkComposeValid();
+      window._compRecChunks = [];
+      const m = document.getElementById('compose-rec-modal');
+      if (m) m.remove();
+      showToast('Grabación lista', 'success');
+    }
+
     // Compose
     function openCompose(type) {
       composeType = type || 'text';
       composeMediaFiles = [];
+      composePostType = 'normal';
       document.getElementById('compose-media-preview').innerHTML = '';
       document.getElementById('compose-media-preview').classList.add('hidden');
       document.getElementById('compose-title').value = '';
       document.getElementById('compose-body').value = '';
       document.getElementById('compose-submit').disabled = true;
       document.getElementById('compose-modal').classList.remove('hidden');
+      setComposeType('normal');
       document.getElementById('compose-body').focus();
       createEmojiPicker('compose-body', 'compose-emoji-btn');
     }
@@ -518,17 +645,30 @@
           if (url) mediaUrls.push(url);
         }
 
-        const postType = composeMediaFiles.length > 0
-          ? (composeMediaFiles[0].type.startsWith('video') ? 'video' : 'photo')
-          : 'text';
+        let postType;
+        if (composePostType === 'evento') postType = 'evento';
+        else if (composePostType === 'en_vivo') postType = 'en_vivo';
+        else if (composeMediaFiles.length > 0) postType = composeMediaFiles[0].type.startsWith('video') ? 'video' : 'photo';
+        else postType = 'text';
 
-        const { error } = await sb.from('community_posts').insert({
+        const insertData = {
           author_id: currentUser.id,
           post_type: postType,
           title: title || null,
           body: body || null,
           media_urls: mediaUrls.length > 0 ? mediaUrls : []
-        });
+        };
+
+        if (composePostType === 'evento') {
+          insertData.event_date = document.getElementById('compose-event-date').value || null;
+          insertData.event_time = document.getElementById('compose-event-time').value || null;
+          insertData.event_link = document.getElementById('compose-event-link').value || null;
+        } else if (composePostType === 'en_vivo') {
+          insertData.live_platform = document.getElementById('compose-live-platform').value || null;
+          insertData.live_url = document.getElementById('compose-live-url').value || null;
+        }
+
+        const { error } = await sb.from('community_posts').insert(insertData);
 
         if (error) throw error;
         closeCompose();
