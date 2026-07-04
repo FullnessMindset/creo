@@ -415,69 +415,37 @@
         <div id="meta-stages-section" class="space-y-4"></div>
       </div>
 
-      <!-- TAB: Posts -->
+      <!-- TAB: Posts (posts to Comunidad) -->
       <div id="panel-posts" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
-          <h3 class="font-bold text-gray-900">Publicar Video</h3>
-
-          <!-- Post Mode Selector -->
-          <div class="flex bg-gray-100 rounded-lg p-1 gap-1">
-            <button onclick="setPostMode('upload')" id="pm-upload" class="flex-1 py-2 text-xs font-semibold rounded-md text-center transition bg-white text-gray-900 shadow-sm">Subir Video</button>
-            <button onclick="setPostMode('record')" id="pm-record" class="flex-1 py-2 text-xs font-semibold rounded-md text-center transition text-gray-500">Grabar</button>
-            <button onclick="setPostMode('url')" id="pm-url" class="flex-1 py-2 text-xs font-semibold rounded-md text-center transition text-gray-500">URL (YouTube, TikTok)</button>
+          <h3 class="font-bold text-gray-900">Nueva Publicación</h3>
+          <p class="text-[10px] text-gray-400">Tu publicación aparecerá en la Comunidad para que todos la vean.</p>
+          <input id="post-title" type="text" placeholder="Título (opcional)" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm font-semibold">
+          <textarea id="post-body" placeholder="¿Qué quieres compartir con la comunidad?" rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+          <!-- Media preview -->
+          <div id="post-media-preview" class="hidden flex gap-2 overflow-x-auto"></div>
+          <!-- Media buttons -->
+          <div class="flex items-center gap-3 border-t border-gray-100 pt-3">
+            <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-green-600 transition">
+              <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              Foto
+              <input type="file" accept="image/*" multiple class="hidden" onchange="handlePostMedia(this, 'image')">
+            </label>
+            <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition">
+              <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg>
+              Video
+              <input type="file" accept="video/*" class="hidden" onchange="handlePostMedia(this, 'video')">
+            </label>
+            <button onclick="startPostRecording('video')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition">
+              <svg class="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
+              Grabar Video
+            </button>
+            <button onclick="startPostRecording('audio')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-amber-500 transition">
+              <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
+              Grabar Audio
+            </button>
           </div>
-
-          <!-- Mode: URL -->
-          <div id="post-mode-url" class="hidden">
-            <input id="post-url" type="url" placeholder="URL del video (YouTube, TikTok, Instagram)" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
-          </div>
-
-          <!-- Mode: Upload -->
-          <div id="post-mode-upload" class="space-y-3">
-            <div id="upload-drop-zone" class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-creo-mint transition" onclick="document.getElementById('post-video-file').click()">
-              <svg class="w-10 h-10 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-              <p class="text-sm text-gray-500">Toca para seleccionar un video</p>
-              <p class="text-[10px] text-gray-400 mt-1">MP4, MOV, WebM. Max 50MB</p>
-            </div>
-            <input type="file" id="post-video-file" accept="video/*" class="hidden" onchange="handleVideoFileSelect(this)">
-            <div id="upload-preview" class="hidden rounded-xl overflow-hidden bg-black">
-              <video id="upload-video-preview" class="w-full max-h-64 mx-auto" controls></video>
-            </div>
-            <div id="upload-progress" class="hidden">
-              <div class="flex items-center gap-3">
-                <div class="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
-                  <div id="upload-progress-bar" class="bg-creo-mint h-full rounded-full transition-all duration-300" style="width:0%"></div>
-                </div>
-                <span id="upload-progress-text" class="text-xs text-gray-500 font-medium">0%</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Mode: Record -->
-          <div id="post-mode-record" class="hidden space-y-3">
-            <div id="camera-container" class="relative rounded-xl overflow-hidden bg-black">
-              <video id="camera-preview" class="w-full max-h-64 mx-auto" autoplay muted playsinline></video>
-              <div id="rec-indicator" class="hidden absolute top-3 left-3 flex items-center gap-1.5 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-full">
-                <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span> REC
-              </div>
-              <div id="rec-timer" class="hidden absolute top-3 right-3 bg-black/60 text-white text-xs font-mono px-2 py-1 rounded">00:00</div>
-            </div>
-            <div id="recorded-preview" class="hidden rounded-xl overflow-hidden bg-black">
-              <video id="recorded-video" class="w-full max-h-64 mx-auto" controls></video>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="toggleRecording()" id="rec-btn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-lg font-semibold transition text-sm flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
-                Iniciar Grabación
-              </button>
-              <button onclick="switchCamera()" id="switch-cam-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 p-2.5 rounded-lg transition" title="Cambiar cámara">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-              </button>
-            </div>
-            <p class="text-[10px] text-gray-400 text-center">Max 2 minutos. El video se sube automáticamente.</p>
-          </div>
-
-          <textarea id="post-caption" placeholder="Escribe un caption..." rows="2" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+          <div id="post-upload-status" class="hidden text-xs text-creo-purple font-semibold"></div>
           <button onclick="createPost()" id="create-post-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Publicar</button>
         </div>
         <div id="posts-list" class="space-y-3"></div>
@@ -2308,222 +2276,185 @@
     }
 
     // POSTS
-    let postMode = 'upload';
-    let uploadedVideoUrl = null;
-    let mediaStream = null;
-    let mediaRecorder = null;
-    let recordedChunks = [];
-    let recordedBlob = null;
-    let isRecording = false;
-    let recTimerInterval = null;
-    let recSeconds = 0;
-    let facingMode = 'user';
-
-    function setPostMode(mode) {
-      postMode = mode;
-      ['url', 'upload', 'record'].forEach(m => {
-        document.getElementById('post-mode-' + m).classList.toggle('hidden', m !== mode);
-        const btn = document.getElementById('pm-' + m);
-        if (m === mode) { btn.className = 'flex-1 py-2 text-xs font-semibold rounded-md text-center transition bg-white text-gray-900 shadow-sm'; }
-        else { btn.className = 'flex-1 py-2 text-xs font-semibold rounded-md text-center transition text-gray-500'; }
-      });
-      uploadedVideoUrl = null;
-      recordedBlob = null;
-      if (mode === 'record') startCamera();
-      else stopCamera();
-    }
-
-    function handleVideoFileSelect(input) {
-      const file = input.files[0];
-      if (!file) return;
-      if (file.size > 50 * 1024 * 1024) return showToast('Video max 50MB', 'error');
-      const preview = document.getElementById('upload-video-preview');
-      preview.src = URL.createObjectURL(file);
-      document.getElementById('upload-preview').classList.remove('hidden');
-      document.getElementById('upload-drop-zone').classList.add('hidden');
-    }
-
-    async function uploadVideoFile(file) {
-      const ext = file.name ? file.name.split('.').pop() : 'webm';
-      const path = `${currentUser.id}/${Date.now()}.${ext}`;
-      document.getElementById('upload-progress').classList.remove('hidden');
-      document.getElementById('upload-progress-bar').style.width = '10%';
-      document.getElementById('upload-progress-text').textContent = '10%';
-
-      const { data, error } = await sb.storage.from('videos').upload(path, file, { upsert: true });
-
-      if (error) {
-        document.getElementById('upload-progress').classList.add('hidden');
-        throw error;
-      }
-
-      document.getElementById('upload-progress-bar').style.width = '100%';
-      document.getElementById('upload-progress-text').textContent = '100%';
-
-      const { data: urlData } = sb.storage.from('videos').getPublicUrl(path);
-      return urlData.publicUrl;
-    }
-
-    async function startCamera() {
-      try {
-        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-        mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode }, audio: true });
-        const preview = document.getElementById('camera-preview');
-        preview.srcObject = mediaStream;
-        document.getElementById('camera-container').classList.remove('hidden');
-        document.getElementById('recorded-preview').classList.add('hidden');
-      } catch (e) {
-        showToast('No se pudo acceder a la cámara: ' + e.message, 'error');
-      }
-    }
-
-    function stopCamera() {
-      if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; }
-      if (isRecording) stopRecording();
-    }
-
-    function switchCamera() {
-      facingMode = facingMode === 'user' ? 'environment' : 'user';
-      if (postMode === 'record' && !isRecording) startCamera();
-    }
-
-    function toggleRecording() {
-      if (isRecording) stopRecording();
-      else startRecording();
-    }
-
-    function startRecording() {
-      if (!mediaStream) return showToast('Cámara no disponible', 'error');
-      recordedChunks = [];
-      recordedBlob = null;
-      recSeconds = 0;
-
-      const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus' :
-        MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : 'video/mp4';
-
-      mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
-      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
-      mediaRecorder.onstop = () => {
-        recordedBlob = new Blob(recordedChunks, { type: mimeType });
-        const url = URL.createObjectURL(recordedBlob);
-        document.getElementById('recorded-video').src = url;
-        document.getElementById('recorded-preview').classList.remove('hidden');
-        document.getElementById('camera-container').classList.add('hidden');
-      };
-
-      mediaRecorder.start(1000);
-      isRecording = true;
-      document.getElementById('rec-indicator').classList.remove('hidden');
-      document.getElementById('rec-timer').classList.remove('hidden');
-      document.getElementById('rec-btn').innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg> Detener';
-      document.getElementById('rec-btn').className = 'flex-1 bg-gray-800 hover:bg-gray-900 text-white py-2.5 rounded-lg font-semibold transition text-sm flex items-center justify-center gap-2';
-
-      recTimerInterval = setInterval(() => {
-        recSeconds++;
-        const m = String(Math.floor(recSeconds / 60)).padStart(2, '0');
-        const s = String(recSeconds % 60).padStart(2, '0');
-        document.getElementById('rec-timer').textContent = m + ':' + s;
-        if (recSeconds >= 120) stopRecording();
-      }, 1000);
-    }
-
-    function stopRecording() {
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-      isRecording = false;
-      clearInterval(recTimerInterval);
-      document.getElementById('rec-indicator').classList.add('hidden');
-      document.getElementById('rec-timer').classList.add('hidden');
-      document.getElementById('rec-btn').innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg> Grabar de Nuevo';
-      document.getElementById('rec-btn').className = 'flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-lg font-semibold transition text-sm flex items-center justify-center gap-2';
-      stopCamera();
-    }
-
     let myPostsCache = [];
     let myMetasCache = [];
     let myBizLinksCache = [];
 
-    const DUMMY_POSTS = [
-      { id:'dp1', caption:'Mi proceso creativo para el mural del centro 🎨', video_type:'youtube', video_url:'https://youtube.com/watch?v=demo1', created_at:'2026-06-28T10:00:00Z', isDummy:true },
-      { id:'dp2', caption:'Tutorial rápido: cómo mezclar colores acrílicos', video_type:'tiktok', video_url:'https://tiktok.com/@demo/video/123', created_at:'2026-06-25T15:30:00Z', isDummy:true },
-    ];
+    let postMediaFiles = [];
 
-    function renderPostCard(p, isDummy) {
-      const badge = isDummy ? ' <span class="text-[10px]">🤖</span>' : '';
-      const deleteBtn = isDummy ? '' : `<div class="flex gap-1">
-        <button onclick="editPost('${p.id}')" class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-600">Editar</button>
-        <button onclick="deletePost('${p.id}')" class="text-xs px-2 py-1 rounded bg-red-100 text-red-600">Eliminar</button>
-      </div>`;
-      const isDirectVideo = p.video_type === 'direct' && p.video_url && !p.video_url.includes('youtube') && !p.video_url.includes('tiktok');
-      const videoHtml = isDummy
-        ? `<div class="w-full aspect-video rounded-lg bg-gray-100 flex items-center justify-center"><svg class="w-12 h-12 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>`
-        : isDirectVideo
-          ? `<video src="${esc(p.video_url)}" class="w-full aspect-video rounded-lg" controls preload="metadata"></video>`
-          : getEmbedHTML(p.video_url, p.video_type, 'aspect-video');
-      return `<div class="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
-        <div class="flex justify-between items-start">
-          <div class="flex-1 mr-3"><p class="text-sm font-medium text-gray-900 truncate">${esc(p.caption || 'Sin caption')}${badge}</p><p class="text-xs text-gray-400 mt-1">${p.video_type} · ${new Date(p.created_at).toLocaleDateString()}</p></div>
-          ${deleteBtn}
-        </div>
-        <div class="rounded-lg overflow-hidden">${videoHtml}</div>
-      </div>`;
+    function handlePostMedia(input, type) {
+      const files = Array.from(input.files);
+      postMediaFiles.push(...files);
+      input.value = '';
+      renderPostMediaPreview();
+    }
+
+    function renderPostMediaPreview() {
+      const container = document.getElementById('post-media-preview');
+      if (postMediaFiles.length === 0) { container.classList.add('hidden'); return; }
+      container.classList.remove('hidden');
+      container.innerHTML = postMediaFiles.map((f, i) => {
+        const url = URL.createObjectURL(f);
+        const isVid = f.type.startsWith('video');
+        const isAudio = f.type.startsWith('audio');
+        let preview = '';
+        if (isVid) preview = `<video src="${url}" class="w-full h-full object-cover"></video>`;
+        else if (isAudio) preview = `<div class="w-full h-full bg-gray-100 flex items-center justify-center"><svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg></div>`;
+        else preview = `<img src="${url}" class="w-full h-full object-cover">`;
+        return `<div class="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
+          ${preview}
+          <button onclick="removePostMedia(${i})" class="absolute top-0.5 right-0.5 w-5 h-5 bg-black/60 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-500">✕</button>
+        </div>`;
+      }).join('');
+    }
+
+    function removePostMedia(idx) {
+      postMediaFiles.splice(idx, 1);
+      renderPostMediaPreview();
+    }
+
+    function startPostRecording(type) {
+      const isVideo = type === 'video';
+      const constraints = isVideo ? { video: { facingMode: 'user' }, audio: true } : { audio: true };
+      navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+        const modal = document.createElement('div');
+        modal.id = 'post-rec-modal';
+        modal.className = 'fixed inset-0 z-[200] flex items-center justify-center';
+        modal.innerHTML = `
+          <div class="absolute inset-0 bg-black/70" onclick="cancelPostRecording()"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl p-5 w-80 space-y-4 z-10">
+            <h3 class="font-bold text-center text-gray-900">${isVideo ? 'Grabando Video' : 'Grabando Audio'}</h3>
+            ${isVideo ? '<video id="post-rec-preview" autoplay playsinline muted class="w-full rounded-xl bg-black aspect-video"></video>' :
+            '<div class="flex items-center justify-center py-6"><div class="w-16 h-16 rounded-full bg-red-500 animate-pulse flex items-center justify-center"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg></div></div>'}
+            <p id="post-rec-timer" class="text-center text-sm font-mono text-gray-500">00:00</p>
+            <div class="flex gap-2">
+              <button onclick="cancelPostRecording()" class="flex-1 py-2 rounded-xl border text-sm font-semibold text-gray-600 hover:bg-gray-50">Cancelar</button>
+              <button onclick="savePostRecording('${type}')" class="flex-1 py-2 rounded-xl bg-creo-mint text-creo-purple text-sm font-bold hover:opacity-90">Guardar</button>
+            </div>
+          </div>`;
+        document.body.appendChild(modal);
+        if (isVideo) document.getElementById('post-rec-preview').srcObject = stream;
+
+        const mimeType = isVideo
+          ? (MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm')
+          : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg');
+        window._postRecChunks = [];
+        window._postRecorder = new MediaRecorder(stream, { mimeType });
+        window._postRecorder.ondataavailable = e => { if (e.data.size > 0) window._postRecChunks.push(e.data); };
+        window._postRecorder.start(100);
+        window._postRecStream = stream;
+        let secs = 0;
+        window._postRecTimer = setInterval(() => {
+          secs++;
+          const el = document.getElementById('post-rec-timer');
+          if (el) el.textContent = String(Math.floor(secs/60)).padStart(2,'0') + ':' + String(secs%60).padStart(2,'0');
+        }, 1000);
+      }).catch(err => showToast('No se pudo acceder: ' + err.message, 'error'));
+    }
+
+    function cancelPostRecording() {
+      if (window._postRecorder && window._postRecorder.state !== 'inactive') window._postRecorder.stop();
+      clearInterval(window._postRecTimer);
+      if (window._postRecStream) window._postRecStream.getTracks().forEach(t => t.stop());
+      window._postRecChunks = [];
+      const m = document.getElementById('post-rec-modal');
+      if (m) m.remove();
+    }
+
+    async function savePostRecording(type) {
+      if (!window._postRecorder) return;
+      clearInterval(window._postRecTimer);
+      const done = new Promise(r => { window._postRecorder.onstop = r; window._postRecorder.stop(); });
+      await done;
+      window._postRecStream.getTracks().forEach(t => t.stop());
+      const isVid = type === 'video';
+      const blob = new Blob(window._postRecChunks, { type: isVid ? 'video/webm' : 'audio/webm' });
+      const file = new File([blob], (isVid ? 'video-' : 'audio-') + Date.now() + '.webm', { type: blob.type });
+      postMediaFiles.push(file);
+      renderPostMediaPreview();
+      window._postRecChunks = [];
+      const m = document.getElementById('post-rec-modal');
+      if (m) m.remove();
+      showToast('Grabación lista', 'success');
     }
 
     async function loadPosts() {
-      const { data } = await sb.from('posts').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false });
+      const { data } = await sb.from('community_posts').select('*').eq('author_id', currentUser.id).order('created_at', { ascending: false });
       const list = document.getElementById('posts-list');
       if (!data || data.length === 0) {
         myPostsCache = [];
-        list.innerHTML = DUMMY_POSTS.map(p => renderPostCard(p, true)).join('');
+        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Aún no tienes publicaciones</p>';
         return;
       }
       myPostsCache = data;
-      list.innerHTML = data.map(p => renderPostCard(p, false)).join('');
+      list.innerHTML = data.map(p => {
+        const mediaHtml = (p.media_urls || []).map(url => {
+          const isVid = /\.(mp4|webm|mov)$/i.test(url);
+          return isVid
+            ? `<video src="${esc(url)}" class="w-full max-h-48 object-contain bg-black rounded-lg" controls preload="metadata"></video>`
+            : `<img src="${esc(url)}" class="w-full max-h-48 object-contain rounded-lg">`;
+        }).join('');
+        return `<div class="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
+          <div class="flex justify-between items-start">
+            <div class="flex-1 mr-3">
+              ${p.title ? `<p class="text-sm font-bold text-gray-900">${esc(p.title)}</p>` : ''}
+              ${p.body ? `<p class="text-sm text-gray-700">${esc(p.body)}</p>` : ''}
+              <p class="text-[10px] text-gray-400 mt-1">${p.post_type} · ${new Date(p.created_at).toLocaleDateString()}</p>
+            </div>
+            <div class="flex gap-1">
+              <button onclick="editCommunityPostDash('${p.id}')" class="text-gray-400 hover:text-creo-purple p-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
+              <button onclick="deletePost('${p.id}')" class="text-gray-400 hover:text-red-500 p-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+            </div>
+          </div>
+          ${mediaHtml ? `<div class="space-y-2">${mediaHtml}</div>` : ''}
+        </div>`;
+      }).join('');
     }
 
     async function createPost() {
       const btn = document.getElementById('create-post-btn');
       btn.innerText = 'Publicando...'; btn.disabled = true;
-      const caption = document.getElementById('post-caption').value.trim();
-
-      let video_url = '';
-      let video_type = 'direct';
+      const title = document.getElementById('post-title').value.trim();
+      const body = document.getElementById('post-body').value.trim();
+      if (!body && postMediaFiles.length === 0) {
+        btn.innerText = 'Publicar'; btn.disabled = false;
+        return showToast('Escribe algo o agrega media', 'error');
+      }
 
       try {
-        if (postMode === 'url') {
-          video_url = document.getElementById('post-url').value.trim();
-          if (!video_url) { btn.innerText = 'Publicar'; btn.disabled = false; return showToast('Ingresa la URL del video', 'error'); }
-          video_type = detectVideoType(video_url);
-
-        } else if (postMode === 'upload') {
-          const fileInput = document.getElementById('post-video-file');
-          const file = fileInput.files[0];
-          if (!file) { btn.innerText = 'Publicar'; btn.disabled = false; return showToast('Selecciona un video primero', 'error'); }
-          showToast('Subiendo video...', 'info');
-          video_url = await uploadVideoFile(file);
-          video_type = 'direct';
-
-        } else if (postMode === 'record') {
-          if (!recordedBlob) { btn.innerText = 'Publicar'; btn.disabled = false; return showToast('Graba un video primero', 'error'); }
-          showToast('Subiendo grabación...', 'info');
-          const file = new File([recordedBlob], `recording_${Date.now()}.webm`, { type: recordedBlob.type });
-          video_url = await uploadVideoFile(file);
-          video_type = 'direct';
+        const status = document.getElementById('post-upload-status');
+        let mediaUrls = [];
+        if (postMediaFiles.length > 0) {
+          status.classList.remove('hidden');
+          for (let i = 0; i < postMediaFiles.length; i++) {
+            status.textContent = `Subiendo ${i+1}/${postMediaFiles.length}...`;
+            const maxMB = postMediaFiles[i].type.startsWith('video') ? 50 : 10;
+            const url = await uploadToStorage(postMediaFiles[i], 'community-media', maxMB);
+            if (url) mediaUrls.push(url);
+          }
+          status.classList.add('hidden');
         }
 
-        const { error } = await sb.from('posts').insert([{ creator_id: currentUser.id, video_url, video_type, caption }]);
+        const postType = postMediaFiles.length > 0
+          ? (postMediaFiles[0].type.startsWith('video') ? 'video' : postMediaFiles[0].type.startsWith('audio') ? 'text' : 'photo')
+          : 'text';
+
+        const { error } = await sb.from('community_posts').insert({
+          author_id: currentUser.id,
+          post_type: postType,
+          title: title || null,
+          body: body || null,
+          media_urls: mediaUrls.length > 0 ? mediaUrls : []
+        });
+
         btn.innerText = 'Publicar'; btn.disabled = false;
         if (error) return showToast(error.message, 'error');
 
-        document.getElementById('post-url').value = '';
-        document.getElementById('post-caption').value = '';
-        document.getElementById('post-video-file').value = '';
-        document.getElementById('upload-preview').classList.add('hidden');
-        document.getElementById('upload-drop-zone').classList.remove('hidden');
-        document.getElementById('upload-progress').classList.add('hidden');
-        document.getElementById('recorded-preview').classList.add('hidden');
-        uploadedVideoUrl = null;
-        recordedBlob = null;
-        showToast('Video publicado', 'success');
+        document.getElementById('post-title').value = '';
+        document.getElementById('post-body').value = '';
+        postMediaFiles = [];
+        renderPostMediaPreview();
+        showToast('¡Publicado en Comunidad!', 'success');
         loadPosts();
       } catch (e) {
         btn.innerText = 'Publicar'; btn.disabled = false;
@@ -2531,9 +2462,14 @@
       }
     }
 
-    async function deletePost(id) { if (!confirm('¿Eliminar?')) return; await sb.from('posts').delete().eq('id', id); showToast('Post eliminado', 'success'); loadPosts(); }
+    async function deletePost(id) {
+      if (!confirm('¿Eliminar?')) return;
+      await sb.from('community_posts').delete().eq('id', id);
+      showToast('Post eliminado', 'success');
+      loadPosts();
+    }
 
-    function editPost(id) {
+    function editCommunityPostDash(id) {
       const p = myPostsCache.find(x => x.id === id);
       if (!p) return;
       let existing = document.getElementById('edit-post-modal');
@@ -2551,12 +2487,12 @@
             </button>
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Caption</label>
-            <textarea id="edit-post-caption" rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(p.caption || '')}</textarea>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Título</label>
+            <input id="edit-post-title" type="text" value="${esc(p.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">URL del Video</label>
-            <input id="edit-post-url" type="text" value="${esc(p.video_url || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+            <label class="block text-xs font-medium text-gray-500 mb-1">Contenido</label>
+            <textarea id="edit-post-body" rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(p.body || '')}</textarea>
           </div>
           <div class="flex gap-3">
             <button onclick="savePostEdit('${p.id}')" id="save-post-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Cambios</button>
@@ -2569,10 +2505,9 @@
     async function savePostEdit(id) {
       const btn = document.getElementById('save-post-btn');
       btn.textContent = 'Guardando...'; btn.disabled = true;
-      const caption = document.getElementById('edit-post-caption').value.trim();
-      const video_url = document.getElementById('edit-post-url').value.trim();
-      const video_type = detectVideoType(video_url);
-      const { error } = await sb.from('posts').update({ caption, video_url, video_type }).eq('id', id).eq('creator_id', currentUser.id);
+      const title = document.getElementById('edit-post-title').value.trim();
+      const body = document.getElementById('edit-post-body').value.trim();
+      const { error } = await sb.from('community_posts').update({ title: title || null, body: body || null, updated_at: new Date().toISOString() }).eq('id', id).eq('author_id', currentUser.id);
       btn.textContent = 'Guardar Cambios'; btn.disabled = false;
       if (error) { showToast('Error: ' + error.message, 'error'); return; }
       document.getElementById('edit-post-modal').remove();
@@ -2583,15 +2518,12 @@
     // STATS
     async function loadCreatorStats(userId) {
       const [postsRes, metasRes] = await Promise.all([
-        sb.from('posts').select('id, like_count, comment_count').eq('creator_id', userId),
+        sb.from('community_posts').select('id', { count: 'exact', head: true }).eq('author_id', userId),
         sb.from('metas').select('id', { count: 'exact', head: true }).eq('creator_id', userId)
       ]);
-      const posts = postsRes.data || [];
-      const totalLikes = posts.reduce((sum, p) => sum + (p.like_count || 0), 0);
-      const totalComments = posts.reduce((sum, p) => sum + (p.comment_count || 0), 0);
-      document.getElementById('stat-posts').textContent = posts.length;
-      document.getElementById('stat-likes').textContent = totalLikes;
-      document.getElementById('stat-comments').textContent = totalComments;
+      document.getElementById('stat-posts').textContent = postsRes.count || 0;
+      document.getElementById('stat-likes').textContent = 0;
+      document.getElementById('stat-comments').textContent = 0;
       document.getElementById('stat-metas').textContent = metasRes.count || 0;
       document.getElementById('creator-stats').classList.remove('hidden');
     }
