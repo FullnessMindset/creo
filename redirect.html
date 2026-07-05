@@ -124,43 +124,47 @@
       setStatus('Incompleto', 'Onboarding incompleto. Redirigiendo para reintentar...', 'text-yellow-600');
       setTimeout(() => { window.location.href = 'index.html'; }, 2500);
     } else {
-      (async () => {
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const hasHashToken = hashParams.get('access_token');
-        const hasCode = urlParams.get('code');
+      let redirectStarted = false;
 
-        if (hasHashToken || hasCode) {
-          setStatus('¡Cuenta verificada!', 'Redirigiendo en 3 segundos...');
-          startCountdown('index.html', 3);
-
-          try {
-            if (hasCode) {
-              const { data } = await sb.auth.exchangeCodeForSession(hasCode);
-              if (data?.user) await handleProfileSetup(data.user);
-            } else {
-              for (let i = 0; i < 5; i++) {
-                const { data: { session } } = await sb.auth.getSession();
-                if (session?.user) { await handleProfileSetup(session.user); break; }
-                await new Promise(r => setTimeout(r, 500));
-              }
-            }
-          } catch (e) { console.log('Profile setup deferred:', e); }
-        } else {
-          const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
-            if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
-              subscription.unsubscribe();
-              await handleAuthRedirect(session.user);
-            }
-          });
-
-          const { data: { session } } = await sb.auth.getSession();
-          if (session?.user) {
-            subscription.unsubscribe();
-            await handleAuthRedirect(session.user);
-          } else {
-            setTimeout(() => { window.location.href = 'index.html'; }, 5000);
-          }
+      function doRedirect(user) {
+        if (redirectStarted) return;
+        redirectStarted = true;
+        handleProfileSetup(user).catch(() => {});
+        if (isAdmin(user.email)) {
+          sessionStorage.setItem('admin_mode', 'true');
         }
+        setStatus('¡Cuenta verificada!', 'Redirigiendo en 3 segundos...');
+        startCountdown('index.html', 3);
+      }
+
+      const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
+        if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+          subscription.unsubscribe();
+          doRedirect(session.user);
+        }
+      });
+
+      (async () => {
+        const hasCode = urlParams.get('code');
+        if (hasCode) {
+          try {
+            const { data } = await sb.auth.exchangeCodeForSession(hasCode);
+            if (data?.user) doRedirect(data.user);
+          } catch (e) { console.log('Code exchange error:', e); }
+        }
+
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.user) {
+          subscription.unsubscribe();
+          doRedirect(session.user);
+        }
+
+        setTimeout(() => {
+          if (!redirectStarted) {
+            setStatus('Sesión no detectada', 'Redirigiendo...');
+            window.location.href = 'index.html';
+          }
+        }, 6000);
       })();
     }
   </script>
