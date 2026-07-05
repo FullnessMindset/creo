@@ -324,15 +324,16 @@ function renderBottomNav(activePage) {
     { id: 'biblioteca', label: 'Libros', href: 'biblioteca.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>' },
     { id: 'galeria', label: 'Galeria', href: 'galeria.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
     { id: 'post', label: 'Publicar', href: 'index.html#post', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>', authOnly: true },
-    { id: 'messages', label: 'Mensajes', href: 'messages.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' },
-    { id: 'profile', label: 'Perfil', href: 'index.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>' },
-    { id: 'dashboard', label: 'Panel', href: 'index.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>' },
+    { id: 'messages', label: 'Mensajes', href: 'messages.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>', authOnly: true },
+    { id: 'profile', label: 'Perfil', href: 'profile.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>' },
+    { id: 'dashboard', label: 'Panel', href: 'index.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>', authOnly: true }
   ];
   const inner = document.createElement('div');
   inner.className = 'max-w-2xl mx-auto flex justify-around items-center h-14';
   items.forEach(item => {
     const a = document.createElement('a');
     a.href = item.href;
+    a.setAttribute('data-nav-id', item.id);
     if (item.authOnly) a.setAttribute('data-auth-only', 'true');
     const isActive = activePage === item.id;
     a.className = `flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors ${isActive ? 'text-creo-purple' : 'text-gray-400 hover:text-gray-600'}`;
@@ -352,7 +353,7 @@ async function updateNavAuth() {
   if (user) {
     const { data } = await sb.from('profiles').select('username').eq('id', user.id).single();
     if (data && data.username) {
-      const perfil = document.querySelector('#bottom-nav a:nth-child(5)');
+      const perfil = document.querySelector('#bottom-nav [data-nav-id="profile"]');
       if (perfil) perfil.href = 'profile.html?u=' + data.username;
     }
     if (isAdmin(user.email)) {

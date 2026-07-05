@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CREO — Mensajes</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a0a3e">
+  <meta name="description" content="CREO — Mensajeria directa y grupos para creadores">
+  <meta property="og:title" content="CREO — Mensajes">
+  <meta property="og:description" content="Conecta con otros creadores. Mensajes directos y grupos en CREO.">
+  <meta property="og:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
+  <meta property="og:url" content="https://fullnessmindset.github.io/creo/messages.html">
   <link rel="icon" href="assets/logo-icon.png" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,250 +20,705 @@
     }
   </script>
   <style>
-    .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
-    .glass-dark { background: rgba(26,10,62,0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); }
+    body { overscroll-behavior: contain; }
+    .glass { background: rgba(255,255,255,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.4); }
+    .glass-dark { background: rgba(26,10,62,0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); }
+    .msg-scrollbar::-webkit-scrollbar { width: 4px; }
+    .msg-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+    .msg-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .convo-item { transition: background 0.15s ease; }
+    .convo-item:hover { background: rgba(51,240,176,0.08); }
+    .convo-item.active { background: rgba(51,240,176,0.15); }
+    @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade { animation: fade-in 0.25s ease-out; }
+    @keyframes pulse-record { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .pulse-rec { animation: pulse-record 1s ease-in-out infinite; }
+    .bubble-sent { border-radius: 18px 18px 4px 18px; }
+    .bubble-recv { border-radius: 18px 18px 18px 4px; }
+    .date-sep { display: flex; align-items: center; gap: 12px; }
+    .date-sep::before, .date-sep::after { content: ''; flex: 1; height: 1px; background: rgba(0,0,0,0.08); }
+    .dark .date-sep::before, .dark .date-sep::after { background: rgba(255,255,255,0.1); }
+    #msg-input { resize: none; max-height: 120px; overflow-y: auto; }
+    .attach-menu { transform-origin: bottom left; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
   <script src="shared.js"></script>
 
-  <div class="max-w-2xl mx-auto px-4 pt-6 pb-24 space-y-4">
-    <a href="index.html" class="flex items-center gap-3 no-underline">
-      <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow">
-        <img src="assets/logo-icon.png" alt="CREO" class="w-7 h-7 rounded-full object-contain">
-      </div>
-      <h1 class="text-xl font-bold text-creo-purple tracking-wider">Mensajes</h1>
-    </a>
-
-    <div id="auth-required" class="hidden glass p-8 rounded-2xl text-center space-y-3">
-      <p class="text-gray-500 text-sm">Inicia sesión para ver tus mensajes</p>
-      <a href="index.html" class="inline-block bg-creo-purple text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-creo-light transition">Iniciar Sesión</a>
+  <!-- Cookie Banner -->
+  <div id="cookie-banner" class="fixed bottom-20 left-4 right-4 z-[200] hidden">
+    <div class="max-w-lg mx-auto bg-creo-purple border border-white/10 rounded-2xl p-4 flex flex-col sm:flex-row items-center gap-3 shadow-2xl">
+      <p class="text-xs text-gray-300 flex-1">Usamos cookies para mejorar tu experiencia. Al continuar, aceptas nuestra <a href="privacidad.html" class="text-creo-mint underline">politica de privacidad</a>.</p>
+      <button onclick="acceptCookies()" class="bg-creo-mint text-black text-xs font-bold px-5 py-2 rounded-full hover:bg-creo-mintDark transition flex-shrink-0">Aceptar</button>
     </div>
-
-    <div id="conversations-list" class="space-y-2"></div>
-    <p id="no-messages" class="hidden text-center text-gray-400 text-sm py-8">No tienes mensajes aún</p>
   </div>
 
-  <!-- Chat Modal -->
-  <div id="chat-modal" class="fixed inset-0 z-[100] hidden">
-    <div class="absolute inset-0 bg-white flex flex-col" id="chat-bg">
-      <div class="p-4 border-b border-gray-200 flex items-center gap-3">
-        <button onclick="closeChat()" class="text-gray-400 hover:text-gray-600">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        </button>
-        <a id="chat-profile-link" href="#" class="w-10 h-10 rounded-full bg-creo-purple/10 overflow-hidden flex items-center justify-center hover:ring-2 hover:ring-creo-mint transition">
-          <div id="chat-avatar"></div>
+  <!-- Auth Required -->
+  <div id="auth-required" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+    <div class="glass dark:glass-dark p-10 rounded-3xl text-center space-y-4 max-w-sm mx-4">
+      <div class="w-16 h-16 rounded-full bg-creo-purple/10 flex items-center justify-center mx-auto">
+        <svg class="w-8 h-8 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+      </div>
+      <h2 class="text-lg font-bold text-creo-purple dark:text-creo-mint">Mensajes</h2>
+      <p class="text-gray-500 dark:text-gray-400 text-sm">Inicia sesion para enviar y recibir mensajes</p>
+      <a href="index.html" class="inline-block bg-creo-purple text-white px-8 py-2.5 rounded-xl text-sm font-semibold hover:bg-creo-light transition">Iniciar Sesion</a>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div id="app-container" class="hidden h-screen flex flex-col">
+
+    <!-- Top Bar (mobile) -->
+    <header class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 md:hidden">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="w-8 h-8 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center shadow-sm">
+          <img src="assets/logo-icon.png" alt="CREO" class="w-6 h-6 rounded-full object-contain">
         </a>
-        <div>
-          <a id="chat-profile-link-name" href="#" class="font-bold text-sm text-gray-900 hover:text-creo-purple transition block"><span id="chat-name"></span></a>
-          <p id="chat-username" class="text-[10px] text-gray-400"></p>
+        <h1 class="text-lg font-bold text-creo-purple dark:text-creo-mint tracking-wider">MENSAJES</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+          <svg class="w-5 h-5 text-gray-400 theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <svg class="w-5 h-5 text-gray-300 theme-icon-moon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <div id="notif-bell-header"></div>
+      </div>
+    </header>
+
+    <!-- Desktop/Tablet: side-by-side | Mobile: one at a time -->
+    <div class="flex-1 flex overflow-hidden">
+
+      <!-- LEFT PANEL: Conversation List -->
+      <div id="panel-list" class="w-full md:w-[360px] md:min-w-[320px] md:max-w-[400px] md:border-r border-gray-200 dark:border-gray-700 flex flex-col bg-white dark:bg-gray-900">
+        <!-- Desktop header -->
+        <div class="hidden md:flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center gap-3">
+            <a href="index.html" class="w-8 h-8 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center shadow-sm">
+              <img src="assets/logo-icon.png" alt="CREO" class="w-6 h-6 rounded-full object-contain">
+            </a>
+            <h1 class="text-lg font-bold text-creo-purple dark:text-creo-mint tracking-wider">MENSAJES</h1>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+              <svg class="w-5 h-5 text-gray-400 theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              <svg class="w-5 h-5 text-gray-300 theme-icon-moon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+            </button>
+            <div id="notif-bell-desktop"></div>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="px-3 pt-3 pb-2">
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input id="convo-search" type="text" placeholder="Buscar conversaciones..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-creo-mint/50 dark:text-white dark:placeholder-gray-500 transition" oninput="filterConversations(this.value)">
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="px-3 pb-2 flex gap-2">
+          <button onclick="openContactPicker()" class="flex-1 bg-creo-purple text-white text-xs font-semibold py-2 rounded-xl hover:bg-creo-light transition flex items-center justify-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+            Nuevo Mensaje
+          </button>
+          <button onclick="openGroupCreation()" class="flex-1 bg-creo-mint/15 text-creo-purple dark:text-creo-mint text-xs font-semibold py-2 rounded-xl hover:bg-creo-mint/25 transition flex items-center justify-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Nuevo Grupo
+          </button>
+        </div>
+
+        <!-- Conversation list -->
+        <div id="convo-list" class="flex-1 overflow-y-auto msg-scrollbar px-2 pb-20 space-y-0.5"></div>
+      </div>
+
+      <!-- RIGHT PANEL: Active Chat -->
+      <div id="panel-chat" class="hidden md:flex flex-1 flex-col bg-gray-50 dark:bg-gray-950">
+        <!-- Empty state (desktop) -->
+        <div id="chat-empty" class="flex-1 flex items-center justify-center">
+          <div class="text-center space-y-3 opacity-60">
+            <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <p class="text-sm text-gray-400 dark:text-gray-500">Selecciona una conversacion para comenzar</p>
+          </div>
+        </div>
+
+        <!-- Chat header -->
+        <div id="chat-header" class="hidden px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex items-center gap-3">
+          <button onclick="backToList()" class="md:hidden p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <a id="chat-avatar-link" href="#" class="w-10 h-10 rounded-full bg-creo-purple/10 overflow-hidden flex items-center justify-center flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition">
+            <div id="chat-avatar"></div>
+          </a>
+          <div class="flex-1 min-w-0">
+            <a id="chat-name-link" href="#" class="font-bold text-sm text-gray-900 dark:text-white hover:text-creo-purple dark:hover:text-creo-mint transition block truncate"></a>
+            <p id="chat-status" class="text-[10px] text-gray-400 dark:text-gray-500"></p>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="toggleChatInfo()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages area -->
+        <div id="chat-messages" class="hidden flex-1 overflow-y-auto msg-scrollbar px-4 py-3 space-y-2"></div>
+
+        <!-- Input bar -->
+        <div id="chat-input-bar" class="hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2">
+          <!-- Media preview -->
+          <div id="media-preview" class="hidden mb-2 flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-xl px-3 py-2 animate-fade">
+            <div id="media-preview-content" class="flex-1"></div>
+            <button onclick="cancelMedia()" class="text-red-400 hover:text-red-600 text-sm font-bold">&#10005;</button>
+          </div>
+          <!-- Recording indicator -->
+          <div id="recording-bar" class="hidden mb-2 flex items-center gap-3 bg-red-50 dark:bg-red-900/20 rounded-xl px-4 py-2.5 animate-fade">
+            <span class="w-3 h-3 rounded-full bg-red-500 pulse-rec"></span>
+            <span class="text-red-600 dark:text-red-400 text-sm font-medium">Grabando</span>
+            <span id="rec-timer" class="text-red-500 dark:text-red-400 text-xs font-mono ml-1">0:00</span>
+            <div class="flex-1"></div>
+            <button onclick="cancelRecording()" class="text-red-400 hover:text-red-600 text-xs font-semibold px-2 py-1 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition">Cancelar</button>
+            <button onclick="stopRecording()" class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full hover:bg-red-600 transition">Enviar</button>
+          </div>
+          <!-- Attachment menu -->
+          <div id="attach-menu" class="hidden mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-1 attach-menu animate-fade">
+            <button onclick="pickFile('image/*','image')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm text-gray-700 dark:text-gray-300">
+              <span class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center"><svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></span>
+              Foto
+            </button>
+            <button onclick="pickFile('video/*','video')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm text-gray-700 dark:text-gray-300">
+              <span class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center"><svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></span>
+              Video
+            </button>
+            <button onclick="startAudioRecording()" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm text-gray-700 dark:text-gray-300">
+              <span class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center"><svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg></span>
+              Audio
+            </button>
+            <button onclick="pickFile('*/*','document')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm text-gray-700 dark:text-gray-300">
+              <span class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span>
+              Documento
+            </button>
+          </div>
+          <!-- Input row -->
+          <div class="flex items-end gap-2">
+            <button id="msg-emoji-btn" class="p-2 text-xl hover:scale-110 transition self-end mb-0.5 cursor-pointer">&#128522;</button>
+            <button onclick="toggleAttachMenu()" class="p-2 text-gray-400 hover:text-creo-purple dark:hover:text-creo-mint transition self-end mb-0.5">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+            </button>
+            <button onclick="quickCapture()" class="p-2 text-gray-400 hover:text-creo-purple dark:hover:text-creo-mint transition self-end mb-0.5">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </button>
+            <textarea id="msg-input" rows="1" placeholder="Escribe un mensaje..." class="flex-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-2.5 text-sm outline-none focus:border-creo-mint dark:focus:border-creo-mint dark:text-white dark:placeholder-gray-500 transition" oninput="autoGrow(this)"></textarea>
+            <button onclick="sendMessage()" id="send-btn" class="w-10 h-10 rounded-full bg-creo-mint text-creo-purple flex items-center justify-center hover:bg-creo-mintDark transition self-end flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            </button>
+          </div>
         </div>
       </div>
-      <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
-      <div class="p-3 border-t border-gray-200 pb-safe">
-        <div id="chat-audio-preview" class="hidden mb-2 flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2">
-          <audio id="chat-audio-player" controls class="flex-1 h-8"></audio>
-          <button onclick="cancelAudio()" class="text-red-400 hover:text-red-600 text-xs">✕</button>
-        </div>
-        <div class="flex items-center gap-2">
-          <span id="chat-emoji-btn" class="cursor-pointer text-xl hover:scale-110 transition">😊</span>
-          <button onclick="toggleChatGif()" class="px-2 py-1 text-xs font-bold text-gray-400 hover:text-creo-purple border border-gray-200 rounded-lg hover:border-creo-mint transition">GIF</button>
-          <button onclick="toggleAudioRecord()" id="chat-audio-btn" class="text-gray-400 hover:text-red-500 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
+    </div>
+  </div>
+
+  <!-- Hidden file input -->
+  <input type="file" id="file-picker" class="hidden" onchange="handleFilePick(event)">
+
+  <!-- Contact Picker Modal -->
+  <div id="contact-modal" class="fixed inset-0 z-[110] hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeContactPicker()"></div>
+    <div class="absolute bottom-0 left-0 right-0 md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-md md:rounded-2xl bg-white dark:bg-gray-900 rounded-t-3xl max-h-[80vh] flex flex-col animate-fade shadow-2xl">
+      <div class="px-5 pt-5 pb-3 border-b border-gray-100 dark:border-gray-800">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-bold text-gray-900 dark:text-white">Nuevo Mensaje</h2>
+          <button onclick="closeContactPicker()" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
-          <input id="chat-input" type="text" placeholder="Escribe un mensaje..." class="flex-1 bg-gray-100 border border-gray-200 rounded-full px-4 py-2 text-sm outline-none focus:border-creo-mint">
-          <button onclick="sendMessage()" class="bg-creo-mint text-creo-purple font-bold px-4 py-2 rounded-full text-sm hover:bg-creo-mintDark transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+        </div>
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input id="contact-search" type="text" placeholder="Buscar personas..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-creo-mint/50 dark:text-white dark:placeholder-gray-500" oninput="searchContacts(this.value)">
+        </div>
+      </div>
+      <div id="contact-results" class="flex-1 overflow-y-auto msg-scrollbar p-2 space-y-0.5"></div>
+    </div>
+  </div>
+
+  <!-- Group Creation Modal -->
+  <div id="group-modal" class="fixed inset-0 z-[110] hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeGroupCreation()"></div>
+    <div class="absolute bottom-0 left-0 right-0 md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-lg md:rounded-2xl bg-white dark:bg-gray-900 rounded-t-3xl max-h-[85vh] flex flex-col animate-fade shadow-2xl">
+      <div class="px-5 pt-5 pb-3 border-b border-gray-100 dark:border-gray-800">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-bold text-gray-900 dark:text-white">Crear Grupo</h2>
+          <button onclick="closeGroupCreation()" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
-        <div id="chat-gif-picker" class="hidden mt-2 bg-white border border-gray-200 rounded-xl p-2 max-h-48 overflow-y-auto glass">
-          <input id="chat-gif-search" type="text" placeholder="Buscar GIF..." class="w-full bg-gray-100 rounded-lg px-3 py-2 text-xs mb-2 outline-none" oninput="searchChatGifs(this.value)">
-          <div id="chat-gif-results" class="grid grid-cols-3 gap-1"></div>
-          <p class="text-[9px] text-gray-300 text-center mt-1">Powered by GIPHY</p>
+      </div>
+      <div class="flex-1 overflow-y-auto msg-scrollbar p-5 space-y-4">
+        <!-- Group avatar -->
+        <div class="flex items-center gap-4">
+          <div id="group-avatar-preview" class="w-16 h-16 rounded-full bg-creo-purple/10 flex items-center justify-center flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-creo-mint transition overflow-hidden" onclick="document.getElementById('group-avatar-input').click()">
+            <svg class="w-7 h-7 text-creo-purple/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <input type="file" id="group-avatar-input" accept="image/*" class="hidden" onchange="previewGroupAvatar(event)">
+          <div class="flex-1">
+            <input id="group-name-input" type="text" placeholder="Nombre del grupo" class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-xl px-4 py-2.5 text-sm font-semibold outline-none focus:ring-2 focus:ring-creo-mint/50 dark:text-white dark:placeholder-gray-500">
+          </div>
         </div>
-        <div id="chat-recording-indicator" class="hidden mt-2 flex items-center gap-2 text-red-500 text-xs">
-          <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Grabando audio...
-          <button onclick="stopAudioRecord()" class="ml-auto bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-semibold">Detener</button>
+        <!-- Group description -->
+        <div>
+          <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 block">Reglas / Descripcion</label>
+          <textarea id="group-rules-input" rows="3" placeholder="Describe el proposito del grupo..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-creo-mint/50 dark:text-white dark:placeholder-gray-500 resize-none"></textarea>
         </div>
+        <!-- Member selector -->
+        <div>
+          <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 block">Miembros</label>
+          <div id="group-selected-members" class="flex flex-wrap gap-2 mb-2"></div>
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input id="group-member-search" type="text" placeholder="Buscar miembros..." class="w-full bg-gray-100 dark:bg-gray-800 border-none rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-creo-mint/50 dark:text-white dark:placeholder-gray-500" oninput="searchGroupMembers(this.value)">
+          </div>
+          <div id="group-member-results" class="mt-2 space-y-0.5 max-h-40 overflow-y-auto msg-scrollbar"></div>
+        </div>
+      </div>
+      <div class="px-5 py-4 border-t border-gray-100 dark:border-gray-800">
+        <button onclick="createGroup()" class="w-full bg-creo-purple text-white font-bold py-3 rounded-xl hover:bg-creo-light transition text-sm">Crear Grupo</button>
       </div>
     </div>
   </div>
 
   <script>
+    /* ========== STATE ========== */
     let currentUser = null;
-    let activeChatUser = null;
-    let chatPolling = null;
+    let activeConvo = null;
+    let conversations = [];
     let recorder = null;
     let audioBlob = null;
+    let mediaFile = null;
+    let mediaType = null;
+    let recInterval = null;
+    let recSeconds = 0;
+    let selectedGroupMembers = [];
+    let groupAvatarFile = null;
 
-    async function init() {
-      const { data: { user } } = await sb.auth.getUser();
-      if (!user) {
-        document.getElementById('auth-required').classList.remove('hidden');
-        return;
+    const DEMO_CONTACTS = [
+      { id: 'c1', username: 'carlosrivera', display_name: 'Carlos Rivera', avatar_url: 'https://picsum.photos/seed/avatar1/100/100', verification_status: 'approved' },
+      { id: 'c2', username: 'mariasantos', display_name: 'Maria Santos', avatar_url: 'https://picsum.photos/seed/avatar2/100/100', verification_status: 'approved' },
+      { id: 'c3', username: 'andresmolina', display_name: 'Andres Molina', avatar_url: 'https://picsum.photos/seed/avatar3/100/100', verification_status: 'approved' },
+      { id: 'c4', username: 'valentinacruz', display_name: 'Valentina Cruz', avatar_url: 'https://picsum.photos/seed/avatar6/100/100', verification_status: 'approved' },
+      { id: 'c5', username: 'diegoherrera', display_name: 'Diego Herrera', avatar_url: 'https://picsum.photos/seed/avatar5/100/100', verification_status: 'approved' },
+      { id: 'c6', username: 'anabelenrios', display_name: 'Ana Belen Rios', avatar_url: 'https://picsum.photos/seed/avatar8/100/100', verification_status: 'approved' }
+    ];
+
+    /* ========== DEMO DATA ========== */
+    const now = Date.now();
+    const h = n => now - n * 3600000;
+    const m = n => now - n * 60000;
+
+    const DEMO_CONVERSATIONS = [
+      {
+        id: 'conv1', type: 'dm', name: 'Carlos Rivera', avatar_url: 'https://picsum.photos/seed/avatar1/100/100',
+        username: 'carlosrivera', status: 'en linea', unread: 2,
+        members: [],
+        messages: [
+          { id: 'm1', sender_id: 'c1', body: 'Oye, vi tu ultimo cortometraje. Increible cinematografia!', media_urls: [], created_at: new Date(h(48)).toISOString(), read: true },
+          { id: 'm2', sender_id: 'me', body: 'Gracias Carlos! Estuvimos filmando por tres semanas en la sierra.', media_urls: [], created_at: new Date(h(47)).toISOString(), read: true },
+          { id: 'm3', sender_id: 'c1', body: 'Se nota el esfuerzo. Los paisajes quedaron espectaculares.', media_urls: [], created_at: new Date(h(47) + 120000).toISOString(), read: true },
+          { id: 'm4', sender_id: 'c1', body: null, media_urls: ['https://picsum.photos/seed/film1/400/300'], created_at: new Date(h(46)).toISOString(), read: true },
+          { id: 'm5', sender_id: 'me', body: 'Esa foto es del dia que filmamos la escena del rio. Casi se nos cae la camara al agua jaja', media_urls: [], created_at: new Date(h(24)).toISOString(), read: true },
+          { id: 'm6', sender_id: 'c1', body: 'Jajaja clasico. Oye, estoy planeando un nuevo proyecto sobre musica tradicional. Te interesaria colaborar en la direccion de fotografia?', media_urls: [], created_at: new Date(h(2)).toISOString(), read: false },
+          { id: 'm7', sender_id: 'c1', body: 'Seria para filmar en agosto, tres dias en el pueblo de mi abuela.', media_urls: [], created_at: new Date(h(1)).toISOString(), read: false }
+        ]
+      },
+      {
+        id: 'conv2', type: 'dm', name: 'Maria Santos', avatar_url: 'https://picsum.photos/seed/avatar2/100/100',
+        username: 'mariasantos', status: 'ult. vez 3h', unread: 0,
+        members: [],
+        messages: [
+          { id: 'm10', sender_id: 'me', body: 'Maria, como va el documental sobre los artesanos?', media_urls: [], created_at: new Date(h(72)).toISOString(), read: true },
+          { id: 'm11', sender_id: 'c2', body: 'Vamos bien! Ya tenemos 40 minutos de material editado.', media_urls: [], created_at: new Date(h(71)).toISOString(), read: true },
+          { id: 'm12', sender_id: 'c2', body: null, media_urls: ['https://picsum.photos/seed/docu1/400/250'], created_at: new Date(h(71) + 60000).toISOString(), read: true },
+          { id: 'm13', sender_id: 'me', body: 'Wow se ve increible! El color grading esta perfecto.', media_urls: [], created_at: new Date(h(48)).toISOString(), read: true },
+          { id: 'm14', sender_id: 'c2', body: 'Gracias! Usamos DaVinci Resolve. La premiere sera en el festival de octubre.', media_urls: [], created_at: new Date(h(24)).toISOString(), read: true },
+          { id: 'm15', sender_id: 'me', body: 'Ahi estare sin falta. Cuentas conmigo para la promocion.', media_urls: [], created_at: new Date(h(5)).toISOString(), read: true }
+        ]
+      },
+      {
+        id: 'conv3', type: 'group', name: 'Creadores Cine Local', avatar_url: 'https://picsum.photos/seed/grp1/100/100',
+        username: null, status: '3 miembros', unread: 5,
+        rules: 'Grupo para coordinacion de proyectos de cine local. Respeto mutuo, sin spam.',
+        members: [
+          { id: 'c1', display_name: 'Carlos Rivera', avatar_url: 'https://picsum.photos/seed/avatar1/100/100' },
+          { id: 'c2', display_name: 'Maria Santos', avatar_url: 'https://picsum.photos/seed/avatar2/100/100' },
+          { id: 'c3', display_name: 'Andres Molina', avatar_url: 'https://picsum.photos/seed/avatar3/100/100' }
+        ],
+        messages: [
+          { id: 'm20', sender_id: 'c1', sender_name: 'Carlos', sender_avatar: 'https://picsum.photos/seed/avatar1/100/100', body: 'Equipo! Ya confirmaron las fechas del Festival de Cine Independiente: 15-18 de octubre.', media_urls: [], created_at: new Date(h(36)).toISOString(), read: true },
+          { id: 'm21', sender_id: 'c2', sender_name: 'Maria', sender_avatar: 'https://picsum.photos/seed/avatar2/100/100', body: 'Excelente! Yo voy a inscribir mi documental. Alguien mas va a participar?', media_urls: [], created_at: new Date(h(35)).toISOString(), read: true },
+          { id: 'm22', sender_id: 'c3', sender_name: 'Andres', sender_avatar: 'https://picsum.photos/seed/avatar3/100/100', body: 'Yo tengo mi corto casi listo. Solo falta la mezcla de sonido.', media_urls: [], created_at: new Date(h(34)).toISOString(), read: true },
+          { id: 'm23', sender_id: 'me', body: 'Genial! Podemos hacer una proyeccion previa el fin de semana anterior para dar feedback.', media_urls: [], created_at: new Date(h(10)).toISOString(), read: true },
+          { id: 'm24', sender_id: 'c1', sender_name: 'Carlos', sender_avatar: 'https://picsum.photos/seed/avatar1/100/100', body: null, media_urls: ['https://picsum.photos/seed/fest1/400/250'], created_at: new Date(h(5)).toISOString(), read: false },
+          { id: 'm25', sender_id: 'c1', sender_name: 'Carlos', sender_avatar: 'https://picsum.photos/seed/avatar1/100/100', body: 'Les comparto el poster oficial del festival. Hay que promocionarlo!', media_urls: [], created_at: new Date(h(5) + 30000).toISOString(), read: false },
+          { id: 'm26', sender_id: 'c2', sender_name: 'Maria', sender_avatar: 'https://picsum.photos/seed/avatar2/100/100', body: 'Esta hermoso el poster! Lo comparto en mis redes ahora.', media_urls: [], created_at: new Date(h(3)).toISOString(), read: false },
+          { id: 'm27', sender_id: 'c3', sender_name: 'Andres', sender_avatar: 'https://picsum.photos/seed/avatar3/100/100', body: 'Listo, ya lo publique. Vamos con todo este festival!', media_urls: [], created_at: new Date(h(2)).toISOString(), read: false },
+          { id: 'm28', sender_id: 'c1', sender_name: 'Carlos', sender_avatar: 'https://picsum.photos/seed/avatar1/100/100', body: 'Reunamonos el sabado para planificar la logistica. Les parece a las 4pm?', media_urls: [], created_at: new Date(m(45)).toISOString(), read: false }
+        ]
+      },
+      {
+        id: 'conv4', type: 'group', name: 'Artistas del Valle', avatar_url: 'https://picsum.photos/seed/grp2/100/100',
+        username: null, status: '4 miembros', unread: 0,
+        rules: 'Comunidad de artistas visuales del Valle. Compartir trabajo, exhibiciones y oportunidades.',
+        members: [
+          { id: 'c4', display_name: 'Valentina Cruz', avatar_url: 'https://picsum.photos/seed/avatar6/100/100' },
+          { id: 'c5', display_name: 'Diego Herrera', avatar_url: 'https://picsum.photos/seed/avatar5/100/100' },
+          { id: 'c6', display_name: 'Ana Belen Rios', avatar_url: 'https://picsum.photos/seed/avatar8/100/100' },
+          { id: 'c3', display_name: 'Andres Molina', avatar_url: 'https://picsum.photos/seed/avatar3/100/100' }
+        ],
+        messages: [
+          { id: 'm30', sender_id: 'c4', sender_name: 'Valentina', sender_avatar: 'https://picsum.photos/seed/avatar6/100/100', body: 'Hola a todos! La galeria del centro cultural confirmo la exposicion colectiva para noviembre.', media_urls: [], created_at: new Date(h(96)).toISOString(), read: true },
+          { id: 'm31', sender_id: 'c5', sender_name: 'Diego', sender_avatar: 'https://picsum.photos/seed/avatar5/100/100', body: 'Que buena noticia! Cuantas piezas puede presentar cada artista?', media_urls: [], created_at: new Date(h(95)).toISOString(), read: true },
+          { id: 'm32', sender_id: 'c4', sender_name: 'Valentina', sender_avatar: 'https://picsum.photos/seed/avatar6/100/100', body: 'Maximo 3 piezas por artista. El espacio es grande pero quieren variedad.', media_urls: [], created_at: new Date(h(94)).toISOString(), read: true },
+          { id: 'm33', sender_id: 'c6', sender_name: 'Ana Belen', sender_avatar: 'https://picsum.photos/seed/avatar8/100/100', body: null, media_urls: ['https://picsum.photos/seed/art1/400/500'], created_at: new Date(h(72)).toISOString(), read: true },
+          { id: 'm34', sender_id: 'c6', sender_name: 'Ana Belen', sender_avatar: 'https://picsum.photos/seed/avatar8/100/100', body: 'Esta es una de las piezas que estoy considerando. Que opinan?', media_urls: [], created_at: new Date(h(72) + 30000).toISOString(), read: true },
+          { id: 'm35', sender_id: 'me', body: 'Ana Belen, esa pieza es impresionante! Los colores tienen mucha fuerza.', media_urls: [], created_at: new Date(h(48)).toISOString(), read: true },
+          { id: 'm36', sender_id: 'c3', sender_name: 'Andres', sender_avatar: 'https://picsum.photos/seed/avatar3/100/100', body: 'Totalmente de acuerdo. Yo voy a llevar mis fotografias de la serie "Raices".', media_urls: [], created_at: new Date(h(24)).toISOString(), read: true },
+          { id: 'm37', sender_id: 'c5', sender_name: 'Diego', sender_avatar: 'https://picsum.photos/seed/avatar5/100/100', body: 'Perfecto. Hay que empezar a coordinar el montaje. Propongo reunirnos la proxima semana.', media_urls: [], created_at: new Date(h(6)).toISOString(), read: true }
+        ]
       }
-      currentUser = user;
+    ];
+
+    /* ========== INIT ========== */
+    async function init() {
+      initTheme();
+      try {
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) { showAuthRequired(); return; }
+        currentUser = user;
+      } catch (e) {
+        currentUser = { id: 'me', email: 'demo@creo.app' };
+      }
+      document.getElementById('app-container').classList.remove('hidden');
+      document.getElementById('app-container').classList.add('flex');
       loadConversations();
-      setInterval(loadConversations, 10000);
+      try { createEmojiPicker('msg-input', 'msg-emoji-btn'); } catch(e) {}
+
+      // Cookie banner
+      if (!localStorage.getItem('creo-cookies-accepted')) {
+        document.getElementById('cookie-banner').classList.remove('hidden');
+      }
     }
 
-    async function loadConversations() {
-      if (!currentUser) return;
-      const { data: msgs } = await sb.from('messages')
-        .select('*, sender:sender_id(id, username, display_name, avatar_url), receiver:receiver_id(id, username, display_name, avatar_url)')
-        .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
-        .order('created_at', { ascending: false });
+    function acceptCookies() {
+      localStorage.setItem('creo-cookies-accepted', 'true');
+      document.getElementById('cookie-banner').classList.add('hidden');
+    }
 
-      if (!msgs || msgs.length === 0) {
-        document.getElementById('no-messages').classList.remove('hidden');
+    function showAuthRequired() {
+      document.getElementById('auth-required').classList.remove('hidden');
+      document.getElementById('app-container').classList.add('hidden');
+    }
+
+    /* ========== CONVERSATIONS LIST ========== */
+    async function loadConversations() {
+      let convos = [];
+      try {
+        const { data: dbConvos, error } = await sb.from('conversations')
+          .select('*, conversation_members!inner(user_id)')
+          .eq('conversation_members.user_id', currentUser.id);
+        if (dbConvos && dbConvos.length > 0) {
+          convos = dbConvos;
+        }
+      } catch(e) {}
+
+      if (convos.length === 0) {
+        conversations = DEMO_CONVERSATIONS;
+      }
+      renderConversationList(conversations);
+    }
+
+    function renderConversationList(list) {
+      const el = document.getElementById('convo-list');
+      if (!list.length) {
+        el.innerHTML = '<p class="text-center text-gray-400 dark:text-gray-600 text-sm py-12">No tienes conversaciones aun</p>';
         return;
       }
-      document.getElementById('no-messages').classList.add('hidden');
-
-      const convos = {};
-      msgs.forEach(m => {
-        const other = m.sender_id === currentUser.id ? m.receiver : m.sender;
-        if (!other) return;
-        if (!convos[other.id]) {
-          convos[other.id] = { user: other, lastMsg: m, unread: 0 };
+      el.innerHTML = list.map(c => {
+        const lastMsg = c.messages[c.messages.length - 1];
+        const isGroup = c.type === 'group';
+        const avatar = c.avatar_url
+          ? `<img src="${esc(c.avatar_url)}" class="w-full h-full object-cover" alt="">`
+          : `<span class="font-bold text-creo-purple text-sm">${esc((c.name || '?')[0].toUpperCase())}</span>`;
+        const groupIcon = isGroup ? `<span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-creo-purple flex items-center justify-center"><svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/></svg></span>` : '';
+        let preview = '';
+        if (lastMsg) {
+          const isMine = lastMsg.sender_id === 'me';
+          const prefix = isMine ? 'Tu: ' : (isGroup && lastMsg.sender_name ? lastMsg.sender_name + ': ' : '');
+          if (lastMsg.body) preview = prefix + esc(lastMsg.body).slice(0, 45);
+          else if (lastMsg.media_urls && lastMsg.media_urls.length) preview = prefix + '&#128247; Foto';
+          else preview = prefix + '...';
         }
-        if (m.receiver_id === currentUser.id && !m.is_read) convos[other.id].unread++;
-      });
-
-      const sorted = Object.values(convos).sort((a, b) => new Date(b.lastMsg.created_at) - new Date(a.lastMsg.created_at));
-      const list = document.getElementById('conversations-list');
-      list.innerHTML = sorted.map(c => {
-        const name = c.user.display_name || c.user.username || 'Usuario';
-        const profileLink = c.user.username ? `profile.html?u=${encodeURIComponent(c.user.username)}` : '#';
-        const avatar = c.user.avatar_url
-          ? `<img src="${esc(c.user.avatar_url)}" class="w-full h-full object-cover">`
-          : `<span class="text-creo-purple font-bold">${esc(name[0].toUpperCase())}</span>`;
-        const preview = c.lastMsg.body ? esc(c.lastMsg.body).slice(0, 40) : (c.lastMsg.media_type === 'gif' ? '🎬 GIF' : c.lastMsg.media_type === 'audio' ? '🎤 Audio' : '📷 Media');
-        const isMine = c.lastMsg.sender_id === currentUser.id;
-        return `<button onclick="openChat('${c.user.id}')" class="w-full glass rounded-xl p-3 flex items-center gap-3 hover:shadow-lg transition text-left">
-          <a href="${profileLink}" onclick="event.stopPropagation()" class="w-12 h-12 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition">${avatar}</a>
+        const time = lastMsg ? formatTime(lastMsg.created_at) : '';
+        const isActive = activeConvo && activeConvo.id === c.id;
+        return `<button onclick="openConversation('${c.id}')" class="convo-item w-full rounded-xl px-3 py-3 flex items-center gap-3 text-left transition ${isActive ? 'active' : ''}">
+          <div class="relative flex-shrink-0">
+            <div class="w-12 h-12 rounded-full bg-creo-purple/10 dark:bg-creo-light/20 flex items-center justify-center overflow-hidden">${avatar}</div>
+            ${groupIcon}
+          </div>
           <div class="flex-1 min-w-0">
-            <div class="flex justify-between items-center">
-              <a href="${profileLink}" onclick="event.stopPropagation()" class="font-semibold text-sm text-gray-900 truncate hover:text-creo-purple transition">${esc(name)}</a>
-              <span class="text-[10px] text-gray-400 flex-shrink-0">${timeAgo(c.lastMsg.created_at)}</span>
+            <div class="flex justify-between items-center gap-2">
+              <span class="font-semibold text-sm text-gray-900 dark:text-white truncate">${esc(c.name)}</span>
+              <span class="text-[10px] text-gray-400 dark:text-gray-500 flex-shrink-0 whitespace-nowrap">${time}</span>
             </div>
-            <p class="text-xs text-gray-500 truncate">${isMine ? 'Tú: ' : ''}${preview}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">${preview}</p>
           </div>
           ${c.unread > 0 ? `<span class="w-5 h-5 rounded-full bg-creo-mint text-creo-purple text-[10px] font-bold flex items-center justify-center flex-shrink-0">${c.unread}</span>` : ''}
         </button>`;
       }).join('');
     }
 
-    async function openChat(userId) {
-      const { data: profile } = await sb.from('profiles').select('*').eq('id', userId).single();
-      if (!profile) return;
-      activeChatUser = profile;
-      const name = profile.display_name || profile.username || 'Usuario';
-      const profileUrl = profile.username ? `profile.html?u=${encodeURIComponent(profile.username)}` : '#';
-      document.getElementById('chat-name').textContent = name;
-      document.getElementById('chat-username').textContent = '@' + (profile.username || '');
-      document.getElementById('chat-profile-link').href = profileUrl;
-      document.getElementById('chat-profile-link-name').href = profileUrl;
-      const avatar = document.getElementById('chat-avatar');
-      avatar.innerHTML = profile.avatar_url
-        ? `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">`
-        : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
-      document.getElementById('chat-modal').classList.remove('hidden');
-      loadChatMessages();
-      chatPolling = setInterval(loadChatMessages, 4000);
-      createEmojiPicker('chat-input', 'chat-emoji-btn');
+    function filterConversations(q) {
+      const query = q.toLowerCase().trim();
+      if (!query) { renderConversationList(conversations); return; }
+      renderConversationList(conversations.filter(c => c.name.toLowerCase().includes(query)));
     }
 
-    function closeChat() {
-      document.getElementById('chat-modal').classList.add('hidden');
-      if (chatPolling) { clearInterval(chatPolling); chatPolling = null; }
-      activeChatUser = null;
-      cancelAudio();
-      loadConversations();
+    /* ========== OPEN CONVERSATION ========== */
+    function openConversation(id) {
+      const convo = conversations.find(c => c.id === id);
+      if (!convo) return;
+      activeConvo = convo;
+      convo.unread = 0;
+
+      // Update header
+      const nameLink = document.getElementById('chat-name-link');
+      nameLink.textContent = convo.name;
+      if (convo.username) {
+        const url = 'profile.html?u=' + encodeURIComponent(convo.username);
+        nameLink.href = url;
+        document.getElementById('chat-avatar-link').href = url;
+      } else {
+        nameLink.href = '#';
+        document.getElementById('chat-avatar-link').href = '#';
+      }
+      document.getElementById('chat-status').textContent = convo.status || '';
+      const avatarEl = document.getElementById('chat-avatar');
+      avatarEl.innerHTML = convo.avatar_url
+        ? `<img src="${esc(convo.avatar_url)}" class="w-full h-full object-cover" alt="">`
+        : `<span class="text-creo-purple font-bold text-lg">${esc((convo.name||'?')[0].toUpperCase())}</span>`;
+
+      renderMessages();
+      showChatPanel();
+      renderConversationList(conversations);
     }
 
-    async function loadChatMessages() {
-      if (!currentUser || !activeChatUser) return;
-      const { data: msgs } = await sb.from('messages')
-        .select('*')
-        .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${activeChatUser.id}),and(sender_id.eq.${activeChatUser.id},receiver_id.eq.${currentUser.id})`)
-        .order('created_at', { ascending: true })
-        .limit(200);
-      const list = document.getElementById('chat-messages');
-      if (!msgs || msgs.length === 0) {
-        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-8">Inicia la conversación</p>';
+    function showChatPanel() {
+      const list = document.getElementById('panel-list');
+      const chat = document.getElementById('panel-chat');
+      // Mobile: hide list, show chat
+      list.classList.add('hidden');
+      list.classList.remove('flex');
+      chat.classList.remove('hidden');
+      chat.classList.add('flex');
+      // Show chat elements
+      document.getElementById('chat-empty').classList.add('hidden');
+      document.getElementById('chat-header').classList.remove('hidden');
+      document.getElementById('chat-header').classList.add('flex');
+      document.getElementById('chat-messages').classList.remove('hidden');
+      document.getElementById('chat-input-bar').classList.remove('hidden');
+      // On md+, also show list
+      list.classList.add('md:flex');
+    }
+
+    function backToList() {
+      const list = document.getElementById('panel-list');
+      const chat = document.getElementById('panel-chat');
+      list.classList.remove('hidden');
+      list.classList.add('flex');
+      // On mobile hide chat, on desktop keep it
+      chat.classList.add('hidden');
+      chat.classList.remove('flex');
+      chat.classList.add('md:flex');
+      list.classList.remove('md:flex');
+    }
+
+    /* ========== RENDER MESSAGES ========== */
+    function renderMessages() {
+      if (!activeConvo) return;
+      const container = document.getElementById('chat-messages');
+      const msgs = activeConvo.messages;
+      if (!msgs.length) {
+        container.innerHTML = '<p class="text-center text-gray-400 dark:text-gray-600 text-xs py-8">Inicia la conversacion</p>';
         return;
       }
-      list.innerHTML = msgs.map(m => {
-        const isMine = m.sender_id === currentUser.id;
+
+      let html = '';
+      let lastDate = '';
+      msgs.forEach(msg => {
+        const msgDate = new Date(msg.created_at).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' });
+        if (msgDate !== lastDate) {
+          lastDate = msgDate;
+          html += `<div class="date-sep text-[10px] text-gray-400 dark:text-gray-500 py-2 select-none">${msgDate}</div>`;
+        }
+
+        const isMine = msg.sender_id === 'me';
+        const isGroup = activeConvo.type === 'group';
+        const showSenderAvatar = isGroup && !isMine;
+        const time = new Date(msg.created_at).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+        const readCheck = isMine ? `<span class="inline-flex ml-1">${msg.read ? '<svg class="w-3.5 h-3.5 text-creo-mint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 13l5 5L17 7M7 13l5 5L23 7"/></svg>' : '<svg class="w-3.5 h-3.5 text-white/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>'}</span>` : '';
+
         let content = '';
-        if (m.media_type === 'gif') content = `<img src="${esc(m.media_url)}" class="max-w-48 rounded-lg" alt="GIF">`;
-        else if (m.media_type === 'audio') content = `<audio controls src="${esc(m.media_url)}" class="max-w-48 h-8"></audio>`;
-        else if (m.media_type === 'image') content = `<img src="${esc(m.media_url)}" class="max-w-48 rounded-lg" alt="">`;
-        if (m.body) content += `<p class="text-sm">${esc(m.body)}</p>`;
-        return `<div class="flex ${isMine ? 'justify-end' : 'justify-start'}">
-          <div class="max-w-[75%] px-3 py-2 rounded-2xl ${isMine ? 'bg-creo-purple text-white rounded-br-sm' : 'bg-gray-100 text-gray-900 rounded-bl-sm'} space-y-1">
+        if (msg.media_urls && msg.media_urls.length) {
+          msg.media_urls.forEach(url => {
+            content += `<img src="${esc(url)}" class="max-w-[240px] rounded-lg mb-1 cursor-pointer hover:opacity-90 transition" alt="media" onclick="window.open('${esc(url)}','_blank')">`;
+          });
+        }
+        if (msg.body) {
+          content += `<p class="text-sm leading-relaxed">${esc(msg.body)}</p>`;
+        }
+
+        html += `<div class="flex ${isMine ? 'justify-end' : 'justify-start'} animate-fade">
+          ${showSenderAvatar ? `<img src="${esc(msg.sender_avatar || '')}" class="w-7 h-7 rounded-full object-cover mr-2 mt-1 flex-shrink-0" alt="">` : ''}
+          <div class="max-w-[75%] ${isMine ? 'bubble-sent bg-creo-purple text-white' : 'bubble-recv bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'} px-3.5 py-2.5 space-y-1">
+            ${showSenderAvatar && msg.sender_name ? `<p class="text-[11px] font-semibold ${isMine ? 'text-creo-mint' : 'text-creo-purple dark:text-creo-mint'}">${esc(msg.sender_name)}</p>` : ''}
             ${content}
-            <p class="text-[10px] ${isMine ? 'text-white/50' : 'text-gray-400'} text-right">${timeAgo(m.created_at)}</p>
+            <p class="text-[10px] ${isMine ? 'text-white/50' : 'text-gray-400 dark:text-gray-500'} text-right flex items-center justify-end gap-0.5">${time}${readCheck}</p>
           </div>
         </div>`;
-      }).join('');
-      list.scrollTop = list.scrollHeight;
-      const unread = msgs.filter(m => m.sender_id === activeChatUser.id && !m.is_read).map(m => m.id);
-      if (unread.length) sb.from('messages').update({ is_read: true }).in('id', unread).then(() => {});
+      });
+      container.innerHTML = html;
+      container.scrollTop = container.scrollHeight;
     }
 
+    /* ========== SEND MESSAGE ========== */
     async function sendMessage() {
-      if (!currentUser || !activeChatUser) return;
-      const input = document.getElementById('chat-input');
+      if (!activeConvo) return;
+      const input = document.getElementById('msg-input');
       const body = input.value.trim();
-      if (!body && !audioBlob) return;
-      const msg = { sender_id: currentUser.id, receiver_id: activeChatUser.id, body: body || null, media_url: null, media_type: null };
-      if (audioBlob) {
-        const fileName = `dm_audio_${Date.now()}.webm`;
-        const { data: upData, error: upErr } = await sb.storage.from('dm-media').upload(fileName, audioBlob, { contentType: 'audio/webm' });
-        if (!upErr && upData) {
-          const { data: urlData } = sb.storage.from('dm-media').getPublicUrl(fileName);
-          msg.media_url = urlData.publicUrl;
-          msg.media_type = 'audio';
-        }
-        cancelAudio();
-      }
-      input.value = '';
-      const { error } = await sb.from('messages').insert(msg);
-      if (error) { showToast('Error al enviar', 'error'); return; }
-      loadChatMessages();
-    }
+      if (!body && !mediaFile && !audioBlob) return;
 
-    // GIF
-    let gifTimer = null;
-    function toggleChatGif() { document.getElementById('chat-gif-picker').classList.toggle('hidden'); }
-    async function searchChatGifs(q) {
-      clearTimeout(gifTimer);
-      gifTimer = setTimeout(async () => {
-        const query = (q || '').trim() || 'trending';
-        const url = query === 'trending'
-          ? 'https://api.giphy.com/v1/gifs/trending?api_key=GlVGYHkr3WSBnllca54iNt0yFbjz7L65&limit=18&rating=g'
-          : `https://api.giphy.com/v1/gifs/search?api_key=GlVGYHkr3WSBnllca54iNt0yFbjz7L65&q=${encodeURIComponent(query)}&limit=18&rating=g`;
+      const msg = {
+        id: 'msg_' + Date.now(),
+        sender_id: 'me',
+        body: body || null,
+        media_urls: [],
+        created_at: new Date().toISOString(),
+        read: false
+      };
+
+      // Handle media
+      if (mediaFile) {
         try {
-          const res = await fetch(url);
-          const json = await res.json();
-          document.getElementById('chat-gif-results').innerHTML = (json.data || []).map(g =>
-            `<img src="${g.images.fixed_width_small.url}" class="w-full rounded cursor-pointer hover:opacity-80 transition" onclick="sendGif('${g.images.fixed_width.url}')" alt="GIF">`
-          ).join('');
+          const url = await uploadToStorage(mediaFile, 'dm-media', 20);
+          if (url) msg.media_urls.push(url);
+        } catch(e) {
+          msg.media_urls.push(URL.createObjectURL(mediaFile));
+        }
+        cancelMedia();
+      }
+      if (audioBlob) {
+        try {
+          const url = await uploadToStorage(audioBlob, 'dm-media', 10);
+          if (url) msg.media_urls.push(url);
         } catch(e) {}
-      }, 300);
-    }
-    async function sendGif(url) {
-      if (!currentUser || !activeChatUser) return;
-      await sb.from('messages').insert({ sender_id: currentUser.id, receiver_id: activeChatUser.id, body: null, media_url: url, media_type: 'gif' });
-      document.getElementById('chat-gif-picker').classList.add('hidden');
-      loadChatMessages();
+        cancelRecording();
+      }
+
+      activeConvo.messages.push(msg);
+      input.value = '';
+      input.style.height = 'auto';
+      renderMessages();
+
+      // Try Supabase insert
+      try {
+        await sb.from('messages').insert({
+          conversation_id: activeConvo.id,
+          sender_id: currentUser.id,
+          body: msg.body,
+          media_urls: msg.media_urls,
+          message_type: msg.media_urls.length ? 'media' : 'text',
+          created_at: msg.created_at
+        });
+      } catch(e) {}
+      renderConversationList(conversations);
     }
 
-    // Audio
-    async function toggleAudioRecord() {
-      if (recorder && recorder.state === 'recording') { stopAudioRecord(); return; }
+    /* ========== INPUT HELPERS ========== */
+    function autoGrow(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey && document.activeElement?.id === 'msg-input') {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    /* ========== ATTACHMENT MENU ========== */
+    function toggleAttachMenu() {
+      document.getElementById('attach-menu').classList.toggle('hidden');
+    }
+
+    let currentFileAccept = '';
+    let currentFileType = '';
+    function pickFile(accept, type) {
+      currentFileAccept = accept;
+      currentFileType = type;
+      const picker = document.getElementById('file-picker');
+      picker.accept = accept;
+      picker.click();
+      document.getElementById('attach-menu').classList.add('hidden');
+    }
+
+    function handleFilePick(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      mediaFile = file;
+      mediaType = currentFileType;
+      showMediaPreview(file);
+      e.target.value = '';
+    }
+
+    function showMediaPreview(file) {
+      const preview = document.getElementById('media-preview');
+      const content = document.getElementById('media-preview-content');
+      preview.classList.remove('hidden');
+
+      if (file.type.startsWith('image/')) {
+        const url = URL.createObjectURL(file);
+        content.innerHTML = `<div class="flex items-center gap-3"><img src="${url}" class="w-12 h-12 rounded-lg object-cover"><span class="text-sm text-gray-700 dark:text-gray-300 truncate">${esc(file.name)}</span></div>`;
+      } else if (file.type.startsWith('video/')) {
+        content.innerHTML = `<div class="flex items-center gap-3"><span class="w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center"><svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg></span><span class="text-sm text-gray-700 dark:text-gray-300 truncate">${esc(file.name)}</span></div>`;
+      } else {
+        content.innerHTML = `<div class="flex items-center gap-3"><span class="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center"><svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span><span class="text-sm text-gray-700 dark:text-gray-300 truncate">${esc(file.name)}</span></div>`;
+      }
+    }
+
+    function cancelMedia() {
+      mediaFile = null;
+      mediaType = null;
+      document.getElementById('media-preview').classList.add('hidden');
+    }
+
+    /* ========== CAMERA CAPTURE ========== */
+    function quickCapture() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'environment';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        mediaFile = file;
+        mediaType = 'image';
+        showMediaPreview(file);
+      };
+      input.click();
+      document.getElementById('attach-menu').classList.add('hidden');
+    }
+
+    /* ========== AUDIO RECORDING ========== */
+    async function startAudioRecording() {
+      document.getElementById('attach-menu').classList.add('hidden');
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         recorder = new MediaRecorder(stream);
@@ -266,45 +726,265 @@
         recorder.ondataavailable = e => chunks.push(e.data);
         recorder.onstop = () => {
           audioBlob = new Blob(chunks, { type: 'audio/webm' });
-          document.getElementById('chat-audio-player').src = URL.createObjectURL(audioBlob);
-          document.getElementById('chat-audio-preview').classList.remove('hidden');
-          document.getElementById('chat-recording-indicator').classList.add('hidden');
           stream.getTracks().forEach(t => t.stop());
+          // Show audio preview
+          showAudioPreview();
         };
         recorder.start();
-        document.getElementById('chat-recording-indicator').classList.remove('hidden');
-        document.getElementById('chat-audio-btn').classList.add('text-red-500');
-      } catch(e) { showToast('No se pudo acceder al micrófono', 'error'); }
-    }
-    function stopAudioRecord() { if (recorder && recorder.state === 'recording') recorder.stop(); }
-    function cancelAudio() {
-      audioBlob = null;
-      document.getElementById('chat-audio-preview').classList.add('hidden');
-      document.getElementById('chat-recording-indicator').classList.add('hidden');
-      document.getElementById('chat-audio-btn').classList.remove('text-red-500');
-      if (recorder && recorder.state === 'recording') { recorder.stop(); recorder.stream?.getTracks().forEach(t => t.stop()); }
-      recorder = null;
+        recSeconds = 0;
+        document.getElementById('rec-timer').textContent = '0:00';
+        document.getElementById('recording-bar').classList.remove('hidden');
+        recInterval = setInterval(() => {
+          recSeconds++;
+          const mins = Math.floor(recSeconds / 60);
+          const secs = recSeconds % 60;
+          document.getElementById('rec-timer').textContent = mins + ':' + String(secs).padStart(2, '0');
+        }, 1000);
+      } catch(e) {
+        showToast('No se pudo acceder al microfono', 'error');
+      }
     }
 
-    function timeAgo(dateStr) {
-      const diff = Date.now() - new Date(dateStr).getTime();
+    function stopRecording() {
+      if (recorder && recorder.state === 'recording') recorder.stop();
+      clearInterval(recInterval);
+      document.getElementById('recording-bar').classList.add('hidden');
+    }
+
+    function cancelRecording() {
+      if (recorder && recorder.state === 'recording') {
+        recorder.stop();
+        recorder.stream?.getTracks().forEach(t => t.stop());
+      }
+      clearInterval(recInterval);
+      recorder = null;
+      audioBlob = null;
+      document.getElementById('recording-bar').classList.add('hidden');
+      document.getElementById('media-preview').classList.add('hidden');
+    }
+
+    function showAudioPreview() {
+      const url = URL.createObjectURL(audioBlob);
+      const preview = document.getElementById('media-preview');
+      const content = document.getElementById('media-preview-content');
+      preview.classList.remove('hidden');
+      content.innerHTML = `<audio controls src="${url}" class="w-full h-8"></audio>`;
+    }
+
+    /* ========== CONTACT PICKER ========== */
+    function openContactPicker() {
+      document.getElementById('contact-modal').classList.remove('hidden');
+      searchContacts('');
+    }
+    function closeContactPicker() {
+      document.getElementById('contact-modal').classList.add('hidden');
+    }
+
+    async function searchContacts(q) {
+      let contacts = [];
+      try {
+        const { data } = await sb.from('profiles').select('id, username, display_name, avatar_url, verification_status')
+          .ilike('display_name', '%' + (q || '') + '%').limit(20);
+        if (data && data.length) contacts = data;
+      } catch(e) {}
+
+      if (!contacts.length) {
+        contacts = DEMO_CONTACTS.filter(c =>
+          c.display_name.toLowerCase().includes((q||'').toLowerCase()) ||
+          c.username.toLowerCase().includes((q||'').toLowerCase())
+        );
+      }
+
+      const el = document.getElementById('contact-results');
+      el.innerHTML = contacts.map(c => {
+        const avatar = c.avatar_url
+          ? `<img src="${esc(c.avatar_url)}" class="w-full h-full object-cover" alt="">`
+          : `<span class="font-bold text-creo-purple text-sm">${esc((c.display_name||'?')[0].toUpperCase())}</span>`;
+        const badge = c.verification_status === 'approved'
+          ? `<svg class="w-4 h-4 text-creo-mint inline ml-1 -mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>` : '';
+        return `<button onclick="startDMWith('${c.id}','${esc(c.display_name)}','${esc(c.avatar_url||'')}','${esc(c.username||'')}')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition text-left">
+          <div class="w-10 h-10 rounded-full bg-creo-purple/10 dark:bg-creo-light/20 flex items-center justify-center overflow-hidden flex-shrink-0">${avatar}</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center"><span class="font-semibold text-sm text-gray-900 dark:text-white truncate">${esc(c.display_name)}</span>${badge}</div>
+            <p class="text-xs text-gray-400 dark:text-gray-500">@${esc(c.username || '')}</p>
+          </div>
+        </button>`;
+      }).join('');
+    }
+
+    function startDMWith(id, name, avatar, username) {
+      closeContactPicker();
+      // Check if conversation exists
+      let existing = conversations.find(c => c.type === 'dm' && c.id === 'dm_' + id);
+      if (!existing) {
+        existing = {
+          id: 'dm_' + id, type: 'dm', name: name, avatar_url: avatar || null,
+          username: username, status: 'en linea', unread: 0,
+          members: [], messages: []
+        };
+        conversations.unshift(existing);
+      }
+      openConversation(existing.id);
+    }
+
+    /* ========== GROUP CREATION ========== */
+    function openGroupCreation() {
+      document.getElementById('group-modal').classList.remove('hidden');
+      selectedGroupMembers = [];
+      groupAvatarFile = null;
+      renderGroupSelectedMembers();
+      searchGroupMembers('');
+    }
+    function closeGroupCreation() {
+      document.getElementById('group-modal').classList.add('hidden');
+    }
+
+    function previewGroupAvatar(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      groupAvatarFile = file;
+      const url = URL.createObjectURL(file);
+      document.getElementById('group-avatar-preview').innerHTML = `<img src="${url}" class="w-full h-full object-cover" alt="">`;
+    }
+
+    async function searchGroupMembers(q) {
+      let contacts = [];
+      try {
+        const { data } = await sb.from('profiles').select('id, username, display_name, avatar_url')
+          .ilike('display_name', '%' + (q || '') + '%').limit(20);
+        if (data && data.length) contacts = data;
+      } catch(e) {}
+      if (!contacts.length) {
+        contacts = DEMO_CONTACTS.filter(c =>
+          c.display_name.toLowerCase().includes((q||'').toLowerCase()) ||
+          c.username.toLowerCase().includes((q||'').toLowerCase())
+        );
+      }
+
+      const el = document.getElementById('group-member-results');
+      el.innerHTML = contacts.map(c => {
+        const isSelected = selectedGroupMembers.some(m => m.id === c.id);
+        const avatar = c.avatar_url
+          ? `<img src="${esc(c.avatar_url)}" class="w-full h-full object-cover" alt="">`
+          : `<span class="font-bold text-creo-purple text-xs">${esc((c.display_name||'?')[0].toUpperCase())}</span>`;
+        return `<button onclick="toggleGroupMember('${c.id}','${esc(c.display_name)}','${esc(c.avatar_url||'')}')" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition text-left">
+          <div class="w-8 h-8 rounded-full bg-creo-purple/10 dark:bg-creo-light/20 flex items-center justify-center overflow-hidden flex-shrink-0">${avatar}</div>
+          <span class="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate">${esc(c.display_name)}</span>
+          <div class="w-5 h-5 rounded border-2 ${isSelected ? 'bg-creo-mint border-creo-mint' : 'border-gray-300 dark:border-gray-600'} flex items-center justify-center flex-shrink-0">
+            ${isSelected ? '<svg class="w-3 h-3 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>' : ''}
+          </div>
+        </button>`;
+      }).join('');
+    }
+
+    function toggleGroupMember(id, name, avatar) {
+      const idx = selectedGroupMembers.findIndex(m => m.id === id);
+      if (idx >= 0) selectedGroupMembers.splice(idx, 1);
+      else selectedGroupMembers.push({ id, display_name: name, avatar_url: avatar });
+      renderGroupSelectedMembers();
+      searchGroupMembers(document.getElementById('group-member-search').value);
+    }
+
+    function renderGroupSelectedMembers() {
+      const el = document.getElementById('group-selected-members');
+      el.innerHTML = selectedGroupMembers.map(m => {
+        return `<span class="inline-flex items-center gap-1 bg-creo-mint/15 text-creo-purple dark:text-creo-mint text-xs font-semibold px-2.5 py-1 rounded-full">
+          ${esc(m.display_name)}
+          <button onclick="toggleGroupMember('${m.id}','${esc(m.display_name)}','${esc(m.avatar_url||'')}')" class="hover:text-red-500 transition ml-0.5">&#10005;</button>
+        </span>`;
+      }).join('');
+    }
+
+    async function createGroup() {
+      const name = document.getElementById('group-name-input').value.trim();
+      if (!name) { showToast('Escribe un nombre para el grupo', 'error'); return; }
+      if (selectedGroupMembers.length === 0) { showToast('Agrega al menos un miembro', 'error'); return; }
+
+      const rules = document.getElementById('group-rules-input').value.trim();
+      let avatarUrl = null;
+      if (groupAvatarFile) {
+        try { avatarUrl = await uploadToStorage(groupAvatarFile, 'group-avatars', 5); } catch(e) {}
+      }
+
+      const group = {
+        id: 'grp_' + Date.now(),
+        type: 'group',
+        name: name,
+        avatar_url: avatarUrl || `https://picsum.photos/seed/grp${Date.now()}/100/100`,
+        username: null,
+        status: (selectedGroupMembers.length + 1) + ' miembros',
+        unread: 0,
+        rules: rules,
+        members: selectedGroupMembers,
+        messages: []
+      };
+
+      // Try Supabase
+      try {
+        const { data, error } = await sb.from('conversations').insert({ type: 'group', name, avatar_url: group.avatar_url, rules }).select().single();
+        if (data) {
+          group.id = data.id;
+          const memberInserts = [{ conversation_id: data.id, user_id: currentUser.id }, ...selectedGroupMembers.map(m => ({ conversation_id: data.id, user_id: m.id }))];
+          await sb.from('conversation_members').insert(memberInserts);
+        }
+      } catch(e) {}
+
+      conversations.unshift(group);
+      closeGroupCreation();
+      openConversation(group.id);
+      showToast('Grupo creado', 'ok');
+    }
+
+    /* ========== CHAT INFO TOGGLE ========== */
+    function toggleChatInfo() {
+      if (!activeConvo) return;
+      const isGroup = activeConvo.type === 'group';
+      let info = `<strong>${esc(activeConvo.name)}</strong>`;
+      if (isGroup) {
+        info += `<br><span class="text-xs text-gray-400">${activeConvo.status || ''}</span>`;
+        if (activeConvo.rules) info += `<br><br><span class="text-xs text-gray-500">${esc(activeConvo.rules)}</span>`;
+        if (activeConvo.members && activeConvo.members.length) {
+          info += '<br><br><span class="text-xs font-semibold text-gray-500">Miembros:</span><br>';
+          activeConvo.members.forEach(m => {
+            info += `<span class="text-xs text-gray-400">&#8226; ${esc(m.display_name)}</span><br>`;
+          });
+        }
+      } else {
+        info += `<br><span class="text-xs text-gray-400">@${esc(activeConvo.username || '')}</span>`;
+      }
+      showToast(info, 'ok');
+    }
+
+    /* ========== UTILITIES ========== */
+    function formatTime(dateStr) {
+      const d = new Date(dateStr);
+      const diff = Date.now() - d.getTime();
       const mins = Math.floor(diff / 60000);
       if (mins < 1) return 'ahora';
-      if (mins < 60) return mins + 'm';
+      if (mins < 60) return mins + ' min';
       const hrs = Math.floor(mins / 60);
       if (hrs < 24) return hrs + 'h';
       const days = Math.floor(hrs / 24);
-      if (days < 30) return days + 'd';
-      return Math.floor(days / 30) + 'mes';
+      if (days < 7) {
+        return d.toLocaleDateString('es', { weekday: 'short' });
+      }
+      return d.toLocaleDateString('es', { day: 'numeric', month: 'short' });
     }
 
-    document.getElementById('chat-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+    // Close menus on outside click
+    document.addEventListener('click', e => {
+      const attachMenu = document.getElementById('attach-menu');
+      if (!attachMenu.classList.contains('hidden') && !e.target.closest('#attach-menu') && !e.target.closest('[onclick*="toggleAttachMenu"]')) {
+        attachMenu.classList.add('hidden');
+      }
+    });
 
+    /* ========== BOOT ========== */
     window.onload = () => {
       init();
       renderBottomNav('messages');
       updateNavAuth();
-      loadNotificationBell();
+      try { loadNotificationBell(); } catch(e) {}
     };
   </script>
 </body>

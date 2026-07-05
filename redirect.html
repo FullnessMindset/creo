@@ -45,6 +45,20 @@
       }
     }
 
+    function startCountdown(url, seconds) {
+      const statusEl = document.getElementById('desc');
+      let remaining = seconds;
+      const interval = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(interval);
+          window.location.href = url;
+        } else {
+          statusEl.textContent = 'Redirigiendo en ' + remaining + ' segundos...';
+        }
+      }, 1000);
+    }
+
     async function handleAuthRedirect(user) {
       if (!user) {
         setStatus('Error', 'No se pudo verificar tu cuenta');
@@ -64,12 +78,12 @@
       if (isAdmin(user.email)) {
         localStorage.removeItem('creo-admin-login');
         sessionStorage.setItem('admin_mode', 'true');
-        setStatus('Acceso Admin Verificado', 'Redirigiendo al panel...');
-        window.location.href = 'index.html';
+        setStatus('Acceso Admin Verificado', 'Redirigiendo al panel en 5 segundos...');
+        startCountdown('index.html', 5);
       } else {
         localStorage.removeItem('creo-admin-login');
-        setStatus('¡Cuenta verificada!', 'Redirigiendo a tu panel...');
-        window.location.href = 'index.html?welcome=1';
+        setStatus('¡Cuenta verificada!', 'Redirigiendo a tu panel en 5 segundos...');
+        startCountdown('index.html?welcome=1', 5);
       }
     }
 
@@ -131,10 +145,17 @@
 
         if (!handled && hasHashToken) {
           try {
-            const { data: { user } } = await sb.auth.getUser();
-            if (user) {
+            const { data: { session }, error } = await sb.auth.getSession();
+            if (!error && session?.user) {
               handled = true;
-              await handleAuthRedirect(user);
+              await handleAuthRedirect(session.user);
+            } else {
+              await new Promise(r => setTimeout(r, 1000));
+              const { data: { session: s2 } } = await sb.auth.getSession();
+              if (s2?.user) {
+                handled = true;
+                await handleAuthRedirect(s2.user);
+              }
             }
           } catch (e) {}
         }
