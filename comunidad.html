@@ -31,6 +31,12 @@
     .media-preview-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; scrollbar-width: none; }
     .media-preview-scroll::-webkit-scrollbar { display: none; }
     .welcome-gradient { background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 50%, #33f0b0 100%); }
+    .mention-dropdown { position: absolute; background: white; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); max-height: 200px; overflow-y: auto; z-index: 200; width: 260px; }
+    .mention-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; transition: background 0.15s; }
+    .mention-item:hover, .mention-item.active { background: #f3f0ff; }
+    .mention-item:first-child { border-radius: 12px 12px 0 0; }
+    .mention-item:last-child { border-radius: 0 0 12px 12px; }
+    .mention-tag { color: #1a0a3e; font-weight: 600; background: rgba(51,240,176,0.15); padding: 0 4px; border-radius: 4px; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
@@ -46,6 +52,9 @@
         <h1 class="text-xl font-bold text-creo-purple dark:text-white tracking-wider">Comunidad</h1>
       </div>
       <div class="flex items-center gap-2">
+        <button onclick="openFindFriends()" class="p-2 rounded-full hover:bg-gray-100 transition" title="Buscar Amigos">
+          <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+        </button>
         <button onclick="toggleTheme()" id="theme-toggle-btn" class="p-2 rounded-full hover:bg-gray-100 transition">
           <svg class="w-5 h-5 text-gray-500 theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
           <svg class="w-5 h-5 text-gray-300 theme-icon-moon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
@@ -112,6 +121,17 @@
         </div>
       </div>
     </div>
+
+    <!-- Feed View Toggle -->
+    <div class="flex items-center gap-2">
+      <button onclick="setFeedView('pueblo')" id="feed-view-pueblo" class="flex-1 py-2.5 rounded-xl text-sm font-bold transition bg-creo-purple text-white">
+        Favoritos del Pueblo
+      </button>
+      <button onclick="setFeedView('recientes')" id="feed-view-recientes" class="flex-1 py-2.5 rounded-xl text-sm font-bold transition bg-gray-100 text-gray-600 hover:bg-gray-200">
+        Recientes
+      </button>
+    </div>
+    <p id="feed-view-desc" class="text-[10px] text-gray-400 text-center -mt-2">La comunidad decide — mas likes, comentarios y compartidos suben al tope</p>
 
     <!-- Feed -->
     <div id="community-feed" class="space-y-4"></div>
@@ -189,6 +209,10 @@
             <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
             Grabar Audio
           </button>
+          <button onclick="insertMentionTrigger()" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-creo-purple transition">
+            <svg class="w-5 h-5 text-creo-purple/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            Etiquetar
+          </button>
           <span id="compose-emoji-btn" class="cursor-pointer text-xl hover:scale-110 transition ml-auto">😊</span>
         </div>
       </div>
@@ -232,6 +256,31 @@
     </div>
   </div>
 
+  <!-- Find Friends Modal -->
+  <div id="friends-modal" class="fixed inset-0 z-[100] hidden">
+    <div class="compose-overlay" onclick="closeFindFriends()"></div>
+    <div class="fixed inset-x-0 bottom-0 z-[101] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl max-h-[80vh] flex flex-col">
+      <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+        <span class="font-bold text-sm text-gray-900">Buscar Amigos</span>
+        <button onclick="closeFindFriends()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-4 border-b border-gray-100">
+        <div class="relative">
+          <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input id="friends-search" type="text" placeholder="Buscar por nombre o @usuario..." class="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-creo-mint" oninput="searchFriends(this.value)">
+        </div>
+      </div>
+      <div id="friends-results" class="flex-1 overflow-y-auto p-4 space-y-2">
+        <p class="text-center text-gray-400 text-sm py-8">Escribe un nombre para buscar creadores</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mention autocomplete dropdown (reusable, positioned dynamically) -->
+  <div id="mention-dropdown" class="mention-dropdown hidden"></div>
+
   <!-- Lightbox for media -->
   <div id="media-lightbox" class="fixed inset-0 z-[100] hidden bg-black/95 flex items-center justify-center" onclick="closeLightbox()">
     <button class="absolute top-4 right-4 text-white/70 hover:text-white z-10">
@@ -250,7 +299,43 @@
     let sharePostId = null;
     let composeMediaFiles = [];
     let composeType = 'text';
+    let feedView = 'pueblo';
     const PAGE_SIZE = 15;
+
+    const DEMO_POSTS = [
+      { id: 'demo1', author: { id: 'a1', username: 'luciavargas', display_name: 'Lucia Vargas', avatar_url: 'https://picsum.photos/seed/avatar4/100/100', verification_status: 'approved' }, post_type: 'photo', title: 'Nuevo mural terminado en el barrio', body: 'Despues de 3 semanas de trabajo, el mural del centro comunitario esta listo. Gracias a todos los que vinieron a ayudar y a los vecinos que nos apoyaron con agua y comida. El arte transforma comunidades.', media_urls: ['https://picsum.photos/seed/mural1/800/600'], created_at: '2026-07-03T14:30:00Z', _likes: 47, _comments: 12, _shares: 8 },
+      { id: 'demo2', author: { id: 'a2', username: 'andresmolina', display_name: 'Andres Molina', avatar_url: 'https://picsum.photos/seed/avatar3/100/100', verification_status: 'approved' }, post_type: 'video', title: 'Ensayo acustico — cancion nueva', body: 'Preparando material nuevo para el proximo EP. Esta cancion habla sobre volver a casa despues de mucho tiempo. Que les parece?', media_urls: ['https://picsum.photos/seed/music1/800/450'], created_at: '2026-07-03T10:15:00Z', _likes: 89, _comments: 34, _shares: 21 },
+      { id: 'demo3', author: { id: 'a3', username: 'mariasantos', display_name: 'Maria Santos', avatar_url: 'https://picsum.photos/seed/avatar2/100/100', verification_status: 'approved' }, post_type: 'text', title: null, body: 'Alguien mas siente que el cine independiente esta viviendo su mejor momento? Cada vez veo mas creadores haciendo cosas increibles sin necesidad de grandes presupuestos. La creatividad no tiene precio.', media_urls: [], created_at: '2026-07-02T18:45:00Z', _likes: 156, _comments: 43, _shares: 67 },
+      { id: 'demo4', author: { id: 'a4', username: 'carlosrivera', display_name: 'Carlos Rivera', avatar_url: 'https://picsum.photos/seed/avatar1/100/100', verification_status: 'approved' }, post_type: 'photo', title: 'Detras de camaras — El Ultimo Amanecer', body: 'Compartiendo algunas fotos del proceso de grabacion. Filmamos todo en locacion real, sin sets. El pueblo nos presto su magia y nosotros solo la capturamos.', media_urls: ['https://picsum.photos/seed/bts1/800/500', 'https://picsum.photos/seed/bts2/800/500'], created_at: '2026-07-02T09:20:00Z', _likes: 201, _comments: 56, _shares: 89 },
+      { id: 'demo5', author: { id: 'a5', username: 'valentinacruz', display_name: 'Valentina Cruz', avatar_url: 'https://picsum.photos/seed/avatar6/100/100', verification_status: 'approved' }, post_type: 'text', title: 'Busco colaboradores para cortometraje', body: 'Estoy escribiendo un guion sobre la relacion entre abuelos y nietos en el campo. Necesito: un director de fotografia, alguien para sonido, y actores locales. No hay presupuesto grande pero si mucho corazon. DM si te interesa.', media_urls: [], created_at: '2026-07-01T16:00:00Z', _likes: 78, _comments: 28, _shares: 15 },
+      { id: 'demo6', author: { id: 'a6', username: 'diegoherrera', display_name: 'Diego Herrera', avatar_url: 'https://picsum.photos/seed/avatar5/100/100', verification_status: 'approved' }, post_type: 'photo', title: 'Amanecer en la finca cafetera', body: 'Seguimos documentando la ruta del cafe. Hoy nos levantamos a las 4am para capturar este amanecer. Cada taza tiene una historia.', media_urls: ['https://picsum.photos/seed/coffee1/800/600'], created_at: '2026-07-01T08:30:00Z', _likes: 134, _comments: 30, _shares: 55 },
+      { id: 'demo7', author: { id: 'a7', username: 'anabelenrios', display_name: 'Ana Belen Rios', avatar_url: 'https://picsum.photos/seed/avatar8/100/100', verification_status: 'approved' }, post_type: 'photo', title: 'Escultura nueva — "Resilencia"', body: 'Metal reciclado transformado en arte. Esta pieza me tomo 2 meses. Representa la fuerza de levantarse despues de cada caida. Disponible para exposiciones.', media_urls: ['https://picsum.photos/seed/sculpture1/600/800'], created_at: '2026-06-30T13:10:00Z', _likes: 93, _comments: 19, _shares: 41 },
+      { id: 'demo8', author: { id: 'a8', username: 'robertomendez', display_name: 'Roberto Mendez', avatar_url: 'https://picsum.photos/seed/avatar7/100/100', verification_status: 'approved' }, post_type: 'text', title: 'Reflexion sobre crear contenido con valores', body: 'En un mundo donde todo es clickbait y FOMO, elegir crear contenido honesto es un acto de resistencia. No necesitamos vender urgencia — necesitamos contar historias reales. CREO es el lugar para eso.', media_urls: [], created_at: '2026-06-30T20:00:00Z', _likes: 245, _comments: 78, _shares: 102 },
+      { id: 'demo9', author: { id: 'a2', username: 'andresmolina', display_name: 'Andres Molina', avatar_url: 'https://picsum.photos/seed/avatar3/100/100', verification_status: 'approved' }, post_type: 'photo', title: 'Taller de percusion este sabado', body: 'Vamos a hacer un taller gratuito de percusion afrolatina en el patio colonial. Trae tu instrumento o ven con las manos — todos son bienvenidos. Sabado 3pm.', media_urls: ['https://picsum.photos/seed/drums1/800/500'], created_at: '2026-06-29T11:00:00Z', _likes: 67, _comments: 22, _shares: 31 },
+      { id: 'demo10', author: { id: 'a4', username: 'carlosrivera', display_name: 'Carlos Rivera', avatar_url: 'https://picsum.photos/seed/avatar1/100/100', verification_status: 'approved' }, post_type: 'text', title: null, body: 'Acabo de ver "Manos que Hablan" de Ana Belen en Cine Local. Increible como una pelicula sin una sola palabra hablada puede decir tanto. Si no la han visto, corran. Esto es lo que hace especial a esta plataforma.', media_urls: [], created_at: '2026-06-28T22:15:00Z', _likes: 112, _comments: 35, _shares: 48 },
+      { id: 'demo11', author: { id: 'a5', username: 'valentinacruz', display_name: 'Valentina Cruz', avatar_url: 'https://picsum.photos/seed/avatar6/100/100', verification_status: 'approved' }, post_type: 'photo', title: 'Paginas del guion — primer borrador listo', body: 'Despues de meses de investigacion, el primer borrador de "Carta a Mi Padre" esta completo. 47 paginas que empezaron como cartas reales que nunca envie. A veces el arte mas honesto nace del dolor.', media_urls: ['https://picsum.photos/seed/script1/600/800'], created_at: '2026-06-27T15:30:00Z', _likes: 189, _comments: 45, _shares: 76 },
+      { id: 'demo12', author: { id: 'a3', username: 'mariasantos', display_name: 'Maria Santos', avatar_url: 'https://picsum.photos/seed/avatar2/100/100', verification_status: 'approved' }, post_type: 'photo', title: 'Documental "Raices de Barro" — ya en Cine Local', body: 'Despues de 6 meses de filmacion en 4 pueblos diferentes, el documental esta disponible en Cine Local. Gracias a cada artesano que abrio las puertas de su taller. Sus manos guardan siglos de historia.', media_urls: ['https://picsum.photos/seed/clay1/800/450'], created_at: '2026-06-26T12:00:00Z', _likes: 167, _comments: 39, _shares: 71 }
+    ];
+
+    function setFeedView(view) {
+      feedView = view;
+      const puebloBtn = document.getElementById('feed-view-pueblo');
+      const recientesBtn = document.getElementById('feed-view-recientes');
+      const desc = document.getElementById('feed-view-desc');
+      if (view === 'pueblo') {
+        puebloBtn.className = 'flex-1 py-2.5 rounded-xl text-sm font-bold transition bg-creo-purple text-white';
+        recientesBtn.className = 'flex-1 py-2.5 rounded-xl text-sm font-bold transition bg-gray-100 text-gray-600 hover:bg-gray-200';
+        desc.textContent = 'La comunidad decide — mas likes, comentarios y compartidos suben al tope';
+      } else {
+        recientesBtn.className = 'flex-1 py-2.5 rounded-xl text-sm font-bold transition bg-creo-purple text-white';
+        puebloBtn.className = 'flex-1 py-2.5 rounded-xl text-sm font-bold transition bg-gray-100 text-gray-600 hover:bg-gray-200';
+        desc.textContent = 'Lo mas nuevo de la comunidad — sin filtros, sin algoritmo';
+      }
+      document.getElementById('community-feed').innerHTML = '';
+      feedPage = 0;
+      feedDone = false;
+      loadFeed();
+    }
 
     async function init() {
       const { data: { user } } = await sb.auth.getUser();
@@ -268,11 +353,13 @@
       }
       loadFeed();
       loadStories();
+      loadMentionCache();
       renderBottomNav('comunidad');
       updateNavAuth();
       loadNotificationBell();
       window.addEventListener('scroll', onScroll);
       document.getElementById('comment-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitComment(); });
+      setupMentionListener(document.getElementById('comment-input'));
     }
 
     // Welcome post logic
@@ -339,42 +426,105 @@
           .range(feedPage * PAGE_SIZE, (feedPage + 1) * PAGE_SIZE - 1);
 
         if (error) throw error;
-        if (!data || data.length < PAGE_SIZE) feedDone = true;
-        if (feedPage === 0 && (!data || data.length === 0)) {
-          document.getElementById('feed-empty').classList.remove('hidden');
+
+        let posts = data || [];
+        let useDemos = false;
+
+        if (feedPage === 0 && posts.length === 0) {
+          useDemos = true;
+          posts = DEMO_POSTS.map(d => ({
+            ...d,
+            author_id: d.author.id,
+            shared_post: null,
+            _isDemo: true
+          }));
         }
-        if (data && data.length > 0) {
+
+        if (!useDemos && posts.length < PAGE_SIZE) feedDone = true;
+        if (useDemos) feedDone = true;
+
+        if (posts.length > 0) {
           document.getElementById('feed-empty').classList.add('hidden');
-          const likesMap = {};
-          if (currentUser) {
-            const postIds = data.map(p => p.id);
-            const { data: likes } = await sb.from('community_likes').select('post_id').eq('user_id', currentUser.id).in('post_id', postIds);
-            (likes || []).forEach(l => likesMap[l.post_id] = true);
+
+          let likesMap = {};
+          let likeCounts, commentCounts;
+
+          if (useDemos) {
+            likeCounts = posts.map(p => ({ count: p._likes || 0 }));
+            commentCounts = posts.map(p => ({ count: p._comments || 0 }));
+          } else {
+            if (currentUser) {
+              const postIds = posts.map(p => p.id);
+              const { data: likes } = await sb.from('community_likes').select('post_id').eq('user_id', currentUser.id).in('post_id', postIds);
+              (likes || []).forEach(l => likesMap[l.post_id] = true);
+            }
+            const countPromises = posts.map(p => sb.from('community_likes').select('id', { count: 'exact', head: true }).eq('post_id', p.id));
+            const commentCountPromises = posts.map(p => sb.from('community_comments').select('id', { count: 'exact', head: true }).eq('post_id', p.id));
+            [likeCounts, commentCounts] = await Promise.all([Promise.all(countPromises), Promise.all(commentCountPromises)]);
           }
-          const countPromises = data.map(p => sb.from('community_likes').select('id', { count: 'exact', head: true }).eq('post_id', p.id));
-          const commentCountPromises = data.map(p => sb.from('community_comments').select('id', { count: 'exact', head: true }).eq('post_id', p.id));
-          const [likeCounts, commentCounts] = await Promise.all([Promise.all(countPromises), Promise.all(commentCountPromises)]);
+
+          let postsWithCounts = posts.map((post, i) => ({
+            post,
+            liked: likesMap[post.id] || false,
+            likeCount: useDemos ? (likeCounts[i].count) : (likeCounts[i].count || 0),
+            commentCount: useDemos ? (commentCounts[i].count) : (commentCounts[i].count || 0),
+            shareCount: post._shares || 0,
+            interactionScore: (useDemos ? likeCounts[i].count : (likeCounts[i].count || 0))
+              + (useDemos ? commentCounts[i].count : (commentCounts[i].count || 0)) * 2
+              + (post._shares || 0) * 3
+          }));
+
+          if (feedView === 'pueblo') {
+            postsWithCounts.sort((a, b) => b.interactionScore - a.interactionScore);
+          }
 
           const feed = document.getElementById('community-feed');
-          data.forEach((post, i) => {
-            feed.insertAdjacentHTML('beforeend', renderPost(post, likesMap[post.id], likeCounts[i].count || 0, commentCounts[i].count || 0));
+          postsWithCounts.forEach(({ post, liked, likeCount, commentCount }, idx) => {
+            const rank = feedView === 'pueblo' ? idx + 1 + (feedPage * PAGE_SIZE) : 0;
+            feed.insertAdjacentHTML('beforeend', renderPost(post, liked, likeCount, commentCount, rank));
           });
           feedPage++;
+        } else {
+          document.getElementById('feed-empty').classList.remove('hidden');
         }
         if (feedDone) document.getElementById('feed-end').classList.remove('hidden');
       } catch(e) {
         console.error('Feed error:', e);
-        if (feedPage === 0) document.getElementById('feed-empty').classList.remove('hidden');
+        if (feedPage === 0) {
+          loadDemoFeed();
+        }
       }
       feedLoading = false;
       document.getElementById('feed-loading').classList.add('hidden');
+    }
+
+    function loadDemoFeed() {
+      const feed = document.getElementById('community-feed');
+      document.getElementById('feed-empty').classList.add('hidden');
+      let demoPosts = DEMO_POSTS.map(d => ({
+        post: { ...d, author_id: d.author.id, shared_post: null, _isDemo: true },
+        liked: false,
+        likeCount: d._likes,
+        commentCount: d._comments,
+        shareCount: d._shares,
+        interactionScore: d._likes + d._comments * 2 + d._shares * 3
+      }));
+      if (feedView === 'pueblo') {
+        demoPosts.sort((a, b) => b.interactionScore - a.interactionScore);
+      }
+      demoPosts.forEach(({ post, liked, likeCount, commentCount }, idx) => {
+        const rank = feedView === 'pueblo' ? idx + 1 : 0;
+        feed.insertAdjacentHTML('beforeend', renderPost(post, liked, likeCount, commentCount, rank));
+      });
+      feedDone = true;
+      document.getElementById('feed-end').classList.remove('hidden');
     }
 
     function onScroll() {
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 400) loadFeed();
     }
 
-    function renderPost(post, liked, likeCount, commentCount) {
+    function renderPost(post, liked, likeCount, commentCount, rank) {
       const a = post.author;
       if (!a) return '';
       const name = a.display_name || a.username || 'Usuario';
@@ -383,6 +533,10 @@
         : `<span class="text-creo-purple font-bold text-sm">${esc(name[0].toUpperCase())}</span>`;
       const verified = a.verification_status === 'approved' ? '<svg class="w-4 h-4 text-creo-mint flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' : '';
       const isOwner = currentUser && currentUser.id === post.author_id;
+      const isDemo = post._isDemo;
+      const rankBadge = rank && rank <= 3 ? `<span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${rank === 1 ? 'bg-yellow-100 text-yellow-700' : rank === 2 ? 'bg-gray-100 text-gray-600' : 'bg-orange-50 text-orange-600'}">
+        ${rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'} #${rank} del Pueblo
+      </span>` : rank ? `<span class="text-[10px] text-gray-400 font-semibold">#${rank}</span>` : '';
 
       let mediaHtml = '';
       const media = post.media_urls || [];
@@ -425,9 +579,10 @@
             <div class="flex items-center gap-3">
               <a href="profile.html?u=${esc(a.username || '')}" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-creo-mint transition">${avatar}</a>
               <div>
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-1.5">
                   <a href="profile.html?u=${esc(a.username || '')}" class="font-bold text-sm text-gray-900 hover:text-creo-purple transition">${esc(name)}</a>
                   ${verified}
+                  ${rankBadge}
                 </div>
                 <p class="text-[10px] text-gray-400">${timeAgo(post.created_at)}</p>
               </div>
@@ -463,15 +618,15 @@
           ${sharedHtml}
           <!-- Actions -->
           <div class="flex items-center justify-between pt-2 border-t border-gray-100">
-            <button onclick="toggleLike('${post.id}', this)" class="flex items-center gap-1.5 text-sm transition ${liked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}">
+            <button onclick="${isDemo ? "showToast('Inicia sesion para interactuar','info')" : `toggleLike('${post.id}', this)`}" class="flex items-center gap-1.5 text-sm transition ${liked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}">
               <svg class="w-5 h-5" fill="${liked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
               <span class="like-count">${likeCount}</span>
             </button>
-            <button onclick="openComments('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-purple transition">
+            <button onclick="${isDemo ? "showToast('Inicia sesion para comentar','info')" : `openComments('${post.id}')`}" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-purple transition">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
               <span>${commentCount}</span>
             </button>
-            <button onclick="openShareModal('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-mint transition">
+            <button onclick="${isDemo ? "showToast('Inicia sesion para compartir','info')" : `openShareModal('${post.id}')`}" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-mint transition">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
               Compartir
             </button>
@@ -481,7 +636,9 @@
     }
 
     function linkify(text) {
-      return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" class="text-creo-mint hover:underline">$1</a>');
+      return text
+        .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" class="text-creo-mint hover:underline">$1</a>')
+        .replace(/@(\w+)/g, '<a href="profile.html?u=$1" class="mention-tag hover:underline">@$1</a>');
     }
 
     function timeAgo(date) {
@@ -581,7 +738,9 @@
       document.getElementById('compose-submit').disabled = true;
       document.getElementById('compose-modal').classList.remove('hidden');
       setComposeType('normal');
-      document.getElementById('compose-body').focus();
+      const composeBody = document.getElementById('compose-body');
+      composeBody.focus();
+      setupMentionListener(composeBody);
       createEmojiPicker('compose-body', 'compose-emoji-btn');
     }
 
@@ -903,6 +1062,231 @@
       document.getElementById('community-feed').innerHTML = '';
       feedPage = 0; feedDone = false;
       loadFeed();
+    }
+
+    // --- @Mention Autocomplete ---
+    let mentionActive = false;
+    let mentionInput = null;
+    let mentionStart = -1;
+    let mentionResults = [];
+    let mentionSelectedIdx = 0;
+    let mentionCache = [];
+
+    function getDemoProfiles() {
+      return DEMO_POSTS.reduce((acc, p) => {
+        if (!acc.find(x => x.username === p.author.username)) {
+          acc.push({ username: p.author.username, display_name: p.author.display_name, avatar_url: p.author.avatar_url, bio: null, verification_status: 'approved' });
+        }
+        return acc;
+      }, []);
+    }
+
+    async function loadMentionCache() {
+      try {
+        const { data, error } = await sb.from('profiles').select('username, display_name, avatar_url').limit(200);
+        if (error || !data || data.length === 0) {
+          mentionCache = getDemoProfiles();
+        } else {
+          mentionCache = data;
+        }
+      } catch(e) {
+        mentionCache = getDemoProfiles();
+      }
+    }
+
+    function setupMentionListener(inputEl) {
+      inputEl.addEventListener('input', () => handleMentionInput(inputEl));
+      inputEl.addEventListener('keydown', (e) => handleMentionKeydown(e, inputEl));
+      inputEl.addEventListener('blur', () => setTimeout(closeMentionDropdown, 200));
+    }
+
+    function handleMentionInput(inputEl) {
+      const isTextarea = inputEl.tagName === 'TEXTAREA';
+      const val = isTextarea ? inputEl.value : inputEl.value;
+      const pos = inputEl.selectionStart;
+      const before = val.substring(0, pos);
+      const match = before.match(/@(\w*)$/);
+
+      if (match) {
+        mentionActive = true;
+        mentionInput = inputEl;
+        mentionStart = pos - match[1].length;
+        const query = match[1].toLowerCase();
+        mentionResults = mentionCache.filter(p =>
+          (p.username && p.username.toLowerCase().includes(query)) ||
+          (p.display_name && p.display_name.toLowerCase().includes(query))
+        ).slice(0, 6);
+        mentionSelectedIdx = 0;
+        renderMentionDropdown(inputEl);
+      } else {
+        closeMentionDropdown();
+      }
+    }
+
+    function handleMentionKeydown(e, inputEl) {
+      if (!mentionActive || mentionResults.length === 0) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        mentionSelectedIdx = (mentionSelectedIdx + 1) % mentionResults.length;
+        renderMentionDropdown(inputEl);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        mentionSelectedIdx = (mentionSelectedIdx - 1 + mentionResults.length) % mentionResults.length;
+        renderMentionDropdown(inputEl);
+      } else if (e.key === 'Enter' && mentionActive) {
+        e.preventDefault();
+        selectMention(mentionResults[mentionSelectedIdx]);
+      } else if (e.key === 'Escape') {
+        closeMentionDropdown();
+      }
+    }
+
+    function renderMentionDropdown(inputEl) {
+      const dd = document.getElementById('mention-dropdown');
+      if (mentionResults.length === 0) { dd.classList.add('hidden'); return; }
+
+      const rect = inputEl.getBoundingClientRect();
+      dd.style.left = rect.left + 'px';
+      dd.style.top = (rect.bottom + 4) + 'px';
+      dd.style.width = Math.min(rect.width, 280) + 'px';
+      dd.classList.remove('hidden');
+
+      dd.innerHTML = mentionResults.map((p, i) => {
+        const name = p.display_name || p.username || '?';
+        const avatar = p.avatar_url
+          ? `<img src="${esc(p.avatar_url)}" class="w-8 h-8 rounded-full object-cover">`
+          : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-creo-purple font-bold text-xs">${esc(name[0].toUpperCase())}</span></div>`;
+        return `<div class="mention-item ${i === mentionSelectedIdx ? 'active' : ''}" onmousedown="selectMention(mentionResults[${i}])">
+          ${avatar}
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-gray-900 truncate">${esc(name)}</p>
+            <p class="text-[10px] text-gray-400 truncate">@${esc(p.username || '')}</p>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function selectMention(profile) {
+      if (!mentionInput || !profile) return;
+      const val = mentionInput.value;
+      const before = val.substring(0, mentionStart);
+      const after = val.substring(mentionInput.selectionStart);
+      mentionInput.value = before + profile.username + ' ' + after;
+      mentionInput.selectionStart = mentionInput.selectionEnd = mentionStart + profile.username.length + 1;
+      mentionInput.focus();
+      closeMentionDropdown();
+      checkComposeValid();
+    }
+
+    function closeMentionDropdown() {
+      mentionActive = false;
+      document.getElementById('mention-dropdown').classList.add('hidden');
+    }
+
+    function insertMentionTrigger() {
+      const ta = document.getElementById('compose-body');
+      const pos = ta.selectionStart;
+      const val = ta.value;
+      const needsSpace = pos > 0 && val[pos - 1] !== ' ' && val[pos - 1] !== '\n';
+      const insert = (needsSpace ? ' ' : '') + '@';
+      ta.value = val.substring(0, pos) + insert + val.substring(pos);
+      ta.selectionStart = ta.selectionEnd = pos + insert.length;
+      ta.focus();
+      handleMentionInput(ta);
+    }
+
+    // --- Find Friends ---
+    let friendsSearchTimeout = null;
+
+    function openFindFriends() {
+      document.getElementById('friends-modal').classList.remove('hidden');
+      document.getElementById('friends-search').value = '';
+      document.getElementById('friends-results').innerHTML = '<p class="text-center text-gray-400 text-sm py-8">Escribe un nombre para buscar creadores</p>';
+      setTimeout(() => document.getElementById('friends-search').focus(), 100);
+    }
+
+    function closeFindFriends() {
+      document.getElementById('friends-modal').classList.add('hidden');
+    }
+
+    function searchFriends(query) {
+      clearTimeout(friendsSearchTimeout);
+      const q = query.trim().toLowerCase();
+      if (q.length < 2) {
+        document.getElementById('friends-results').innerHTML = '<p class="text-center text-gray-400 text-sm py-8">Escribe al menos 2 caracteres</p>';
+        return;
+      }
+      document.getElementById('friends-results').innerHTML = '<p class="text-center text-gray-400 text-sm py-4">Buscando...</p>';
+      friendsSearchTimeout = setTimeout(() => doFriendsSearch(q), 300);
+    }
+
+    async function doFriendsSearch(q) {
+      let results = [];
+      try {
+        const { data, error } = await sb.from('profiles')
+          .select('id, username, display_name, avatar_url, bio, verification_status')
+          .or(`username.ilike.%${q}%,display_name.ilike.%${q}%`)
+          .limit(20);
+        if (!error && data && data.length > 0) {
+          results = data;
+        } else {
+          results = getDemoProfiles().filter(p =>
+            (p.username && p.username.toLowerCase().includes(q)) ||
+            (p.display_name && p.display_name.toLowerCase().includes(q))
+          ).map(p => ({ ...p, id: p.username }));
+        }
+      } catch(e) {
+        results = getDemoProfiles().filter(p =>
+          (p.username && p.username.toLowerCase().includes(q)) ||
+          (p.display_name && p.display_name.toLowerCase().includes(q))
+        ).map(p => ({ ...p, id: p.username }));
+      }
+
+      const container = document.getElementById('friends-results');
+      if (results.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">No se encontraron creadores</p>';
+        return;
+      }
+
+      container.innerHTML = results.map(p => {
+        const name = p.display_name || p.username || '?';
+        const avatar = p.avatar_url
+          ? `<img src="${esc(p.avatar_url)}" class="w-12 h-12 rounded-full object-cover flex-shrink-0">`
+          : `<div class="w-12 h-12 rounded-full bg-creo-purple/10 flex items-center justify-center flex-shrink-0"><span class="text-creo-purple font-bold">${esc(name[0].toUpperCase())}</span></div>`;
+        const verified = p.verification_status === 'approved' ? '<svg class="w-3.5 h-3.5 text-creo-mint flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' : '';
+        const isSelf = currentUser && currentUser.id === p.id;
+        return `<div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition">
+          <a href="profile.html?u=${esc(p.username || '')}">${avatar}</a>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1">
+              <a href="profile.html?u=${esc(p.username || '')}" class="font-bold text-sm text-gray-900 hover:text-creo-purple truncate">${esc(name)}</a>
+              ${verified}
+            </div>
+            <p class="text-xs text-gray-400 truncate">@${esc(p.username || '')}</p>
+            ${p.bio ? `<p class="text-xs text-gray-500 mt-0.5 line-clamp-1">${esc(p.bio)}</p>` : ''}
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            ${!isSelf ? `<button onclick="tagFriendFromSearch('${esc(p.username || '')}')" class="text-[10px] font-bold px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 hover:bg-creo-purple/10 hover:text-creo-purple transition" title="Etiquetar en publicacion">
+              @ Etiquetar
+            </button>` : ''}
+            <a href="profile.html?u=${esc(p.username || '')}" class="text-[10px] font-bold px-3 py-1.5 rounded-full bg-creo-mint/20 text-creo-purple hover:bg-creo-mint/40 transition">
+              Ver Perfil
+            </a>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function tagFriendFromSearch(username) {
+      closeFindFriends();
+      openCompose('text');
+      setTimeout(() => {
+        const ta = document.getElementById('compose-body');
+        ta.value = '@' + username + ' ';
+        ta.selectionStart = ta.selectionEnd = ta.value.length;
+        ta.focus();
+        checkComposeValid();
+      }, 200);
     }
 
     // Lightbox
