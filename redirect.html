@@ -30,6 +30,11 @@
       </div>
     </div>
   </div>
+  <script>
+    // Capture hash BEFORE Supabase client strips it
+    const _rawHash = window.location.hash;
+    const _isOAuthCallback = _rawHash.includes('access_token=');
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="shared.js"></script>
   <script>
@@ -124,48 +129,42 @@
       setStatus('Incompleto', 'Onboarding incompleto. Redirigiendo para reintentar...', 'text-yellow-600');
       setTimeout(() => { window.location.href = 'index.html'; }, 2500);
     } else {
-      let redirectStarted = false;
-
-      function doRedirect(user) {
-        if (redirectStarted) return;
-        redirectStarted = true;
-        handleProfileSetup(user).catch(() => {});
-        if (isAdmin(user.email)) {
-          sessionStorage.setItem('admin_mode', 'true');
-        }
+      if (_isOAuthCallback) {
         setStatus('¡Cuenta verificada!', 'Redirigiendo en 3 segundos...');
         startCountdown('index.html', 3);
-      }
 
-      const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
-        if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
-          subscription.unsubscribe();
-          doRedirect(session.user);
-        }
-      });
-
-      (async () => {
-        const hasCode = urlParams.get('code');
-        if (hasCode) {
+        (async () => {
           try {
-            const { data } = await sb.auth.exchangeCodeForSession(hasCode);
-            if (data?.user) doRedirect(data.user);
-          } catch (e) { console.log('Code exchange error:', e); }
-        }
+            const { data: { session } } = await sb.auth.getSession();
+            if (session?.user) await handleProfileSetup(session.user);
+          } catch (e) { console.log('Profile setup deferred:', e); }
+        })();
+      } else {
+        const hasCode = urlParams.get('code');
 
-        const { data: { session } } = await sb.auth.getSession();
-        if (session?.user) {
-          subscription.unsubscribe();
-          doRedirect(session.user);
-        }
-
-        setTimeout(() => {
-          if (!redirectStarted) {
-            setStatus('Sesión no detectada', 'Redirigiendo...');
-            window.location.href = 'index.html';
+        (async () => {
+          if (hasCode) {
+            try {
+              const { data } = await sb.auth.exchangeCodeForSession(hasCode);
+              if (data?.user) {
+                await handleProfileSetup(data.user);
+                setStatus('¡Cuenta verificada!', 'Redirigiendo en 3 segundos...');
+                startCountdown('index.html', 3);
+                return;
+              }
+            } catch (e) { console.log('Code exchange error:', e); }
           }
-        }, 6000);
-      })();
+
+          const { data: { session } } = await sb.auth.getSession();
+          if (session?.user) {
+            await handleProfileSetup(session.user);
+            setStatus('¡Cuenta verificada!', 'Redirigiendo en 3 segundos...');
+            startCountdown('index.html', 3);
+          } else {
+            setTimeout(() => { window.location.href = 'index.html'; }, 5000);
+          }
+        })();
+      }
     }
   </script>
 </body>
