@@ -141,6 +141,7 @@
         <button onclick="showTab('branding');closeHerramientas()" id="tab-branding" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎨 Mi Branding</button>
         <button onclick="showTab('events');closeHerramientas()" id="tab-events" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">📅 Eventos</button>
         <button onclick="showTab('livestream');closeHerramientas()" id="tab-livestream" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">📡 En Vivo</button>
+        <button onclick="showTab('cine');closeHerramientas()" id="tab-cine" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎬 Cine Local</button>
         <a href="brand-deals.html" id="tab-deals-link" class="hidden w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium block">🤝 Brand Deals</a>
       </div>
 
@@ -927,6 +928,65 @@
         </div>
       </div>
 
+      <!-- TAB: Cine Local -->
+      <div id="panel-cine" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+          <h3 class="font-bold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg>
+            Publicar en Cine Local
+          </h3>
+          <p class="text-xs text-gray-500">Sube contenido cinematográfico en formato horizontal. Cortometrajes, documentales, videos musicales y más.</p>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Título</label>
+            <input id="cine-title" type="text" placeholder="Nombre de tu película o video" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
+            <textarea id="cine-desc" rows="3" placeholder="Sinopsis o descripción del contenido..." class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm resize-none"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
+              <select id="cine-category" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+                <option value="">Seleccionar...</option>
+                <option value="Cortometrajes">Cortometrajes</option>
+                <option value="Documentales">Documentales</option>
+                <option value="Música">Música</option>
+                <option value="Arte">Arte</option>
+                <option value="Comedia">Comedia</option>
+                <option value="Drama">Drama</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Duración</label>
+              <input id="cine-duration" type="text" placeholder="12:34" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Archivo de Video</label>
+            <input id="cine-video-file" type="file" accept="video/*" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple hover:file:opacity-80 cursor-pointer">
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Miniatura (Thumbnail)</label>
+            <input id="cine-thumbnail-file" type="file" accept="image/*" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple hover:file:opacity-80 cursor-pointer">
+          </div>
+
+          <button onclick="publishCineVideo()" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 rounded-xl transition text-sm">🎬 Publicar en Cine Local</button>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-3">
+          <h4 class="font-bold text-gray-900 text-sm">Mis Películas</h4>
+          <div id="my-cine-list" class="space-y-2">
+            <p class="text-center text-gray-400 text-xs py-4">Publica tu primer video para verlo aquí.</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -956,7 +1016,7 @@
       if (!e.target.closest('#tab-herramientas') && !e.target.closest('#herramientas-menu')) closeHerramientas();
     });
 
-    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'events', 'livestream', 'deals'];
+    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'events', 'livestream', 'deals', 'cine'];
 
     function showTab(tab) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
@@ -979,6 +1039,7 @@
       if (tab === 'events') loadMyEvents();
       if (tab === 'livestream') initLivestreamPanel();
       if (tab === 'creoellos') loadCreoEllosPanel();
+      if (tab === 'cine') loadCinePanel();
     }
 
     // ===== BRANDING PANEL =====
@@ -3161,6 +3222,100 @@
           </div>
         </div>`;
       }).join('');
+    }
+
+    // ===== CINE LOCAL =====
+    async function loadCinePanel() {
+      if (!currentUser) return;
+      const list = document.getElementById('my-cine-list');
+      list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Cargando...</p>';
+
+      try {
+        const { data, error } = await sb.from('cine_local').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false });
+        if (error || !data || !data.length) {
+          list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">No has publicado contenido en Cine Local aún.</p>';
+          return;
+        }
+        list.innerHTML = data.map(v => `
+          <div class="flex items-center gap-3 p-3 border border-gray-200 rounded-xl">
+            <div class="w-24 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+              ${v.thumbnail_url ? `<img src="${esc(v.thumbnail_url)}" class="w-full h-full object-cover">` : '<div class="w-full h-full flex items-center justify-center text-gray-300"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg></div>'}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-sm truncate">${esc(v.title)}</p>
+              <p class="text-xs text-gray-400">${esc(v.category || '')} · ${esc(v.duration || '')}</p>
+            </div>
+            <button onclick="deleteCineVideo('${v.id}')" class="text-red-400 hover:text-red-600 p-1" title="Eliminar">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        `).join('');
+      } catch (e) {
+        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Error al cargar.</p>';
+      }
+    }
+
+    async function publishCineVideo() {
+      if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
+      const title = document.getElementById('cine-title').value.trim();
+      const description = document.getElementById('cine-desc').value.trim();
+      const category = document.getElementById('cine-category').value;
+      const duration = document.getElementById('cine-duration').value.trim();
+      const videoFile = document.getElementById('cine-video-file').files[0];
+      const thumbFile = document.getElementById('cine-thumbnail-file').files[0];
+
+      if (!title) { showToast('Agrega un título', 'error'); return; }
+      if (!videoFile) { showToast('Selecciona un video', 'error'); return; }
+      if (!category) { showToast('Selecciona una categoría', 'error'); return; }
+
+      const btn = document.querySelector('#panel-cine button[onclick="publishCineVideo()"]');
+      btn.disabled = true; btn.textContent = 'Subiendo video...';
+
+      try {
+        const video_url = await uploadToStorage(videoFile, 'cine-local', 500);
+        if (!video_url) { showToast('Error al subir video', 'error'); btn.disabled = false; btn.textContent = '🎬 Publicar en Cine Local'; return; }
+
+        let thumbnail_url = null;
+        if (thumbFile) {
+          thumbnail_url = await uploadToStorage(thumbFile, 'cine-local', 10);
+        }
+
+        const { error } = await sb.from('cine_local').insert({
+          creator_id: currentUser.id,
+          title,
+          description: description || null,
+          video_url,
+          thumbnail_url,
+          category,
+          duration: duration || null
+        });
+
+        if (error) throw error;
+        showToast('Video publicado en Cine Local', 'success');
+        document.getElementById('cine-title').value = '';
+        document.getElementById('cine-desc').value = '';
+        document.getElementById('cine-category').value = '';
+        document.getElementById('cine-duration').value = '';
+        document.getElementById('cine-video-file').value = '';
+        document.getElementById('cine-thumbnail-file').value = '';
+        loadCinePanel();
+      } catch (e) {
+        showToast('Error: ' + (e.message || ''), 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = '🎬 Publicar en Cine Local';
+      }
+    }
+
+    async function deleteCineVideo(id) {
+      if (!confirm('¿Eliminar este video de Cine Local?')) return;
+      try {
+        const { error } = await sb.from('cine_local').delete().eq('id', id).eq('creator_id', currentUser.id);
+        if (error) throw error;
+        showToast('Video eliminado', 'success');
+        loadCinePanel();
+      } catch (e) {
+        showToast('Error: ' + (e.message || ''), 'error');
+      }
     }
 
     // Brand Deals moved to brand-deals.html and empresa-profile.html

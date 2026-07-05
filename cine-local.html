@@ -49,10 +49,16 @@
         </a>
         <h1 class="text-lg font-bold tracking-[0.2em] text-creo-mint">CINE LOCAL</h1>
       </div>
-      <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-white/10 transition">
-        <svg class="w-5 h-5 text-gray-400 theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        <svg class="w-5 h-5 text-gray-300 theme-icon-moon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-      </button>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-white/10 transition">
+          <svg class="w-5 h-5 text-gray-400 theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <svg class="w-5 h-5 text-gray-300 theme-icon-moon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <button id="cine-upload-btn" class="hidden bg-creo-mint text-black font-bold text-sm px-4 py-1.5 rounded-full hover:bg-creo-mintDark transition flex items-center gap-1" onclick="openUploadModal()">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+          Publicar
+        </button>
+      </div>
     </div>
   </header>
 
@@ -79,6 +85,18 @@
       </div>
     </section>
 
+    <!-- Search Bar -->
+    <section class="px-4 mb-4">
+      <div class="max-w-6xl mx-auto">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input id="cine-search" type="text" placeholder="Buscar películas, creadores..."
+            class="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-creo-mint focus:border-transparent outline-none"
+            oninput="searchVideos(this.value)">
+        </div>
+      </div>
+    </section>
+
     <!-- Featured Hero -->
     <section id="hero-section" class="px-4 mb-10">
       <div class="max-w-6xl mx-auto">
@@ -93,7 +111,81 @@
       <!-- filled by JS -->
     </div>
 
+    <!-- My Films Section (visible when logged in) -->
+    <section id="my-films-section" class="hidden px-4 mb-10">
+      <div class="max-w-6xl mx-auto">
+        <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
+          <span class="text-creo-mint">Mis Películas</span>
+        </h3>
+        <div id="my-films-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        </div>
+      </div>
+    </section>
+
   </main>
+
+  <!-- Upload Modal -->
+  <div id="upload-modal" class="fixed inset-0 z-[100] hidden modal-backdrop flex items-center justify-center p-4">
+    <div class="bg-[#1a1a1a] rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in border border-white/10">
+      <div class="flex items-center justify-between p-5 border-b border-white/10">
+        <h2 class="text-lg font-bold">Publicar en Cine Local</h2>
+        <button onclick="closeUploadModal()" class="text-gray-400 hover:text-white transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-5 space-y-4">
+        <!-- Title -->
+        <div>
+          <label class="block text-sm text-gray-400 mb-1">Título *</label>
+          <input id="upload-title" type="text" placeholder="Nombre de tu película"
+            class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-creo-mint focus:border-transparent outline-none">
+        </div>
+        <!-- Description -->
+        <div>
+          <label class="block text-sm text-gray-400 mb-1">Descripción</label>
+          <textarea id="upload-desc" rows="3" placeholder="Cuenta la historia detrás de tu película..."
+            class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-creo-mint focus:border-transparent outline-none resize-none"></textarea>
+        </div>
+        <!-- Category -->
+        <div>
+          <label class="block text-sm text-gray-400 mb-1">Categoría *</label>
+          <select id="upload-category"
+            class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:ring-2 focus:ring-creo-mint focus:border-transparent outline-none appearance-none">
+            <option value="" class="bg-[#1a1a1a]">Seleccionar categoría</option>
+            <option value="Cortometrajes" class="bg-[#1a1a1a]">Cortometrajes</option>
+            <option value="Documentales" class="bg-[#1a1a1a]">Documentales</option>
+            <option value="Música" class="bg-[#1a1a1a]">Música</option>
+            <option value="Arte" class="bg-[#1a1a1a]">Arte</option>
+            <option value="Comedia" class="bg-[#1a1a1a]">Comedia</option>
+            <option value="Drama" class="bg-[#1a1a1a]">Drama</option>
+          </select>
+        </div>
+        <!-- Duration -->
+        <div>
+          <label class="block text-sm text-gray-400 mb-1">Duración</label>
+          <input id="upload-duration" type="text" placeholder="ej. 12:34"
+            class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-creo-mint focus:border-transparent outline-none">
+        </div>
+        <!-- Video Upload -->
+        <div>
+          <label class="block text-sm text-gray-400 mb-1">Video *</label>
+          <input id="upload-video" type="file" accept="video/*"
+            class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-creo-mint/10 file:text-creo-mint hover:file:bg-creo-mint/20">
+        </div>
+        <!-- Thumbnail Upload -->
+        <div>
+          <label class="block text-sm text-gray-400 mb-1">Miniatura (opcional)</label>
+          <input id="upload-thumb" type="file" accept="image/*"
+            class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-creo-mint/10 file:text-creo-mint hover:file:bg-creo-mint/20">
+        </div>
+        <!-- Submit -->
+        <button id="upload-submit-btn" onclick="submitCineUpload()"
+          class="w-full bg-creo-mint text-black font-bold text-sm py-3 rounded-full hover:bg-creo-mintDark transition mt-2">
+          Publicar
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Video Player Modal -->
   <div id="player-modal" class="fixed inset-0 z-[100] hidden modal-backdrop">
@@ -195,6 +287,16 @@
     renderBottomNav('cine');
     initTheme();
     updateNavAuth();
+
+    // Show upload button and My Films for logged-in creators
+    try {
+      const { data: { user } } = await sb.auth.getUser();
+      if (user) {
+        cineCurrentUser = user;
+        document.getElementById('cine-upload-btn').classList.remove('hidden');
+        loadMyFilms(user.id);
+      }
+    } catch(e) {}
   });
 
   /* ── Load from Supabase or fall back to demo ──────────── */
@@ -331,17 +433,22 @@
 
   function videoCard(v, safe) {
     return `
-      <div class="card-hover rounded-lg overflow-hidden bg-white/5 cursor-pointer group" onclick="openPlayer(allVideos.find(x=>x.id==='${v.id}'))">
+      <div class="card-hover rounded-xl overflow-hidden bg-white/5 cursor-pointer group" onclick="openPlayer(allVideos.find(x=>x.id==='${v.id}'))">
         <div class="relative aspect-video">
-          <img src="${safe(v.thumbnail)}" alt="${safe(v.title)}" class="w-full h-full object-cover" loading="lazy">
+          <img src="${safe(v.thumbnail)}" alt="${safe(v.title)}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" loading="lazy">
+          <!-- Gradient overlay on hover -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+            <h4 class="text-sm font-bold leading-tight">${safe(v.title)}</h4>
+            <p class="text-[11px] text-gray-300 mt-1 line-clamp-2">${safe(v.description)}</p>
+          </div>
           <!-- Play overlay -->
-          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition flex items-center justify-center">
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="w-10 h-10 rounded-full bg-creo-mint/0 group-hover:bg-creo-mint/90 flex items-center justify-center transition opacity-0 group-hover:opacity-100">
               <svg class="w-5 h-5 text-black ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </div>
           </div>
           <!-- Duration -->
-          <span class="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] px-1.5 py-0.5 rounded">${safe(v.duration)}</span>
+          <span class="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] px-1.5 py-0.5 rounded z-10">${safe(v.duration)}</span>
         </div>
         <div class="p-3">
           <h4 class="text-sm font-semibold truncate">${safe(v.title)}</h4>
@@ -398,9 +505,136 @@
     document.body.style.overflow = '';
   }
 
-  // Close modal on Escape
+  /* ── Search ────────────────────────────────────────────── */
+  function searchVideos(query) {
+    const q = query.toLowerCase().trim();
+    if (!q) { renderAll(); return; }
+    const filtered = allVideos.filter(v =>
+      v.title.toLowerCase().includes(q) ||
+      v.creator.toLowerCase().includes(q) ||
+      v.description.toLowerCase().includes(q) ||
+      v.category.toLowerCase().includes(q)
+    );
+    renderContentRows(filtered);
+    // Hide hero during search
+    document.getElementById('hero-section').classList.toggle('hidden', q.length > 0);
+  }
+
+  /* ── Upload Modal ─────────────────────────────────────── */
+  let cineCurrentUser = null;
+
+  function openUploadModal() {
+    document.getElementById('upload-modal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeUploadModal() {
+    document.getElementById('upload-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  async function submitCineUpload() {
+    const title = document.getElementById('upload-title').value.trim();
+    const desc = document.getElementById('upload-desc').value.trim();
+    const cat = document.getElementById('upload-category').value;
+    const dur = document.getElementById('upload-duration').value.trim();
+    const videoFile = document.getElementById('upload-video').files[0];
+    const thumbFile = document.getElementById('upload-thumb').files[0];
+
+    if (!title) { showToast('Agrega un título', 'error'); return; }
+    if (!videoFile) { showToast('Selecciona un video', 'error'); return; }
+    if (!cat) { showToast('Selecciona una categoría', 'error'); return; }
+
+    const btn = document.getElementById('upload-submit-btn');
+    btn.disabled = true; btn.textContent = 'Subiendo...';
+
+    try {
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) throw new Error('No autenticado');
+
+      const video_url = await uploadToStorage(videoFile, 'cine-local', 500);
+      if (!video_url) throw new Error('Error al subir video');
+
+      let thumbnail_url = null;
+      if (thumbFile) {
+        thumbnail_url = await uploadToStorage(thumbFile, 'cine-local', 10);
+      }
+
+      const { error } = await sb.from('cine_local').insert({
+        creator_id: user.id,
+        title, description: desc || null, video_url, thumbnail_url, category: cat, duration: dur || null
+      });
+      if (error) throw error;
+
+      showToast('Publicado en Cine Local', 'success');
+      closeUploadModal();
+      // Clear form
+      document.getElementById('upload-title').value = '';
+      document.getElementById('upload-desc').value = '';
+      document.getElementById('upload-category').value = '';
+      document.getElementById('upload-duration').value = '';
+      document.getElementById('upload-video').value = '';
+      document.getElementById('upload-thumb').value = '';
+      // Reload
+      await loadVideos();
+      renderAll();
+      loadMyFilms(user.id);
+    } catch (e) {
+      showToast('Error: ' + (e.message || ''), 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Publicar';
+    }
+  }
+
+  /* ── My Films ─────────────────────────────────────────── */
+  async function loadMyFilms(userId) {
+    try {
+      const { data } = await sb.from('cine_local').select('*').eq('creator_id', userId).order('created_at', { ascending: false });
+      if (data && data.length) {
+        document.getElementById('my-films-section').classList.remove('hidden');
+        const safe = typeof esc === 'function' ? esc : s => s;
+        document.getElementById('my-films-grid').innerHTML = data.map(v => `
+          <div class="rounded-lg overflow-hidden bg-white/5 group relative">
+            <div class="relative aspect-video">
+              <img src="${safe(v.thumbnail_url || 'https://picsum.photos/seed/' + v.id + '/640/360')}" class="w-full h-full object-cover" loading="lazy">
+              <span class="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] px-1.5 py-0.5 rounded">${safe(v.duration || '')}</span>
+            </div>
+            <div class="p-3 flex items-center justify-between">
+              <div class="min-w-0 flex-1">
+                <h4 class="text-sm font-semibold truncate">${safe(v.title)}</h4>
+                <p class="text-xs text-gray-500">${safe(v.category || '')}</p>
+              </div>
+              <button onclick="deleteMyCineFilm('${v.id}')" class="text-red-400 hover:text-red-500 p-1 flex-shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+    } catch(e) {}
+  }
+
+  async function deleteMyCineFilm(id) {
+    if (!confirm('¿Eliminar este video?')) return;
+    try {
+      const { data: { user } } = await sb.auth.getUser();
+      const { error } = await sb.from('cine_local').delete().eq('id', id).eq('creator_id', user.id);
+      if (error) throw error;
+      showToast('Video eliminado', 'success');
+      await loadVideos();
+      renderAll();
+      loadMyFilms(user.id);
+    } catch(e) {
+      showToast('Error: ' + (e.message || ''), 'error');
+    }
+  }
+
+  // Close modals on Escape
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closePlayer();
+    if (e.key === 'Escape') {
+      closePlayer();
+      closeUploadModal();
+    }
   });
   </script>
 </body>
