@@ -8,6 +8,32 @@ function isAdmin(email) { return email === ADMIN_EMAIL; }
 
 // ========== AUTHENTICATION ==========
 
+// Post-login redirect logic
+async function handlePostLoginRedirect() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+
+  // Check if user has visited before (check if profile was created before today)
+  const { data: profile } = await sb.from('profiles').select('created_at').eq('id', user.id).single();
+  
+  if (profile) {
+    const createdAt = new Date(profile.created_at);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (createdAt < today) {
+      // Not first visit — go to Comunidad
+      window.location.href = 'comunidad.html';
+    } else {
+      // First visit today — go to Panel (index.html shows dashboard)
+      window.location.href = 'index.html';
+    }
+  } else {
+    // First time ever — go to Panel
+    window.location.href = 'index.html';
+  }
+}
+
 // Google OAuth Sign In
 async function signInWithGoogle() {
   try {
@@ -38,7 +64,7 @@ async function signIn() {
     showToast('Error: ' + error.message, 'error');
   } else {
     showToast('¡Bienvenido!', 'success');
-    setTimeout(() => location.reload(), 500);
+    setTimeout(() => handlePostLoginRedirect(), 500);
   }
 }
 
@@ -84,7 +110,7 @@ async function signUp() {
     }]).catch(err => console.log('Profile creation note:', err));
     
     showToast('¡Cuenta creada! Verifica tu email', 'success');
-    setTimeout(() => location.reload(), 1500);
+    setTimeout(() => handlePostLoginRedirect(), 1500);
   }
 }
 
@@ -93,6 +119,20 @@ async function signOut() {
   await sb.auth.signOut();
   showToast('Sesión cerrada', 'success');
   setTimeout(() => location.reload(), 500);
+}
+
+// Check auth on page load and redirect if needed
+async function checkAuthAndRedirect() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (user) {
+    const currentPath = window.location.pathname;
+    const isAuthPage = currentPath.includes('index.html') || currentPath === '/' || currentPath.endsWith('/creo/');
+    
+    if (isAuthPage) {
+      // Already on auth page, check if should redirect
+      await handlePostLoginRedirect();
+    }
+  }
 }
 
 // ========== THEME ==========
