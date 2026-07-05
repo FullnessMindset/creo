@@ -59,6 +59,19 @@
       }, 1000);
     }
 
+    async function handleProfileSetup(user) {
+      if (!user) return;
+      let { data: profile } = await sb.from('profiles').select('id').eq('id', user.id).single();
+      if (!profile) {
+        const displayName = user.user_metadata?.full_name || user.email.split('@')[0];
+        const username = 'user_' + Math.floor(Math.random() * 100000);
+        await sb.from('profiles').insert([{ id: user.id, username, display_name: displayName, avatar_url: user.user_metadata?.avatar_url || null }]);
+      }
+      if (isAdmin(user.email)) {
+        sessionStorage.setItem('admin_mode', 'true');
+      }
+    }
+
     async function handleAuthRedirect(user) {
       if (!user) {
         setStatus('Error', 'No se pudo verificar tu cuenta');
@@ -111,91 +124,44 @@
       setStatus('Incompleto', 'Onboarding incompleto. Redirigiendo para reintentar...', 'text-yellow-600');
       setTimeout(() => { window.location.href = 'index.html'; }, 2500);
     } else {
-      // Handle auth callback — works for magic link (PKCE code), OAuth, and hash tokens
-      let handled = false;
+      (async () => {
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const hasHashToken = hashParams.get('access_token');
+        const hasCode = urlParams.get('code');
 
-      // Method 1: Check for hash-based tokens (older Supabase flow)
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const hasHashToken = hashParams.get('access_token');
+        if (hasHashToken || hasCode) {
+          setStatus('¡Cuenta verificada!', 'Redirigiendo en 3 segundos...');
+          startCountdown('index.html', 3);
 
-      // Method 2: Check for PKCE code (Supabase v2 magic link flow)
-      const hasCode = urlParams.get('code');
-
-      if (hasHashToken || hasCode) {
-        setStatus('Verificando...', 'Confirmando tu identidad con Supabase...');
-
-        // Let Supabase client handle the token exchange
-        // For PKCE: exchangeCodeForSession will be called by the client
-        // For hash: the client detects tokens automatically
-        if (hasCode) {
           try {
-            const { data, error } = await sb.auth.exchangeCodeForSession(hasCode);
-            if (error) {
-              setStatus('Error de autenticación', error.message);
-              setTimeout(() => { window.location.href = 'index.html'; }, 3000);
-            } else if (data.user) {
-              handled = true;
-              await handleAuthRedirect(data.user);
-            }
-          } catch (e) {
-            setStatus('Error', e.message);
-            setTimeout(() => { window.location.href = 'index.html'; }, 3000);
-          }
-        }
-
-        if (!handled && hasHashToken) {
-          try {
-            const { data: { session }, error } = await sb.auth.getSession();
-            if (!error && session?.user) {
-              handled = true;
-              await handleAuthRedirect(session.user);
+            if (hasCode) {
+              const { data } = await sb.auth.exchangeCodeForSession(hasCode);
+              if (data?.user) await handleProfileSetup(data.user);
             } else {
-              await new Promise(r => setTimeout(r, 1000));
-              const { data: { session: s2 } } = await sb.auth.getSession();
-              if (s2?.user) {
-                handled = true;
-                await handleAuthRedirect(s2.user);
+              for (let i = 0; i < 5; i++) {
+                const { data: { session } } = await sb.auth.getSession();
+                if (session?.user) { await handleProfileSetup(session.user); break; }
+                await new Promise(r => setTimeout(r, 500));
               }
             }
-          } catch (e) {}
-        }
-      }
+          } catch (e) { console.log('Profile setup deferred:', e); }
+        } else {
+          const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
+            if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+              subscription.unsubscribe();
+              await handleAuthRedirect(session.user);
+            }
+          });
 
-      if (!handled) {
-        // Method 3: Listen for auth state change (catches all flows)
-        const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
-          if (handled) return;
-          if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
-            handled = true;
+          const { data: { session } } = await sb.auth.getSession();
+          if (session?.user) {
             subscription.unsubscribe();
             await handleAuthRedirect(session.user);
+          } else {
+            setTimeout(() => { window.location.href = 'index.html'; }, 5000);
           }
-        });
-
-        // Method 4: Check if already signed in
-        const { data: { session } } = await sb.auth.getSession();
-        if (!handled && session?.user) {
-          handled = true;
-          subscription.unsubscribe();
-          await handleAuthRedirect(session.user);
         }
-
-        // Timeout fallback — if nothing triggers in 5 seconds, try one more session check then redirect
-        if (!handled) {
-          setTimeout(async () => {
-            if (handled) return;
-            const { data: { user } } = await sb.auth.getUser();
-            if (user) {
-              handled = true;
-              subscription.unsubscribe();
-              await handleAuthRedirect(user);
-            } else {
-              setStatus('Sesión no detectada', 'Redirigiendo...');
-              window.location.href = 'index.html';
-            }
-          }, 5000);
-        }
-      }
+      })();
     }
   </script>
 </body>
