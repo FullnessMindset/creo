@@ -8,28 +8,18 @@ function isAdmin(email) { return email === ADMIN_EMAIL; }
 
 // ========== AUTHENTICATION ==========
 
-// Post-login redirect logic
+// Post-login redirect logic — profile incomplete → Panel, otherwise → Comunidad
 async function handlePostLoginRedirect() {
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return;
 
-  // Check if user has visited before (check if profile was created before today)
-  const { data: profile } = await sb.from('profiles').select('created_at').eq('id', user.id).single();
-  
-  if (profile) {
-    const createdAt = new Date(profile.created_at);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    if (createdAt < today) {
-      // Not first visit — go to Comunidad
-      window.location.href = 'comunidad.html';
-    } else {
-      // First visit today — go to Panel (index.html shows dashboard)
-      window.location.href = 'index.html';
-    }
+  const { data: profile } = await sb.from('profiles')
+    .select('display_name, bio, username')
+    .eq('id', user.id).single();
+
+  if (profile && profile.display_name && profile.bio) {
+    window.location.href = 'comunidad.html';
   } else {
-    // First time ever — go to Panel
     window.location.href = 'index.html';
   }
 }
@@ -312,21 +302,17 @@ function showToast(message, type) {
   setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
 }
 
-// Bottom Navigation
+// Bottom Navigation — 5 items: Comunidad, Explorar, Publicar (+), Mensajes, Perfil
 function renderBottomNav(activePage) {
   const nav = document.createElement('nav');
   nav.id = 'bottom-nav';
   nav.className = 'fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-2 pb-[env(safe-area-inset-bottom)] transition-colors';
   const items = [
-    { id: 'comunidad', label: 'Comunidad', href: 'comunidad.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6"/>' },
+    { id: 'comunidad', label: 'Comunidad', href: 'comunidad.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>' },
     { id: 'explore', label: 'Explorar', href: 'explore.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>' },
-    { id: 'cine', label: 'Cine', href: 'cine-local.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16"/>' },
-    { id: 'biblioteca', label: 'Libros', href: 'biblioteca.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>' },
-    { id: 'galeria', label: 'Galeria', href: 'galeria.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
-    { id: 'post', label: 'Publicar', href: 'index.html#post', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>', authOnly: true },
+    { id: 'post', label: 'Publicar', href: '#', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>', isPublicar: true, authOnly: true },
     { id: 'messages', label: 'Mensajes', href: 'messages.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>', authOnly: true },
-    { id: 'profile', label: 'Perfil', href: 'profile.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>' },
-    { id: 'dashboard', label: 'Panel', href: 'index.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>', authOnly: true }
+    { id: 'profile', label: 'Perfil', href: 'profile.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>' }
   ];
   const inner = document.createElement('div');
   inner.className = 'max-w-2xl mx-auto flex justify-around items-center h-14';
@@ -336,13 +322,101 @@ function renderBottomNav(activePage) {
     a.setAttribute('data-nav-id', item.id);
     if (item.authOnly) a.setAttribute('data-auth-only', 'true');
     const isActive = activePage === item.id;
-    a.className = `flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors ${isActive ? 'text-creo-purple' : 'text-gray-400 hover:text-gray-600'}`;
-    a.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg><span class="text-[10px] font-medium">${item.label}</span>`;
+    if (item.isPublicar) {
+      a.className = 'flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors text-creo-mint hover:text-white';
+      a.innerHTML = `<div class="w-10 h-10 rounded-full bg-creo-mint flex items-center justify-center -mt-5 shadow-lg border-4 border-white dark:border-gray-900"><svg class="w-6 h-6 text-creo-purple" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">${item.icon}</svg></div><span class="text-[10px] font-bold text-creo-mint">${item.label}</span>`;
+      a.onclick = (e) => { e.preventDefault(); togglePublicarMenu(); };
+    } else {
+      a.className = `flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors ${isActive ? 'text-creo-purple' : 'text-gray-400 hover:text-gray-600'}`;
+      a.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg><span class="text-[10px] font-medium">${item.label}</span>`;
+    }
     inner.appendChild(a);
   });
   nav.appendChild(inner);
   document.body.appendChild(nav);
   document.body.style.paddingBottom = '4rem';
+}
+
+// Publicar content type selector
+function togglePublicarMenu() {
+  let menu = document.getElementById('publicar-menu');
+  if (menu) { menu.remove(); return; }
+
+  const dk = isDark();
+  const overlay = document.createElement('div');
+  overlay.id = 'publicar-menu';
+  overlay.className = 'fixed inset-0 z-[90] flex items-end justify-center';
+  overlay.style.background = 'rgba(0,0,0,0.5)';
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+  const bg = dk ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200';
+  const textCls = dk ? 'text-white' : 'text-gray-900';
+  const subCls = dk ? 'text-gray-400' : 'text-gray-500';
+  const hoverCls = dk ? 'hover:bg-gray-800' : 'hover:bg-gray-50';
+
+  const types = [
+    { icon: '📝', label: 'Post', desc: 'Texto, fotos o reflexion', action: 'post' },
+    { icon: '🎨', label: 'Arte', desc: 'Pintura, escultura, fotografia', action: 'arte' },
+    { icon: '🎵', label: 'Musica', desc: 'Cancion, album o cover', action: 'musica' },
+    { icon: '🎬', label: 'Pelicula / Cine', desc: 'Corto, documental o pelicula', action: 'cine-local' },
+    { icon: '📚', label: 'Libro', desc: 'Novela, poesia o ensayo', action: 'biblioteca' },
+    { icon: '🖼️', label: 'Galeria', desc: 'Exposicion o coleccion visual', action: 'galeria' },
+    { icon: '🛍️', label: 'Producto Local', desc: 'Artesania, alimentos, productos', action: 'productos-locales' }
+  ];
+
+  const sheet = document.createElement('div');
+  sheet.className = `w-full max-w-lg ${bg} border-t rounded-t-3xl p-4 pb-20 animate-slide-up`;
+  sheet.innerHTML = `
+    <div class="w-10 h-1 rounded-full ${dk ? 'bg-gray-600' : 'bg-gray-300'} mx-auto mb-4"></div>
+    <h3 class="text-lg font-bold ${textCls} mb-1 text-center">¿Que quieres publicar?</h3>
+    <p class="text-xs ${subCls} text-center mb-4">Selecciona el tipo de contenido</p>
+    <div class="space-y-1">
+      ${types.map(t => `
+        <button onclick="handlePublicarChoice('${t.action}')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl ${hoverCls} transition">
+          <span class="text-2xl">${t.icon}</span>
+          <div class="text-left">
+            <p class="text-sm font-semibold ${textCls}">${t.label}</p>
+            <p class="text-xs ${subCls}">${t.desc}</p>
+          </div>
+        </button>
+      `).join('')}
+    </div>`;
+
+  overlay.appendChild(sheet);
+  document.body.appendChild(overlay);
+}
+
+function handlePublicarChoice(action) {
+  document.getElementById('publicar-menu')?.remove();
+  if (action === 'post') {
+    if (window.location.pathname.includes('comunidad')) {
+      document.getElementById('compose-modal')?.classList.remove('hidden');
+      const sectionSelect = document.getElementById('post-section');
+      if (sectionSelect) sectionSelect.value = 'general';
+    } else {
+      window.location.href = 'comunidad.html?publish=post';
+    }
+  } else if (action === 'productos-locales') {
+    if (window.location.pathname.includes('comunidad')) {
+      document.getElementById('compose-modal')?.classList.remove('hidden');
+      const sectionSelect = document.getElementById('post-section');
+      if (sectionSelect) sectionSelect.value = 'productos-locales';
+      const productFields = document.getElementById('product-fields');
+      if (productFields) productFields.classList.remove('hidden');
+    } else {
+      window.location.href = 'comunidad.html?publish=productos-locales';
+    }
+  } else if (action === 'arte' || action === 'musica') {
+    if (window.location.pathname.includes('comunidad')) {
+      document.getElementById('compose-modal')?.classList.remove('hidden');
+      const sectionSelect = document.getElementById('post-section');
+      if (sectionSelect) sectionSelect.value = action;
+    } else {
+      window.location.href = 'comunidad.html?publish=' + action;
+    }
+  } else {
+    window.location.href = action + '.html?publish=1';
+  }
 }
 
 async function updateNavAuth() {
@@ -543,19 +617,8 @@ function emojiButton(btnId) {
   return `<button type="button" id="${btnId}" class="p-1.5 text-gray-400 hover:text-yellow-500 transition rounded-lg hover:bg-gray-100" title="Emojis">😊</button>`;
 }
 
-// Messages nav item
-function addMessagesNavItem() {
-  const nav = document.querySelector('#bottom-nav .max-w-2xl');
-  if (!nav) return;
-  const postLink = nav.querySelector('[href="index.html#post"]');
-  if (!postLink) return;
-  const msgLink = document.createElement('a');
-  msgLink.href = 'messages.html';
-  msgLink.setAttribute('data-auth-only', 'true');
-  msgLink.className = 'flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors text-gray-400 hover:text-gray-600';
-  msgLink.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span class="text-[10px] font-medium">Mensajes</span>';
-  postLink.parentNode.insertBefore(msgLink, postLink);
-}
+// Messages nav item (kept for backwards compat — now built into renderBottomNav)
+function addMessagesNavItem() {}
 
 // Cookie Consent Banner
 function initCookieConsent() {
@@ -629,6 +692,8 @@ function acceptCookies() {
     }
     .dark .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.4), 0 8px 10px -6px rgba(0,0,0,0.4) !important; }
     .dark .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5) !important; }
+    @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .animate-slide-up { animation: slide-up 0.3s ease-out; }
     .dark .hover\\:bg-gray-50:hover { background-color: #374151 !important; }
     .dark .hover\\:bg-gray-100:hover { background-color: #374151 !important; }
     .dark .hover\\:bg-gray-200:hover { background-color: #4b5563 !important; }

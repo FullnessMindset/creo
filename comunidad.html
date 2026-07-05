@@ -562,6 +562,20 @@
       renderBottomNav('comunidad');
       updateNavAuth();
       loadNotificationBell();
+
+      const publishParam = new URLSearchParams(window.location.search).get('publish');
+      if (publishParam && currentUser) {
+        setTimeout(() => {
+          document.getElementById('compose-modal')?.classList.remove('hidden');
+          const sectionSelect = document.getElementById('post-section');
+          if (sectionSelect) sectionSelect.value = publishParam;
+          if (publishParam === 'productos-locales') {
+            const pf = document.getElementById('product-fields');
+            if (pf) pf.classList.remove('hidden');
+          }
+        }, 500);
+      }
+
       window.addEventListener('scroll', onScroll);
       document.getElementById('comment-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitComment(); });
       setupMentionListener(document.getElementById('comment-input'));

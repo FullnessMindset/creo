@@ -65,16 +65,18 @@
     }
 
     async function handleProfileSetup(user) {
-      if (!user) return;
-      let { data: profile } = await sb.from('profiles').select('id').eq('id', user.id).single();
+      if (!user) return 'index.html';
+      let { data: profile } = await sb.from('profiles').select('id, display_name, bio').eq('id', user.id).single();
       if (!profile) {
         const displayName = user.user_metadata?.full_name || user.email.split('@')[0];
         const username = 'user_' + Math.floor(Math.random() * 100000);
         await sb.from('profiles').insert([{ id: user.id, username, display_name: displayName, avatar_url: user.user_metadata?.avatar_url || null }]);
+        return 'index.html';
       }
       if (isAdmin(user.email)) {
         sessionStorage.setItem('admin_mode', 'true');
       }
+      return (profile.display_name && profile.bio) ? 'comunidad.html' : 'index.html';
     }
 
     async function handleAuthRedirect(user) {
@@ -84,25 +86,21 @@
         return;
       }
 
-      let { data: profile } = await sb.from('profiles').select('id').eq('id', user.id).single();
+      let { data: profile } = await sb.from('profiles').select('id, display_name, bio').eq('id', user.id).single();
       if (!profile) {
         const displayName = user.user_metadata?.full_name || user.email.split('@')[0];
         const username = 'user_' + Math.floor(Math.random() * 100000);
         await sb.from('profiles').insert([{ id: user.id, username, display_name: displayName, avatar_url: user.user_metadata?.avatar_url || null }]);
       }
 
-      const isAdminLogin = localStorage.getItem('creo-admin-login') === '1';
-
+      localStorage.removeItem('creo-admin-login');
       if (isAdmin(user.email)) {
-        localStorage.removeItem('creo-admin-login');
         sessionStorage.setItem('admin_mode', 'true');
-        setStatus('Acceso Admin Verificado', 'Redirigiendo al panel en 5 segundos...');
-        startCountdown('index.html', 5);
-      } else {
-        localStorage.removeItem('creo-admin-login');
-        setStatus('¡Cuenta verificada!', 'Redirigiendo a tu panel en 5 segundos...');
-        startCountdown('index.html?welcome=1', 5);
       }
+
+      const dest = (profile && profile.display_name && profile.bio) ? 'comunidad.html' : 'index.html';
+      setStatus('¡Cuenta verificada!', 'Redirigiendo en 3 segundos...');
+      startCountdown(dest, 3);
     }
 
     if (status === 'success') {
@@ -130,14 +128,22 @@
       setTimeout(() => { window.location.href = 'index.html'; }, 2500);
     } else {
       if (_isOAuthCallback) {
-        setStatus('¡Cuenta verificada!', 'Redirigiendo en 3 segundos...');
-        startCountdown('index.html', 3);
+        setStatus('¡Cuenta verificada!', 'Preparando tu experiencia...');
 
         (async () => {
           try {
-            const { data: { session } } = await sb.auth.getSession();
-            if (session?.user) await handleProfileSetup(session.user);
-          } catch (e) { console.log('Profile setup deferred:', e); }
+            let dest = 'index.html';
+            for (let i = 0; i < 6; i++) {
+              const { data: { session } } = await sb.auth.getSession();
+              if (session?.user) { dest = await handleProfileSetup(session.user); break; }
+              await new Promise(r => setTimeout(r, 500));
+            }
+            setStatus('¡Cuenta verificada!', 'Redirigiendo en 3 segundos...');
+            startCountdown(dest, 3);
+          } catch (e) {
+            console.log('Profile setup deferred:', e);
+            startCountdown('index.html', 3);
+          }
         })();
       } else {
         const hasCode = urlParams.get('code');
@@ -147,9 +153,9 @@
             try {
               const { data } = await sb.auth.exchangeCodeForSession(hasCode);
               if (data?.user) {
-                await handleProfileSetup(data.user);
+                const dest = await handleProfileSetup(data.user);
                 setStatus('¡Cuenta verificada!', 'Redirigiendo en 3 segundos...');
-                startCountdown('index.html', 3);
+                startCountdown(dest, 3);
                 return;
               }
             } catch (e) { console.log('Code exchange error:', e); }
@@ -157,9 +163,9 @@
 
           const { data: { session } } = await sb.auth.getSession();
           if (session?.user) {
-            await handleProfileSetup(session.user);
+            const dest = await handleProfileSetup(session.user);
             setStatus('¡Cuenta verificada!', 'Redirigiendo en 3 segundos...');
-            startCountdown('index.html', 3);
+            startCountdown(dest, 3);
           } else {
             setTimeout(() => { window.location.href = 'index.html'; }, 5000);
           }
