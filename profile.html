@@ -602,9 +602,16 @@
         const bgContainer = document.createElement('div');
         bgContainer.className = 'fixed inset-0 -z-10 overflow-hidden';
         if (/\.(mp4|webm|mov)$/i.test(data.bg_media_url)) {
-          bgContainer.innerHTML = `<video src="${data.bg_media_url}" class="w-full h-full object-cover opacity-20" autoplay muted loop playsinline></video>`;
+          const vid = document.createElement('video');
+          vid.src = data.bg_media_url;
+          vid.className = 'w-full h-full object-cover opacity-20';
+          vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true;
+          bgContainer.appendChild(vid);
         } else {
-          bgContainer.innerHTML = `<img src="${data.bg_media_url}" class="w-full h-full object-cover opacity-20">`;
+          const img = document.createElement('img');
+          img.src = data.bg_media_url;
+          img.className = 'w-full h-full object-cover opacity-20';
+          bgContainer.appendChild(img);
         }
         document.body.prepend(bgContainer);
       }
@@ -917,7 +924,7 @@
       const { data: { user } } = await sb.auth.getUser();
       const { data: senderProfile } = await sb.from('profiles').select('display_name, username').eq('id', user.id).single();
       const senderName = senderProfile?.display_name || senderProfile?.username || 'Un creador';
-      createNotification(creatorProfile.id, 'payment', `${senderName} te apoyó con $${amount.toFixed(2)} desde su meta`, null, 'profile.html?u=' + creatorProfile.username);
+      createNotification(creatorProfile.id, 'payment', `${senderName} te apoyó con $${amount.toFixed(2)} desde su meta`, null, 'profile.html?u=' + encodeURIComponent(creatorProfile.username));
       btn.innerHTML = '<span>🎯</span><span>Enviar desde mi Meta</span>'; btn.disabled = false;
       showToast(`¡Enviaste $${amount.toFixed(2)} a ${creatorProfile.display_name || creatorProfile.username}!`, 'success');
     }
@@ -1074,7 +1081,7 @@
       if (error) { showToast(error.message || 'Error', 'error'); return; }
       metasCache[activeMetaId].comment_count = data.count;
       document.getElementById('meta-comment-count').textContent = data.count > 0 ? data.count : '';
-      if (creatorProfile) createNotification(creatorProfile.id, 'meta_comment', 'Nuevo comentario en tu meta', body, 'profile.html?u=' + creatorProfile.username);
+      if (creatorProfile) createNotification(creatorProfile.id, 'meta_comment', 'Nuevo comentario en tu meta', body, 'profile.html?u=' + encodeURIComponent(creatorProfile.username));
       loadMetaComments(activeMetaId);
     }
 
@@ -1225,7 +1232,12 @@
       const profileUrl = creatorProfile.username ? `profile.html?u=${encodeURIComponent(creatorProfile.username)}` : '#';
       const avatar = document.getElementById('dm-avatar');
       if (creatorProfile.avatar_url) {
-        avatar.innerHTML = `<img src="${creatorProfile.avatar_url}" class="w-full h-full object-cover" alt="">`;
+        const avatarImg = document.createElement('img');
+        avatarImg.src = creatorProfile.avatar_url;
+        avatarImg.className = 'w-full h-full object-cover';
+        avatarImg.alt = '';
+        avatar.innerHTML = '';
+        avatar.appendChild(avatarImg);
       } else {
         avatar.innerHTML = `<span class="text-creo-purple font-bold text-lg">${esc((creatorProfile.display_name || creatorProfile.username)[0].toUpperCase())}</span>`;
       }
@@ -1242,6 +1254,9 @@
       if (dmPollingInterval) { clearInterval(dmPollingInterval); dmPollingInterval = null; }
       cancelAudioDM();
     }
+    window.addEventListener('beforeunload', () => {
+      if (dmPollingInterval) { clearInterval(dmPollingInterval); dmPollingInterval = null; }
+    });
 
     async function loadDMHistory() {
       const { data: { user } } = await sb.auth.getUser();
@@ -1329,9 +1344,16 @@
         try {
           const res = await fetch(endpoint);
           const json = await res.json();
-          document.getElementById('gif-results').innerHTML = (json.data || []).map(g =>
-            `<img src="${g.images.fixed_width_small.url}" class="w-full rounded cursor-pointer hover:opacity-80 transition" onclick="selectGif('${g.images.fixed_width.url}')" alt="GIF">`
-          ).join('');
+          const container = document.getElementById('gif-results');
+          container.innerHTML = '';
+          (json.data || []).forEach(g => {
+            const img = document.createElement('img');
+            img.src = g.images.fixed_width_small.url;
+            img.className = 'w-full rounded cursor-pointer hover:opacity-80 transition';
+            img.alt = 'GIF';
+            img.addEventListener('click', () => selectGif(g.images.fixed_width.url));
+            container.appendChild(img);
+          });
         } catch(e) { console.error('GIF search error', e); }
       }, 300);
     }
@@ -1599,7 +1621,7 @@
       if (error) { showToast(error.message || 'Error', 'error'); return; }
       const countEl = document.getElementById('story-comment-count-' + storyId);
       if (countEl && data?.count != null) countEl.textContent = data.count > 0 ? data.count : '';
-      if (creatorProfile) createNotification(creatorProfile.id, 'comment', 'Nuevo comentario en tu historia', body, 'profile.html?u=' + creatorProfile.username);
+      if (creatorProfile) createNotification(creatorProfile.id, 'comment', 'Nuevo comentario en tu historia', body, 'profile.html?u=' + encodeURIComponent(creatorProfile.username));
       loadStoryComments(storyId);
     }
 
@@ -2019,7 +2041,7 @@
         document.getElementById('follower-count').textContent = data.follower_count || 0;
         updateFollowButton();
         if (isFollowing) {
-          createNotification(creatorProfile.id, 'follow', 'Tienes un nuevo seguidor', null, 'profile.html?u=' + creatorProfile.username);
+          createNotification(creatorProfile.id, 'follow', 'Tienes un nuevo seguidor', null, 'profile.html?u=' + encodeURIComponent(creatorProfile.username));
         }
       } catch (e) {
         showToast('Seguimiento no disponible aún', 'info');

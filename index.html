@@ -1583,7 +1583,7 @@
       const username = document.getElementById('username').value.trim();
       const display_name = document.getElementById('display_name').value.trim();
       const bio = document.getElementById('bio').value.trim();
-      const social_links = {
+      const rawSocials = {
         instagram: document.getElementById('social-instagram').value.trim(),
         tiktok: document.getElementById('social-tiktok').value.trim(),
         youtube: document.getElementById('social-youtube').value.trim(),
@@ -1591,7 +1591,14 @@
         facebook: document.getElementById('social-facebook').value.trim(),
         linkedin: document.getElementById('social-linkedin').value.trim(),
       };
-      const hasSocial = Object.values(social_links).some(v => v);
+      const social_links = {};
+      for (const [k, v] of Object.entries(rawSocials)) {
+        if (v) {
+          if (!/^https?:\/\//i.test(v)) { btn.innerText = 'Guardar Perfil'; btn.disabled = false; return showToast('El enlace de ' + k + ' debe empezar con https://', 'error'); }
+          social_links[k] = v;
+        }
+      }
+      const hasSocial = Object.keys(social_links).length > 0;
       if (username.length < 3) { btn.innerText = 'Guardar Perfil'; btn.disabled = false; return showToast('Username mínimo 3 caracteres', 'error'); }
       if (!hasSocial) { btn.innerText = 'Guardar Perfil'; btn.disabled = false; return showToast('Agrega al menos 1 red social', 'error'); }
       const contact_email = document.getElementById('contact-email').value.trim() || null;
