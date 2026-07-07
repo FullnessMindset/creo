@@ -609,8 +609,8 @@
         document.body.prepend(bgContainer);
       }
 
-      // Verified badge: Stripe-verified users OR admin
-      if (data.verification_status === 'approved' || isAdmin(data.email || '')) {
+      // Verified badge: creators with Stripe Connect OR admin (identity verification bypassed for now — see supabase/STRIPE_IDENTITY_VERIFICATION.md)
+      if (data.stripe_connect_id || isAdmin(data.email || '')) {
         document.getElementById('verified-badge').classList.remove('hidden');
         document.getElementById('avatar-container').classList.add('verified-ring');
       }
@@ -627,11 +627,9 @@
       });
       if (hasSocials) document.getElementById('social-links').classList.remove('hidden');
 
-      if (data.verification_status !== 'approved' || !data.stripe_connect_id) {
+      // Only disable payments if no Stripe Connect account (identity verification bypassed for now)
+      if (!data.stripe_connect_id) {
         disablePayments();
-        if (data.verification_status !== 'approved') {
-          document.getElementById('not-verified-banner').classList.remove('hidden');
-        }
       }
 
       await loadCreatorMetas(data.id);
@@ -684,7 +682,7 @@
       }
 
       const today = new Date().toISOString().split('T')[0];
-      const canPay = creatorProfile?.verification_status === 'approved' && creatorProfile?.stripe_connect_id;
+      const canPay = !!creatorProfile?.stripe_connect_id;
 
       container.innerHTML = data.map(m => {
         const pct = m.goal_amount_cents > 0 ? Math.min(100, Math.round(m.raised_cents / m.goal_amount_cents * 100)) : 0;
