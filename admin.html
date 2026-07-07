@@ -180,6 +180,10 @@
         <button onclick="showTab('accounts')" id="tab-accounts" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Stripe Accounts</button>
         <button onclick="showTab('links')" id="tab-links" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Quick Links</button>
         <button onclick="showTab('metareviews')" id="tab-metareviews" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Meta Reviews</button>
+        <button onclick="showTab('stripe')" id="tab-stripe" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
+          Stripe
+        </button>
       </div>
 
       <!-- Verification Review Panel -->
@@ -322,6 +326,107 @@
           </div>
           <div id="meta-reviews-list" class="divide-y divide-gray-200"></div>
           <div id="meta-reviews-empty" class="p-8 text-center text-gray-400 text-sm">Cargando metas...</div>
+        </div>
+      </div>
+
+      <!-- STRIPE PANEL -->
+      <div id="panel-stripe" class="hidden fade-in space-y-6">
+        <!-- Balance Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-gradient-to-br from-stripe-purple to-indigo-600 rounded-xl p-5 text-white stat-card">
+            <p class="text-xs uppercase tracking-wider opacity-80">Balance Disponible</p>
+            <p id="stripe-available" class="text-2xl font-bold mt-1">—</p>
+          </div>
+          <div class="bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl p-5 text-white stat-card">
+            <p class="text-xs uppercase tracking-wider opacity-80">Balance Pendiente</p>
+            <p id="stripe-pending" class="text-2xl font-bold mt-1">—</p>
+          </div>
+          <div class="bg-gradient-to-br from-emerald-600 to-teal-500 rounded-xl p-5 text-white stat-card">
+            <p class="text-xs uppercase tracking-wider opacity-80">Cuentas Conectadas</p>
+            <p id="stripe-accounts-count" class="text-2xl font-bold mt-1">—</p>
+            <p id="stripe-accounts-active" class="text-xs opacity-80 mt-0.5"></p>
+          </div>
+        </div>
+
+        <!-- Sub-tabs -->
+        <div class="flex gap-2 border-b border-gray-200 pb-2">
+          <button onclick="showStripeSection('payments')" id="stripe-sub-payments" class="stripe-sub-btn text-sm font-semibold px-4 py-1.5 rounded-full bg-stripe-purple text-white transition">Pagos</button>
+          <button onclick="showStripeSection('payouts')" id="stripe-sub-payouts" class="stripe-sub-btn text-sm font-semibold px-4 py-1.5 rounded-full text-gray-500 transition">Payouts</button>
+          <button onclick="showStripeSection('connected')" id="stripe-sub-connected" class="stripe-sub-btn text-sm font-semibold px-4 py-1.5 rounded-full text-gray-500 transition">Cuentas</button>
+        </div>
+
+        <!-- Payments Section -->
+        <div id="stripe-section-payments" class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="font-semibold text-gray-900">Pagos Recientes</h2>
+            <button onclick="loadStripePayments()" class="text-xs text-stripe-purple font-semibold hover:underline">Refrescar</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                <tr>
+                  <th class="px-4 py-3 text-left">ID</th>
+                  <th class="px-4 py-3 text-left">Monto</th>
+                  <th class="px-4 py-3 text-left">Fee Plataforma</th>
+                  <th class="px-4 py-3 text-left">Estado</th>
+                  <th class="px-4 py-3 text-left">Fecha</th>
+                  <th class="px-4 py-3 text-left">Destino</th>
+                </tr>
+              </thead>
+              <tbody id="stripe-payments-body" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+          <div id="stripe-payments-empty" class="p-8 text-center text-gray-400 text-sm">Cargando pagos...</div>
+          <div id="stripe-payments-more" class="hidden px-5 py-3 border-t border-gray-100 text-center">
+            <button onclick="loadStripePayments(true)" class="text-sm text-stripe-purple font-semibold hover:underline">Cargar más</button>
+          </div>
+        </div>
+
+        <!-- Payouts Section -->
+        <div id="stripe-section-payouts" class="hidden bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="font-semibold text-gray-900">Payouts a tu Banco</h2>
+            <button onclick="loadStripePayouts()" class="text-xs text-stripe-purple font-semibold hover:underline">Refrescar</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                <tr>
+                  <th class="px-4 py-3 text-left">ID</th>
+                  <th class="px-4 py-3 text-left">Monto</th>
+                  <th class="px-4 py-3 text-left">Estado</th>
+                  <th class="px-4 py-3 text-left">Método</th>
+                  <th class="px-4 py-3 text-left">Llegada</th>
+                </tr>
+              </thead>
+              <tbody id="stripe-payouts-body" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+          <div id="stripe-payouts-empty" class="p-8 text-center text-gray-400 text-sm">Cargando payouts...</div>
+        </div>
+
+        <!-- Connected Accounts Section -->
+        <div id="stripe-section-connected" class="hidden bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="font-semibold text-gray-900">Cuentas Conectadas (Creadores)</h2>
+            <button onclick="loadStripeConnected()" class="text-xs text-stripe-purple font-semibold hover:underline">Refrescar</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                <tr>
+                  <th class="px-4 py-3 text-left">ID</th>
+                  <th class="px-4 py-3 text-left">Email</th>
+                  <th class="px-4 py-3 text-left">País</th>
+                  <th class="px-4 py-3 text-left">Cobros</th>
+                  <th class="px-4 py-3 text-left">Payouts</th>
+                  <th class="px-4 py-3 text-left">Creada</th>
+                </tr>
+              </thead>
+              <tbody id="stripe-connected-body" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+          <div id="stripe-connected-empty" class="p-8 text-center text-gray-400 text-sm">Cargando cuentas...</div>
         </div>
       </div>
 
@@ -813,8 +918,131 @@
       const active = document.getElementById('tab-' + tab);
       active.classList.add('bg-creo-purple', 'text-white');
       active.classList.remove('text-gray-500');
-      ['verification', 'creators', 'transactions', 'accounts', 'links', 'metareviews'].forEach(p => {
+      ['verification', 'creators', 'transactions', 'accounts', 'links', 'metareviews', 'stripe'].forEach(p => {
         document.getElementById('panel-' + p).classList.toggle('hidden', p !== tab);
+      });
+      if (tab === 'stripe' && !stripeDataLoaded) loadStripeData();
+    }
+
+    // ===== STRIPE TAB =====
+    let stripeDataLoaded = false;
+    let lastPaymentId = null;
+
+    async function loadStripeData() {
+      stripeDataLoaded = true;
+      await Promise.all([loadStripeDashboard(), loadStripePayments(), loadStripePayouts(), loadStripeConnected()]);
+    }
+
+    async function loadStripeDashboard() {
+      const data = await apiCall('dashboard');
+      if (data.error) return;
+      const fmtCents = (cents, cur) => '$' + (cents / 100).toFixed(2) + ' ' + (cur || 'usd').toUpperCase();
+      const avail = data.balance?.available?.[0];
+      const pend = data.balance?.pending?.[0];
+      document.getElementById('stripe-available').textContent = avail ? fmtCents(avail.amount, avail.currency) : '$0.00';
+      document.getElementById('stripe-pending').textContent = pend ? fmtCents(pend.amount, pend.currency) : '$0.00';
+      document.getElementById('stripe-accounts-count').textContent = data.total_accounts || 0;
+      document.getElementById('stripe-accounts-active').textContent = (data.active_accounts || 0) + ' activas';
+    }
+
+    function showStripeSection(section) {
+      document.querySelectorAll('.stripe-sub-btn').forEach(b => { b.classList.remove('bg-stripe-purple', 'text-white'); b.classList.add('text-gray-500'); });
+      document.getElementById('stripe-sub-' + section).classList.add('bg-stripe-purple', 'text-white');
+      document.getElementById('stripe-sub-' + section).classList.remove('text-gray-500');
+      ['payments', 'payouts', 'connected'].forEach(s => {
+        document.getElementById('stripe-section-' + s).classList.toggle('hidden', s !== section);
+      });
+    }
+
+    async function loadStripePayments(loadMore) {
+      const body = document.getElementById('stripe-payments-body');
+      const empty = document.getElementById('stripe-payments-empty');
+      if (!loadMore) { body.innerHTML = ''; lastPaymentId = null; }
+      empty.textContent = 'Cargando pagos...';
+      empty.classList.remove('hidden');
+
+      let url = 'payments&limit=25';
+      if (loadMore && lastPaymentId) url += '&starting_after=' + lastPaymentId;
+      const data = await apiCall(url);
+      if (data.error) { empty.textContent = 'Error: ' + data.error; return; }
+      if (!data.data || data.data.length === 0) { empty.textContent = 'No hay pagos'; return; }
+      empty.classList.add('hidden');
+
+      const statusBadge = (s) => {
+        const colors = { succeeded: 'bg-green-100 text-green-700', pending: 'bg-yellow-100 text-yellow-700', failed: 'bg-red-100 text-red-700', canceled: 'bg-gray-100 text-gray-500' };
+        return `<span class="text-xs px-2 py-0.5 rounded-full font-medium ${colors[s] || 'bg-gray-100 text-gray-500'}">${s}</span>`;
+      };
+
+      data.data.forEach(pi => {
+        const dest = pi.transfer_data?.destination || '—';
+        const fee = pi.application_fee_amount ? '$' + (pi.application_fee_amount / 100).toFixed(2) : '—';
+        const date = new Date(pi.created * 1000).toLocaleDateString('es', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        body.innerHTML += `<tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 text-xs font-mono text-gray-500">${pi.id.slice(0, 18)}...</td>
+          <td class="px-4 py-3 font-semibold">$${(pi.amount / 100).toFixed(2)}</td>
+          <td class="px-4 py-3 text-emerald-600 font-medium">${fee}</td>
+          <td class="px-4 py-3">${statusBadge(pi.status)}</td>
+          <td class="px-4 py-3 text-gray-500">${date}</td>
+          <td class="px-4 py-3 text-xs font-mono text-gray-400">${typeof dest === 'string' ? dest.slice(0, 18) : '—'}</td>
+        </tr>`;
+        lastPaymentId = pi.id;
+      });
+
+      document.getElementById('stripe-payments-more').classList.toggle('hidden', !data.has_more);
+    }
+
+    async function loadStripePayouts() {
+      const body = document.getElementById('stripe-payouts-body');
+      const empty = document.getElementById('stripe-payouts-empty');
+      body.innerHTML = '';
+      empty.textContent = 'Cargando payouts...';
+      empty.classList.remove('hidden');
+
+      const data = await apiCall('payouts');
+      if (data.error) { empty.textContent = 'Error: ' + data.error; return; }
+      if (!data.data || data.data.length === 0) { empty.textContent = 'No hay payouts aún'; return; }
+      empty.classList.add('hidden');
+
+      const statusBadge = (s) => {
+        const colors = { paid: 'bg-green-100 text-green-700', pending: 'bg-yellow-100 text-yellow-700', in_transit: 'bg-blue-100 text-blue-700', failed: 'bg-red-100 text-red-700', canceled: 'bg-gray-100 text-gray-500' };
+        return `<span class="text-xs px-2 py-0.5 rounded-full font-medium ${colors[s] || 'bg-gray-100 text-gray-500'}">${s}</span>`;
+      };
+
+      data.data.forEach(p => {
+        const arrival = new Date(p.arrival_date * 1000).toLocaleDateString('es', { month: 'short', day: 'numeric', year: 'numeric' });
+        body.innerHTML += `<tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 text-xs font-mono text-gray-500">${p.id.slice(0, 18)}...</td>
+          <td class="px-4 py-3 font-semibold">$${(p.amount / 100).toFixed(2)}</td>
+          <td class="px-4 py-3">${statusBadge(p.status)}</td>
+          <td class="px-4 py-3 text-gray-500">${p.method || '—'}</td>
+          <td class="px-4 py-3 text-gray-500">${arrival}</td>
+        </tr>`;
+      });
+    }
+
+    async function loadStripeConnected() {
+      const body = document.getElementById('stripe-connected-body');
+      const empty = document.getElementById('stripe-connected-empty');
+      body.innerHTML = '';
+      empty.textContent = 'Cargando cuentas...';
+      empty.classList.remove('hidden');
+
+      const data = await apiCall('connected-accounts');
+      if (data.error) { empty.textContent = 'Error: ' + data.error; return; }
+      if (!data.data || data.data.length === 0) { empty.textContent = 'No hay cuentas conectadas'; return; }
+      empty.classList.add('hidden');
+
+      data.data.forEach(a => {
+        const date = new Date(a.created * 1000).toLocaleDateString('es', { month: 'short', day: 'numeric', year: 'numeric' });
+        const badge = (v) => v ? '<span class="text-xs px-2 py-0.5 rounded-full font-medium bg-green-100 text-green-700">Sí</span>' : '<span class="text-xs px-2 py-0.5 rounded-full font-medium bg-red-100 text-red-700">No</span>';
+        body.innerHTML += `<tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 text-xs font-mono text-gray-500">${a.id.slice(0, 20)}...</td>
+          <td class="px-4 py-3 text-gray-700">${a.email || '—'}</td>
+          <td class="px-4 py-3 text-gray-500">${a.country || '—'}</td>
+          <td class="px-4 py-3">${badge(a.charges_enabled)}</td>
+          <td class="px-4 py-3">${badge(a.payouts_enabled)}</td>
+          <td class="px-4 py-3 text-gray-500">${date}</td>
+        </tr>`;
       });
     }
 
