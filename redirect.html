@@ -48,28 +48,31 @@
     async function handleAuthRedirect(user) {
       if (!user) {
         setStatus('Error', 'No se pudo verificar tu cuenta');
-        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'index.html'; }, 3000);
         return;
       }
 
-      let { data: profile } = await sb.from('profiles').select('id').eq('id', user.id).single();
+      let { data: profile } = await sb.from('profiles').select('id, username').eq('id', user.id).single();
       if (!profile) {
         const displayName = user.user_metadata?.full_name || user.email.split('@')[0];
         const username = 'user_' + Math.floor(Math.random() * 100000);
-        await sb.from('profiles').insert([{ id: user.id, username, display_name: displayName, avatar_url: user.user_metadata?.avatar_url || null }]);
+        const { data: newProfile } = await sb.from('profiles').insert([{ id: user.id, username, display_name: displayName, avatar_url: user.user_metadata?.avatar_url || null }]).select('id, username').single();
+        profile = newProfile;
       }
 
       const isAdminLogin = localStorage.getItem('creo-admin-login') === '1';
+      localStorage.removeItem('creo-admin-login');
 
       if (isAdmin(user.email) && isAdminLogin) {
-        localStorage.removeItem('creo-admin-login');
         sessionStorage.setItem('admin_mode', 'true');
-        setStatus('Acceso Admin Verificado', 'Redirigiendo al admin...');
-        window.location.href = 'admin.html';
+        setStatus('Acceso Admin Verificado', 'Redirigiendo al panel de administración...');
+        document.getElementById('spinner').classList.add('hidden');
+        setTimeout(() => { window.location.href = 'admin.html'; }, 3000);
       } else {
-        localStorage.removeItem('creo-admin-login');
-        setStatus('¡Cuenta verificada!', 'Redirigiendo a tu panel...');
-        window.location.href = 'index.html?welcome=1';
+        const username = profile?.username || '';
+        setStatus('¡Bienvenido!', 'Redirigiendo a tu perfil...');
+        document.getElementById('spinner').classList.add('hidden');
+        setTimeout(() => { window.location.href = 'profile.html?u=' + encodeURIComponent(username); }, 3000);
       }
     }
 

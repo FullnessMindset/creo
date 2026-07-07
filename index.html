@@ -779,32 +779,8 @@
           <div id="no-events" class="text-center py-4">
             <p class="text-xs text-gray-400">No tienes eventos programados</p>
           </div>
-          <!-- Dummy events for visualization -->
           <div id="dummy-events" class="space-y-3">
-            <div class="border border-gray-200 rounded-xl p-4 flex gap-3 items-start">
-              <div class="bg-creo-mint/10 rounded-lg p-2 text-center min-w-[50px]">
-                <p class="text-lg font-bold text-creo-purple">15</p>
-                <p class="text-[10px] text-gray-500 uppercase">Jul</p>
-              </div>
-              <div class="flex-1">
-                <p class="font-bold text-sm flex items-center gap-1">Workshop de Arte Digital <span class="text-[10px]">🤖</span></p>
-                <p class="text-xs text-gray-500">3:00 PM • Zoom</p>
-                <p class="text-[10px] text-gray-400 mt-1">Aprende técnicas de ilustración digital desde cero</p>
-              </div>
-              <span class="text-[9px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-semibold">Activo</span>
-            </div>
-            <div class="border border-gray-200 rounded-xl p-4 flex gap-3 items-start">
-              <div class="bg-creo-mint/10 rounded-lg p-2 text-center min-w-[50px]">
-                <p class="text-lg font-bold text-creo-purple">22</p>
-                <p class="text-[10px] text-gray-500 uppercase">Jul</p>
-              </div>
-              <div class="flex-1">
-                <p class="font-bold text-sm flex items-center gap-1">Q&A con Seguidores <span class="text-[10px]">🤖</span></p>
-                <p class="text-xs text-gray-500">7:00 PM • Instagram Live</p>
-                <p class="text-[10px] text-gray-400 mt-1">Sesión abierta de preguntas y respuestas</p>
-              </div>
-              <span class="text-[9px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-semibold">Activo</span>
-            </div>
+            <p class="text-center text-gray-400 text-xs py-4">No tienes eventos programados</p>
           </div>
         </div>
       </div>
@@ -865,29 +841,9 @@
           </div>
         </div>
 
-        <!-- Past streams (dummy) -->
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-3">
           <h4 class="font-bold text-sm text-gray-900">Transmisiones Anteriores</h4>
-          <div class="space-y-3">
-            <div class="border border-gray-200 rounded-xl p-4 flex gap-3 items-center">
-              <div class="w-16 h-10 bg-gray-900 rounded-lg flex items-center justify-center">
-                <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              </div>
-              <div class="flex-1">
-                <p class="font-bold text-sm flex items-center gap-1">Pintando mural en vivo <span class="text-[10px]">🤖</span></p>
-                <p class="text-[10px] text-gray-400">Hace 3 días • 45 min • 128 viewers</p>
-              </div>
-            </div>
-            <div class="border border-gray-200 rounded-xl p-4 flex gap-3 items-center">
-              <div class="w-16 h-10 bg-gray-900 rounded-lg flex items-center justify-center">
-                <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              </div>
-              <div class="flex-1">
-                <p class="font-bold text-sm flex items-center gap-1">Unboxing de equipo nuevo <span class="text-[10px]">🤖</span></p>
-                <p class="text-[10px] text-gray-400">Hace 1 semana • 32 min • 85 viewers</p>
-              </div>
-            </div>
-          </div>
+          <p class="text-center text-gray-400 text-xs py-4">No tienes transmisiones anteriores</p>
         </div>
       </div>
 
@@ -1743,11 +1699,7 @@
     }
 
     // METAS
-    const DUMMY_METAS = [
-      { id:'dm1', title:'Nuevo micrófono profesional', description:'Para mejorar la calidad de audio en mis streams y podcasts', goal_amount_cents:15000, raised_cents:8500, start_date:'2026-07-01', end_date:'2026-08-15', is_active:true, images:[], isDummy:true },
-      { id:'dm2', title:'Curso de edición de video', description:'Quiero aprender After Effects para crear mejores contenidos', goal_amount_cents:20000, raised_cents:3200, start_date:'2026-07-05', end_date:'2026-09-01', is_active:true, images:[], isDummy:true },
-      { id:'dm3', title:'Tablet para ilustración digital', description:'Wacom Cintiq para hacer arte digital profesional', goal_amount_cents:35000, raised_cents:35000, start_date:'2026-06-01', end_date:'2026-07-15', is_active:true, images:[], isDummy:true },
-    ];
+    const DUMMY_METAS = [];
 
     function renderMetaCard(m, isDummy) {
       const pct = m.goal_amount_cents > 0 ? Math.min(100, Math.round(m.raised_cents / m.goal_amount_cents * 100)) : 0;
@@ -2630,10 +2582,7 @@
     }
 
     // ===== STORIES MANAGEMENT =====
-    const DUMMY_STORIES = [
-      { id:'ds1', content:'Hoy terminé un nuevo mural en el centro de la ciudad 🎨 Fue un proceso increíble de 3 días. ¡Gracias a todos los que pasaron a saludar!', media_urls:[], created_at:'2026-06-30T14:00:00Z', like_count:24, comment_count:8, isDummy:true },
-      { id:'ds2', content:'Preparando todo para el workshop del próximo viernes. ¿Quién se apunta? 🙋‍♀️', media_urls:[], created_at:'2026-06-28T09:15:00Z', like_count:15, comment_count:3, isDummy:true },
-    ];
+    const DUMMY_STORIES = [];
 
     function renderStoryCard(s) {
       const mediaArr = s.media_urls || [];
