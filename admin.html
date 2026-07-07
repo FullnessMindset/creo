@@ -552,9 +552,10 @@
     }
 
     async function googleLogin() {
+      localStorage.setItem('creo-admin-login', '1');
       await sb.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: 'https://fullnessmindset.github.io/creo/redirect.html?admin=1' }
+        options: { redirectTo: 'https://fullnessmindset.github.io/creo/redirect.html' }
       });
     }
 

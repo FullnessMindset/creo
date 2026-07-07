@@ -61,11 +61,11 @@
 
       const isAdminLogin = localStorage.getItem('creo-admin-login') === '1';
 
-      if (isAdmin(user.email)) {
+      if (isAdmin(user.email) && isAdminLogin) {
         localStorage.removeItem('creo-admin-login');
         sessionStorage.setItem('admin_mode', 'true');
-        setStatus('Acceso Admin Verificado', 'Redirigiendo al panel...');
-        window.location.href = 'index.html';
+        setStatus('Acceso Admin Verificado', 'Redirigiendo al admin...');
+        window.location.href = 'admin.html';
       } else {
         localStorage.removeItem('creo-admin-login');
         setStatus('¡Cuenta verificada!', 'Redirigiendo a tu panel...');
