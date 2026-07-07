@@ -286,6 +286,9 @@
         document.getElementById('cine-upload-btn').classList.remove('hidden');
         document.getElementById('sidebar-myfilms').classList.remove('hidden');
         loadMyFilms(user.id);
+        if (new URLSearchParams(window.location.search).get('publish') === '1') {
+          setTimeout(() => openUploadModal(), 500);
+        }
       }
     } catch(e) {}
   });

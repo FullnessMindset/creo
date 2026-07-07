@@ -391,31 +391,28 @@ function togglePublicarMenu() {
 
 function handlePublicarChoice(action) {
   document.getElementById('publicar-menu')?.remove();
-  if (action === 'post') {
-    if (window.location.pathname.includes('comunidad')) {
+  const onComunidad = window.location.pathname.includes('comunidad');
+
+  if (action === 'post' || action === 'arte' || action === 'musica') {
+    if (onComunidad) {
       document.getElementById('compose-modal')?.classList.remove('hidden');
-      const sectionSelect = document.getElementById('post-section');
-      if (sectionSelect) sectionSelect.value = 'general';
+      const sectionSelect = document.getElementById('compose-section');
+      if (sectionSelect) {
+        sectionSelect.value = action === 'post' ? 'general' : action;
+        sectionSelect.dispatchEvent(new Event('change'));
+      }
     } else {
-      window.location.href = 'comunidad.html?publish=post';
+      window.location.href = 'comunidad.html?publish=' + (action === 'post' ? 'general' : action);
     }
   } else if (action === 'productos-locales') {
-    if (window.location.pathname.includes('comunidad')) {
+    if (onComunidad) {
       document.getElementById('compose-modal')?.classList.remove('hidden');
-      const sectionSelect = document.getElementById('post-section');
-      if (sectionSelect) sectionSelect.value = 'productos-locales';
-      const productFields = document.getElementById('product-fields');
-      if (productFields) productFields.classList.remove('hidden');
+      const sectionSelect = document.getElementById('compose-section');
+      if (sectionSelect) { sectionSelect.value = 'productos'; sectionSelect.dispatchEvent(new Event('change')); }
+      const pf = document.getElementById('compose-producto-fields');
+      if (pf) pf.classList.remove('hidden');
     } else {
       window.location.href = 'comunidad.html?publish=productos-locales';
-    }
-  } else if (action === 'arte' || action === 'musica') {
-    if (window.location.pathname.includes('comunidad')) {
-      document.getElementById('compose-modal')?.classList.remove('hidden');
-      const sectionSelect = document.getElementById('post-section');
-      if (sectionSelect) sectionSelect.value = action;
-    } else {
-      window.location.href = 'comunidad.html?publish=' + action;
     }
   } else {
     window.location.href = action + '.html?publish=1';

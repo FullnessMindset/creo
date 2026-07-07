@@ -567,10 +567,14 @@
       if (publishParam && currentUser) {
         setTimeout(() => {
           document.getElementById('compose-modal')?.classList.remove('hidden');
-          const sectionSelect = document.getElementById('post-section');
-          if (sectionSelect) sectionSelect.value = publishParam;
-          if (publishParam === 'productos-locales') {
-            const pf = document.getElementById('product-fields');
+          const sectionSelect = document.getElementById('compose-section');
+          if (sectionSelect) {
+            const val = publishParam === 'productos-locales' ? 'productos' : publishParam;
+            sectionSelect.value = val;
+            sectionSelect.dispatchEvent(new Event('change'));
+          }
+          if (publishParam === 'productos-locales' || publishParam === 'productos') {
+            const pf = document.getElementById('compose-producto-fields');
             if (pf) pf.classList.remove('hidden');
           }
         }, 500);

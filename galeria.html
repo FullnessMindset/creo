@@ -324,6 +324,9 @@
       if (user) {
         galeriaCurrentUser = user;
         document.getElementById('galeria-upload-btn').classList.remove('hidden');
+        if (new URLSearchParams(window.location.search).get('publish') === '1') {
+          setTimeout(() => openUploadModal(), 500);
+        }
       }
     } catch(e) {}
   });
