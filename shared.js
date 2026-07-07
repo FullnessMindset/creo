@@ -6,7 +6,96 @@ const ADMIN_EMAIL = 'fullnessmindset@gmail.com';
 
 function isAdmin(email) { return email === ADMIN_EMAIL; }
 
-// Theme — light/dark
+// ========== AUTHENTICATION ==========
+
+async function handlePostLoginRedirect() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+  const { data: profile } = await sb.from('profiles')
+    .select('display_name, bio, username')
+    .eq('id', user.id).single();
+  if (profile && profile.display_name && profile.bio) {
+    window.location.href = 'comunidad.html';
+  } else {
+    window.location.href = 'index.html';
+  }
+}
+
+async function signInWithGoogle() {
+  try {
+    const { data, error } = await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'https://fullnessmindset.github.io/creo/redirect.html'
+      }
+    });
+    if (error) {
+      showToast('Error: ' + error.message, 'error');
+      console.error('Google sign-in error:', error);
+    }
+  } catch (err) {
+    showToast('Error al conectar con Google', 'error');
+    console.error(err);
+  }
+}
+
+async function signIn() {
+  const email = document.getElementById('email')?.value?.trim();
+  const password = document.getElementById('password')?.value;
+  if (!email || !password) { showToast('Email y contraseña requeridos', 'error'); return; }
+  showToast('Iniciando sesión...', 'info');
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) {
+    showToast('Error: ' + error.message, 'error');
+  } else {
+    showToast('¡Bienvenido!', 'success');
+    setTimeout(() => handlePostLoginRedirect(), 500);
+  }
+}
+
+async function signUp() {
+  const email = document.getElementById('email')?.value?.trim();
+  const password = document.getElementById('password')?.value;
+  const termsSection = document.getElementById('register-terms');
+  if (!email || !password) { showToast('Email y contraseña requeridos', 'error'); return; }
+  if (termsSection?.classList.contains('hidden')) { termsSection.classList.remove('hidden'); return; }
+  const acceptedTerms = document.getElementById('accept-terms')?.checked;
+  const acceptedConduct = document.getElementById('accept-conduct')?.checked;
+  if (!acceptedTerms || !acceptedConduct) { showToast('Debes aceptar los términos y conducta', 'error'); return; }
+  showToast('Creando cuenta...', 'info');
+  const { data: { user }, error } = await sb.auth.signUp({ email, password });
+  if (error) {
+    showToast('Error: ' + error.message, 'error');
+  } else if (user) {
+    const accountType = document.getElementById('reg-account-type')?.value || 'creator';
+    const language = document.getElementById('reg-language')?.value || 'es';
+    await sb.from('profiles').insert([{
+      id: user.id, email: email, account_type: accountType,
+      language: language, created_at: new Date().toISOString()
+    }]).catch(err => console.log('Profile creation note:', err));
+    showToast('¡Cuenta creada! Verifica tu email', 'success');
+    setTimeout(() => handlePostLoginRedirect(), 1500);
+  }
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+  showToast('Sesión cerrada', 'success');
+  setTimeout(() => location.reload(), 500);
+}
+
+async function checkAuthAndRedirect() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (user) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('panel') === '1') return;
+    const currentPath = window.location.pathname;
+    const isAuthPage = currentPath.includes('index.html') || currentPath === '/' || currentPath.endsWith('/creo/');
+    if (isAuthPage) { await handlePostLoginRedirect(); }
+  }
+}
+
+// ========== THEME ==========
 function initTheme() {
   applyTheme('light');
 }
