@@ -294,11 +294,12 @@
       }
 
       const isOwnDeal = currentUser && currentUser.id === selectedDeal.brand_id;
+      const isPlatform = isPlatformCreator(currentProfile?.email || '');
       const contactBtn = document.getElementById('detail-contact-btn');
       if (!currentUser) {
         contactBtn.textContent = 'Inicia sesión para contactar';
         contactBtn.onclick = () => signInWithGoogle();
-      } else if (isOwnDeal) {
+      } else if (isOwnDeal && !isPlatform) {
         contactBtn.textContent = 'Es tu deal';
         contactBtn.disabled = true;
       } else {
@@ -496,18 +497,28 @@
       const list = document.getElementById('convos-list');
       list.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Cargando...</div>';
 
-      const isBrandAccount = currentProfile?.account_type === 'empresa';
-      const myCol = isBrandAccount ? 'brand_id' : 'creator_id';
-      const otherJoin = isBrandAccount
-        ? 'other:creator_id(display_name, username, avatar_url)'
-        : 'other:brand_id(display_name, username, avatar_url)';
+      const isBrandAccount = currentProfile?.account_type === 'empresa' || currentProfile?.account_type === 'business' || isPlatformCreator(currentProfile?.email || '');
+      const isPlatform = isPlatformCreator(currentProfile?.email || '');
 
-      const { data: convos } = await sb
-        .from('deal_conversations')
-        .select(`*, brand_deals(title), ${otherJoin}`)
-        .eq(myCol, currentUser.id)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false });
+      let convos = [];
+      if (isBrandAccount) {
+        const { data: brandConvos } = await sb
+          .from('deal_conversations')
+          .select('*, brand_deals(title), other:creator_id(display_name, username, avatar_url)')
+          .eq('brand_id', currentUser.id)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+        if (brandConvos) convos.push(...brandConvos.map(c => ({ ...c, _role: 'brand' })));
+      }
+      if (!isBrandAccount || isPlatform) {
+        const { data: creatorConvos } = await sb
+          .from('deal_conversations')
+          .select('*, brand_deals(title), other:brand_id(display_name, username, avatar_url)')
+          .eq('creator_id', currentUser.id)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+        if (creatorConvos) convos.push(...creatorConvos.map(c => ({ ...c, _role: 'creator' })));
+      }
 
       if (!convos || convos.length === 0) {
         list.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">No tienes conversaciones activas</div>';

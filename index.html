@@ -1453,10 +1453,16 @@
 
       // Show Brand Deals tab for creators and businesses
       const dealsTab = document.getElementById('tab-deals');
-      if (profile.account_type === 'business') {
+      const isPlatform = isPlatformCreator(profile.email || '');
+      if (profile.account_type === 'business' || isPlatform) {
         dealsTab.classList.remove('hidden');
-        document.getElementById('deals-creator-view').classList.add('hidden');
         document.getElementById('deals-business-view').classList.remove('hidden');
+        if (isPlatform) {
+          document.getElementById('deals-creator-view').classList.remove('hidden');
+          if (!profile.stripe_connect_id) document.getElementById('deals-no-stripe').classList.remove('hidden');
+        } else {
+          document.getElementById('deals-creator-view').classList.add('hidden');
+        }
       } else if (profile.account_type !== 'co-creator') {
         dealsTab.classList.remove('hidden');
         document.getElementById('deals-creator-view').classList.remove('hidden');
@@ -3483,8 +3489,8 @@
 
     async function loadMyDeals() {
       if (!currentUser) return;
-      const isBusiness = currentProfile?.account_type === 'business';
-      if (isBusiness) { await loadMyCampaigns(); await loadBizAllRequests(); return; }
+      const isBusiness = currentProfile?.account_type === 'business' || isPlatformCreator(currentProfile?.email || '');
+      if (isBusiness) { await loadMyCampaigns(); await loadBizAllRequests(); }
 
       const { data } = await sb
         .from('brand_deal_requests')

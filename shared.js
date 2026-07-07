@@ -5,6 +5,7 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const ADMIN_EMAIL = 'fullnessmindset@gmail.com';
 
 function isAdmin(email) { return email === ADMIN_EMAIL; }
+function isPlatformCreator(email) { return email === ADMIN_EMAIL; }
 
 // ========== AUTHENTICATION ==========
 
