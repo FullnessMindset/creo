@@ -2499,7 +2499,8 @@
       const avatar = p.avatar_url;
       const badge = isDummy ? ' 🤖' : '';
       const bio = (p.bio || p.content || '').slice(0, 60) + ((p.bio || p.content || '').length > 60 ? '...' : '');
-      const dataAttrs = `data-creo-user="${esc(p.username)}" data-creo-name="${esc(name)}" data-creo-avatar="${esc(avatar || '')}" data-creo-bio="${esc(p.bio || p.content || '')}" data-creo-dummy="${isDummy}"`;
+      const cover = p.cover_url || '';
+      const dataAttrs = `data-creo-user="${esc(p.username)}" data-creo-name="${esc(name)}" data-creo-avatar="${esc(avatar || '')}" data-creo-bio="${esc(p.bio || p.content || '')}" data-creo-cover="${esc(cover)}" data-creo-dummy="${isDummy}"`;
 
       return `<div class="creo-ellos-card flex items-center gap-2 px-3 py-2 rounded-xl glass hover:shadow-md transition-all" ${dataAttrs} onmouseenter="showCreoPopup(event,this)" onmouseleave="hideCreoPopup()" onclick="${isDummy ? "event.preventDefault();showToast('Demo: perfil de ejemplo','info')" : "window.location.href='profile.html?u='+encodeURIComponent('"+esc(p.username)+"')"}">
         ${avatar ? `<img src="${esc(avatar)}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">` : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center flex-shrink-0 text-xs font-bold text-creo-purple">${esc(initials)}</div>`}
@@ -2518,7 +2519,16 @@
       const username = el.dataset.creoUser;
       const avatar = el.dataset.creoAvatar;
       const bio = el.dataset.creoBio;
+      const cover = el.dataset.creoCover;
       const isDummy = el.dataset.creoDummy === 'true';
+
+      const coverEl = document.getElementById('creo-popup-cover');
+      if (cover) {
+        coverEl.style.background = `url('${cover}') center/cover no-repeat`;
+      } else {
+        coverEl.style.background = '';
+        coverEl.className = 'h-20 bg-gradient-to-r from-creo-purple to-creo-light';
+      }
 
       document.getElementById('creo-popup-name').textContent = name;
       document.getElementById('creo-popup-username').textContent = '@' + username;
@@ -2565,14 +2575,22 @@
 
       const { data: prof } = await sb.from('profiles').select('creo_en_ellos').eq('id', creatorId).single();
       if (prof && prof.creo_en_ellos && Array.isArray(prof.creo_en_ellos) && prof.creo_en_ellos.length > 0) {
-        curatedCreators = prof.creo_en_ellos.map(c => ({ ...c, isDummy: false }));
+        const usernames = prof.creo_en_ellos.map(c => c.username).filter(Boolean);
+        if (usernames.length > 0) {
+          const { data: fullProfiles } = await sb.from('profiles').select('username, display_name, avatar_url, bio, cover_url').in('username', usernames);
+          const profileMap = {};
+          (fullProfiles || []).forEach(p => { profileMap[p.username] = p; });
+          curatedCreators = prof.creo_en_ellos.map(c => ({ ...c, ...(profileMap[c.username] || {}), isDummy: false }));
+        } else {
+          curatedCreators = prof.creo_en_ellos.map(c => ({ ...c, isDummy: false }));
+        }
       }
 
       if (curatedCreators.length === 0) {
         try {
           const { data: follows } = await sb.from('follows').select('following_id').eq('follower_id', creatorId);
           if (follows && follows.length > 0) {
-            const { data: profiles } = await sb.from('profiles').select('id, username, display_name, avatar_url, bio').in('id', follows.map(f => f.following_id)).limit(10);
+            const { data: profiles } = await sb.from('profiles').select('id, username, display_name, avatar_url, bio, cover_url').in('id', follows.map(f => f.following_id)).limit(10);
             if (profiles && profiles.length > 0) curatedCreators = profiles.map(p => ({ ...p, isDummy: false }));
           }
         } catch (e) {}
