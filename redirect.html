@@ -100,61 +100,28 @@
       setStatus('Incompleto', 'Onboarding incompleto. Redirigiendo para reintentar...', 'text-yellow-600');
       setTimeout(() => { window.location.href = 'index.html'; }, 2500);
     } else {
-      // Handle auth callback — works for magic link (PKCE code), OAuth, and hash tokens
       let handled = false;
-
-      // Method 1: Check for hash-based tokens (older Supabase flow)
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const hasHashToken = hashParams.get('access_token');
-
-      // Method 2: Check for PKCE code (Supabase v2 magic link flow)
       const hasCode = urlParams.get('code');
 
-      if (hasHashToken || hasCode) {
-        setStatus('Verificando...', 'Confirmando tu identidad con Supabase...');
-
-        // Let Supabase client handle the token exchange
-        // For PKCE: exchangeCodeForSession will be called by the client
-        // For hash: the client detects tokens automatically
-        if (hasCode) {
-          try {
-            const { data, error } = await sb.auth.exchangeCodeForSession(hasCode);
-            if (error) {
-              setStatus('Error de autenticación', error.message);
-              setTimeout(() => { window.location.href = 'index.html'; }, 3000);
-            } else if (data.user) {
-              handled = true;
-              await handleAuthRedirect(data.user);
-            }
-          } catch (e) {
-            setStatus('Error', e.message);
-            setTimeout(() => { window.location.href = 'index.html'; }, 3000);
-          }
-        }
-
-        if (!handled && hasHashToken) {
-          try {
-            const { data: { user } } = await sb.auth.getUser();
-            if (user) {
-              handled = true;
-              await handleAuthRedirect(user);
-            }
-          } catch (e) {}
-        }
+      if (hasCode) {
+        setStatus('Verificando...', 'Confirmando tu identidad...');
+        try {
+          const { data, error } = await sb.auth.exchangeCodeForSession(hasCode);
+          if (!error && data.user) { handled = true; await handleAuthRedirect(data.user); }
+          else { setStatus('Error', error?.message || 'No se pudo verificar'); setTimeout(() => { window.location.href = 'index.html'; }, 3000); }
+        } catch (e) { setStatus('Error', e.message); setTimeout(() => { window.location.href = 'index.html'; }, 3000); }
       }
 
       if (!handled) {
-        // Method 3: Listen for auth state change (catches all flows)
         const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
           if (handled) return;
-          if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+          if (session?.user) {
             handled = true;
             subscription.unsubscribe();
             await handleAuthRedirect(session.user);
           }
         });
 
-        // Method 4: Check if already signed in
         const { data: { session } } = await sb.auth.getSession();
         if (!handled && session?.user) {
           handled = true;
@@ -162,20 +129,13 @@
           await handleAuthRedirect(session.user);
         }
 
-        // Timeout fallback — if nothing triggers in 5 seconds, try one more session check then redirect
         if (!handled) {
           setTimeout(async () => {
             if (handled) return;
             const { data: { user } } = await sb.auth.getUser();
-            if (user) {
-              handled = true;
-              subscription.unsubscribe();
-              await handleAuthRedirect(user);
-            } else {
-              setStatus('Sesión no detectada', 'Redirigiendo...');
-              window.location.href = 'index.html';
-            }
-          }, 5000);
+            if (user) { handled = true; subscription.unsubscribe(); await handleAuthRedirect(user); }
+            else { setStatus('Sesión no detectada', 'Redirigiendo...'); window.location.href = 'index.html'; }
+          }, 3000);
         }
       }
     }
