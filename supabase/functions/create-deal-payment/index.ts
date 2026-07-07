@@ -28,14 +28,14 @@ serve(async (req) => {
       });
     }
 
-    // Verify the sender is the empresa in this conversation
+    // Verify the sender is the brand in this conversation
     const { data: conv, error: convErr } = await supabase
       .from("deal_conversations")
-      .select("empresa_id, creator_id")
+      .select("brand_id, creator_id")
       .eq("id", conversation_id)
       .single();
 
-    if (convErr || !conv || conv.empresa_id !== sender_id) {
+    if (convErr || !conv || conv.brand_id !== sender_id) {
       return new Response(JSON.stringify({ error: "Only the brand can send payments" }), {
         status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

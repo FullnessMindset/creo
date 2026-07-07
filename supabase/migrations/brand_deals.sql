@@ -1,7 +1,8 @@
--- Brand Deals: tables, encryption, RLS
--- Run in Supabase SQL Editor
+-- Brand Deals: Encrypted messaging + in-chat payments
+-- Run AFTER migration-complete.sql (brand_deals & brand_deal_requests already exist)
+-- Safe to re-run — uses IF NOT EXISTS / OR REPLACE
 
--- 1. Enable pgcrypto
+-- 1. Enable pgcrypto for message encryption
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- 2. Secure encryption key storage (no RLS policies = only SECURITY DEFINER functions can read)
@@ -11,49 +12,39 @@ CREATE TABLE IF NOT EXISTS app_secrets (
 );
 ALTER TABLE app_secrets ENABLE ROW LEVEL SECURITY;
 
--- Insert the encryption key (change this to a strong random string in production!)
 INSERT INTO app_secrets (key, value)
 VALUES ('message_encryption_key', encode(gen_random_bytes(32), 'hex'))
 ON CONFLICT (key) DO NOTHING;
 
--- 3. Brand deals listings
-CREATE TABLE brand_deals (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  empresa_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  title TEXT NOT NULL,
-  description TEXT,
-  budget_min INTEGER DEFAULT 0,
-  budget_max INTEGER DEFAULT 0,
-  category TEXT,
-  requirements TEXT,
-  image_url TEXT,
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-ALTER TABLE brand_deals ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Anyone can view active deals" ON brand_deals FOR SELECT USING (is_active = true);
-CREATE POLICY "Empresas manage own deals" ON brand_deals FOR ALL USING (auth.uid() = empresa_id);
-
--- 4. Conversations between creator and empresa about a deal
-CREATE TABLE deal_conversations (
+-- 3. Conversations between creator and brand about a deal
+CREATE TABLE IF NOT EXISTS deal_conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   deal_id UUID REFERENCES brand_deals(id) ON DELETE CASCADE,
   creator_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  empresa_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  brand_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   status TEXT DEFAULT 'active' CHECK (status IN ('active','completed','cancelled')),
   created_at TIMESTAMPTZ DEFAULT now(),
   UNIQUE(deal_id, creator_id)
 );
 ALTER TABLE deal_conversations ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Participants can view own conversations" ON deal_conversations
-  FOR SELECT USING (auth.uid() = creator_id OR auth.uid() = empresa_id);
-CREATE POLICY "Creators can start conversations" ON deal_conversations
-  FOR INSERT WITH CHECK (auth.uid() = creator_id);
-CREATE POLICY "Participants can update own conversations" ON deal_conversations
-  FOR UPDATE USING (auth.uid() = creator_id OR auth.uid() = empresa_id);
 
--- 5. Encrypted messages (content stored encrypted, accessed only via functions)
-CREATE TABLE deal_messages (
+DO $$ BEGIN
+  CREATE POLICY "deal_convos_select" ON deal_conversations
+    FOR SELECT USING (auth.uid() = creator_id OR auth.uid() = brand_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  CREATE POLICY "deal_convos_insert" ON deal_conversations
+    FOR INSERT WITH CHECK (auth.uid() = creator_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  CREATE POLICY "deal_convos_update" ON deal_conversations
+    FOR UPDATE USING (auth.uid() = creator_id OR auth.uid() = brand_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- 4. Encrypted messages (content encrypted at rest via pgcrypto)
+CREATE TABLE IF NOT EXISTS deal_messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   conversation_id UUID REFERENCES deal_conversations(id) ON DELETE CASCADE NOT NULL,
   sender_id UUID REFERENCES profiles(id) NOT NULL,
@@ -65,12 +56,15 @@ CREATE TABLE deal_messages (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 ALTER TABLE deal_messages ENABLE ROW LEVEL SECURITY;
--- No direct SELECT policy — messages are read only through the decrypt function
--- But we need insert for the encrypt function
-CREATE POLICY "No direct message access" ON deal_messages FOR SELECT USING (false);
-CREATE POLICY "No direct message insert" ON deal_messages FOR INSERT WITH CHECK (false);
 
--- 6. Encrypt & insert a message (SECURITY DEFINER — bypasses RLS, accesses the key)
+DO $$ BEGIN
+  CREATE POLICY "deal_msgs_no_direct_select" ON deal_messages FOR SELECT USING (false);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "deal_msgs_no_direct_insert" ON deal_messages FOR INSERT WITH CHECK (false);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- 5. Send encrypted message (SECURITY DEFINER — bypasses RLS, accesses key)
 CREATE OR REPLACE FUNCTION send_deal_message(
   p_conversation_id UUID,
   p_sender_id UUID,
@@ -84,18 +78,15 @@ DECLARE
   enc_key TEXT;
   conv_record RECORD;
 BEGIN
-  -- Verify sender is a participant
   SELECT * INTO conv_record FROM deal_conversations
   WHERE id = p_conversation_id
-    AND (creator_id = p_sender_id OR empresa_id = p_sender_id);
+    AND (creator_id = p_sender_id OR brand_id = p_sender_id);
   IF NOT FOUND THEN
     RAISE EXCEPTION 'Not a participant in this conversation';
   END IF;
 
   SELECT value INTO enc_key FROM app_secrets WHERE key = 'message_encryption_key';
-  IF enc_key IS NULL THEN
-    RAISE EXCEPTION 'Encryption key not configured';
-  END IF;
+  IF enc_key IS NULL THEN RAISE EXCEPTION 'Encryption key not configured'; END IF;
 
   INSERT INTO deal_messages (conversation_id, sender_id, encrypted_content, message_type, payment_amount_cents, payment_status)
   VALUES (p_conversation_id, p_sender_id, pgp_sym_encrypt(p_content, enc_key), p_message_type, p_payment_amount_cents, p_payment_status)
@@ -105,7 +96,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 7. Decrypt & read messages (SECURITY DEFINER — only participants can call, decrypts on the fly)
+-- 6. Read decrypted messages (SECURITY DEFINER — verifies participant, decrypts on the fly)
 CREATE OR REPLACE FUNCTION get_deal_messages(p_conversation_id UUID, p_caller_id UUID)
 RETURNS TABLE (
   id UUID,
@@ -120,13 +111,12 @@ RETURNS TABLE (
 ) AS $$
 DECLARE
   enc_key TEXT;
-  conv_record RECORD;
 BEGIN
-  -- Verify caller is a participant
-  SELECT * INTO conv_record FROM deal_conversations dc
-  WHERE dc.id = p_conversation_id
-    AND (dc.creator_id = p_caller_id OR dc.empresa_id = p_caller_id);
-  IF NOT FOUND THEN
+  IF NOT EXISTS (
+    SELECT 1 FROM deal_conversations dc
+    WHERE dc.id = p_conversation_id
+      AND (dc.creator_id = p_caller_id OR dc.brand_id = p_caller_id)
+  ) THEN
     RAISE EXCEPTION 'Not a participant in this conversation';
   END IF;
 
@@ -134,22 +124,17 @@ BEGIN
 
   RETURN QUERY
   SELECT
-    dm.id,
-    dm.conversation_id,
-    dm.sender_id,
+    dm.id, dm.conversation_id, dm.sender_id,
     pgp_sym_decrypt(dm.encrypted_content, enc_key) as content,
-    dm.message_type,
-    dm.payment_amount_cents,
-    dm.payment_status,
-    dm.stripe_session_id,
-    dm.created_at
+    dm.message_type, dm.payment_amount_cents, dm.payment_status,
+    dm.stripe_session_id, dm.created_at
   FROM deal_messages dm
   WHERE dm.conversation_id = p_conversation_id
   ORDER BY dm.created_at ASC;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 8. Update payment status (for webhook use)
+-- 7. Update payment status (for webhook)
 CREATE OR REPLACE FUNCTION update_deal_payment_status(
   p_stripe_session_id TEXT,
   p_status TEXT
