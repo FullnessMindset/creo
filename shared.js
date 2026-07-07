@@ -310,8 +310,8 @@ async function updateNavAuth() {
   if (user) {
     const { data } = await sb.from('profiles').select('username').eq('id', user.id).single();
     if (data && data.username) {
-      const perfil = document.querySelector('#bottom-nav a:nth-child(5)');
-      if (perfil) perfil.href = 'profile.html?u=' + data.username;
+      const perfil = document.querySelector('#bottom-nav a[href="profile.html"]');
+      if (perfil) perfil.href = 'profile.html?u=' + encodeURIComponent(data.username);
     }
     if (isAdmin(user.email)) {
       const nav = document.querySelector('#bottom-nav .max-w-2xl');
