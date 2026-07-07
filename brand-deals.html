@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CREO — Brand Deals</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a0a3e">
+  <meta name="description" content="CREO — Colaboraciones con marcas">
+  <meta property="og:title" content="CREO — Brand Deals">
+  <meta property="og:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
+  <link rel="icon" href="assets/logo-icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/logo-icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { creo: { purple: '#1a0a3e', light: '#2d1b69', mint: '#33f0b0', mintDark: '#28c48e' } } } }
+    }
+  </script>
+  <style>
+    body { overscroll-behavior: contain; }
+    .glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
+    .glass-dark { background: rgba(26,10,62,0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); }
+    .chat-bubble-mine { background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 100%); color: white; border-radius: 18px 18px 4px 18px; }
+    .chat-bubble-theirs { background: #f3f4f6; color: #1f2937; border-radius: 18px 18px 18px 4px; }
+    .dark .chat-bubble-theirs { background: rgba(255,255,255,0.1); color: #e5e7eb; }
+    .payment-bubble { background: linear-gradient(135deg, #33f0b0 0%, #28c48e 100%); color: #1a0a3e; border-radius: 16px; }
+    @keyframes pulse-dot { 0%,80%,100% { transform: scale(0); } 40% { transform: scale(1); } }
+    .typing-dot { animation: pulse-dot 1.4s infinite ease-in-out both; }
+    .typing-dot:nth-child(2) { animation-delay: 0.16s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.32s; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-creo-purple text-white px-4 py-3 flex items-center gap-3 shadow-lg">
+    <a href="index.html" class="p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></a>
+    <h1 class="text-lg font-bold flex-1">Brand Deals</h1>
+    <button id="create-deal-btn" class="hidden bg-creo-mint text-creo-purple px-3 py-1.5 rounded-xl text-sm font-bold" onclick="openCreateDeal()">+ Crear Deal</button>
+  </header>
+
+  <!-- Category filter -->
+  <div class="px-4 py-3 flex gap-2 overflow-x-auto no-scrollbar">
+    <button onclick="filterDeals('all')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-creo-purple text-white" data-cat="all">Todos</button>
+    <button onclick="filterDeals('moda')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 text-gray-700" data-cat="moda">Moda</button>
+    <button onclick="filterDeals('tech')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 text-gray-700" data-cat="tech">Tech</button>
+    <button onclick="filterDeals('food')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 text-gray-700" data-cat="food">Comida</button>
+    <button onclick="filterDeals('fitness')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 text-gray-700" data-cat="fitness">Fitness</button>
+    <button onclick="filterDeals('beauty')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 text-gray-700" data-cat="beauty">Belleza</button>
+    <button onclick="filterDeals('music')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 text-gray-700" data-cat="music">Música</button>
+    <button onclick="filterDeals('other')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 text-gray-700" data-cat="other">Otro</button>
+  </div>
+
+  <!-- Deals grid -->
+  <div id="deals-grid" class="px-4 pb-24 grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="text-center text-gray-400 py-12 col-span-full">Cargando deals...</div>
+  </div>
+
+  <!-- Empty state -->
+  <div id="no-deals" class="hidden text-center py-16 px-4">
+    <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+    <p class="text-gray-500 font-semibold">No hay deals disponibles</p>
+    <p class="text-gray-400 text-sm mt-1">Las marcas publicarán oportunidades pronto</p>
+  </div>
+
+  <!-- Chat Modal -->
+  <div id="chat-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeChat()"></div>
+    <div class="absolute inset-x-0 bottom-0 top-12 bg-white rounded-t-3xl flex flex-col overflow-hidden shadow-2xl dark-aware-glass">
+      <!-- Chat header -->
+      <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100 bg-white/90 backdrop-blur">
+        <button onclick="closeChat()" class="p-1"><svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        <img id="chat-avatar" src="" class="w-10 h-10 rounded-full object-cover border-2 border-creo-purple" alt="">
+        <div class="flex-1 min-w-0">
+          <p id="chat-name" class="font-bold text-sm truncate"></p>
+          <p id="chat-deal-title" class="text-xs text-gray-400 truncate"></p>
+        </div>
+        <div class="flex items-center gap-1 text-xs text-creo-mint font-semibold">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Encriptado
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+        <div class="text-center text-xs text-gray-400 py-4">
+          <svg class="w-8 h-8 mx-auto mb-2 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Mensajes encriptados de extremo a extremo.<br>Solo tú y la otra parte pueden leerlos.
+        </div>
+      </div>
+
+      <!-- Payment popup (shown inside chat for empresa) -->
+      <div id="payment-popup" class="hidden px-4 py-3 bg-creo-mint/10 border-t border-creo-mint/30">
+        <div class="flex items-center gap-2 mb-2">
+          <svg class="w-5 h-5 text-creo-mintDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="font-bold text-sm text-creo-purple">Enviar Pago al Creador</span>
+          <button onclick="togglePaymentPopup()" class="ml-auto text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>
+        <div class="flex gap-2">
+          <div class="relative flex-1">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+            <input id="payment-amount" type="number" min="1" step="0.01" placeholder="0.00" class="w-full pl-8 pr-3 py-2.5 border border-gray-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-creo-mint focus:border-creo-mint">
+          </div>
+          <input id="payment-desc" type="text" placeholder="Descripción" class="flex-1 px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-mint">
+          <button onclick="sendPayment()" class="bg-creo-mint text-creo-purple px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap hover:bg-creo-mintDark transition">Pagar</button>
+        </div>
+        <p class="text-[11px] text-gray-400 mt-1.5">5% comisión de plataforma. El creador recibe el 95%.</p>
+      </div>
+
+      <!-- Chat input -->
+      <div class="px-4 py-3 border-t border-gray-100 bg-white/90 backdrop-blur flex gap-2 items-end">
+        <button id="pay-toggle-btn" class="hidden p-2 rounded-full bg-creo-mint/20 text-creo-mintDark hover:bg-creo-mint/30 transition" onclick="togglePaymentPopup()" title="Enviar Pago">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </button>
+        <textarea id="chat-input" rows="1" placeholder="Escribe un mensaje..." class="flex-1 px-4 py-2.5 border border-gray-300 rounded-2xl text-sm resize-none max-h-24 focus:ring-2 focus:ring-creo-purple focus:border-creo-purple" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
+        <button onclick="sendMessage()" class="p-2.5 bg-creo-purple text-white rounded-full hover:bg-creo-light transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Deal Modal (for empresas) -->
+  <div id="create-deal-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCreateDeal()"></div>
+    <div class="absolute inset-x-4 top-20 bottom-20 bg-white rounded-3xl shadow-2xl overflow-y-auto p-6">
+      <h2 class="text-xl font-bold text-creo-purple mb-4">Crear Brand Deal</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm font-semibold text-gray-600">Título</label>
+          <input id="deal-title" type="text" class="w-full mt-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple" placeholder="Ej: Embajador de marca — campaña verano">
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-gray-600">Descripción</label>
+          <textarea id="deal-desc" rows="3" class="w-full mt-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm resize-none focus:ring-2 focus:ring-creo-purple" placeholder="Describe la colaboración, requisitos, entregables..."></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-sm font-semibold text-gray-600">Presupuesto mínimo ($)</label>
+            <input id="deal-budget-min" type="number" min="0" class="w-full mt-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm" placeholder="100">
+          </div>
+          <div>
+            <label class="text-sm font-semibold text-gray-600">Presupuesto máximo ($)</label>
+            <input id="deal-budget-max" type="number" min="0" class="w-full mt-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm" placeholder="1000">
+          </div>
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-gray-600">Categoría</label>
+          <select id="deal-category" class="w-full mt-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm">
+            <option value="moda">Moda</option>
+            <option value="tech">Tech</option>
+            <option value="food">Comida</option>
+            <option value="fitness">Fitness</option>
+            <option value="beauty">Belleza</option>
+            <option value="music">Música</option>
+            <option value="other">Otro</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-gray-600">Requisitos</label>
+          <textarea id="deal-requirements" rows="2" class="w-full mt-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm resize-none" placeholder="Ej: Mínimo 10k seguidores, contenido en español"></textarea>
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-gray-600">Imagen del deal (URL)</label>
+          <input id="deal-image" type="url" class="w-full mt-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm" placeholder="https://...">
+        </div>
+        <button onclick="submitDeal()" class="w-full bg-creo-purple text-white py-3 rounded-xl font-bold hover:bg-creo-light transition">Publicar Deal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Conversations tab (for logged-in users) -->
+  <button id="my-convos-btn" class="hidden fixed bottom-20 right-4 z-40 bg-creo-purple text-white p-3 rounded-full shadow-lg hover:bg-creo-light transition" onclick="toggleMyConvos()" title="Mis Conversaciones">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+    <span id="convo-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center"></span>
+  </button>
+
+  <!-- My Conversations Panel -->
+  <div id="convos-panel" class="fixed inset-x-0 bottom-16 z-40 hidden">
+    <div class="mx-4 bg-white rounded-2xl shadow-2xl border border-gray-100 max-h-80 overflow-y-auto">
+      <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="font-bold text-sm">Mis Conversaciones</h3>
+        <button onclick="toggleMyConvos()" class="text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+      <div id="convos-list" class="divide-y divide-gray-50"></div>
+    </div>
+  </div>
+
+  <script src="shared.js"></script>
+  <script>
+    const SUPABASE_FN_URL = 'https://qddxoyjtoxtdcezwuvcq.supabase.co/functions/v1';
+    let currentUser = null;
+    let currentProfile = null;
+    let allDeals = [];
+    let activeConversation = null;
+    let chatPollInterval = null;
+    let activeCategoryFilter = 'all';
+
+    async function init() {
+      renderBottomNav('deals');
+      applyDarkMode();
+      const { data: { user } } = await sb.auth.getUser();
+      currentUser = user;
+      if (user) {
+        const { data: p } = await sb.from('profiles').select('*').eq('id', user.id).single();
+        currentProfile = p;
+        document.getElementById('my-convos-btn').classList.remove('hidden');
+        if (p && p.account_type === 'empresa') {
+          document.getElementById('create-deal-btn').classList.remove('hidden');
+        }
+      }
+      updateNavAuth();
+      loadNotificationBell();
+      loadDeals();
+
+      const params = new URLSearchParams(location.search);
+      if (params.get('status') === 'payment_sent') {
+        showToast('Pago enviado exitosamente', 'success');
+      }
+    }
+
+    async function loadDeals() {
+      const { data, error } = await sb
+        .from('brand_deals')
+        .select('*, profiles:empresa_id(display_name, username, avatar_url)')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (error) { console.error(error); return; }
+      allDeals = data || [];
+      renderDeals();
+    }
+
+    function filterDeals(cat) {
+      activeCategoryFilter = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => {
+        if (b.dataset.cat === cat) {
+          b.className = 'cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-creo-purple text-white';
+        } else {
+          b.className = 'cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 text-gray-700';
+        }
+      });
+      renderDeals();
+    }
+
+    function renderDeals() {
+      const grid = document.getElementById('deals-grid');
+      const noDeals = document.getElementById('no-deals');
+      const filtered = activeCategoryFilter === 'all' ? allDeals : allDeals.filter(d => d.category === activeCategoryFilter);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        noDeals.classList.remove('hidden');
+        return;
+      }
+      noDeals.classList.add('hidden');
+
+      grid.innerHTML = filtered.map(d => {
+        const empresa = d.profiles || {};
+        const budgetText = d.budget_min && d.budget_max
+          ? `$${d.budget_min} — $${d.budget_max}`
+          : d.budget_min ? `Desde $${d.budget_min}` : d.budget_max ? `Hasta $${d.budget_max}` : 'Negociable';
+        const catLabels = { moda:'Moda', tech:'Tech', food:'Comida', fitness:'Fitness', beauty:'Belleza', music:'Música', other:'Otro' };
+
+        return `
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer" onclick="openDealDetail('${d.id}')">
+            ${d.image_url ? `<img src="${esc(d.image_url)}" class="w-full h-40 object-cover" alt="">` : `<div class="w-full h-40 bg-gradient-to-br from-creo-purple to-creo-light flex items-center justify-center"><svg class="w-12 h-12 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>`}
+            <div class="p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <img src="${esc(empresa.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(empresa.display_name || 'E'))}" class="w-6 h-6 rounded-full object-cover">
+                <span class="text-xs text-gray-500 font-medium truncate">${esc(empresa.display_name || empresa.username || 'Empresa')}</span>
+                ${d.category ? `<span class="ml-auto text-[10px] bg-creo-purple/10 text-creo-purple px-2 py-0.5 rounded-full font-semibold">${esc(catLabels[d.category] || d.category)}</span>` : ''}
+              </div>
+              <h3 class="font-bold text-sm text-gray-800 mb-1 line-clamp-2">${esc(d.title)}</h3>
+              <p class="text-xs text-gray-500 line-clamp-2 mb-3">${esc(d.description || '')}</p>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-bold text-creo-mintDark">${budgetText}</span>
+                <span class="text-[10px] text-gray-400">${new Date(d.created_at).toLocaleDateString('es')}</span>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    async function openDealDetail(dealId) {
+      if (!currentUser) {
+        showToast('Inicia sesión para contactar marcas', 'error');
+        return;
+      }
+      const deal = allDeals.find(d => d.id === dealId);
+      if (!deal) return;
+
+      const empresa = deal.profiles || {};
+      const isEmpresa = currentUser.id === deal.empresa_id;
+
+      if (isEmpresa) {
+        showToast('Es tu propio deal. Ve a "Mis Conversaciones" para ver respuestas.', 'info');
+        return;
+      }
+
+      // Find or create conversation
+      let { data: conv } = await sb
+        .from('deal_conversations')
+        .select('*')
+        .eq('deal_id', dealId)
+        .eq('creator_id', currentUser.id)
+        .single();
+
+      if (!conv) {
+        const { data: newConv, error } = await sb
+          .from('deal_conversations')
+          .insert({ deal_id: dealId, creator_id: currentUser.id, empresa_id: deal.empresa_id })
+          .select()
+          .single();
+        if (error) { showToast('Error al iniciar conversación', 'error'); console.error(error); return; }
+        conv = newConv;
+      }
+
+      openChat(conv, deal.title, empresa.display_name || empresa.username, empresa.avatar_url);
+    }
+
+    function openChat(conversation, dealTitle, otherName, otherAvatar) {
+      activeConversation = conversation;
+      const isEmpresa = currentUser.id === conversation.empresa_id;
+
+      document.getElementById('chat-name').textContent = otherName || 'Usuario';
+      document.getElementById('chat-deal-title').textContent = dealTitle || 'Brand Deal';
+      document.getElementById('chat-avatar').src = otherAvatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(otherName || 'U');
+
+      // Show payment button only for empresa
+      document.getElementById('pay-toggle-btn').classList.toggle('hidden', !isEmpresa);
+      document.getElementById('payment-popup').classList.add('hidden');
+
+      document.getElementById('chat-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      loadMessages();
+
+      chatPollInterval = setInterval(loadMessages, 4000);
+    }
+
+    function closeChat() {
+      document.getElementById('chat-modal').classList.add('hidden');
+      document.body.style.overflow = '';
+      activeConversation = null;
+      if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
+    }
+
+    async function loadMessages() {
+      if (!activeConversation) return;
+
+      const { data, error } = await sb.rpc('get_deal_messages', {
+        p_conversation_id: activeConversation.id,
+        p_caller_id: currentUser.id
+      });
+
+      if (error) { console.error('Error loading messages:', error); return; }
+
+      const container = document.getElementById('chat-messages');
+      const wasAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 60;
+
+      const encryptedBanner = `<div class="text-center text-xs text-gray-400 py-4">
+        <svg class="w-8 h-8 mx-auto mb-2 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        Mensajes encriptados de extremo a extremo.<br>Solo tú y la otra parte pueden leerlos.
+      </div>`;
+
+      if (!data || data.length === 0) {
+        container.innerHTML = encryptedBanner;
+        return;
+      }
+
+      container.innerHTML = encryptedBanner + data.map(m => {
+        const isMine = m.sender_id === currentUser.id;
+        const time = new Date(m.created_at).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+
+        if (m.message_type === 'payment') {
+          const amt = (m.payment_amount_cents / 100).toFixed(2);
+          const statusLabel = m.payment_status === 'completed' ? '✅ Completado'
+            : m.payment_status === 'failed' ? '❌ Fallido' : '⏳ Pendiente';
+          return `<div class="flex ${isMine ? 'justify-end' : 'justify-start'}">
+            <div class="payment-bubble px-4 py-3 max-w-[85%] shadow-md">
+              <div class="flex items-center gap-2 mb-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="font-bold">Pago: $${amt}</span>
+              </div>
+              <p class="text-sm">${esc(m.content)}</p>
+              <div class="flex items-center justify-between mt-2 text-xs opacity-80">
+                <span>${statusLabel}</span>
+                <span>${time}</span>
+              </div>
+            </div>
+          </div>`;
+        }
+
+        if (m.message_type === 'system') {
+          return `<div class="text-center text-xs text-gray-400 py-1">${esc(m.content)}</div>`;
+        }
+
+        return `<div class="flex ${isMine ? 'justify-end' : 'justify-start'}">
+          <div class="${isMine ? 'chat-bubble-mine' : 'chat-bubble-theirs'} px-4 py-2.5 max-w-[80%] shadow-sm">
+            <p class="text-sm whitespace-pre-wrap break-words">${esc(m.content)}</p>
+            <p class="text-[10px] ${isMine ? 'text-white/60' : 'text-gray-400'} text-right mt-1">${time}</p>
+          </div>
+        </div>`;
+      }).join('');
+
+      if (wasAtBottom) container.scrollTop = container.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text || !activeConversation) return;
+
+      input.value = '';
+
+      const { error } = await sb.rpc('send_deal_message', {
+        p_conversation_id: activeConversation.id,
+        p_sender_id: currentUser.id,
+        p_content: text,
+        p_message_type: 'text'
+      });
+
+      if (error) {
+        showToast('Error al enviar mensaje', 'error');
+        console.error(error);
+        return;
+      }
+
+      await loadMessages();
+      document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+    }
+
+    function togglePaymentPopup() {
+      const popup = document.getElementById('payment-popup');
+      popup.classList.toggle('hidden');
+    }
+
+    async function sendPayment() {
+      const amount = parseFloat(document.getElementById('payment-amount').value);
+      const desc = document.getElementById('payment-desc').value.trim();
+
+      if (!amount || amount < 1) {
+        showToast('Monto mínimo $1', 'error');
+        return;
+      }
+      if (!activeConversation) return;
+
+      // Get creator's stripe_connect_id
+      const { data: creatorProfile } = await sb
+        .from('profiles')
+        .select('stripe_connect_id')
+        .eq('id', activeConversation.creator_id)
+        .single();
+
+      if (!creatorProfile?.stripe_connect_id) {
+        showToast('Este creador no tiene Stripe conectado', 'error');
+        return;
+      }
+
+      showToast('Procesando pago...', 'info');
+
+      try {
+        const res = await fetch(SUPABASE_FN_URL + '/create-deal-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
+          body: JSON.stringify({
+            conversation_id: activeConversation.id,
+            sender_id: currentUser.id,
+            creator_connect_id: creatorProfile.stripe_connect_id,
+            amount_usd: amount,
+            description: desc
+          })
+        });
+
+        const result = await res.json();
+        if (result.error) throw new Error(result.error);
+        if (result.url) window.location.href = result.url;
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    function toggleMyConvos() {
+      const panel = document.getElementById('convos-panel');
+      if (panel.classList.contains('hidden')) {
+        loadMyConversations();
+        panel.classList.remove('hidden');
+      } else {
+        panel.classList.add('hidden');
+      }
+    }
+
+    async function loadMyConversations() {
+      const list = document.getElementById('convos-list');
+      list.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Cargando...</div>';
+
+      const isEmpresa = currentProfile?.account_type === 'empresa';
+      const col = isEmpresa ? 'empresa_id' : 'creator_id';
+      const otherCol = isEmpresa ? 'creator_id' : 'empresa_id';
+
+      const { data: convos } = await sb
+        .from('deal_conversations')
+        .select(`*, brand_deals(title), ${otherCol === 'creator_id' ? 'creator:creator_id(display_name, username, avatar_url)' : 'empresa:empresa_id(display_name, username, avatar_url)'}`)
+        .eq(col, currentUser.id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (!convos || convos.length === 0) {
+        list.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">No tienes conversaciones activas</div>';
+        return;
+      }
+
+      list.innerHTML = convos.map(c => {
+        const other = isEmpresa ? c.creator : c.empresa;
+        const name = other?.display_name || other?.username || 'Usuario';
+        const avatar = other?.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name);
+        const dealTitle = c.brand_deals?.title || 'Deal';
+        return `<button onclick="openConvoFromList('${c.id}', '${esc(dealTitle)}', '${esc(name)}', '${esc(avatar)}')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition text-left">
+          <img src="${esc(avatar)}" class="w-10 h-10 rounded-full object-cover">
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-sm truncate">${esc(name)}</p>
+            <p class="text-xs text-gray-400 truncate">${esc(dealTitle)}</p>
+          </div>
+          <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>`;
+      }).join('');
+    }
+
+    function openConvoFromList(convoId, dealTitle, name, avatar) {
+      const conv = { id: convoId };
+      // We need creator/empresa IDs — fetch them
+      sb.from('deal_conversations').select('*').eq('id', convoId).single().then(({ data }) => {
+        if (!data) return;
+        document.getElementById('convos-panel').classList.add('hidden');
+        openChat(data, dealTitle, name, avatar);
+      });
+    }
+
+    // Create deal (empresa only)
+    function openCreateDeal() {
+      document.getElementById('create-deal-modal').classList.remove('hidden');
+    }
+
+    function closeCreateDeal() {
+      document.getElementById('create-deal-modal').classList.add('hidden');
+    }
+
+    async function submitDeal() {
+      const title = document.getElementById('deal-title').value.trim();
+      const description = document.getElementById('deal-desc').value.trim();
+      const budget_min = parseInt(document.getElementById('deal-budget-min').value) || 0;
+      const budget_max = parseInt(document.getElementById('deal-budget-max').value) || 0;
+      const category = document.getElementById('deal-category').value;
+      const requirements = document.getElementById('deal-requirements').value.trim();
+      const image_url = document.getElementById('deal-image').value.trim();
+
+      if (!title) { showToast('Agrega un título', 'error'); return; }
+
+      const { error } = await sb.from('brand_deals').insert({
+        empresa_id: currentUser.id,
+        title, description, budget_min, budget_max, category, requirements,
+        image_url: image_url && image_url.startsWith('https://') ? image_url : null
+      });
+
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+
+      showToast('Deal publicado', 'success');
+      closeCreateDeal();
+      loadDeals();
+    }
+
+    window.addEventListener('beforeunload', () => {
+      if (chatPollInterval) clearInterval(chatPollInterval);
+    });
+
+    init();
+  </script>
+</body>
+</html>
