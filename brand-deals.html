@@ -32,6 +32,11 @@
   <header class="sticky top-0 z-40 bg-creo-purple text-white px-4 py-3 flex items-center gap-3 shadow-lg">
     <a href="index.html" class="p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></a>
     <h1 class="text-lg font-bold flex-1">Brand Deals</h1>
+    <!-- Role toggle for Platform Creator only -->
+    <div id="role-toggle" class="hidden flex items-center bg-white/15 rounded-full p-0.5 text-xs font-semibold">
+      <button id="role-btn-creator" onclick="switchRole('creator')" class="px-3 py-1 rounded-full bg-white text-creo-purple transition">Creador</button>
+      <button id="role-btn-brand" onclick="switchRole('brand')" class="px-3 py-1 rounded-full text-white/70 transition">Marca</button>
+    </div>
   </header>
 
   <!-- Category filter -->
@@ -185,6 +190,23 @@
     let selectedDeal = null;
     let chatPollInterval = null;
     let activeCategoryFilter = 'all';
+    let currentRole = 'creator';
+
+    function switchRole(role) {
+      currentRole = role;
+      const cBtn = document.getElementById('role-btn-creator');
+      const bBtn = document.getElementById('role-btn-brand');
+      if (role === 'creator') {
+        cBtn.className = 'px-3 py-1 rounded-full bg-white text-creo-purple transition';
+        bBtn.className = 'px-3 py-1 rounded-full text-white/70 transition';
+      } else {
+        bBtn.className = 'px-3 py-1 rounded-full bg-white text-creo-purple transition';
+        cBtn.className = 'px-3 py-1 rounded-full text-white/70 transition';
+      }
+      if (document.getElementById('convos-panel').classList.contains('hidden') === false) {
+        loadMyConversations();
+      }
+    }
 
     async function init() {
       renderBottomNav('deals');
@@ -195,6 +217,9 @@
         const { data: p } = await sb.from('profiles').select('*').eq('id', user.id).single();
         currentProfile = p;
         document.getElementById('my-convos-btn').classList.remove('hidden');
+        if (isPlatformCreator(p?.email || '')) {
+          document.getElementById('role-toggle').classList.remove('hidden');
+        }
       }
       updateNavAuth();
       loadNotificationBell();
@@ -299,7 +324,7 @@
       if (!currentUser) {
         contactBtn.textContent = 'Inicia sesión para contactar';
         contactBtn.onclick = () => signInWithGoogle();
-      } else if (isOwnDeal && !isPlatform) {
+      } else if (isOwnDeal && (!isPlatform || currentRole === 'brand')) {
         contactBtn.textContent = 'Es tu deal';
         contactBtn.disabled = true;
       } else {
@@ -344,7 +369,8 @@
 
     function openChat(conversation, dealTitle, otherName, otherAvatar) {
       activeConversation = conversation;
-      const isBrand = currentUser.id === conversation.brand_id;
+      const isPlatform = isPlatformCreator(currentProfile?.email || '');
+      const isBrand = isPlatform ? currentRole === 'brand' : currentUser.id === conversation.brand_id;
 
       document.getElementById('chat-name').textContent = otherName || 'Usuario';
       document.getElementById('chat-deal-title').textContent = dealTitle || 'Brand Deal';
@@ -497,11 +523,12 @@
       const list = document.getElementById('convos-list');
       list.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Cargando...</div>';
 
-      const isBrandAccount = currentProfile?.account_type === 'empresa' || currentProfile?.account_type === 'business' || isPlatformCreator(currentProfile?.email || '');
       const isPlatform = isPlatformCreator(currentProfile?.email || '');
+      const isBrandAccount = currentProfile?.account_type === 'empresa' || currentProfile?.account_type === 'business';
+      const showAsBrand = isPlatform ? currentRole === 'brand' : isBrandAccount;
 
       let convos = [];
-      if (isBrandAccount) {
+      if (showAsBrand) {
         const { data: brandConvos } = await sb
           .from('deal_conversations')
           .select('*, brand_deals(title), other:creator_id(display_name, username, avatar_url)')
@@ -509,8 +536,7 @@
           .eq('status', 'active')
           .order('created_at', { ascending: false });
         if (brandConvos) convos.push(...brandConvos.map(c => ({ ...c, _role: 'brand' })));
-      }
-      if (!isBrandAccount || isPlatform) {
+      } else {
         const { data: creatorConvos } = await sb
           .from('deal_conversations')
           .select('*, brand_deals(title), other:brand_id(display_name, username, avatar_url)')

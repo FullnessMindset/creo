@@ -918,6 +918,11 @@
       </div>
 
       <div id="panel-deals" class="tab-panel hidden space-y-4">
+        <!-- Role toggle for Platform Creator -->
+        <div id="panel-role-toggle" class="hidden flex items-center justify-center gap-1 bg-gray-100 rounded-full p-1 mx-auto w-fit">
+          <button id="panel-role-creator" onclick="switchPanelRole('creator')" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-creo-purple text-white transition">Creador</button>
+          <button id="panel-role-brand" onclick="switchPanelRole('brand')" class="px-4 py-1.5 rounded-full text-xs font-semibold text-gray-500 transition">Marca</button>
+        </div>
         <!-- Creator view: incoming deal requests -->
         <div id="deals-creator-view">
           <!-- Stats bar -->
@@ -1454,15 +1459,14 @@
       // Show Brand Deals tab for creators and businesses
       const dealsTab = document.getElementById('tab-deals');
       const isPlatform = isPlatformCreator(profile.email || '');
-      if (profile.account_type === 'business' || isPlatform) {
+      if (isPlatform) {
+        dealsTab.classList.remove('hidden');
+        document.getElementById('panel-role-toggle').classList.remove('hidden');
+        switchPanelRole('creator');
+      } else if (profile.account_type === 'business') {
         dealsTab.classList.remove('hidden');
         document.getElementById('deals-business-view').classList.remove('hidden');
-        if (isPlatform) {
-          document.getElementById('deals-creator-view').classList.remove('hidden');
-          if (!profile.stripe_connect_id) document.getElementById('deals-no-stripe').classList.remove('hidden');
-        } else {
-          document.getElementById('deals-creator-view').classList.add('hidden');
-        }
+        document.getElementById('deals-creator-view').classList.add('hidden');
       } else if (profile.account_type !== 'co-creator') {
         dealsTab.classList.remove('hidden');
         document.getElementById('deals-creator-view').classList.remove('hidden');
@@ -3485,6 +3489,27 @@
           ${actions}
         </div>`;
       }).join('');
+    }
+
+    function switchPanelRole(role) {
+      const cBtn = document.getElementById('panel-role-creator');
+      const bBtn = document.getElementById('panel-role-brand');
+      const creatorView = document.getElementById('deals-creator-view');
+      const businessView = document.getElementById('deals-business-view');
+      const noStripe = document.getElementById('deals-no-stripe');
+      if (role === 'creator') {
+        cBtn.className = 'px-4 py-1.5 rounded-full text-xs font-semibold bg-creo-purple text-white transition';
+        bBtn.className = 'px-4 py-1.5 rounded-full text-xs font-semibold text-gray-500 transition';
+        creatorView.classList.remove('hidden');
+        businessView.classList.add('hidden');
+        if (!currentProfile?.stripe_connect_id && noStripe) noStripe.classList.remove('hidden');
+      } else {
+        bBtn.className = 'px-4 py-1.5 rounded-full text-xs font-semibold bg-creo-purple text-white transition';
+        cBtn.className = 'px-4 py-1.5 rounded-full text-xs font-semibold text-gray-500 transition';
+        creatorView.classList.add('hidden');
+        businessView.classList.remove('hidden');
+        if (noStripe) noStripe.classList.add('hidden');
+      }
     }
 
     async function loadMyDeals() {
