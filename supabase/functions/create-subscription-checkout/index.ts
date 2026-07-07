@@ -59,13 +59,17 @@ serve(async (req) => {
       recurring: { interval: "month" },
     });
 
+    const isPlatform = creator_connect_id === "platform";
+    const subscriptionData: any = {};
+    if (!isPlatform) {
+      subscriptionData.application_fee_percent = PLATFORM_FEE_PERCENT;
+      subscriptionData.transfer_data = { destination: creator_connect_id };
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: price.id, quantity: 1 }],
-      subscription_data: {
-        application_fee_percent: PLATFORM_FEE_PERCENT,
-        transfer_data: { destination: creator_connect_id },
-      },
+      subscription_data: subscriptionData,
       metadata: { type: "subscription", creator_id, creator_connect_id },
       success_url: success_url || "https://fullnessmindset.github.io/creo/redirect.html?status=success",
       cancel_url: cancel_url || "https://fullnessmindset.github.io/creo/",

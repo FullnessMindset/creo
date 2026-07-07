@@ -635,8 +635,10 @@
       });
       if (hasSocials) document.getElementById('social-links').classList.remove('hidden');
 
-      // Only disable payments if no Stripe Connect account (identity verification bypassed for now)
-      if (!data.stripe_connect_id) {
+      // Platform creator (owner) doesn't need Connect — payments go to main Stripe
+      // Other creators need stripe_connect_id for payouts
+      const isPlatformOwner = data.id === '67133679-4e5f-49aa-8a22-43af41b917ee';
+      if (!data.stripe_connect_id && !isPlatformOwner) {
         disablePayments();
       }
 
@@ -690,7 +692,8 @@
       }
 
       const today = new Date().toISOString().split('T')[0];
-      const canPay = !!creatorProfile?.stripe_connect_id;
+      const isPlatformOwner = creatorProfile?.id === '67133679-4e5f-49aa-8a22-43af41b917ee';
+      const canPay = !!creatorProfile?.stripe_connect_id || isPlatformOwner;
 
       container.innerHTML = data.map(m => {
         const pct = m.goal_amount_cents > 0 ? Math.min(100, Math.round(m.raised_cents / m.goal_amount_cents * 100)) : 0;
@@ -837,7 +840,7 @@
       try {
         const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ creator_connect_id: creatorProfile.stripe_connect_id, amount_usd: amount, success_url: window.location.href.split('?')[0] + '?u=' + username + '&status=completed', cancel_url: window.location.href })
+          body: JSON.stringify({ creator_connect_id: creatorProfile.stripe_connect_id || 'platform', amount_usd: amount, success_url: window.location.href.split('?')[0] + '?u=' + username + '&status=completed', cancel_url: window.location.href })
         });
         const data = await response.json();
         if (data.url) window.location.href = data.url;
@@ -854,7 +857,7 @@
       try {
         const response = await fetch(`${SUPABASE_URL}/functions/v1/create-meta-checkout`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ creator_connect_id: creatorProfile.stripe_connect_id, amount_usd: amount, meta_id: metaId, success_url: window.location.href.split('?')[0] + '?u=' + username + '&status=meta_completed', cancel_url: window.location.href })
+          body: JSON.stringify({ creator_connect_id: creatorProfile.stripe_connect_id || 'platform', amount_usd: amount, meta_id: metaId, success_url: window.location.href.split('?')[0] + '?u=' + username + '&status=meta_completed', cancel_url: window.location.href })
         });
         const data = await response.json();
         if (data.url) window.location.href = data.url;
@@ -871,7 +874,7 @@
       try {
         const response = await fetch(`${SUPABASE_URL}/functions/v1/create-subscription-checkout`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ creator_connect_id: creatorProfile.stripe_connect_id, creator_id: creatorProfile.id, amount_usd: amount, success_url: window.location.href.split('?')[0] + '?u=' + username + '&status=subscribed', cancel_url: window.location.href })
+          body: JSON.stringify({ creator_connect_id: creatorProfile.stripe_connect_id || 'platform', creator_id: creatorProfile.id, amount_usd: amount, success_url: window.location.href.split('?')[0] + '?u=' + username + '&status=subscribed', cancel_url: window.location.href })
         });
         const data = await response.json();
         if (data.url) window.location.href = data.url;

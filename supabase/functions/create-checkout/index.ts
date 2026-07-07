@@ -23,7 +23,14 @@ serve(async (req) => {
     }
 
     const amountCents = Math.round(amount_usd * 100);
+    const isPlatform = creator_connect_id === "platform";
     const feeCents = Math.round(amountCents * PLATFORM_FEE_PERCENT / 100);
+
+    const paymentIntentData: any = {};
+    if (!isPlatform) {
+      paymentIntentData.application_fee_amount = feeCents;
+      paymentIntentData.transfer_data = { destination: creator_connect_id };
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -35,10 +42,7 @@ serve(async (req) => {
         },
         quantity: 1,
       }],
-      payment_intent_data: {
-        application_fee_amount: feeCents,
-        transfer_data: { destination: creator_connect_id },
-      },
+      payment_intent_data: paymentIntentData,
       metadata: { type: "tip", creator_connect_id },
       success_url: success_url || "https://fullnessmindset.github.io/creo/redirect.html?status=success",
       cancel_url: cancel_url || "https://fullnessmindset.github.io/creo/",
