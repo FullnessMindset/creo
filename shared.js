@@ -304,18 +304,21 @@ function showToast(message, type) {
   setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
 }
 
-// Bottom Navigation — 5 items: Comunidad, Explorar, Publicar (+), Mensajes, Perfil
+// Bottom Navigation — full platform nav with all sections
 function renderBottomNav(activePage) {
   const nav = document.createElement('nav');
   nav.id = 'bottom-nav';
-  nav.className = 'fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-2 pb-[env(safe-area-inset-bottom)] transition-colors';
+  nav.className = 'fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-1 pb-[env(safe-area-inset-bottom)] transition-colors';
   const items = [
     { id: 'comunidad', label: 'Comunidad', href: 'comunidad.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>' },
     { id: 'explore', label: 'Explorar', href: 'explore.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>' },
+    { id: 'cine', label: 'Cine', href: 'cine-local.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16"/>' },
+    { id: 'biblioteca', label: 'Libros', href: 'biblioteca.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>' },
+    { id: 'galeria', label: 'Galeria', href: 'galeria.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
     { id: 'post', label: 'Publicar', href: '#', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>', isPublicar: true, authOnly: true },
     { id: 'messages', label: 'Mensajes', href: 'messages.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>', authOnly: true },
     { id: 'profile', label: 'Perfil', href: 'profile.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>' },
-    { id: 'dashboard', label: 'Panel', href: 'index.html?panel=1', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>', authOnly: true }
+    { id: 'dashboard', label: 'Panel', href: 'index.html?panel=1', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>', authOnly: true }
   ];
   const inner = document.createElement('div');
   inner.className = 'max-w-2xl mx-auto flex justify-around items-center h-14';
@@ -326,12 +329,12 @@ function renderBottomNav(activePage) {
     if (item.authOnly) a.setAttribute('data-auth-only', 'true');
     const isActive = activePage === item.id;
     if (item.isPublicar) {
-      a.className = 'flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors text-creo-mint hover:text-white';
-      a.innerHTML = `<div class="w-10 h-10 rounded-full bg-creo-mint flex items-center justify-center -mt-5 shadow-lg border-4 border-white dark:border-gray-900"><svg class="w-6 h-6 text-creo-purple" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">${item.icon}</svg></div><span class="text-[10px] font-bold text-creo-mint">${item.label}</span>`;
+      a.className = 'flex flex-col items-center gap-0.5 py-1 px-1 rounded-lg transition-colors text-creo-mint hover:text-white';
+      a.innerHTML = `<div class="w-9 h-9 rounded-full bg-creo-mint flex items-center justify-center -mt-4 shadow-lg border-3 border-white dark:border-gray-900"><svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">${item.icon}</svg></div><span class="text-[9px] font-bold text-creo-mint">${item.label}</span>`;
       a.onclick = (e) => { e.preventDefault(); togglePublicarMenu(); };
     } else {
-      a.className = `flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors ${isActive ? 'text-creo-purple' : 'text-gray-400 hover:text-gray-600'}`;
-      a.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg><span class="text-[10px] font-medium">${item.label}</span>`;
+      a.className = `flex flex-col items-center gap-0.5 py-1 px-1 rounded-lg transition-colors ${isActive ? 'text-creo-purple' : 'text-gray-400 hover:text-gray-600'}`;
+      a.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg><span class="text-[9px] font-medium">${item.label}</span>`;
     }
     inner.appendChild(a);
   });
