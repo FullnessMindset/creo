@@ -432,16 +432,16 @@
       await sb.from('story_comments').insert([{ story_id: s.id, user_id: exploreUser.id, body }]);
       input.value = '';
       loadStoryCommentsList();
-      const el = document.getElementById('sv-comment-count');
-      el.textContent = parseInt(el.textContent) + 1;
+      const el = document.querySelector('.sv-comment-count');
+      if (el) el.textContent = parseInt(el.textContent || '0') + 1;
     }
 
     async function deleteStoryComment(commentId) {
       if (!confirm('¿Eliminar comentario?')) return;
       await sb.from('story_comments').delete().eq('id', commentId);
       loadStoryCommentsList();
-      const el = document.getElementById('sv-comment-count');
-      el.textContent = Math.max(0, parseInt(el.textContent) - 1);
+      const el = document.querySelector('.sv-comment-count');
+      if (el) el.textContent = Math.max(0, parseInt(el.textContent || '0') - 1);
     }
 
     async function shareStory() {
