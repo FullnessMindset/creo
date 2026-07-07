@@ -1,133 +1,12 @@
 // CREO Platform — Shared utilities
 const SUPABASE_URL = "https://qddxoyjtoxtdcezwuvcq.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZHhveWp0b3h0ZGNlend1dmNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MTUxNDIsImV4cCI6MjA5Nzk5MTE0Mn0.MEaMf[...]";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZHhveWp0b3h0ZGNlend1dmNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MTUxNDIsImV4cCI6MjA5Nzk5MTE0Mn0.MEaMfib77T0B7HW-jI6nctc1a7WbIf1n7rKBhdc-Gm8";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const ADMIN_EMAIL = 'fullnessmindset@gmail.com';
 
 function isAdmin(email) { return email === ADMIN_EMAIL; }
 
-// ========== AUTHENTICATION ==========
-
-// Post-login redirect logic — profile incomplete → Panel, otherwise → Comunidad
-async function handlePostLoginRedirect() {
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) return;
-
-  const { data: profile } = await sb.from('profiles')
-    .select('display_name, bio, username')
-    .eq('id', user.id).single();
-
-  if (profile && profile.display_name && profile.bio) {
-    window.location.href = 'comunidad.html';
-  } else {
-    window.location.href = 'index.html';
-  }
-}
-
-// Google OAuth Sign In
-async function signInWithGoogle() {
-  try {
-    const { data, error } = await sb.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin + window.location.pathname
-      }
-    });
-    if (error) {
-      showToast('Error: ' + error.message, 'error');
-      console.error('Google sign-in error:', error);
-    }
-  } catch (err) {
-    showToast('Error al conectar con Google', 'error');
-    console.error(err);
-  }
-}
-
-// Email/Password Sign In
-async function signIn() {
-  const email = document.getElementById('email')?.value?.trim();
-  const password = document.getElementById('password')?.value;
-  if (!email || !password) { showToast('Email y contraseña requeridos', 'error'); return; }
-  showToast('Iniciando sesión...', 'info');
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) {
-    showToast('Error: ' + error.message, 'error');
-  } else {
-    showToast('¡Bienvenido!', 'success');
-    setTimeout(() => handlePostLoginRedirect(), 500);
-  }
-}
-
-// Email/Password Sign Up
-async function signUp() {
-  const email = document.getElementById('email')?.value?.trim();
-  const password = document.getElementById('password')?.value;
-  const termsSection = document.getElementById('register-terms');
-  
-  if (!email || !password) { showToast('Email y contraseña requeridos', 'error'); return; }
-  
-  // Show terms if not visible
-  if (termsSection?.classList.contains('hidden')) {
-    termsSection.classList.remove('hidden');
-    return;
-  }
-  
-  // Validate terms acceptance
-  const acceptedTerms = document.getElementById('accept-terms')?.checked;
-  const acceptedConduct = document.getElementById('accept-conduct')?.checked;
-  if (!acceptedTerms || !acceptedConduct) {
-    showToast('Debes aceptar los términos y conducta', 'error');
-    return;
-  }
-  
-  showToast('Creando cuenta...', 'info');
-  const { data: { user }, error } = await sb.auth.signUp({ email, password });
-  
-  if (error) {
-    showToast('Error: ' + error.message, 'error');
-  } else if (user) {
-    // Determine account type
-    const accountType = document.getElementById('reg-account-type')?.value || 'creator';
-    const language = document.getElementById('reg-language')?.value || 'es';
-    
-    // Create profile record
-    await sb.from('profiles').insert([{
-      id: user.id,
-      email: email,
-      account_type: accountType,
-      language: language,
-      created_at: new Date().toISOString()
-    }]).catch(err => console.log('Profile creation note:', err));
-    
-    showToast('¡Cuenta creada! Verifica tu email', 'success');
-    setTimeout(() => handlePostLoginRedirect(), 1500);
-  }
-}
-
-// Sign Out
-async function signOut() {
-  await sb.auth.signOut();
-  showToast('Sesión cerrada', 'success');
-  setTimeout(() => location.reload(), 500);
-}
-
-// Check auth on page load and redirect if needed
-async function checkAuthAndRedirect() {
-  const { data: { user } } = await sb.auth.getUser();
-  if (user) {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('panel') === '1') return;
-
-    const currentPath = window.location.pathname;
-    const isAuthPage = currentPath.includes('index.html') || currentPath === '/' || currentPath.endsWith('/creo/');
-
-    if (isAuthPage) {
-      await handlePostLoginRedirect();
-    }
-  }
-}
-
-// ========== THEME ==========
+// Theme — light/dark
 function initTheme() {
   applyTheme('light');
 }
@@ -304,122 +183,33 @@ function showToast(message, type) {
   setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
 }
 
-// Bottom Navigation — full platform nav with all sections
+// Bottom Navigation
 function renderBottomNav(activePage) {
   const nav = document.createElement('nav');
   nav.id = 'bottom-nav';
-  nav.className = 'fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-1 pb-[env(safe-area-inset-bottom)] transition-colors';
+  nav.className = 'fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-2 pb-[env(safe-area-inset-bottom)] transition-colors';
   const items = [
-    { id: 'comunidad', label: 'Comunidad', href: 'comunidad.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>' },
+    { id: 'comunidad', label: 'Comunidad', href: 'comunidad.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>' },
     { id: 'explore', label: 'Explorar', href: 'explore.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>' },
-    { id: 'cine', label: 'Cine', href: 'cine-local.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16"/>' },
-    { id: 'biblioteca', label: 'Libros', href: 'biblioteca.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>' },
-    { id: 'galeria', label: 'Galeria', href: 'galeria.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>' },
-    { id: 'post', label: 'Publicar', href: '#', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>', isPublicar: true, authOnly: true },
+    { id: 'post', label: 'Publicar', href: 'index.html#post', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>', authOnly: true },
     { id: 'messages', label: 'Mensajes', href: 'messages.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>', authOnly: true },
-    { id: 'profile', label: 'Perfil', href: 'profile.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>' },
-    { id: 'dashboard', label: 'Panel', href: 'index.html?panel=1', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>', authOnly: true }
+    { id: 'profile', label: 'Perfil', href: 'index.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>' },
+    { id: 'dashboard', label: 'Panel', href: 'index.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>', authOnly: true }
   ];
   const inner = document.createElement('div');
   inner.className = 'max-w-2xl mx-auto flex justify-around items-center h-14';
   items.forEach(item => {
     const a = document.createElement('a');
     a.href = item.href;
-    a.setAttribute('data-nav-id', item.id);
     if (item.authOnly) a.setAttribute('data-auth-only', 'true');
     const isActive = activePage === item.id;
-    if (item.isPublicar) {
-      a.className = 'flex flex-col items-center gap-0.5 py-1 px-1 rounded-lg transition-colors text-creo-mint hover:text-white';
-      a.innerHTML = `<div class="w-9 h-9 rounded-full bg-creo-mint flex items-center justify-center -mt-4 shadow-lg border-3 border-white dark:border-gray-900"><svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">${item.icon}</svg></div><span class="text-[9px] font-bold text-creo-mint">${item.label}</span>`;
-      a.onclick = (e) => { e.preventDefault(); togglePublicarMenu(); };
-    } else {
-      a.className = `flex flex-col items-center gap-0.5 py-1 px-1 rounded-lg transition-colors ${isActive ? 'text-creo-purple' : 'text-gray-400 hover:text-gray-600'}`;
-      a.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg><span class="text-[9px] font-medium">${item.label}</span>`;
-    }
+    a.className = `flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors ${isActive ? 'text-creo-purple' : 'text-gray-400 hover:text-gray-600'}`;
+    a.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg><span class="text-[10px] font-medium">${item.label}</span>`;
     inner.appendChild(a);
   });
   nav.appendChild(inner);
   document.body.appendChild(nav);
   document.body.style.paddingBottom = '4rem';
-}
-
-// Publicar content type selector
-function togglePublicarMenu() {
-  let menu = document.getElementById('publicar-menu');
-  if (menu) { menu.remove(); return; }
-
-  const dk = isDark();
-  const overlay = document.createElement('div');
-  overlay.id = 'publicar-menu';
-  overlay.className = 'fixed inset-0 z-[90] flex items-end justify-center';
-  overlay.style.background = 'rgba(0,0,0,0.5)';
-  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
-
-  const bg = dk ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200';
-  const textCls = dk ? 'text-white' : 'text-gray-900';
-  const subCls = dk ? 'text-gray-400' : 'text-gray-500';
-  const hoverCls = dk ? 'hover:bg-gray-800' : 'hover:bg-gray-50';
-
-  const types = [
-    { icon: '📝', label: 'Post', desc: 'Texto, fotos o reflexion', action: 'post' },
-    { icon: '🎨', label: 'Arte', desc: 'Pintura, escultura, fotografia', action: 'arte' },
-    { icon: '🎵', label: 'Musica', desc: 'Cancion, album o cover', action: 'musica' },
-    { icon: '🎬', label: 'Pelicula / Cine', desc: 'Corto, documental o pelicula', action: 'cine-local' },
-    { icon: '📚', label: 'Libro', desc: 'Novela, poesia o ensayo', action: 'biblioteca' },
-    { icon: '🖼️', label: 'Galeria', desc: 'Exposicion o coleccion visual', action: 'galeria' },
-    { icon: '🛍️', label: 'Producto Local', desc: 'Artesania, alimentos, productos', action: 'productos-locales' }
-  ];
-
-  const sheet = document.createElement('div');
-  sheet.className = `w-full max-w-lg ${bg} border-t rounded-t-3xl p-4 pb-20 animate-slide-up`;
-  sheet.innerHTML = `
-    <div class="w-10 h-1 rounded-full ${dk ? 'bg-gray-600' : 'bg-gray-300'} mx-auto mb-4"></div>
-    <h3 class="text-lg font-bold ${textCls} mb-1 text-center">¿Que quieres publicar?</h3>
-    <p class="text-xs ${subCls} text-center mb-4">Selecciona el tipo de contenido</p>
-    <div class="space-y-1">
-      ${types.map(t => `
-        <button onclick="handlePublicarChoice('${t.action}')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl ${hoverCls} transition">
-          <span class="text-2xl">${t.icon}</span>
-          <div class="text-left">
-            <p class="text-sm font-semibold ${textCls}">${t.label}</p>
-            <p class="text-xs ${subCls}">${t.desc}</p>
-          </div>
-        </button>
-      `).join('')}
-    </div>`;
-
-  overlay.appendChild(sheet);
-  document.body.appendChild(overlay);
-}
-
-function handlePublicarChoice(action) {
-  document.getElementById('publicar-menu')?.remove();
-  const onComunidad = window.location.pathname.includes('comunidad');
-
-  if (action === 'post' || action === 'arte' || action === 'musica') {
-    if (onComunidad) {
-      document.getElementById('compose-modal')?.classList.remove('hidden');
-      const sectionSelect = document.getElementById('compose-section');
-      if (sectionSelect) {
-        sectionSelect.value = action === 'post' ? 'general' : action;
-        sectionSelect.dispatchEvent(new Event('change'));
-      }
-    } else {
-      window.location.href = 'comunidad.html?publish=' + (action === 'post' ? 'general' : action);
-    }
-  } else if (action === 'productos-locales') {
-    if (onComunidad) {
-      document.getElementById('compose-modal')?.classList.remove('hidden');
-      const sectionSelect = document.getElementById('compose-section');
-      if (sectionSelect) { sectionSelect.value = 'productos'; sectionSelect.dispatchEvent(new Event('change')); }
-      const pf = document.getElementById('compose-producto-fields');
-      if (pf) pf.classList.remove('hidden');
-    } else {
-      window.location.href = 'comunidad.html?publish=productos-locales';
-    }
-  } else {
-    window.location.href = action + '.html?publish=1';
-  }
 }
 
 async function updateNavAuth() {
@@ -430,7 +220,7 @@ async function updateNavAuth() {
   if (user) {
     const { data } = await sb.from('profiles').select('username').eq('id', user.id).single();
     if (data && data.username) {
-      const perfil = document.querySelector('#bottom-nav [data-nav-id="profile"]');
+      const perfil = document.querySelector('#bottom-nav a:nth-child(5)');
       if (perfil) perfil.href = 'profile.html?u=' + data.username;
     }
     if (isAdmin(user.email)) {
@@ -440,7 +230,7 @@ async function updateNavAuth() {
         const btn = document.createElement('a');
         btn.href = '#';
         btn.className = 'flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors ' + (isAdminMode ? 'text-creo-mint' : 'text-gray-400 hover:text-creo-purple');
-        btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>';
+        btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg><span class="text-[10px] font-medium">Admin</span>';
         btn.onclick = (e) => {
           e.preventDefault();
           if (isAdminMode) {
@@ -470,7 +260,7 @@ async function loadNotificationBell() {
   const bellIcon = bell.querySelector('svg');
   if (bellIcon && isDark()) bellIcon.classList.replace('text-gray-500', 'text-gray-300');
   bell.onclick = () => toggleNotifPanel();
-  bell.innerHTML = `<div class="relative p-2"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>${count > 0 ? `<span class="absolute top-0 right-0 w-5 h-5 rounded-full text-xs font-bold text-white bg-red-600 flex items-center justify-center">${Math.min(count, 9)}${count > 9 ? '+' : ''}</span>` : ''}</div>`;
+  bell.innerHTML = `<div class="relative p-2"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>${count > 0 ? `<span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">${count > 9 ? '9+' : count}</span>` : ''}</div>`;
   document.body.appendChild(bell);
 }
 
@@ -494,24 +284,24 @@ async function toggleNotifPanel() {
     const hoverCls = dk ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
     const titleCls = dk ? 'text-white' : 'text-gray-900';
     const subtitleCls = dk ? 'text-gray-400' : 'text-gray-500';
-    panel.innerHTML = `<div class="p-3 border-b ${borderCls} flex justify-between items-center"><span class="font-bold text-sm ${titleCls}">Notificaciones</span><button onclick="markAllRead()" class="text-xs text-creo-mint hover:underline">Marcar todas como leídas</button></div>`;
-    panel.innerHTML += data.map(n => {
-      const link = n.link || getNotifDefaultLink(n);
-      const actionLabel = actionLabels[n.type] || 'Ver';
-      return `<div class="px-3 py-2.5 border-b ${borderItemCls} ${n.is_read ? 'opacity-60' : ''} ${hoverCls} transition cursor-pointer" onclick="${link ? `window.location.href='${link}'` : ''}">
-        <div class="flex gap-2">
-          <span>${icons[n.type] || '🔔'}</span>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium ${titleCls}">${esc(n.title)}</p>
-            ${n.body ? `<p class="text-xs ${subtitleCls} truncate">${esc(n.body)}</p>` : ''}
-            <div class="flex items-center justify-between mt-1">
-              <p class="text-[10px] text-gray-400">${new Date(n.created_at).toLocaleDateString()}</p>
-              ${link ? `<span class="text-[10px] text-creo-mint font-semibold">${actionLabel} →</span>` : ''}
+    panel.innerHTML = `<div class="p-3 border-b ${borderCls} flex justify-between items-center"><span class="font-bold text-sm ${titleCls}">Notificaciones</span><button onclick="markAllRead()" class="text-xs text-creo-mint hover:underline">Marcar leídas</button></div>` +
+      data.map(n => {
+        const link = n.link || getNotifDefaultLink(n);
+        const actionLabel = actionLabels[n.type] || 'Ver';
+        return `<div class="px-3 py-2.5 border-b ${borderItemCls} ${n.is_read ? 'opacity-60' : ''} ${hoverCls} transition cursor-pointer" onclick="${link ? `window.location.href='${link}'` : ''}">
+          <div class="flex gap-2">
+            <span>${icons[n.type] || '🔔'}</span>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium ${titleCls}">${esc(n.title)}</p>
+              ${n.body ? `<p class="text-xs ${subtitleCls} truncate">${esc(n.body)}</p>` : ''}
+              <div class="flex items-center justify-between mt-1">
+                <p class="text-[10px] text-gray-400">${new Date(n.created_at).toLocaleDateString()}</p>
+                ${link ? `<span class="text-[10px] text-creo-mint font-semibold">${actionLabel} →</span>` : ''}
+              </div>
             </div>
           </div>
-        </div>
-      </div>`;
-    }).join('');
+        </div>`;
+      }).join('');
   }
   document.body.appendChild(panel);
   document.addEventListener('click', closeNotifOnClickOutside);
@@ -557,12 +347,12 @@ function getNotifDefaultLink(n) {
 // Emoji Picker
 const EMOJI_CATEGORIES = {
   'Frecuentes': ['😀','😂','🥹','❤️','🔥','👏','🙌','💯','✨','🎉','👍','🙏','😍','🥰','😘','💪','🤝','💜','💚','🤩','😎','🫶','💕','🌟','⭐'],
-  'Caras': ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','😊','😇','🥰','😍','🤩','😘','😗','😚','😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙂','🙁','🥹','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🤬','🤡','👿','😈','😠','😡','🤬','😤','😖','😣','😫','😩','🥺','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👹','👺','👻','👽','👾','🤖','😺','😸','😹','😻','😼','😽','😾','😿','🙀','🙈','🙉','🙊'],
-  'Gestos': ['👋','🤚','🖐️','✋','🖖','🫱','🫲','🫳','🫴','👌','🤌','🤏','✌️','🤞','🫰','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','🫵','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🤜','🤛','🦾','🦿','👂','👃','🧠','🦷','🦴','👅','👂','👂‍♂️','👂‍♀️','🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯'],
-  'Corazones': ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❤️‍🔥','❤️‍🩹','❣️','💕','💞','💓','💗','💖','💘','💝','💟','💌','💋','👋','💋'],
-  'Animales': ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🦅','🦆','🦉','🦋','🐛','🐝','🐞','🦀','🦞','🦟','🦗','🕷️','🦂','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🦑','🦑','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🐆','🦓','🦍','🦧','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦉','🦅','🦆','🦢','🦜','🦗','🕷️','🐢','🐍'],
-  'Comida': ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🥑','🍕','🍔','🍟','🌭','🌮','🌯','🍿','🧁','🍰','🎂','🍮','🍭','🍬','🍫','🍿','🍩','🍪','🌰','🥜','🍯','🥐','🍶','🍼','☕','🍵','🍶','🍾','🍷','🍸','🍹','🍺','🍻','🥂','🥃','🍽️','🍴','🥄'],
-  'Objetos': ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🎮','🕹️','🎯','🎪','🎨','🎬','🎤','🎧','🎵','🎶','🎹','🥁','🎷','🎺','🎸','💻','📱','📸','📷','📹','🎥','📼','💿','📀','🧮','📞','☎️','📟','📠','📺','📻','🎙️','🎚️','🎛️','⌚','⏱️','⏲️','🕰️','⌛','⏳','📡','🔋','🔌','💡','🔦','🕯️','🪔','🧯','🛢️','💸','💵','💴','💶','💷','💰','💳','🧾','✉️','📩','📨','📧','💌','📥','📤','📦','🏷️','🧧','📪','📫','📬','📭','📮','✏️','✒️','🖋️','🖊️','🖌️','🖍️','📝','📁','📂','📅','📆','🗒️','🗓️','📇','📈','📉','📊','📓','📔','📒','📕','📗','📘','📙','📚','📖','🧷','🧷','🧹','🧺','🧻','🧼','🧽','🧯','🛒','🚬','⚰️','⚱️','🏺','🔮'],
+  'Caras': ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','😊','😇','🥰','😍','🤩','😘','😗','😚','😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🫢','🤫','🤔','🫡','🤐','🤨','😐','😑','😶','🫥','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🥵','🥶','🥴','😵','🤯','🤠','🥳','🥸','😎','🤓','🧐','😕','🫤','😟','🙁','😮','😯','😲','😳','🥺','🥹','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀'],
+  'Gestos': ['👋','🤚','🖐️','✋','🖖','🫱','🫲','🫳','🫴','👌','🤌','🤏','✌️','🤞','🫰','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','🫵','👍','👎','✊','👊','🤛','🤜','👏','🙌','🫶','👐','🤲','🤝','🙏','💪'],
+  'Corazones': ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❤️‍🔥','❤️‍🩹','❣️','💕','💞','💓','💗','💖','💘','💝'],
+  'Animales': ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🦅','🦆','🦉','🦋','🐛','🐝','🐞','🦀','🐙','🐚','🐬','🐳','🐊','🦕','🦖','🦈'],
+  'Comida': ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🥑','🍕','🍔','🍟','🌭','🌮','🌯','🍿','🧁','🍰','🍩','🍪','🍫','🍬','☕','🍵','🧃','🍺','🍷','🥂','🍾'],
+  'Objetos': ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🎮','🕹️','🎯','🎪','🎨','🎬','🎤','🎧','🎵','🎶','🎹','🥁','🎷','🎺','🎸','💻','📱','📸','🔑','💡','📚','✏️','📌','💰','💎','🏆','🥇','🎖️','🏅','🎗️']
 };
 
 function createEmojiPicker(inputId, btnId) {
@@ -620,8 +410,19 @@ function emojiButton(btnId) {
   return `<button type="button" id="${btnId}" class="p-1.5 text-gray-400 hover:text-yellow-500 transition rounded-lg hover:bg-gray-100" title="Emojis">😊</button>`;
 }
 
-// Messages nav item (kept for backwards compat — now built into renderBottomNav)
-function addMessagesNavItem() {}
+// Messages nav item
+function addMessagesNavItem() {
+  const nav = document.querySelector('#bottom-nav .max-w-2xl');
+  if (!nav) return;
+  const postLink = nav.querySelector('[href="index.html#post"]');
+  if (!postLink) return;
+  const msgLink = document.createElement('a');
+  msgLink.href = 'messages.html';
+  msgLink.setAttribute('data-auth-only', 'true');
+  msgLink.className = 'flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg transition-colors text-gray-400 hover:text-gray-600';
+  msgLink.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span class="text-[10px] font-medium">Mensajes</span>';
+  postLink.parentNode.insertBefore(msgLink, postLink);
+}
 
 // Cookie Consent Banner
 function initCookieConsent() {
@@ -640,7 +441,7 @@ function initCookieConsent() {
         <span class="text-2xl flex-shrink-0">🍪</span>
         <div>
           <p class="text-sm font-semibold ${ckTitle}">Cookies y Privacidad</p>
-          <p class="text-xs ${ckText} mt-1">CREO utiliza cookies esenciales para autenticación y almacenamiento local para tus preferencias (tema, idioma). No usamos cookies de seguimiento ni publicidad.</p>
+          <p class="text-xs ${ckText} mt-1">CREO utiliza cookies esenciales para autenticación y almacenamiento local para tus preferencias (tema, idioma). No usamos cookies de seguimiento ni publicidad. Al continuar, aceptas nuestro uso de cookies.</p>
         </div>
       </div>
       <div class="flex gap-2">
@@ -695,8 +496,6 @@ function acceptCookies() {
     }
     .dark .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.4), 0 8px 10px -6px rgba(0,0,0,0.4) !important; }
     .dark .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5) !important; }
-    @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .animate-slide-up { animation: slide-up 0.3s ease-out; }
     .dark .hover\\:bg-gray-50:hover { background-color: #374151 !important; }
     .dark .hover\\:bg-gray-100:hover { background-color: #374151 !important; }
     .dark .hover\\:bg-gray-200:hover { background-color: #4b5563 !important; }
