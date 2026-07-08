@@ -1,0 +1,71 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  secret-scan:
+    name: Scan for leaked secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan for hardcoded secrets
+        run: |
+          echo "Scanning for leaked secrets..."
+          FOUND=0
+
+          # Stripe keys
+          if grep -rn 'sk_live_\|sk_test_\|rk_live_\|rk_test_\|whsec_' --include='*.html' --include='*.js' --include='*.ts' --include='*.json' --include='*.md' . 2>/dev/null | grep -v node_modules | grep -v '.git/'; then
+            echo "::error::STRIPE SECRET KEY FOUND IN CODE!"
+            FOUND=1
+          fi
+
+          # Supabase service role key
+          if grep -rn 'service_role.*eyJ\|eyJ.*service_role' --include='*.html' --include='*.js' --include='*.json' . 2>/dev/null | grep -v node_modules | grep -v '.git/' | grep -v '.ts'; then
+            echo "::error::SUPABASE SERVICE ROLE KEY FOUND IN CLIENT CODE!"
+            FOUND=1
+          fi
+
+          # Generic API keys/passwords in client files
+          if grep -rn 'password\s*[:=]\s*["\x27][^"\x27]\{8,\}' --include='*.html' --include='*.js' . 2>/dev/null | grep -v node_modules | grep -v '.git/' | grep -v placeholder | grep -v 'type="password"'; then
+            echo "::warning::Possible hardcoded password found"
+          fi
+
+          # .env files
+          if find . -name '.env' -o -name '.env.*' | grep -v node_modules | grep -v '.git/'; then
+            echo "::error::.env FILE FOUND IN REPO!"
+            FOUND=1
+          fi
+
+          if [ $FOUND -eq 1 ]; then
+            echo "::error::SECRET LEAK DETECTED — FIX BEFORE MERGING"
+            exit 1
+          fi
+
+          echo "No leaked secrets found."
+
+  headers-check:
+    name: Check security headers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify CORS in edge functions
+        run: |
+          echo "Checking CORS origins in edge functions..."
+          UNSAFE=0
+          for f in $(find supabase/functions -name '*.ts' 2>/dev/null); do
+            if grep -q 'Access-Control-Allow-Origin.*\*' "$f"; then
+              echo "::error::WILDCARD CORS in $f — restrict to your domain"
+              UNSAFE=1
+            fi
+          done
+          if [ $UNSAFE -eq 0 ]; then
+            echo "All edge functions have restricted CORS."
+          fi

@@ -1,0 +1,52 @@
+# ===== SECRETS & ENVIRONMENT =====
+.env
+.env.*
+.env.local
+.env.production
+.env.development
+*.env
+
+# Supabase local config (contains project refs)
+supabase/.temp/
+supabase/.branches/
+supabase/config.toml.bak
+
+# ===== API KEYS & CREDENTIALS =====
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+credentials.json
+service-account.json
+secrets.json
+*-credentials.json
+
+# ===== IDE & EDITOR =====
+.claude/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== NODE =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# ===== OS =====
+.DS_Store
+*.tmp
+*.temp
+*.log
+
+# ===== BUILD =====
+dist/
+build/
+.cache/
