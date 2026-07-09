@@ -547,16 +547,16 @@ const EMOJI_CATEGORIES = {
 function createEmojiPicker(inputId, btnId) {
   const btn = document.getElementById(btnId);
   if (!btn) return;
+  const wrapper = btn.parentElement;
+  if (wrapper && getComputedStyle(wrapper).position === 'static') wrapper.style.position = 'relative';
   btn.onclick = (e) => {
     e.preventDefault(); e.stopPropagation();
     let existing = document.getElementById('emoji-picker-panel');
     if (existing) { existing.remove(); return; }
     const panel = document.createElement('div');
     panel.id = 'emoji-picker-panel';
-    panel.className = 'fixed z-[200] rounded-2xl shadow-2xl p-3 w-80 max-h-80 bg-white border border-gray-200';
-    const rect = btn.getBoundingClientRect();
-    panel.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
-    panel.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - 330)) + 'px';
+    panel.className = 'absolute z-[200] rounded-2xl shadow-2xl p-3 bg-white border border-gray-200';
+    panel.style.cssText = 'bottom:100%;left:0;margin-bottom:8px;width:min(320px,calc(100vw - 32px));max-height:320px;';
     let activeCategory = 'Frecuentes';
     function renderPicker() {
       const tabs = Object.keys(EMOJI_CATEGORIES).map(cat =>
@@ -565,7 +565,7 @@ function createEmojiPicker(inputId, btnId) {
       const emojis = EMOJI_CATEGORIES[activeCategory].map(e =>
         `<button class="w-9 h-9 text-xl hover:bg-gray-100 rounded-lg transition flex items-center justify-center emoji-pick" data-emoji="${e}">${e}</button>`
       ).join('');
-      panel.innerHTML = `<div class="flex gap-1 overflow-x-auto pb-2 mb-2 border-b border-gray-100 emoji-tabs">${tabs}</div><div class="grid grid-cols-8 gap-0.5 max-h-48 overflow-y-auto">${emojis}</div>`;
+      panel.innerHTML = `<div class="flex gap-1 overflow-x-auto pb-2 mb-2 border-b border-gray-100 emoji-tabs" style="-webkit-overflow-scrolling:touch">${tabs}</div><div class="grid grid-cols-7 gap-0.5 max-h-48 overflow-y-auto" style="-webkit-overflow-scrolling:touch">${emojis}</div>`;
     }
     renderPicker();
     panel.addEventListener('click', (ev) => {
@@ -575,21 +575,30 @@ function createEmojiPicker(inputId, btnId) {
       if (emojiBtn) {
         const input = document.getElementById(inputId);
         if (input) {
-          const start = input.selectionStart || input.value.length;
-          input.value = input.value.slice(0, start) + emojiBtn.dataset.emoji + input.value.slice(input.selectionEnd || start);
+          const start = input.selectionStart ?? input.value.length;
+          const end = input.selectionEnd ?? start;
+          input.value = input.value.slice(0, start) + emojiBtn.dataset.emoji + input.value.slice(end);
           input.focus();
-          input.selectionStart = input.selectionEnd = start + emojiBtn.dataset.emoji.length;
+          const pos = start + emojiBtn.dataset.emoji.length;
+          input.setSelectionRange(pos, pos);
         }
       }
     });
-    document.body.appendChild(panel);
+    wrapper.appendChild(panel);
+    requestAnimationFrame(() => {
+      const r = panel.getBoundingClientRect();
+      if (r.top < 0) { panel.style.bottom = 'auto'; panel.style.top = '100%'; panel.style.marginBottom = '0'; panel.style.marginTop = '8px'; }
+      if (r.right > window.innerWidth) { panel.style.left = 'auto'; panel.style.right = '0'; }
+    });
     setTimeout(() => {
       const closePicker = (ev) => {
         if (!panel.contains(ev.target) && ev.target !== btn && !btn.contains(ev.target)) {
           panel.remove(); document.removeEventListener('click', closePicker);
+          document.removeEventListener('touchend', closePicker);
         }
       };
       document.addEventListener('click', closePicker);
+      document.addEventListener('touchend', closePicker);
     }, 10);
   };
 }
