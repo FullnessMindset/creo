@@ -132,8 +132,12 @@
           <p class="text-sm text-white/80 leading-relaxed">
             ¿Te gustaría recibir apoyo de otros creadores y empresas para cumplir tus metas?
           </p>
+          <label class="flex items-start gap-2 pt-2 cursor-pointer">
+            <input type="checkbox" id="terms-checkbox" class="mt-1 w-4 h-4 rounded accent-creo-mint flex-shrink-0" onchange="document.getElementById('accept-welcome-btn').disabled = !this.checked">
+            <span class="text-xs text-white/80 leading-snug">Acepto los <a href="terminos.html" target="_blank" class="underline text-white hover:text-creo-mint">Términos de Servicio</a> y la <a href="privacidad.html" target="_blank" class="underline text-white hover:text-creo-mint">Política de Privacidad</a>. Confirmo que soy mayor de 18 años.</span>
+          </label>
           <div class="flex gap-3 pt-2">
-            <button onclick="acceptWelcome()" class="flex-1 bg-white text-creo-purple font-bold py-3 rounded-xl hover:bg-gray-100 transition text-sm">
+            <button onclick="acceptWelcome()" id="accept-welcome-btn" disabled class="flex-1 bg-white text-creo-purple font-bold py-3 rounded-xl hover:bg-gray-100 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed">
               ¡Sí, quiero verificarme! ✨
             </button>
             <button onclick="dismissWelcome()" class="px-4 py-3 text-white/70 hover:text-white border border-white/30 rounded-xl transition text-sm">
@@ -362,7 +366,7 @@
     }
 
     async function acceptWelcome() {
-      await sb.from('profiles').update({ community_intro_seen: true }).eq('id', currentUser.id);
+      await sb.from('profiles').update({ community_intro_seen: true, terms_accepted_at: new Date().toISOString() }).eq('id', currentUser.id);
       document.getElementById('welcome-post').classList.add('hidden');
       showCreoIdModal();
     }
