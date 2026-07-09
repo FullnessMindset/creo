@@ -1265,12 +1265,27 @@
     }
 
     // Auto-login if already authenticated as admin
-    (async () => {
-      const { data: { user } } = await sb.auth.getUser();
-      if (user && isAdmin(user.email)) {
-        const { data: { session } } = await sb.auth.getSession();
-        authToken = session?.access_token;
+    async function tryAutoLogin() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session?.user && isAdmin(session.user.email)) {
+        authToken = session.access_token;
         await verifyAndEnter();
+        return true;
+      }
+      return false;
+    }
+
+    (async () => {
+      const loggedIn = await tryAutoLogin();
+      if (!loggedIn) {
+        // Session may not be ready yet after OAuth redirect — listen for it
+        const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
+          if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && session?.user && isAdmin(session.user.email)) {
+            subscription.unsubscribe();
+            authToken = session.access_token;
+            await verifyAndEnter();
+          }
+        });
       }
     })();
   </script>
