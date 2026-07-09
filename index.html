@@ -3198,7 +3198,13 @@
 
     window.onload = () => {
       checkUser().then(() => { showOnboarding(); });
-      renderBottomNav('dashboard');
+      const urlTab = new URLSearchParams(window.location.search).get('tab');
+      if (urlTab === 'comunidad') {
+        renderBottomNav('comunidad');
+        showTab('comunidad');
+      } else {
+        renderBottomNav('dashboard');
+      }
       loadNotificationBell();
     };
 

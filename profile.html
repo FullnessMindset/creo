@@ -194,63 +194,6 @@
           Ver todo <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
       </div>
-      <!-- Owner-only: Create Post -->
-      <div id="profile-compose-card" class="hidden bg-white rounded-xl border border-gray-200 shadow p-4 space-y-3">
-        <input id="profile-post-title" type="text" placeholder="Título (opcional)" class="w-full border border-gray-200 bg-gray-50 p-2.5 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple font-semibold">
-        <textarea id="profile-post-body" placeholder="¿Qué quieres compartir?" rows="2" class="w-full border border-gray-200 bg-gray-50 p-2.5 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple resize-none"></textarea>
-        <!-- Type pills -->
-        <div class="flex gap-2 flex-wrap">
-          <button onclick="setProfilePostType('normal')" class="profile-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-creo-purple text-white" data-type="normal">Normal</button>
-          <button onclick="setProfilePostType('evento')" class="profile-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="evento">📅 Evento</button>
-          <button onclick="setProfilePostType('en_vivo')" class="profile-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="en_vivo">📡 En Vivo</button>
-        </div>
-        <div id="profile-evento-fields" class="hidden space-y-2">
-          <div class="grid grid-cols-2 gap-2">
-            <input id="profile-event-date" type="date" class="border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
-            <input id="profile-event-time" type="time" class="border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
-          </div>
-          <input id="profile-event-link" type="url" placeholder="Enlace (Zoom, Meet, URL)" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
-        </div>
-        <div id="profile-envivo-fields" class="hidden space-y-2">
-          <select id="profile-live-platform" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
-            <option value="browser">Desde el navegador</option>
-            <option value="youtube">YouTube Live</option>
-            <option value="twitch">Twitch</option>
-            <option value="instagram">Instagram Live</option>
-            <option value="custom">Otro enlace</option>
-          </select>
-          <input id="profile-live-url" type="url" placeholder="URL del stream" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
-        </div>
-        <div id="profile-post-media-preview" class="hidden flex gap-2 overflow-x-auto"></div>
-        <!-- Media buttons -->
-        <div class="flex items-center gap-3 flex-wrap">
-          <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-green-600 transition">
-            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-            Foto
-            <input type="file" accept="image/*" multiple class="hidden" onchange="handleProfilePostMedia(this)">
-          </label>
-          <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition">
-            <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg>
-            Video
-            <input type="file" accept="video/*" class="hidden" onchange="handleProfilePostMedia(this)">
-          </label>
-          <button onclick="startProfilePostRec('video')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition">
-            <svg class="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
-            Grabar Video
-          </button>
-          <button onclick="startProfilePostRec('audio')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-amber-500 transition">
-            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
-            Grabar Audio
-          </button>
-        </div>
-        <!-- Comunidad checkbox -->
-        <label class="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" id="profile-post-to-comunidad" checked class="w-4 h-4 rounded border-gray-300 text-creo-purple focus:ring-creo-purple">
-          <span class="text-xs text-gray-600">Publicar también en la Comunidad</span>
-        </label>
-        <div id="profile-post-status" class="hidden text-xs text-creo-purple font-semibold"></div>
-        <button onclick="createProfilePost()" id="profile-post-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-2.5 rounded-xl font-semibold transition text-sm">Publicar</button>
-      </div>
       <div id="creator-posts-scroll"></div>
       <div id="creator-posts-full" class="hidden grid grid-cols-1 gap-4"></div>
     </div>
@@ -378,8 +321,9 @@
     <!-- Payment Type Selector — Glassmorphism -->
     <div id="payment-tabs" class="flex glass rounded-xl overflow-hidden">
       <button onclick="showPayment('tip')" id="pay-tab-tip" class="flex-1 py-3 text-xs font-semibold text-center transition pay-tab-active">Yo Creo en Ti</button>
-      <button onclick="showPayment('meta-support')" id="pay-tab-meta-support" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400 hidden">🎯 Desde Meta</button>
+      <button onclick="showPayment('metas')" id="pay-tab-metas" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400">Mi Meta</button>
       <button onclick="showPayment('sub')" id="pay-tab-sub" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400">Apoyo Full</button>
+      <button onclick="showPayment('meta-support')" id="pay-tab-meta-support" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400 hidden">🎯 Desde Meta</button>
     </div>
 
     <!-- PAYMENT: Yo Creo en Ti -->
@@ -405,6 +349,17 @@
         <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
         <span>Apoyar Creador</span>
       </button>
+    </div>
+
+    <!-- PAYMENT: Mi Meta — shows creator's active metas -->
+    <div id="pay-metas" class="pay-panel hidden">
+      <div class="space-y-4">
+        <div id="pay-metas-list" class="space-y-4"></div>
+        <div id="pay-metas-empty" class="hidden glass p-6 rounded-2xl shadow-xl text-center">
+          <svg class="w-12 h-12 text-gray-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <p class="text-sm font-semibold text-gray-500">Este creador no tiene metas activas</p>
+        </div>
+      </div>
     </div>
 
     <!-- PAYMENT: Apoyar desde Meta -->
@@ -832,6 +787,49 @@
           </button>
         </div>`;
       }).join('');
+
+      // Populate Mi Meta tab panel
+      const payMetasList = document.getElementById('pay-metas-list');
+      const payMetasEmpty = document.getElementById('pay-metas-empty');
+      const activeMetas = data.filter(m => {
+        const pct = m.goal_amount_cents > 0 ? Math.round(m.raised_cents / m.goal_amount_cents * 100) : 0;
+        return m.end_date >= today && pct < 100;
+      });
+      if (activeMetas.length === 0) {
+        payMetasEmpty.classList.remove('hidden');
+        payMetasList.innerHTML = '';
+      } else {
+        payMetasEmpty.classList.add('hidden');
+        payMetasList.innerHTML = activeMetas.map(m => {
+          const pct = Math.min(100, Math.round(m.raised_cents / m.goal_amount_cents * 100));
+          const raised = (m.raised_cents / 100).toFixed(2);
+          const goal = (m.goal_amount_cents / 100).toFixed(2);
+          return `<div class="glass p-5 rounded-2xl shadow-xl space-y-3">
+            <h3 class="text-base font-bold text-gray-900">${esc(m.title)}</h3>
+            ${m.description ? `<p class="text-xs text-gray-500">${esc(m.description)}</p>` : ''}
+            <div>
+              <div class="flex justify-between text-sm mb-1.5">
+                <span class="font-bold text-creo-purple">$${raised}</span>
+                <span class="text-gray-400">de $${goal}</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                <div class="bg-gradient-to-r from-creo-purple to-creo-mint h-full rounded-full transition-all duration-700" style="width:${pct}%"></div>
+              </div>
+              <p class="text-[10px] text-gray-400 mt-1 text-right">${pct}%</p>
+            </div>
+            ${canPay ? `<div class="flex gap-2">
+              <div class="relative flex-1">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-bold">$</span>
+                <input type="number" id="pay-meta-amount-${m.id}" min="1" value="10" step="1" class="w-full pl-7 pr-3 py-2.5 border border-gray-200 bg-white/50 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+              </div>
+              <button onclick="contributeMeta('${m.id}')" class="bg-creo-purple hover:bg-creo-light text-white font-bold py-2.5 px-5 rounded-lg transition text-sm flex items-center gap-1.5">
+                <img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="">
+                Contribuir
+              </button>
+            </div>` : ''}
+          </div>`;
+        }).join('');
+      }
     }
 
     async function processTip() {
