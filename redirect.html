@@ -39,109 +39,110 @@
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('status');
 
-    function setStatus(title, desc, color) {
+    function setUI(title, desc) {
       document.getElementById('title').textContent = title;
       document.getElementById('desc').textContent = desc;
-      if (color) {
-        document.getElementById('status-msg').textContent = desc;
-        document.getElementById('status-msg').className = 'mt-4 text-sm font-medium ' + color;
-      }
+    }
+
+    async function ensureProfile(user) {
+      const { data: profile } = await sb.from('profiles').select('id, username').eq('id', user.id).single();
+      if (profile) return profile;
+      const displayName = user.user_metadata?.full_name || user.user_metadata?.name || (user.email ? user.email.split('@')[0] : 'user');
+      const username = 'user_' + Math.floor(Math.random() * 100000);
+      const { data: newProfile } = await sb.from('profiles').insert([{
+        id: user.id, username, display_name: displayName,
+        avatar_url: user.user_metadata?.avatar_url || null
+      }]).select('id, username').single();
+      return newProfile;
     }
 
     async function handleAuthRedirect(user) {
       if (!user) {
-        setStatus('Error', 'No se pudo verificar tu cuenta');
-        setTimeout(() => { window.location.href = 'index.html'; }, 3000);
+        setUI('Error', 'No se pudo verificar tu cuenta');
+        setTimeout(() => { window.location.href = 'comunidad.html'; }, 2000);
         return;
       }
 
-      let { data: profile } = await sb.from('profiles').select('id, username').eq('id', user.id).single();
-      if (!profile) {
-        const displayName = user.user_metadata?.full_name || user.email.split('@')[0];
-        const username = 'user_' + Math.floor(Math.random() * 100000);
-        const { data: newProfile } = await sb.from('profiles').insert([{ id: user.id, username, display_name: displayName, avatar_url: user.user_metadata?.avatar_url || null }]).select('id, username').single();
-        profile = newProfile;
-      }
+      await ensureProfile(user);
 
       const isAdminLogin = localStorage.getItem('creo-admin-login') === '1';
       localStorage.removeItem('creo-admin-login');
 
       if (isAdmin(user.email) && isAdminLogin) {
         sessionStorage.setItem('admin_mode', 'true');
-        setStatus('Acceso Admin Verificado', 'Redirigiendo al panel de administración...');
+        setUI('Acceso Admin Verificado', 'Redirigiendo al panel...');
         document.getElementById('spinner').classList.add('hidden');
-        setTimeout(() => { window.location.href = 'admin.html'; }, 3000);
+        setTimeout(() => { window.location.href = 'admin.html'; }, 1000);
       } else {
-        const username = profile?.username || '';
-        setStatus('¡Bienvenido!', 'Redirigiendo a tu perfil...');
+        setUI('¡Bienvenido!', 'Redirigiendo a la comunidad...');
         document.getElementById('spinner').classList.add('hidden');
-        setTimeout(() => { window.location.href = 'profile.html?u=' + encodeURIComponent(username); }, 3000);
+        setTimeout(() => { window.location.href = 'comunidad.html'; }, 1000);
       }
     }
 
-    if (status === 'success') {
-      const isUpgrade = localStorage.getItem('creo-cocreator-upgrade') === '1';
-      if (isUpgrade) {
-        setStatus('¡Ahora eres Creador!', 'Tu cuenta ha sido actualizada. Redirigiendo a tu perfil...', 'text-green-600');
-        localStorage.removeItem('creo-cocreator-upgrade');
-        (async () => {
+    (async function() {
+      if (status === 'success') {
+        const isUpgrade = localStorage.getItem('creo-cocreator-upgrade') === '1';
+        if (isUpgrade) {
+          setUI('¡Ahora eres Creador!', 'Redirigiendo...');
+          localStorage.removeItem('creo-cocreator-upgrade');
           const { data: { user } } = await sb.auth.getUser();
           if (user) {
-            const { data: profile } = await sb.from('profiles').select('username').eq('id', user.id).single();
             await sb.from('profiles').update({ account_type: 'creator', verification_status: 'approved' }).eq('id', user.id);
-            const username = profile?.username || '';
-            setTimeout(() => { window.location.href = 'profile.html?u=' + encodeURIComponent(username); }, 2500);
-          } else {
-            setTimeout(() => { window.location.href = 'index.html'; }, 2500);
           }
-        })();
-      } else {
-        setStatus('Stripe Verificado', 'Cuenta de Stripe conectada. Redirigiendo...', 'text-green-600');
-        setTimeout(() => { window.location.href = 'index.html'; }, 2500);
+          setTimeout(() => { window.location.href = 'comunidad.html'; }, 1500);
+          return;
+        }
+        setUI('Stripe Verificado', 'Redirigiendo...');
+        setTimeout(() => { window.location.href = 'comunidad.html'; }, 1500);
+        return;
       }
-    } else if (status === 'refresh') {
-      setStatus('Incompleto', 'Onboarding incompleto. Redirigiendo para reintentar...', 'text-yellow-600');
-      setTimeout(() => { window.location.href = 'index.html'; }, 2500);
-    } else {
+
+      if (status === 'refresh') {
+        setUI('Incompleto', 'Redirigiendo para reintentar...');
+        setTimeout(() => { window.location.href = 'comunidad.html'; }, 1500);
+        return;
+      }
+
+      // Listen for auth state change FIRST — Supabase auto-detects OAuth tokens
+      // in the URL (both ?code= for PKCE and #access_token= for implicit flow)
       let handled = false;
-      const hasCode = urlParams.get('code');
 
-      if (hasCode) {
-        setStatus('Verificando...', 'Confirmando tu identidad...');
-        try {
-          const { data, error } = await sb.auth.exchangeCodeForSession(hasCode);
-          if (!error && data.user) { handled = true; await handleAuthRedirect(data.user); }
-          else { setStatus('Error', error?.message || 'No se pudo verificar'); setTimeout(() => { window.location.href = 'index.html'; }, 3000); }
-        } catch (e) { setStatus('Error', e.message); setTimeout(() => { window.location.href = 'index.html'; }, 3000); }
-      }
-
-      if (!handled) {
-        const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
-          if (handled) return;
-          if (session?.user) {
-            handled = true;
-            subscription.unsubscribe();
-            await handleAuthRedirect(session.user);
-          }
-        });
-
-        const { data: { session } } = await sb.auth.getSession();
-        if (!handled && session?.user) {
+      const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
+        if (handled) return;
+        if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && session?.user) {
           handled = true;
           subscription.unsubscribe();
           await handleAuthRedirect(session.user);
         }
+      });
 
-        if (!handled) {
-          setTimeout(async () => {
-            if (handled) return;
-            const { data: { user } } = await sb.auth.getUser();
-            if (user) { handled = true; subscription.unsubscribe(); await handleAuthRedirect(user); }
-            else { setStatus('Sesión no detectada', 'Redirigiendo...'); window.location.href = 'index.html'; }
-          }, 3000);
+      // Also check if session already exists (user was already logged in)
+      await new Promise(resolve => setTimeout(resolve, 500));
+      if (!handled) {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.user) {
+          handled = true;
+          subscription.unsubscribe();
+          await handleAuthRedirect(session.user);
+          return;
         }
       }
-    }
+
+      // Final fallback — if nothing detected after 8 seconds, redirect
+      setTimeout(async () => {
+        if (handled) return;
+        const { data: { user } } = await sb.auth.getUser();
+        if (user) {
+          handled = true;
+          subscription.unsubscribe();
+          await handleAuthRedirect(user);
+        } else {
+          setUI('Sesión no detectada', 'Redirigiendo...');
+          setTimeout(() => { window.location.href = 'comunidad.html'; }, 1500);
+        }
+      }, 8000);
+    })();
   </script>
 </body>
 </html>
