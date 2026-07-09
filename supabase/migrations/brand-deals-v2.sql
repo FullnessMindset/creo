@@ -4,7 +4,8 @@
 ALTER TABLE public.brand_deals
   ADD COLUMN IF NOT EXISTS video_vibe TEXT,
   ADD COLUMN IF NOT EXISTS payment_description TEXT,
-  ADD COLUMN IF NOT EXISTS cover_url TEXT;
+  ADD COLUMN IF NOT EXISTS cover_url TEXT,
+  ADD COLUMN IF NOT EXISTS delivery_deadline DATE;
 
 -- Lower minimum budget from $5 (500 cents) to $1 (100 cents)
 ALTER TABLE public.brand_deals DROP CONSTRAINT IF EXISTS brand_deals_budget_per_creator_cents_check;

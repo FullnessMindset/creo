@@ -131,10 +131,17 @@
             <textarea id="deal-terms" rows="2" maxlength="800" placeholder="Derechos de uso del contenido, exclusividad, plazos de entrega..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
           </div>
 
-          <!-- Deadline -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Fecha Límite para Aplicar</label>
-            <input id="deal-deadline" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+          <!-- Deadlines -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Fecha Límite para Aplicar</label>
+              <input id="deal-deadline" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Fecha Límite de Entrega *</label>
+              <input id="deal-delivery-deadline" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+              <p class="text-[11px] text-gray-400 mt-1">Cuándo el creador debe entregar el contenido</p>
+            </div>
           </div>
 
           <!-- Cover image upload -->
@@ -226,10 +233,14 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-6 text-xs text-gray-400 pt-2">
+          <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-400 pt-2">
+            <div id="detail-delivery-row" class="hidden flex items-center gap-1.5 text-orange-500 font-medium">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Entrega: <span id="detail-delivery-deadline"></span></span>
+            </div>
             <div id="detail-deadline-row" class="hidden flex items-center gap-1.5">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              <span>Hasta <span id="detail-deadline"></span></span>
+              <span>Aplicar hasta <span id="detail-deadline"></span></span>
             </div>
             <div class="flex items-center gap-1.5">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -481,6 +492,7 @@
         const brand = d.brand || {};
         const budget = (d.budget_per_creator_cents / 100).toFixed(0);
         const deadlineText = d.deadline ? new Date(d.deadline).toLocaleDateString('es') : '';
+        const deliveryText = d.delivery_deadline ? new Date(d.delivery_deadline).toLocaleDateString('es') : '';
         const coverImg = d.cover_url ? `<img src="${esc(d.cover_url)}" class="w-full h-40 object-cover" alt="">` : `<div class="w-full h-40 bg-gradient-to-br from-creo-purple to-creo-light flex items-center justify-center"><svg class="w-12 h-12 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>`;
 
         return `
@@ -498,7 +510,8 @@
               <div class="flex items-center justify-between pt-2 border-t border-gray-100">
                 <span class="text-lg font-bold text-creo-mintDark">$${budget}</span>
                 <div class="text-right">
-                  ${deadlineText ? `<span class="text-[10px] text-gray-400 block">hasta ${deadlineText}</span>` : ''}
+                  ${deliveryText ? `<span class="text-[10px] text-orange-500 font-medium block">Entrega: ${deliveryText}</span>` : ''}
+                  ${deadlineText ? `<span class="text-[10px] text-gray-400 block">Aplicar hasta ${deadlineText}</span>` : ''}
                   <span class="text-[10px] text-gray-400">${d.max_creators || 1} creador(es)</span>
                 </div>
               </div>
@@ -532,6 +545,7 @@
       const paymentDesc = document.getElementById('deal-payment-desc').value.trim();
       const terms = document.getElementById('deal-terms').value.trim();
       const deadline = document.getElementById('deal-deadline').value || null;
+      const deliveryDeadline = document.getElementById('deal-delivery-deadline').value || null;
 
       if (!title) { showToast('Título requerido', 'error'); return; }
       if (!category) { showToast('Categoría requerida', 'error'); return; }
@@ -539,6 +553,7 @@
       if (!videoVibe) { showToast('Vibe del video requerido', 'error'); return; }
       if (!requirements) { showToast('Requisitos requeridos', 'error'); return; }
       if (!budgetUsd || budgetUsd < 1) { showToast('Pago mínimo $1', 'error'); return; }
+      if (!deliveryDeadline) { showToast('Fecha de entrega requerida', 'error'); return; }
 
       const btn = document.getElementById('submit-deal-btn');
       btn.textContent = 'Publicando...';
@@ -566,6 +581,7 @@
         payment_description: paymentDesc,
         terms_conditions: terms,
         deadline,
+        delivery_deadline: deliveryDeadline,
         cover_url: coverUrl,
         status: 'active'
       }]);
@@ -586,6 +602,7 @@
         document.getElementById('deal-payment-desc').value = '';
         document.getElementById('deal-terms').value = '';
         document.getElementById('deal-deadline').value = '';
+        document.getElementById('deal-delivery-deadline').value = '';
         removeCover();
         loadDeals();
       }
@@ -619,6 +636,13 @@
         document.getElementById('detail-cover-wrap').classList.remove('hidden');
       } else {
         document.getElementById('detail-cover-wrap').classList.add('hidden');
+      }
+
+      if (selectedDeal.delivery_deadline) {
+        document.getElementById('detail-delivery-deadline').textContent = new Date(selectedDeal.delivery_deadline).toLocaleDateString('es', { year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('detail-delivery-row').classList.remove('hidden');
+      } else {
+        document.getElementById('detail-delivery-row').classList.add('hidden');
       }
 
       if (selectedDeal.deadline) {
