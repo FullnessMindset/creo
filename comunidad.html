@@ -6,7 +6,7 @@
   <title>CREO — Comunidad</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a0a3e">
-  <meta name="description" content="CREO — Comunidad de creadores">
+  <meta name="description" content="CREO — El muro de la comunidad de creadores">
   <meta property="og:title" content="CREO — Comunidad">
   <meta property="og:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -22,406 +22,571 @@
     }
   </script>
   <style>
+    body { overscroll-behavior: contain; }
     .glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
+    .media-grid-1 { display: grid; grid-template-columns: 1fr; gap: 2px; }
+    .media-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    .media-grid-3 { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px; }
+    .media-grid-3 > :first-child { grid-row: 1 / 3; }
+    .media-grid-4 { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px; }
+    .compose-overlay { position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+    .media-preview-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; scrollbar-width: none; }
+    .media-preview-scroll::-webkit-scrollbar { display: none; }
+    .welcome-gradient { background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 50%, #33f0b0 100%); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
+<body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
   <script src="shared.js"></script>
 
-  <div class="max-w-2xl mx-auto px-4 pt-6 pb-24 space-y-4">
+  <div class="max-w-2xl mx-auto px-4 pt-4 pb-24 space-y-4">
 
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img src="assets/logo-icon.png" class="w-8 h-8 rounded-full" alt="CREO">
-        <h1 class="text-xl font-bold text-gray-900">Comunidad</h1>
-      </div>
-      <div id="notification-bell-area"></div>
+    <!-- Stories bar -->
+    <div id="stories-bar" class="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+      <div id="stories-list" class="flex gap-3"></div>
     </div>
 
-    <!-- Compose Post -->
-    <div id="compose-section" class="hidden">
-      <div class="bg-white p-4 rounded-xl shadow border border-gray-200 space-y-3">
-        <div class="flex items-start gap-3">
-          <div id="comunidad-avatar" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0">
-            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+    <!-- Category tabs -->
+    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+      <button onclick="setCategory('general')" id="cat-general" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-creo-purple text-white">Muro</button>
+      <button onclick="setCategory('cine_local')" id="cat-cine_local" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Cine Local</button>
+      <button onclick="setCategory('galeria')" id="cat-galeria" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Galería</button>
+      <button onclick="setCategory('biblioteca')" id="cat-biblioteca" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Biblioteca</button>
+      <button onclick="setCategory('musica')" id="cat-musica" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Música</button>
+      <button onclick="setCategory('eventos')" id="cat-eventos" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Eventos</button>
+    </div>
+
+    <!-- Compose box (auth only) -->
+    <div id="compose-box" class="hidden bg-white rounded-2xl p-4 space-y-3 border border-gray-100 shadow-sm">
+      <div class="flex items-center gap-3">
+        <div id="compose-avatar" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0"></div>
+        <button onclick="openCompose()" class="flex-1 text-left text-gray-400 text-sm bg-gray-100 rounded-full px-4 py-2.5 hover:bg-gray-200 transition">¿Qué quieres compartir?</button>
+      </div>
+      <div class="flex justify-around border-t border-gray-100 pt-3">
+        <button onclick="openCompose('video')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-creo-purple transition">
+          <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg>
+          Video
+        </button>
+        <button onclick="openCompose('photo')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-creo-purple transition">
+          <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          Foto
+        </button>
+        <button onclick="openCompose('text')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-creo-purple transition">
+          <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 18H6v-2h8v2zm2-4H6v-2h10v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          Texto
+        </button>
+      </div>
+    </div>
+
+    <!-- Creo ID banner for unverified users -->
+    <div id="creo-id-banner" class="hidden">
+      <div class="bg-gradient-to-r from-creo-purple to-creo-light rounded-2xl p-5 text-white space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur">
+            <img src="assets/logo-icon.png" alt="CREO" class="w-7 h-7 rounded-full">
           </div>
-          <div class="flex-1 space-y-2">
-            <textarea id="comunidad-compose" rows="2" placeholder="¿Qué quieres compartir con la comunidad?" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple resize-none"></textarea>
-            <div class="flex items-center justify-between">
-              <div class="flex gap-2">
-                <label class="cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition text-gray-400 hover:text-creo-purple">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                  <input type="file" id="comunidad-media" accept="image/*,video/*" multiple class="hidden" onchange="previewComunidadMedia()">
-                </label>
-              </div>
-              <button onclick="publishComunidadPost()" id="comunidad-publish-btn" class="px-5 py-2 bg-creo-purple text-white text-xs font-bold rounded-lg hover:bg-creo-light transition">Publicar</button>
+          <div>
+            <p class="font-bold text-sm">Verifica tu Creo ID</p>
+            <p class="text-white/70 text-xs">Para publicar y comentar</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-white/10 rounded-xl p-2">
+            <span class="text-lg">🛡️</span>
+            <p class="text-[10px] text-white/80 mt-1">Personas reales</p>
+          </div>
+          <div class="bg-white/10 rounded-xl p-2">
+            <span class="text-lg">🎓</span>
+            <p class="text-[10px] text-white/80 mt-1">Sin menores</p>
+          </div>
+          <div class="bg-white/10 rounded-xl p-2">
+            <span class="text-lg">🔒</span>
+            <p class="text-[10px] text-white/80 mt-1">Datos seguros</p>
+          </div>
+        </div>
+        <button onclick="showCreoIdModal()" class="w-full bg-white text-creo-purple font-bold py-3 rounded-xl hover:bg-gray-100 transition text-sm flex items-center justify-center gap-2">
+          <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
+          Verificar mi Creo ID
+        </button>
+      </div>
+    </div>
+
+    <!-- Welcome admin post (first-time) -->
+    <div id="welcome-post" class="hidden">
+      <div class="welcome-gradient rounded-2xl overflow-hidden shadow-xl">
+        <div class="p-6 text-white space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center backdrop-blur">
+              <img src="assets/logo-icon.png" alt="CREO" class="w-8 h-8 rounded-full">
             </div>
-            <div id="comunidad-media-preview" class="flex gap-2 overflow-x-auto hidden"></div>
+            <div>
+              <p class="font-bold text-sm">CREO</p>
+              <p class="text-white/60 text-xs">Equipo CREO</p>
+            </div>
+          </div>
+          <h3 class="text-lg font-bold">¡Bienvenido a la Comunidad! 🎨</h3>
+          <p class="text-sm text-white/90 leading-relaxed">
+            CREO es la plataforma donde los creadores como tú pueden recibir apoyo real de su comunidad y de empresas que creen en su talento.
+          </p>
+          <p class="text-sm text-white/80 leading-relaxed">
+            ¿Te gustaría recibir apoyo de otros creadores y empresas para cumplir tus metas?
+          </p>
+          <div class="flex gap-3 pt-2">
+            <button onclick="acceptWelcome()" class="flex-1 bg-white text-creo-purple font-bold py-3 rounded-xl hover:bg-gray-100 transition text-sm">
+              ¡Sí, quiero verificarme! ✨
+            </button>
+            <button onclick="dismissWelcome()" class="px-4 py-3 text-white/70 hover:text-white border border-white/30 rounded-xl transition text-sm">
+              Ahora no
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Sort toggle -->
-    <div class="flex gap-1 bg-gray-100 rounded-xl p-1">
-      <button onclick="setComunidadSort('trending')" id="comunidad-sort-trending" class="flex-1 py-2 text-xs font-semibold rounded-lg transition bg-white text-gray-900 shadow-sm">🔥 Tendencias</button>
-      <button onclick="setComunidadSort('recent')" id="comunidad-sort-recent" class="flex-1 py-2 text-xs font-semibold rounded-lg transition text-gray-500">🕐 Recientes</button>
+    <!-- Safety info cards -->
+    <div id="safety-cards" class="hidden">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="bg-green-50 border border-green-200 rounded-xl p-3 flex gap-2">
+          <span class="text-lg flex-shrink-0">🛡️</span>
+          <div>
+            <p class="text-xs font-bold text-green-800">Comunidad Verificada</p>
+            <p class="text-[10px] text-green-700">Cada persona aquí ha verificado su identidad con Creo ID. Interactúas con personas reales.</p>
+          </div>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 flex gap-2">
+          <span class="text-lg flex-shrink-0">🔒</span>
+          <div>
+            <p class="text-xs font-bold text-blue-800">Espacio Seguro</p>
+            <p class="text-[10px] text-blue-700">CREO no permite menores de edad. Los niños deben estar jugando, aprendiendo y en la escuela.</p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Feed -->
-    <div id="comunidad-feed" class="space-y-4"></div>
-    <div id="comunidad-loading" class="hidden text-center py-4">
-      <div class="inline-block w-6 h-6 border-2 border-creo-purple border-t-transparent rounded-full animate-spin"></div>
+    <div id="community-feed" class="space-y-4"></div>
+    <div id="feed-loading" class="hidden text-center py-8">
+      <div class="inline-flex items-center gap-2 text-gray-400 text-sm">
+        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+        Cargando...
+      </div>
     </div>
-    <div id="comunidad-empty" class="hidden text-center py-8">
-      <svg class="w-16 h-16 text-gray-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-      <p class="text-sm font-semibold text-gray-500">La comunidad está esperando tu primer post</p>
-      <p class="text-xs text-gray-400 mt-1">Comparte algo con los demás creadores</p>
+    <p id="feed-empty" class="hidden text-center text-gray-400 text-sm py-12">Aún no hay publicaciones. ¡Sé el primero en compartir!</p>
+    <div id="feed-end" class="hidden text-center text-gray-300 text-xs py-6">— Has visto todo —</div>
+  </div>
+
+  <!-- Compose Modal -->
+  <div id="compose-modal" class="fixed inset-0 z-[90] hidden">
+    <div class="compose-overlay" onclick="closeCompose()"></div>
+    <div class="fixed inset-x-0 bottom-0 z-[91] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl max-h-[85vh] overflow-y-auto" id="compose-panel">
+      <div class="p-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+        <button onclick="closeCompose()" class="text-gray-400 hover:text-gray-600 text-sm">Cancelar</button>
+        <span class="font-bold text-sm text-gray-900">Nueva publicación</span>
+        <button onclick="submitPost()" id="compose-submit" class="bg-creo-purple text-white font-bold px-5 py-2 rounded-full text-sm hover:bg-creo-light transition disabled:opacity-50" disabled>Publicar</button>
+      </div>
+      <div class="p-4 space-y-4">
+        <div class="flex items-start gap-3">
+          <div id="compose-modal-avatar" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0"></div>
+          <div class="flex-1 space-y-3">
+            <input id="compose-title" type="text" placeholder="Título (opcional)" class="w-full text-base font-bold text-gray-900 outline-none placeholder-gray-300 bg-transparent">
+            <textarea id="compose-body" placeholder="¿Qué quieres compartir con la comunidad?" rows="4" class="w-full text-sm text-gray-700 outline-none placeholder-gray-400 bg-transparent resize-none" oninput="checkComposeValid()"></textarea>
+          </div>
+        </div>
+        <div id="compose-media-preview" class="hidden media-preview-scroll"></div>
+        <div class="flex gap-2 flex-wrap">
+          <span class="text-xs text-gray-400 self-center">Categoría:</span>
+          <select id="compose-category" class="text-xs border border-gray-200 bg-gray-50 px-3 py-1.5 rounded-lg text-gray-700 outline-none">
+            <option value="general">Muro</option>
+            <option value="cine_local">Cine Local</option>
+            <option value="galeria">Galería</option>
+            <option value="biblioteca">Biblioteca</option>
+            <option value="musica">Música</option>
+            <option value="eventos">Eventos</option>
+          </select>
+        </div>
+        <div id="compose-type-pills" class="flex gap-2 flex-wrap">
+          <button onclick="setComposeType('normal')" class="compose-type-pill active px-3 py-1.5 rounded-full text-xs font-semibold transition bg-creo-purple text-white" data-type="normal">Normal</button>
+          <button onclick="setComposeType('evento')" class="compose-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="evento">📅 Evento</button>
+          <button onclick="setComposeType('en_vivo')" class="compose-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="en_vivo">📡 En Vivo</button>
+        </div>
+        <div id="compose-evento-fields" class="hidden space-y-2">
+          <div class="grid grid-cols-2 gap-2">
+            <input id="compose-event-date" type="date" class="border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+            <input id="compose-event-time" type="time" class="border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+          </div>
+          <input id="compose-event-link" type="url" placeholder="Enlace (Zoom, Meet, URL)" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+        </div>
+        <div id="compose-envivo-fields" class="hidden space-y-2">
+          <select id="compose-live-platform" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+            <option value="browser">Desde el navegador</option>
+            <option value="youtube">YouTube Live</option>
+            <option value="twitch">Twitch</option>
+            <option value="instagram">Instagram Live</option>
+            <option value="custom">Otro enlace</option>
+          </select>
+          <input id="compose-live-url" type="url" placeholder="URL del stream" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+        </div>
+        <div class="flex items-center gap-3 border-t border-gray-100 pt-3 flex-wrap">
+          <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-green-600 transition">
+            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+            Foto
+            <input type="file" accept="image/*" multiple class="hidden" onchange="handleComposeMedia(event, 'photo')">
+          </label>
+          <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition">
+            <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg>
+            Video
+            <input type="file" accept="video/*" class="hidden" onchange="handleComposeMedia(event, 'video')">
+          </label>
+          <button onclick="startComposeRecording('video')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition">
+            <svg class="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
+            Grabar Video
+          </button>
+          <button onclick="startComposeRecording('audio')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-amber-500 transition">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
+            Grabar Audio
+          </button>
+          <span id="compose-emoji-btn" class="cursor-pointer text-xl hover:scale-110 transition ml-auto">😊</span>
+        </div>
+      </div>
     </div>
-    <div id="comunidad-end" class="hidden text-center py-4">
-      <p class="text-xs text-gray-400">No hay más publicaciones</p>
+  </div>
+
+  <!-- Comments modal -->
+  <div id="comments-modal" class="fixed inset-0 z-[95] hidden">
+    <div class="compose-overlay" onclick="closeComments()"></div>
+    <div class="fixed inset-x-0 bottom-0 z-[96] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col">
+      <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+        <span class="font-bold text-sm text-gray-900">Comentarios</span>
+        <button onclick="closeComments()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="comments-list" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+      <div class="p-3 border-t border-gray-100 flex items-center gap-2">
+        <span id="comment-emoji-btn" class="cursor-pointer text-lg">😊</span>
+        <input id="comment-input" type="text" placeholder="Escribe un comentario..." class="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-creo-mint">
+        <button onclick="submitComment()" class="bg-creo-mint text-creo-purple font-bold px-4 py-2 rounded-full text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+        </button>
+      </div>
     </div>
-    <button onclick="loadComunidadFeed()" id="comunidad-load-more" class="hidden w-full py-3 text-xs font-semibold text-creo-purple bg-creo-purple/5 rounded-xl hover:bg-creo-purple/10 transition">Cargar más</button>
+  </div>
+
+  <!-- Share modal -->
+  <div id="share-modal" class="fixed inset-0 z-[95] hidden">
+    <div class="compose-overlay" onclick="closeShareModal()"></div>
+    <div class="fixed inset-x-0 bottom-0 z-[96] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-sm text-gray-900">Compartir publicación</span>
+        <button onclick="closeShareModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <textarea id="share-body" placeholder="Añade un comentario..." rows="2" class="w-full text-sm bg-gray-100 rounded-xl px-4 py-3 outline-none resize-none"></textarea>
+      <div id="share-preview" class="border border-gray-200 rounded-xl p-3 bg-gray-50"></div>
+      <button onclick="submitShare()" class="w-full bg-creo-purple text-white font-bold py-3 rounded-xl hover:bg-creo-light transition">Compartir al muro</button>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="media-lightbox" class="fixed inset-0 z-[100] hidden bg-black/95 flex items-center justify-center" onclick="closeLightbox()">
+    <button class="absolute top-4 right-4 text-white/70 hover:text-white z-10">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <div id="lightbox-content" class="max-w-full max-h-full" onclick="event.stopPropagation()"></div>
   </div>
 
   <script>
     let currentUser = null;
-    let comunidadPage = 0;
-    let comunidadDone = false;
-    let comunidadLoading = false;
-    let comunidadSort = 'trending';
-    let comunidadMediaFiles = [];
-    const COMUNIDAD_PAGE_SIZE = 10;
+    let currentProfile = null;
+    let feedPage = 0;
+    let feedLoading = false;
+    let feedDone = false;
+    let activeCommentPostId = null;
+    let sharePostId = null;
+    let composeMediaFiles = [];
+    let composeType = 'text';
+    let activeCategory = 'general';
+    const PAGE_SIZE = 15;
 
-    function setComunidadSort(mode) {
-      comunidadSort = mode;
-      document.getElementById('comunidad-sort-trending').className = mode === 'trending'
-        ? 'flex-1 py-2 text-xs font-semibold rounded-lg transition bg-white text-gray-900 shadow-sm'
-        : 'flex-1 py-2 text-xs font-semibold rounded-lg transition text-gray-500';
-      document.getElementById('comunidad-sort-recent').className = mode === 'recent'
-        ? 'flex-1 py-2 text-xs font-semibold rounded-lg transition bg-white text-gray-900 shadow-sm'
-        : 'flex-1 py-2 text-xs font-semibold rounded-lg transition text-gray-500';
-      comunidadPage = 0;
-      comunidadDone = false;
-      document.getElementById('comunidad-feed').innerHTML = '';
-      document.getElementById('comunidad-empty').classList.add('hidden');
-      document.getElementById('comunidad-end').classList.add('hidden');
-      document.getElementById('comunidad-load-more').classList.add('hidden');
-      loadComunidadFeed();
+    async function init() {
+      const { data: { user } } = await sb.auth.getUser();
+      currentUser = user;
+      if (user) {
+        await ensureProfileExists(user);
+        const { data: prof } = await sb.from('profiles').select('*').eq('id', user.id).single();
+        currentProfile = prof;
+        document.getElementById('compose-box').classList.remove('hidden');
+        const avatarHtml = prof?.avatar_url
+          ? `<img src="${esc(prof.avatar_url)}" class="w-full h-full object-cover">`
+          : `<span class="text-creo-purple font-bold">${esc((prof?.display_name || prof?.username || 'U')[0].toUpperCase())}</span>`;
+        document.getElementById('compose-avatar').innerHTML = avatarHtml;
+        document.getElementById('compose-modal-avatar').innerHTML = avatarHtml;
+        const verified = await isCreoIdVerified();
+        if (!verified) document.getElementById('creo-id-banner').classList.remove('hidden');
+        document.getElementById('safety-cards').classList.remove('hidden');
+        checkWelcomePost();
+      } else {
+        document.getElementById('safety-cards').classList.remove('hidden');
+      }
+      loadFeed();
+      loadStories();
+      renderSidebar('comunidad');
+      loadNotificationBell();
+      window.addEventListener('scroll', onScroll);
+      document.getElementById('comment-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitComment(); });
     }
 
-    async function loadComunidadFeed() {
-      if (comunidadLoading || comunidadDone) return;
-      comunidadLoading = true;
-      document.getElementById('comunidad-loading').classList.remove('hidden');
-      document.getElementById('comunidad-load-more').classList.add('hidden');
+    function setCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(b => {
+        if (b.id === 'cat-' + cat) { b.className = 'cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-creo-purple text-white'; }
+        else { b.className = 'cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200'; }
+      });
+      document.getElementById('community-feed').innerHTML = '';
+      feedPage = 0; feedDone = false;
+      document.getElementById('feed-empty').classList.add('hidden');
+      document.getElementById('feed-end').classList.add('hidden');
+      loadFeed();
+    }
 
+    async function checkWelcomePost() {
+      if (!currentProfile) return;
+      if (currentProfile.community_intro_seen) return;
+      if (currentProfile.community_intro_dismissed_at) {
+        const dismissed = new Date(currentProfile.community_intro_dismissed_at);
+        if (Date.now() - dismissed.getTime() < 90 * 24 * 60 * 60 * 1000) return;
+      }
+      document.getElementById('welcome-post').classList.remove('hidden');
+    }
+
+    async function acceptWelcome() {
+      await sb.from('profiles').update({ community_intro_seen: true }).eq('id', currentUser.id);
+      document.getElementById('welcome-post').classList.add('hidden');
+      showCreoIdModal();
+    }
+
+    async function dismissWelcome() {
+      await sb.from('profiles').update({ community_intro_dismissed_at: new Date().toISOString() }).eq('id', currentUser.id);
+      document.getElementById('welcome-post').classList.add('hidden');
+      showToast('¡Sin problema! Disfruta la comunidad', 'info');
+    }
+
+    async function loadStories() {
+      try {
+        const { data } = await sb.from('creator_stories').select('*, profile:creator_id(username, display_name, avatar_url)')
+          .eq('share_to_community', true).order('created_at', { ascending: false }).limit(20);
+        if (!data || data.length === 0) return;
+        const list = document.getElementById('stories-list');
+        const seen = new Set();
+        list.innerHTML = data.filter(s => { if (seen.has(s.creator_id)) return false; seen.add(s.creator_id); return true; }).map(s => {
+          const p = s.profile;
+          const name = p?.display_name || p?.username || '?';
+          const avatar = p?.avatar_url
+            ? `<img src="${esc(p.avatar_url)}" class="w-14 h-14 rounded-full object-cover ring-2 ring-creo-mint ring-offset-2">`
+            : `<div class="w-14 h-14 rounded-full bg-creo-purple/10 flex items-center justify-center ring-2 ring-creo-mint ring-offset-2"><span class="text-creo-purple font-bold">${esc(name[0].toUpperCase())}</span></div>`;
+          return `<a href="profile.html?u=${esc(p?.username || '')}" class="flex flex-col items-center gap-1 flex-shrink-0 w-16">${avatar}<span class="text-[10px] text-gray-500 truncate w-full text-center">${esc(name)}</span></a>`;
+        }).join('');
+      } catch(e) {}
+    }
+
+    async function loadFeed() {
+      if (feedLoading || feedDone) return;
+      feedLoading = true;
+      document.getElementById('feed-loading').classList.remove('hidden');
       try {
         let query = sb.from('community_posts')
-          .select('*, author:author_id(id, username, display_name, avatar_url, verification_status)')
-          .or('profile_only.is.null,profile_only.eq.false');
-
-        if (comunidadSort === 'trending') {
-          query = query
-            .order('like_count', { ascending: false })
-            .order('comment_count', { ascending: false })
-            .order('share_count', { ascending: false })
-            .order('created_at', { ascending: false });
-        } else {
-          query = query.order('created_at', { ascending: false });
-        }
-
-        const { data, error } = await query.range(
-          comunidadPage * COMUNIDAD_PAGE_SIZE,
-          (comunidadPage + 1) * COMUNIDAD_PAGE_SIZE - 1
-        );
-
+          .select('*, author:author_id(id, username, display_name, avatar_url, verification_status), shared_post:shared_post_id(*, author:author_id(id, username, display_name, avatar_url))')
+          .or('profile_only.is.null,profile_only.eq.false')
+          .order('created_at', { ascending: false })
+          .range(feedPage * PAGE_SIZE, (feedPage + 1) * PAGE_SIZE - 1);
+        if (activeCategory !== 'general') query = query.eq('category', activeCategory);
+        const { data, error } = await query;
         if (error) throw error;
-        if (!data || data.length < COMUNIDAD_PAGE_SIZE) comunidadDone = true;
-
-        if (comunidadPage === 0 && (!data || data.length === 0)) {
-          document.getElementById('comunidad-empty').classList.remove('hidden');
-        }
-
+        if (!data || data.length < PAGE_SIZE) feedDone = true;
+        if (feedPage === 0 && (!data || data.length === 0)) document.getElementById('feed-empty').classList.remove('hidden');
         if (data && data.length > 0) {
-          document.getElementById('comunidad-empty').classList.add('hidden');
-
+          document.getElementById('feed-empty').classList.add('hidden');
           const likesMap = {};
-          const sharesMap = {};
           if (currentUser) {
             const postIds = data.map(p => p.id);
-            const [likesRes, sharesRes] = await Promise.all([
-              sb.from('community_likes').select('post_id').eq('user_id', currentUser.id).in('post_id', postIds),
-              sb.from('community_shares').select('post_id').eq('user_id', currentUser.id).in('post_id', postIds)
-            ]);
-            (likesRes.data || []).forEach(l => likesMap[l.post_id] = true);
-            (sharesRes.data || []).forEach(s => sharesMap[s.post_id] = true);
+            const { data: likes } = await sb.from('community_likes').select('post_id').eq('user_id', currentUser.id).in('post_id', postIds);
+            (likes || []).forEach(l => likesMap[l.post_id] = true);
           }
-
-          const feed = document.getElementById('comunidad-feed');
-          data.forEach(post => {
-            feed.insertAdjacentHTML('beforeend', renderComunidadPost(post, likesMap[post.id], sharesMap[post.id]));
-          });
-          comunidadPage++;
+          const countPromises = data.map(p => sb.from('community_likes').select('id', { count: 'exact', head: true }).eq('post_id', p.id));
+          const commentCountPromises = data.map(p => sb.from('community_comments').select('id', { count: 'exact', head: true }).eq('post_id', p.id));
+          const [likeCounts, commentCounts] = await Promise.all([Promise.all(countPromises), Promise.all(commentCountPromises)]);
+          const feed = document.getElementById('community-feed');
+          data.forEach((post, i) => { feed.insertAdjacentHTML('beforeend', renderPost(post, likesMap[post.id], likeCounts[i].count || 0, commentCounts[i].count || 0)); });
+          feedPage++;
         }
-
-        if (comunidadDone) {
-          document.getElementById('comunidad-end').classList.remove('hidden');
-        } else {
-          document.getElementById('comunidad-load-more').classList.remove('hidden');
-        }
-      } catch (e) {
-        console.error('Comunidad feed error:', e);
-        if (comunidadPage === 0) document.getElementById('comunidad-empty').classList.remove('hidden');
+        if (feedDone && feedPage > 0) document.getElementById('feed-end').classList.remove('hidden');
+      } catch(e) {
+        console.error('Feed error:', e);
+        if (feedPage === 0) document.getElementById('feed-empty').classList.remove('hidden');
       }
-
-      comunidadLoading = false;
-      document.getElementById('comunidad-loading').classList.add('hidden');
+      feedLoading = false;
+      document.getElementById('feed-loading').classList.add('hidden');
     }
 
-    function renderComunidadPost(post, liked, shared) {
+    function onScroll() { if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 400) loadFeed(); }
+
+    function renderPost(post, liked, likeCount, commentCount) {
       const a = post.author;
       if (!a) return '';
       const name = a.display_name || a.username || 'Usuario';
-      const avatar = a.avatar_url
-        ? `<img src="${esc(a.avatar_url)}" class="w-full h-full object-cover">`
-        : `<span class="text-creo-purple font-bold text-sm">${esc(name[0].toUpperCase())}</span>`;
+      const avatar = a.avatar_url ? `<img src="${esc(a.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-sm">${esc(name[0].toUpperCase())}</span>`;
       const verified = a.verification_status === 'approved' ? '<svg class="w-4 h-4 text-creo-mint flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' : '';
       const isOwner = currentUser && currentUser.id === post.author_id;
-      const timeAgo = getTimeAgo(post.created_at);
-
       let mediaHtml = '';
       const media = post.media_urls || [];
       if (media.length > 0) {
-        mediaHtml = `<div class="rounded-xl overflow-hidden mt-2">${media.slice(0, 4).map(m => {
+        const gridClass = media.length === 1 ? 'media-grid-1' : media.length === 2 ? 'media-grid-2' : media.length === 3 ? 'media-grid-3' : 'media-grid-4';
+        mediaHtml = `<div class="${gridClass} rounded-xl overflow-hidden">${media.slice(0, 4).map(m => {
           const isVideo = /\.(mp4|webm|mov)$/i.test(m);
-          if (isVideo) return `<video src="${esc(m)}" class="w-full max-h-80 object-cover rounded-xl" controls preload="metadata"></video>`;
-          return `<img src="${esc(m)}" class="w-full max-h-80 object-cover rounded-xl">`;
-        }).join('')}</div>`;
+          if (isVideo) return `<div class="relative aspect-video bg-black cursor-pointer" onclick="openLightbox('${esc(m)}', true)"><video src="${esc(m)}" class="w-full h-full object-cover" preload="metadata"></video><div class="absolute inset-0 flex items-center justify-center"><svg class="w-12 h-12 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>`;
+          return `<img src="${esc(m)}" class="w-full ${media.length === 1 ? 'max-h-96' : 'aspect-square'} object-cover cursor-pointer hover:opacity-95 transition" onclick="openLightbox('${esc(m)}', false)">`;
+        }).join('')}${media.length > 4 ? `<div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">+${media.length - 4}</div>` : ''}</div>`;
       }
-
-      const likeColor = liked ? 'text-red-500' : 'text-gray-400';
-      const likeFill = liked ? 'fill="currentColor"' : 'fill="none"';
-      const shareColor = shared ? 'text-creo-mint' : 'text-gray-400';
-
-      return `<div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden" id="cp-${post.id}">
-        <div class="p-4">
-          <div class="flex items-center gap-3 mb-3">
-            <a href="profile.html?u=${esc(a.username || '')}" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0">${avatar}</a>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-1">
-                <a href="profile.html?u=${esc(a.username || '')}" class="font-bold text-sm text-gray-900 hover:underline truncate">${esc(name)}</a>
-                ${verified}
-              </div>
-              <p class="text-[10px] text-gray-400">@${esc(a.username || '')} · ${timeAgo}</p>
-            </div>
-            ${isOwner ? `<button onclick="deleteComunidadPost('${post.id}')" class="text-gray-300 hover:text-red-400 transition p-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>` : ''}
-          </div>
-          ${post.body ? `<p class="text-sm text-gray-800 whitespace-pre-wrap mb-2">${esc(post.body)}</p>` : ''}
-          ${mediaHtml}
-          <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-            <button onclick="toggleComunidadLike('${post.id}')" class="flex items-center gap-1.5 ${likeColor} hover:text-red-500 transition text-xs font-semibold">
-              <svg class="w-5 h-5" ${likeFill} stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-              <span id="cp-likes-${post.id}">${post.like_count || 0}</span>
-            </button>
-            <button onclick="toggleComunidadComments('${post.id}')" class="flex items-center gap-1.5 text-gray-400 hover:text-blue-500 transition text-xs font-semibold">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-              <span id="cp-comments-${post.id}">${post.comment_count || 0}</span>
-            </button>
-            <button onclick="toggleComunidadShare('${post.id}')" class="flex items-center gap-1.5 ${shareColor} hover:text-creo-mint transition text-xs font-semibold">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-              <span id="cp-shares-${post.id}">${post.share_count || 0}</span>
-            </button>
-          </div>
-          <div id="cp-comment-section-${post.id}" class="hidden mt-3 pt-3 border-t border-gray-100 space-y-2">
-            <div id="cp-comment-list-${post.id}" class="space-y-2 max-h-60 overflow-y-auto"></div>
-            <div class="flex gap-2">
-              <input id="cp-comment-input-${post.id}" type="text" placeholder="Escribe un comentario..." class="flex-1 border border-gray-300 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple" onkeydown="if(event.key==='Enter')submitComunidadComment('${post.id}')">
-              <button onclick="submitComunidadComment('${post.id}')" class="px-3 py-2 bg-creo-purple text-white text-xs font-bold rounded-lg hover:bg-creo-light transition">Enviar</button>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    }
-
-    function getTimeAgo(dateStr) {
-      const now = new Date();
-      const d = new Date(dateStr);
-      const diff = Math.floor((now - d) / 1000);
-      if (diff < 60) return 'ahora';
-      if (diff < 3600) return Math.floor(diff / 60) + 'm';
-      if (diff < 86400) return Math.floor(diff / 3600) + 'h';
-      if (diff < 604800) return Math.floor(diff / 86400) + 'd';
-      return d.toLocaleDateString('es', { month: 'short', day: 'numeric' });
-    }
-
-    function previewComunidadMedia() {
-      const input = document.getElementById('comunidad-media');
-      const preview = document.getElementById('comunidad-media-preview');
-      comunidadMediaFiles = Array.from(input.files);
-      if (comunidadMediaFiles.length === 0) { preview.classList.add('hidden'); return; }
-      preview.classList.remove('hidden');
-      preview.innerHTML = comunidadMediaFiles.map((f, i) => {
-        const isVideo = f.type.startsWith('video');
-        return `<div class="relative flex-shrink-0">
-          ${isVideo
-            ? `<div class="w-20 h-20 rounded-lg bg-black flex items-center justify-center"><svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>`
-            : `<img src="${URL.createObjectURL(f)}" class="w-20 h-20 rounded-lg object-cover">`}
-          <button onclick="removeComunidadMedia(${i})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">×</button>
-        </div>`;
-      }).join('');
-    }
-
-    function removeComunidadMedia(idx) {
-      comunidadMediaFiles.splice(idx, 1);
-      const preview = document.getElementById('comunidad-media-preview');
-      if (comunidadMediaFiles.length === 0) { preview.classList.add('hidden'); preview.innerHTML = ''; return; }
-      previewComunidadMedia();
-    }
-
-    async function publishComunidadPost() {
-      if (!currentUser) { showToast('Inicia sesión para publicar', 'error'); return; }
-      const body = document.getElementById('comunidad-compose').value.trim();
-      if (!body && comunidadMediaFiles.length === 0) { showToast('Escribe algo o agrega una imagen', 'error'); return; }
-      const btn = document.getElementById('comunidad-publish-btn');
-      btn.textContent = 'Publicando...'; btn.disabled = true;
-
-      let mediaUrls = [];
-      for (const file of comunidadMediaFiles) {
-        const url = await uploadToStorage(file, 'community-media', 10);
-        if (url) mediaUrls.push(url);
+      let sharedHtml = '';
+      if (post.shared_post && post.shared_post.author) {
+        const sp = post.shared_post, sa = sp.author;
+        const sName = sa.display_name || sa.username || '?';
+        const sAvatar = sa.avatar_url ? `<img src="${esc(sa.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-xs">${esc(sName[0])}</span>`;
+        const sMedia = (sp.media_urls || []).length > 0 ? `<img src="${esc(sp.media_urls[0])}" class="w-full max-h-48 object-cover rounded-lg mt-2">` : '';
+        sharedHtml = `<div class="border border-gray-200 rounded-xl p-3 bg-gray-50/50 mt-2"><div class="flex items-center gap-2 mb-2"><a href="profile.html?u=${esc(sa.username || '')}" class="w-6 h-6 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden">${sAvatar}</a><a href="profile.html?u=${esc(sa.username || '')}" class="text-xs font-semibold text-gray-900 hover:text-creo-purple">${esc(sName)}</a><span class="text-[10px] text-gray-400">${timeAgo(sp.created_at)}</span></div>${sp.title ? `<p class="text-sm font-bold text-gray-900 mb-1">${esc(sp.title)}</p>` : ''}${sp.body ? `<p class="text-sm text-gray-700">${linkify(esc(sp.body))}</p>` : ''}${sMedia}</div>`;
       }
-
-      const postType = mediaUrls.some(u => /\.(mp4|webm|mov)$/i.test(u)) ? 'video' : (mediaUrls.length > 0 ? 'photo' : 'text');
-      const { error } = await sb.from('community_posts').insert([{
-        author_id: currentUser.id,
-        body: body || null,
-        media_urls: mediaUrls,
-        post_type: postType,
-        profile_only: false
-      }]);
-
-      btn.textContent = 'Publicar'; btn.disabled = false;
-      if (error) { showToast('Error: ' + error.message, 'error'); return; }
-
-      document.getElementById('comunidad-compose').value = '';
-      document.getElementById('comunidad-media-preview').classList.add('hidden');
-      document.getElementById('comunidad-media-preview').innerHTML = '';
-      document.getElementById('comunidad-media').value = '';
-      comunidadMediaFiles = [];
-      showToast('Publicación creada', 'success');
-
-      comunidadPage = 0; comunidadDone = false;
-      document.getElementById('comunidad-feed').innerHTML = '';
-      loadComunidadFeed();
+      return `<div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition" id="post-${post.id}"><div class="p-4 space-y-3">
+        <div class="flex items-center justify-between"><div class="flex items-center gap-3"><a href="profile.html?u=${esc(a.username || '')}" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-creo-mint transition">${avatar}</a><div><div class="flex items-center gap-1"><a href="profile.html?u=${esc(a.username || '')}" class="font-bold text-sm text-gray-900 hover:text-creo-purple transition">${esc(name)}</a>${verified}</div><p class="text-[10px] text-gray-400">${timeAgo(post.created_at)}</p></div></div>
+        ${isOwner ? `<div class="flex items-center gap-1"><button onclick="editCommunityPost('${post.id}')" class="text-gray-300 hover:text-blue-400 transition p-1" title="Editar"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="deletePost('${post.id}')" class="text-gray-300 hover:text-red-400 transition p-1" title="Eliminar"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div>` : ''}</div>
+        ${post.post_type === 'evento' ? `<div class="flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-xl px-3 py-2"><span class="text-lg">📅</span><div class="flex-1"><p class="text-xs font-bold text-purple-700">Evento</p>${post.event_date ? `<p class="text-[10px] text-purple-600">${post.event_date}${post.event_time ? ' · ' + post.event_time : ''}</p>` : ''}</div>${post.event_link ? `<a href="${esc(post.event_link)}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-creo-purple hover:underline">Unirse</a>` : ''}</div>` : ''}
+        ${post.post_type === 'en_vivo' ? `<div class="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-3 py-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span><div class="flex-1"><p class="text-xs font-bold text-red-600">En Vivo${post.live_platform ? ' · ' + esc(post.live_platform) : ''}</p></div>${post.live_url ? `<a href="${esc(post.live_url)}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-red-600 hover:underline">Ver</a>` : ''}</div>` : ''}
+        ${post.title ? `<h3 class="text-base font-bold text-gray-900">${esc(post.title)}</h3>` : ''}
+        ${post.body ? `<p class="text-sm text-gray-800 leading-relaxed whitespace-pre-line">${linkify(esc(post.body))}</p>` : ''}
+        ${mediaHtml}${sharedHtml}
+        <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+          <button onclick="toggleLike('${post.id}', this)" class="flex items-center gap-1.5 text-sm transition ${liked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}"><svg class="w-5 h-5" fill="${liked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg><span class="like-count">${likeCount}</span></button>
+          <button onclick="openComments('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-purple transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span>${commentCount}</span></button>
+          <button onclick="openShareModal('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-mint transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>Compartir</button>
+        </div></div></div>`;
     }
 
-    async function toggleComunidadLike(postId) {
+    function linkify(text) { return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-creo-mint hover:underline">$1</a>'); }
+    function timeAgo(date) { const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000); if (s < 60) return 'ahora'; if (s < 3600) return Math.floor(s / 60) + 'm'; if (s < 86400) return Math.floor(s / 3600) + 'h'; if (s < 604800) return Math.floor(s / 86400) + 'd'; return new Date(date).toLocaleDateString('es'); }
+
+    let composePostType = 'normal';
+    function setComposeType(type) {
+      composePostType = type;
+      document.querySelectorAll('.compose-type-pill').forEach(b => { b.className = b.dataset.type === type ? 'compose-type-pill active px-3 py-1.5 rounded-full text-xs font-semibold transition bg-creo-purple text-white' : 'compose-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200'; });
+      document.getElementById('compose-evento-fields').classList.toggle('hidden', type !== 'evento');
+      document.getElementById('compose-envivo-fields').classList.toggle('hidden', type !== 'en_vivo');
+    }
+
+    async function openCompose(type) {
+      if (!currentUser) { showToast('Inicia sesión para publicar', 'info'); return; }
+      const ok = await requireCreoId('publicar');
+      if (!ok) return;
+      composeType = type || 'text'; composeMediaFiles = []; composePostType = 'normal';
+      document.getElementById('compose-media-preview').innerHTML = '';
+      document.getElementById('compose-media-preview').classList.add('hidden');
+      document.getElementById('compose-title').value = '';
+      document.getElementById('compose-body').value = '';
+      document.getElementById('compose-submit').disabled = true;
+      document.getElementById('compose-category').value = activeCategory;
+      document.getElementById('compose-modal').classList.remove('hidden');
+      setComposeType('normal');
+      document.getElementById('compose-body').focus();
+      createEmojiPicker('compose-body', 'compose-emoji-btn');
+    }
+    function closeCompose() { document.getElementById('compose-modal').classList.add('hidden'); composeMediaFiles = []; }
+    function checkComposeValid() { document.getElementById('compose-submit').disabled = !document.getElementById('compose-body').value.trim() && composeMediaFiles.length === 0; }
+    function handleComposeMedia(e, type) { const files = Array.from(e.target.files); if (!files.length) return; composeType = type; files.forEach(f => { if (composeMediaFiles.length >= 10) return; composeMediaFiles.push(f); }); renderMediaPreviews(); checkComposeValid(); }
+    function renderMediaPreviews() { const c = document.getElementById('compose-media-preview'); c.innerHTML = ''; if (!composeMediaFiles.length) { c.classList.add('hidden'); return; } c.classList.remove('hidden'); composeMediaFiles.forEach((f, i) => { const url = URL.createObjectURL(f); const isV = f.type.startsWith('video'); c.innerHTML += `<div class="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-100">${isV ? `<video src="${url}" class="w-full h-full object-cover"></video>` : `<img src="${url}" class="w-full h-full object-cover">`}<button onclick="removeComposeMedia(${i})" class="absolute top-0.5 right-0.5 w-5 h-5 bg-black/60 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-500">✕</button></div>`; }); }
+    function removeComposeMedia(idx) { composeMediaFiles.splice(idx, 1); renderMediaPreviews(); checkComposeValid(); }
+
+    function startComposeRecording(type) {
+      const isVideo = type === 'video';
+      navigator.mediaDevices.getUserMedia(isVideo ? { video: { facingMode: 'user' }, audio: true } : { audio: true }).then(stream => {
+        const modal = document.createElement('div'); modal.id = 'compose-rec-modal'; modal.className = 'fixed inset-0 z-[200] flex items-center justify-center';
+        modal.innerHTML = `<div class="absolute inset-0 bg-black/70" onclick="cancelComposeRec()"></div><div class="relative bg-white rounded-2xl shadow-2xl p-5 w-80 space-y-4 z-10"><h3 class="font-bold text-center text-gray-900">${isVideo ? 'Grabando Video' : 'Grabando Audio'}</h3>${isVideo ? '<video id="compose-rec-preview" autoplay playsinline muted class="w-full rounded-xl bg-black aspect-video"></video>' : '<div class="flex items-center justify-center py-6"><div class="w-16 h-16 rounded-full bg-red-500 animate-pulse flex items-center justify-center"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg></div></div>'}<p id="compose-rec-timer" class="text-center text-sm font-mono text-gray-500">00:00</p><div class="flex gap-2"><button onclick="cancelComposeRec()" class="flex-1 py-2 rounded-xl border text-sm font-semibold text-gray-600 hover:bg-gray-50">Cancelar</button><button onclick="saveComposeRec('${type}')" class="flex-1 py-2 rounded-xl bg-creo-mint text-creo-purple text-sm font-bold hover:opacity-90">Guardar</button></div></div>`;
+        document.body.appendChild(modal);
+        if (isVideo) document.getElementById('compose-rec-preview').srcObject = stream;
+        const mimeType = isVideo ? (MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm') : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg');
+        window._compRecChunks = []; window._compRecorder = new MediaRecorder(stream, { mimeType }); window._compRecorder.ondataavailable = e => { if (e.data.size > 0) window._compRecChunks.push(e.data); }; window._compRecorder.start(100); window._compRecStream = stream;
+        let secs = 0; window._compRecTimer = setInterval(() => { secs++; const el = document.getElementById('compose-rec-timer'); if (el) el.textContent = String(Math.floor(secs/60)).padStart(2,'0') + ':' + String(secs%60).padStart(2,'0'); }, 1000);
+      }).catch(err => showToast('No se pudo acceder: ' + err.message, 'error'));
+    }
+    function cancelComposeRec() { if (window._compRecorder && window._compRecorder.state !== 'inactive') window._compRecorder.stop(); clearInterval(window._compRecTimer); if (window._compRecStream) window._compRecStream.getTracks().forEach(t => t.stop()); window._compRecChunks = []; const m = document.getElementById('compose-rec-modal'); if (m) m.remove(); }
+    async function saveComposeRec(type) { if (!window._compRecorder) return; clearInterval(window._compRecTimer); const done = new Promise(r => { window._compRecorder.onstop = r; window._compRecorder.stop(); }); await done; window._compRecStream.getTracks().forEach(t => t.stop()); const isVid = type === 'video'; const blob = new Blob(window._compRecChunks, { type: isVid ? 'video/webm' : 'audio/webm' }); const file = new File([blob], (isVid ? 'video-' : 'audio-') + Date.now() + '.webm', { type: blob.type }); composeMediaFiles.push(file); renderMediaPreviews(); checkComposeValid(); window._compRecChunks = []; const m = document.getElementById('compose-rec-modal'); if (m) m.remove(); showToast('Grabación lista', 'success'); }
+
+    async function submitPost() {
       if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
-      const { data: existing } = await sb.from('community_likes').select('id').eq('post_id', postId).eq('user_id', currentUser.id).single();
-      if (existing) {
-        await sb.from('community_likes').delete().eq('id', existing.id);
-      } else {
-        await sb.from('community_likes').insert([{ post_id: postId, user_id: currentUser.id }]);
-      }
-      const { count } = await sb.from('community_likes').select('id', { count: 'exact', head: true }).eq('post_id', postId);
-      const el = document.getElementById('cp-likes-' + postId);
-      if (el) el.textContent = count || 0;
+      const ok = await requireCreoId('publicar'); if (!ok) return;
+      const title = document.getElementById('compose-title').value.trim();
+      const body = document.getElementById('compose-body').value.trim();
+      if (!body && composeMediaFiles.length === 0) return;
+      const btn = document.getElementById('compose-submit'); btn.disabled = true; btn.textContent = 'Publicando...';
+      try {
+        let mediaUrls = [];
+        for (const file of composeMediaFiles) { const url = await uploadToStorage(file, 'community-media', 10); if (url) mediaUrls.push(url); }
+        let postType; if (composePostType === 'evento') postType = 'evento'; else if (composePostType === 'en_vivo') postType = 'en_vivo'; else if (composeMediaFiles.length > 0) postType = composeMediaFiles[0].type.startsWith('video') ? 'video' : 'photo'; else postType = 'text';
+        const insertData = { author_id: currentUser.id, post_type: postType, title: title || null, body: body || null, media_urls: mediaUrls.length > 0 ? mediaUrls : [], category: document.getElementById('compose-category').value || 'general' };
+        if (composePostType === 'evento') { insertData.event_date = document.getElementById('compose-event-date').value || null; insertData.event_time = document.getElementById('compose-event-time').value || null; insertData.event_link = document.getElementById('compose-event-link').value || null; }
+        else if (composePostType === 'en_vivo') { insertData.live_platform = document.getElementById('compose-live-platform').value || null; insertData.live_url = document.getElementById('compose-live-url').value || null; }
+        const { error } = await sb.from('community_posts').insert(insertData);
+        if (error) throw error;
+        closeCompose(); showToast('¡Publicado!', 'success');
+        document.getElementById('community-feed').innerHTML = ''; feedPage = 0; feedDone = false; loadFeed();
+      } catch(e) { showToast('Error al publicar: ' + (e.message || e), 'error'); }
+      btn.disabled = false; btn.textContent = 'Publicar';
     }
 
-    async function toggleComunidadShare(postId) {
-      if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
-      const { data: existing } = await sb.from('community_shares').select('id').eq('post_id', postId).eq('user_id', currentUser.id).single();
-      if (existing) {
-        await sb.from('community_shares').delete().eq('id', existing.id);
-      } else {
-        await sb.from('community_shares').insert([{ post_id: postId, user_id: currentUser.id }]);
-      }
-      const { count } = await sb.from('community_shares').select('id', { count: 'exact', head: true }).eq('post_id', postId);
-      const el = document.getElementById('cp-shares-' + postId);
-      if (el) el.textContent = count || 0;
+    async function toggleLike(postId, btn) {
+      if (!currentUser) { showToast('Inicia sesión para dar like', 'info'); return; }
+      const ok = await requireCreoId('dar like'); if (!ok) return;
+      const countEl = btn.querySelector('.like-count'); const isLiked = btn.classList.contains('text-red-500');
+      if (isLiked) { btn.classList.remove('text-red-500'); btn.classList.add('text-gray-500'); btn.querySelector('svg').setAttribute('fill', 'none'); countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1); await sb.from('community_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id); }
+      else { btn.classList.add('text-red-500'); btn.classList.remove('text-gray-500'); btn.querySelector('svg').setAttribute('fill', 'currentColor'); countEl.textContent = parseInt(countEl.textContent) + 1; await sb.from('community_likes').insert({ post_id: postId, user_id: currentUser.id }); }
     }
 
-    async function toggleComunidadComments(postId) {
-      const section = document.getElementById('cp-comment-section-' + postId);
-      if (section.classList.contains('hidden')) {
-        section.classList.remove('hidden');
-        await loadComunidadComments(postId);
-      } else {
-        section.classList.add('hidden');
-      }
+    async function openComments(postId) { activeCommentPostId = postId; document.getElementById('comments-modal').classList.remove('hidden'); createEmojiPicker('comment-input', 'comment-emoji-btn'); loadComments(postId); }
+    function closeComments() { document.getElementById('comments-modal').classList.add('hidden'); activeCommentPostId = null; }
+    async function loadComments(postId) {
+      const list = document.getElementById('comments-list'); list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Cargando...</p>';
+      const { data } = await sb.from('community_comments').select('*, author:author_id(id, username, display_name, avatar_url)').eq('post_id', postId).order('created_at', { ascending: true }).limit(100);
+      if (!data || data.length === 0) { list.innerHTML = '<p class="text-center text-gray-400 text-xs py-8">Sin comentarios aún</p>'; return; }
+      list.innerHTML = data.map(c => { const ca = c.author; const cName = ca?.display_name || ca?.username || '?'; const cAvatar = ca?.avatar_url ? `<img src="${esc(ca.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-xs">${esc(cName[0])}</span>`; const isOwner = currentUser && currentUser.id === c.author_id;
+        return `<div class="flex gap-2"><a href="profile.html?u=${esc(ca?.username || '')}" class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0">${cAvatar}</a><div class="flex-1 bg-gray-100 rounded-2xl rounded-tl-sm px-3 py-2"><div class="flex items-center justify-between"><a href="profile.html?u=${esc(ca?.username || '')}" class="text-xs font-bold text-gray-900 hover:text-creo-purple">${esc(cName)}</a><div class="flex items-center gap-2"><span class="text-[10px] text-gray-400">${timeAgo(c.created_at)}</span>${isOwner ? `<button onclick="editComment('${c.id}', this)" class="text-gray-300 hover:text-blue-400 text-[10px]">✎</button><button onclick="deleteComment('${c.id}')" class="text-gray-300 hover:text-red-400 text-[10px]">✕</button>` : ''}</div></div><p class="text-sm text-gray-700 mt-0.5">${linkify(esc(c.body))}</p></div></div>`; }).join('');
+      list.scrollTop = list.scrollHeight;
     }
+    async function submitComment() { if (!currentUser || !activeCommentPostId) { showToast('Inicia sesión', 'info'); return; } const ok = await requireCreoId('comentar'); if (!ok) return; const input = document.getElementById('comment-input'); const body = input.value.trim(); if (!body) return; input.value = ''; const { error } = await sb.from('community_comments').insert({ post_id: activeCommentPostId, author_id: currentUser.id, body }); if (error) { showToast('Error', 'error'); return; } loadComments(activeCommentPostId); }
+    async function deleteComment(id) { if (!confirm('¿Eliminar comentario?')) return; await sb.from('community_comments').delete().eq('id', id); if (activeCommentPostId) loadComments(activeCommentPostId); }
+    function editComment(id, btnEl) { const commentDiv = btnEl.closest('.flex.gap-2'); const bodyP = commentDiv.querySelector('p'); const oldText = bodyP.textContent; bodyP.innerHTML = `<textarea id="edit-comment-${id}" class="w-full border border-gray-300 bg-white p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" rows="2">${esc(oldText)}</textarea><div class="flex gap-2 mt-1"><button onclick="saveCommentEdit('${id}')" class="text-xs px-3 py-1 bg-creo-purple text-white rounded-lg">Guardar</button><button onclick="loadComments(activeCommentPostId)" class="text-xs px-3 py-1 bg-gray-200 text-gray-600 rounded-lg">Cancelar</button></div>`; }
+    async function saveCommentEdit(id) { const textarea = document.getElementById('edit-comment-' + id); const body = textarea.value.trim(); if (!body) return showToast('El comentario no puede estar vacío', 'error'); const { error } = await sb.from('community_comments').update({ body }).eq('id', id); if (error) return showToast('Error: ' + error.message, 'error'); showToast('Comentario actualizado', 'success'); loadComments(activeCommentPostId); }
 
-    async function loadComunidadComments(postId) {
-      const { data } = await sb.from('community_comments')
-        .select('*, author:author_id(username, display_name, avatar_url)')
-        .eq('post_id', postId)
-        .order('created_at', { ascending: true })
-        .limit(50);
-      const list = document.getElementById('cp-comment-list-' + postId);
-      if (!data || data.length === 0) { list.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">Sin comentarios aún</p>'; return; }
-      list.innerHTML = data.map(c => {
-        const ca = c.author;
-        const cName = ca?.display_name || ca?.username || '?';
-        const cAvatar = ca?.avatar_url
-          ? `<img src="${esc(ca.avatar_url)}" class="w-6 h-6 rounded-full object-cover">`
-          : `<div class="w-6 h-6 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-[9px] font-bold text-creo-purple">${esc(cName[0])}</span></div>`;
-        const isOwn = currentUser && currentUser.id === c.author_id;
-        return `<div class="flex gap-2 items-start">
-          ${cAvatar}
-          <div class="flex-1 bg-gray-50 rounded-lg px-3 py-2">
-            <p class="text-[10px] font-semibold text-gray-700">${esc(cName)}</p>
-            <p class="text-xs text-gray-600">${esc(c.body)}</p>
-          </div>
-          ${isOwn ? `<button onclick="deleteComunidadComment('${c.id}','${postId}')" class="text-gray-300 hover:text-red-400 text-xs">×</button>` : ''}
-        </div>`;
-      }).join('');
+    async function openShareModal(postId) { if (!currentUser) { showToast('Inicia sesión', 'info'); return; } const ok = await requireCreoId('compartir'); if (!ok) return; sharePostId = postId; const postEl = document.getElementById('post-' + postId); const preview = document.getElementById('share-preview'); const titleEl = postEl?.querySelector('h3'); const bodyEl = postEl?.querySelector('.whitespace-pre-line'); preview.innerHTML = `<p class="text-xs text-gray-500"><span class="font-semibold">${titleEl ? esc(titleEl.textContent) : 'Publicación compartida'}</span></p>${bodyEl ? `<p class="text-xs text-gray-400 truncate mt-1">${esc(bodyEl.textContent.slice(0, 80))}</p>` : ''}`; document.getElementById('share-body').value = ''; document.getElementById('share-modal').classList.remove('hidden'); }
+    function closeShareModal() { document.getElementById('share-modal').classList.add('hidden'); sharePostId = null; }
+    async function submitShare() { if (!currentUser || !sharePostId) return; const body = document.getElementById('share-body').value.trim(); const { error } = await sb.from('community_posts').insert({ author_id: currentUser.id, post_type: 'share_post', body: body || null, shared_post_id: sharePostId }); if (error) { showToast('Error al compartir', 'error'); return; } closeShareModal(); showToast('¡Compartido!', 'success'); document.getElementById('community-feed').innerHTML = ''; feedPage = 0; feedDone = false; loadFeed(); }
+    async function deletePost(id) { if (!confirm('¿Eliminar esta publicación?')) return; await sb.from('community_posts').delete().eq('id', id); const el = document.getElementById('post-' + id); if (el) el.remove(); showToast('Publicación eliminada', 'success'); }
+
+    async function editCommunityPost(id) {
+      const { data: post } = await sb.from('community_posts').select('*').eq('id', id).single();
+      if (!post) return showToast('No se encontró la publicación', 'error');
+      let existing = document.getElementById('edit-community-modal'); if (existing) existing.remove();
+      const media = post.media_urls || [];
+      const mediaPreview = media.length > 0 ? `<div><label class="block text-xs font-medium text-gray-500 mb-1">Media actual</label><div class="flex gap-2 overflow-x-auto py-1">${media.map((m, i) => { const isVid = /\.(mp4|webm|mov)$/i.test(m); return isVid ? `<div class="relative flex-shrink-0"><video src="${esc(m)}" class="w-16 h-16 rounded-lg object-cover"></video><button onclick="removeCommunityMedia('${id}', ${i})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button></div>` : `<div class="relative flex-shrink-0"><img src="${esc(m)}" class="w-16 h-16 rounded-lg object-cover"><button onclick="removeCommunityMedia('${id}', ${i})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button></div>`; }).join('')}</div></div>` : '';
+      const modal = document.createElement('div'); modal.id = 'edit-community-modal'; modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4';
+      modal.innerHTML = `<div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('edit-community-modal').remove()"></div><div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto"><div class="flex items-center justify-between"><h3 class="font-bold text-lg text-gray-900">Editar Publicación</h3><button onclick="document.getElementById('edit-community-modal').remove()" class="text-gray-400 hover:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div><div><label class="block text-xs font-medium text-gray-500 mb-1">Titulo (opcional)</label><input id="edit-cp-title" type="text" value="${esc(post.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></div><div><label class="block text-xs font-medium text-gray-500 mb-1">Contenido</label><textarea id="edit-cp-body" rows="4" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(post.body || '')}</textarea></div>${mediaPreview}<input type="hidden" id="edit-cp-media" value='${JSON.stringify(media)}'><div class="flex gap-3"><button onclick="saveCommunityPostEdit('${post.id}')" id="save-cp-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Cambios</button><button onclick="document.getElementById('edit-community-modal').remove()" class="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition">Cancelar</button></div></div>`;
+      document.body.appendChild(modal);
     }
+    function removeCommunityMedia(postId, idx) { const input = document.getElementById('edit-cp-media'); const media = JSON.parse(input.value); media.splice(idx, 1); input.value = JSON.stringify(media); editCommunityPost(postId); }
+    async function saveCommunityPostEdit(id) { const btn = document.getElementById('save-cp-btn'); btn.textContent = 'Guardando...'; btn.disabled = true; const title = document.getElementById('edit-cp-title').value.trim(); const body = document.getElementById('edit-cp-body').value.trim(); const media_urls = JSON.parse(document.getElementById('edit-cp-media').value || '[]'); const { error } = await sb.from('community_posts').update({ title: title || null, body: body || null, media_urls, updated_at: new Date().toISOString() }).eq('id', id); btn.textContent = 'Guardar Cambios'; btn.disabled = false; if (error) { showToast('Error: ' + error.message, 'error'); return; } document.getElementById('edit-community-modal').remove(); showToast('Publicación actualizada', 'success'); document.getElementById('community-feed').innerHTML = ''; feedPage = 0; feedDone = false; loadFeed(); }
 
-    async function submitComunidadComment(postId) {
-      if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
-      const input = document.getElementById('cp-comment-input-' + postId);
-      const body = input.value.trim();
-      if (!body) return;
-      input.value = '';
-      await sb.from('community_comments').insert([{ post_id: postId, author_id: currentUser.id, body }]);
-      await loadComunidadComments(postId);
-      const { count } = await sb.from('community_comments').select('id', { count: 'exact', head: true }).eq('post_id', postId);
-      const el = document.getElementById('cp-comments-' + postId);
-      if (el) el.textContent = count || 0;
-    }
+    function openLightbox(url, isVideo) { const lb = document.getElementById('media-lightbox'); const content = document.getElementById('lightbox-content'); content.innerHTML = isVideo ? `<video src="${esc(url)}" controls autoplay class="max-w-full max-h-[90vh] rounded-xl"></video>` : `<img src="${esc(url)}" class="max-w-full max-h-[90vh] rounded-xl object-contain">`; lb.classList.remove('hidden'); }
+    function closeLightbox() { document.getElementById('media-lightbox').classList.add('hidden'); document.getElementById('lightbox-content').innerHTML = ''; }
 
-    async function deleteComunidadComment(commentId, postId) {
-      await sb.from('community_comments').delete().eq('id', commentId);
-      await loadComunidadComments(postId);
-      const { count } = await sb.from('community_comments').select('id', { count: 'exact', head: true }).eq('post_id', postId);
-      const el = document.getElementById('cp-comments-' + postId);
-      if (el) el.textContent = count || 0;
-    }
-
-    async function deleteComunidadPost(postId) {
-      if (!confirm('¿Eliminar esta publicación?')) return;
-      await sb.from('community_posts').delete().eq('id', postId);
-      const el = document.getElementById('cp-' + postId);
-      if (el) el.remove();
-      showToast('Publicación eliminada', 'success');
-    }
-
-    window.onload = async () => {
-      renderBottomNav('comunidad');
-      loadNotificationBell();
-      const { data: { user } } = await sb.auth.getUser();
-      if (user) {
-        currentUser = user;
-        document.getElementById('compose-section').classList.remove('hidden');
-        const { data: profile } = await sb.from('profiles').select('avatar_url, display_name').eq('id', user.id).single();
-        if (profile?.avatar_url) {
-          document.getElementById('comunidad-avatar').innerHTML = `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">`;
-        }
-      }
-      loadComunidadFeed();
-    };
+    init();
   </script>
 </body>
 </html>
