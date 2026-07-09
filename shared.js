@@ -395,11 +395,15 @@ function renderSidebar(activePage) {
     </div>`;
   document.body.appendChild(mobileMenu);
 
-  // Adjust body padding
+  // Adjust body padding and make modals respect sidebar on desktop
   document.body.style.paddingTop = '60px';
   document.body.classList.add('lg:pl-[220px]');
   const style = document.createElement('style');
-  style.textContent = '@media(min-width:1024px){body{padding-top:0!important;}}';
+  style.textContent = `
+    @media(min-width:1024px){
+      body{padding-top:0!important;}
+      .fixed.inset-0:not(#creo-sidebar):not(#creo-mobile-menu):not(#creo-mobile-header){left:220px!important;}
+    }`;
   document.head.appendChild(style);
 
   updateSidebarAuth();

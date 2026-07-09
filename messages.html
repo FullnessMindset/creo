@@ -22,17 +22,12 @@
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
   <script src="shared.js"></script>
 
-  <div class="max-w-2xl mx-auto px-4 pt-6 pb-24 space-y-4">
-    <a href="index.html" class="flex items-center gap-3 no-underline">
-      <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow">
-        <img src="assets/logo-icon.png" alt="CREO" class="w-7 h-7 rounded-full object-contain">
-      </div>
-      <h1 class="text-xl font-bold text-creo-purple tracking-wider">Mensajes</h1>
-    </a>
+  <div class="max-w-2xl mx-auto px-4 pt-4 pb-24 space-y-4">
+    <h1 class="text-xl font-bold text-creo-purple tracking-wider">Mensajes</h1>
 
     <div id="auth-required" class="hidden glass p-8 rounded-2xl text-center space-y-3">
       <p class="text-gray-500 text-sm">Inicia sesión para ver tus mensajes</p>
-      <a href="index.html" class="inline-block bg-creo-purple text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-creo-light transition">Iniciar Sesión</a>
+      <button onclick="signInWithGoogle()" class="inline-block bg-creo-purple text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-creo-light transition">Iniciar Sesión</button>
     </div>
 
     <div id="conversations-list" class="space-y-2"></div>
@@ -40,7 +35,7 @@
   </div>
 
   <!-- Chat Modal -->
-  <div id="chat-modal" class="fixed inset-0 z-[100] hidden">
+  <div id="chat-modal" class="fixed inset-0 z-[35] hidden">
     <div class="absolute inset-0 bg-white flex flex-col" id="chat-bg">
       <div class="p-4 border-b border-gray-200 flex items-center gap-3">
         <button onclick="closeChat()" class="text-gray-400 hover:text-gray-600">

@@ -35,18 +35,11 @@
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
   <script src="shared.js"></script>
 
-  <!-- Sticky Header -->
-  <div class="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-sm border-b border-gray-200 dark-aware-header">
+  <!-- Sticky Header (below mobile header, beside desktop sidebar) -->
+  <div class="fixed top-[60px] lg:top-0 left-0 lg:left-[220px] right-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-200 dark-aware-header">
     <div class="max-w-2xl mx-auto px-4 py-3 space-y-3">
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0"><img src="assets/logo-icon.png" alt="CREO" class="w-6 h-6 rounded-full object-contain"></div>
-          <h1 class="text-lg font-bold tracking-[0.15em] text-creo-purple">EXPLORAR</h1>
-        </div>
-        <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-100 transition">
-          <svg class="w-5 h-5 text-gray-500 theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-          <svg class="w-5 h-5 text-gray-300 theme-icon-moon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-        </button>
+        <h1 class="text-lg font-bold tracking-[0.15em] text-creo-purple">EXPLORAR</h1>
       </div>
       <!-- Search -->
       <div class="relative">
@@ -57,7 +50,7 @@
   </div>
 
   <!-- Content -->
-  <div class="max-w-2xl mx-auto pt-28 pb-20 px-0">
+  <div class="max-w-2xl mx-auto pt-24 pb-20 px-0">
     <!-- Stories grid (Instagram-style) -->
     <div class="story-grid" id="stories-grid"></div>
     <div id="stories-loading" class="text-center py-8">
@@ -74,7 +67,7 @@
   </div>
 
   <!-- Story viewer modal — TikTok-style vertical scroll -->
-  <div id="story-viewer" class="fixed inset-0 z-[100] hidden bg-black">
+  <div id="story-viewer" class="fixed inset-0 z-[35] hidden bg-black">
     <button onclick="closeStoryViewer()" class="fixed top-4 right-4 z-[120] text-white/70 hover:text-white">
       <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
