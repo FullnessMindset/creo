@@ -175,6 +175,11 @@
                 <option value="whatsapp">💬 WhatsApp</option>
               </select>
             </div>
+            <input id="contact-website" type="url" placeholder="Sitio web (https://...)" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <div class="grid grid-cols-2 gap-2">
+              <input id="contact-city" type="text" placeholder="Ciudad" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              <input id="contact-country" type="text" placeholder="País" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            </div>
           </div>
 
           <h4 class="font-semibold text-sm text-gray-700 pt-2">Redes Sociales <span class="text-red-500">*</span></h4>
@@ -1029,6 +1034,9 @@
           document.getElementById('contact-email').value = data.contact_email || '';
           document.getElementById('contact-phone').value = data.contact_phone || '';
           document.getElementById('contact-type').value = data.contact_type || 'phone';
+          document.getElementById('contact-website').value = data.contact_website || '';
+          document.getElementById('contact-city').value = data.contact_city || '';
+          document.getElementById('contact-country').value = data.contact_country || '';
           document.getElementById('profile-link').innerText = 'https://fullnessmindset.github.io/creo/profile.html?u=' + (data.username || '');
           document.getElementById('v-email').value = user.email;
           document.getElementById('v-fullname').value = data.full_name || '';
@@ -1327,7 +1335,10 @@
       const contact_email = document.getElementById('contact-email').value.trim() || null;
       const contact_phone = document.getElementById('contact-phone').value.trim() || null;
       const contact_type = document.getElementById('contact-type').value;
-      const { error } = await sb.from('profiles').update({ first_name, last_name, username, display_name, bio, social_links, contact_email, contact_phone, contact_type }).eq('id', currentUser.id);
+      const contact_website = document.getElementById('contact-website').value.trim() || null;
+      const contact_city = document.getElementById('contact-city').value.trim() || null;
+      const contact_country = document.getElementById('contact-country').value.trim() || null;
+      const { error } = await sb.from('profiles').update({ first_name, last_name, username, display_name, bio, social_links, contact_email, contact_phone, contact_type, contact_website, contact_city, contact_country }).eq('id', currentUser.id);
       btn.innerText = 'Guardar Perfil'; btn.disabled = false;
       if (error) return showToast(error.message, 'error');
       document.getElementById('profile-link').innerText = 'https://fullnessmindset.github.io/creo/profile.html?u=' + username;
