@@ -24,22 +24,13 @@
     .chat-bubble-mine { background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 100%); color: white; border-radius: 18px 18px 4px 18px; }
     .chat-bubble-theirs { background: #f3f4f6; color: #1f2937; border-radius: 18px 18px 18px 4px; }
     .payment-bubble { background: linear-gradient(135deg, #33f0b0 0%, #28c48e 100%); color: #1a0a3e; border-radius: 16px; }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   </style>
 </head>
 <body class="bg-white min-h-screen">
 
-  <!-- Header -->
-  <header class="sticky top-0 z-40 bg-creo-purple text-white px-4 py-3 flex items-center gap-3 shadow-lg">
-    <a href="index.html" class="p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></a>
-    <h1 class="text-lg font-bold flex-1">Brand Deals</h1>
-    <!-- Role toggle for Platform Creator only -->
-    <div id="role-toggle" class="hidden flex items-center bg-white/15 rounded-full p-0.5 text-xs font-semibold">
-      <button id="role-btn-creator" onclick="switchRole('creator')" class="px-3 py-1 rounded-full bg-white text-creo-purple transition">Creador</button>
-      <button id="role-btn-brand" onclick="switchRole('brand')" class="px-3 py-1 rounded-full text-white/70 transition">Marca</button>
-    </div>
-  </header>
-
-  <!-- Category filter -->
+  <!-- Category filter pills -->
   <div class="px-4 py-3 flex gap-2 overflow-x-auto" style="-ms-overflow-style:none;scrollbar-width:none;">
     <button onclick="filterDeals('all')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-creo-purple text-white" data-cat="all">Todos</button>
     <button onclick="filterDeals('moda')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 text-gray-700" data-cat="moda">Moda</button>
@@ -51,8 +42,16 @@
     <button onclick="filterDeals('other')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 text-gray-700" data-cat="other">Otro</button>
   </div>
 
-  <!-- Deals grid -->
-  <div id="deals-grid" class="px-4 pb-24 grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <!-- Post Deal button (admin/brand only) -->
+  <div id="post-deal-bar" class="hidden px-4 pb-3">
+    <button onclick="openPostDeal()" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-creo-purple to-creo-light text-white py-3 rounded-xl font-bold hover:opacity-90 transition shadow-md">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      Publicar Nuevo Deal
+    </button>
+  </div>
+
+  <!-- Deals grid: 3 cols desktop, 1 col mobile -->
+  <div id="deals-grid" class="px-4 pb-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
     <div class="text-center text-gray-400 py-12 col-span-full">Cargando deals...</div>
   </div>
 
@@ -63,55 +62,196 @@
     <p class="text-gray-400 text-sm mt-1">Las marcas publicarán oportunidades pronto</p>
   </div>
 
-  <!-- Deal Detail Modal -->
-  <div id="deal-detail-modal" class="fixed inset-0 z-50 hidden">
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeDealDetail()"></div>
-    <div class="absolute inset-x-0 bottom-0 top-10 bg-white rounded-t-3xl overflow-y-auto shadow-2xl">
-      <div class="p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 id="detail-title" class="text-lg font-bold text-creo-purple"></h2>
-          <button onclick="closeDealDetail()" class="p-1 text-gray-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+  <!-- ==================== POST DEAL MODAL ==================== -->
+  <div id="post-deal-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closePostDeal()"></div>
+    <div class="absolute inset-x-0 bottom-0 top-4 md:top-10 bg-white rounded-t-3xl overflow-y-auto shadow-2xl">
+      <div class="max-w-2xl mx-auto p-5 pb-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-creo-purple">Publicar Brand Deal</h2>
+          <button onclick="closePostDeal()" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
-        <div class="flex items-center gap-2 mb-4">
-          <img id="detail-avatar" src="" class="w-8 h-8 rounded-full object-cover">
-          <span id="detail-brand-name" class="text-sm font-semibold text-gray-600"></span>
-          <span id="detail-category" class="ml-auto text-xs bg-creo-purple/10 text-creo-purple px-2 py-0.5 rounded-full font-semibold"></span>
+
+        <div class="space-y-5">
+          <!-- Title -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Título del Deal *</label>
+            <input id="deal-title" type="text" maxlength="120" placeholder="Ej: Campaña de verano para ropa deportiva" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+          </div>
+
+          <!-- Category -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Categoría *</label>
+            <select id="deal-category" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple bg-white">
+              <option value="">Seleccionar...</option>
+              <option value="moda">Moda</option>
+              <option value="tech">Tech</option>
+              <option value="food">Comida</option>
+              <option value="fitness">Fitness</option>
+              <option value="beauty">Belleza</option>
+              <option value="music">Música</option>
+              <option value="other">Otro</option>
+            </select>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Descripción *</label>
+            <textarea id="deal-description" rows="3" maxlength="1000" placeholder="Describe la campaña, el producto/servicio y lo que buscas" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
+          </div>
+
+          <!-- Video Vibe / Creative Direction -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Vibe del Video / Dirección Creativa *</label>
+            <textarea id="deal-video-vibe" rows="3" maxlength="800" placeholder="Describe el estilo visual, tono, duración, plataforma (TikTok, Reels, YouTube), referencias de contenido similar, hashtags requeridos..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
+            <p class="text-[11px] text-gray-400 mt-1">Ej: Video estilo lifestyle, 30-60 seg, tono casual y auténtico, para Instagram Reels</p>
+          </div>
+
+          <!-- Requirements -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Requisitos del Creador *</label>
+            <textarea id="deal-requirements" rows="3" maxlength="800" placeholder="Mínimo de seguidores, nicho, ubicación, idioma, tipo de contenido que publican..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
+          </div>
+
+          <!-- Payment row -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Pago por Creador (USD) *</label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                <input id="deal-budget" type="number" min="1" step="0.01" placeholder="0.00" class="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Max Creadores</label>
+              <input id="deal-max-creators" type="number" min="1" value="1" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+            </div>
+          </div>
+
+          <!-- Payment description -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Descripción del Pago</label>
+            <input id="deal-payment-desc" type="text" maxlength="200" placeholder="Ej: 50% al aceptar, 50% al publicar el contenido" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+            <p class="text-[11px] text-gray-400 mt-1">Explica cómo y cuándo se realizará el pago</p>
+          </div>
+
+          <!-- Terms -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Términos y Condiciones</label>
+            <textarea id="deal-terms" rows="2" maxlength="800" placeholder="Derechos de uso del contenido, exclusividad, plazos de entrega..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
+          </div>
+
+          <!-- Deadline -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Fecha Límite para Aplicar</label>
+            <input id="deal-deadline" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+          </div>
+
+          <!-- Cover image URL -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Imagen de Portada (URL)</label>
+            <input id="deal-cover-url" type="url" placeholder="https://..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+            <p class="text-[11px] text-gray-400 mt-1">Imagen de la marca o producto (opcional)</p>
+          </div>
+
+          <!-- Info box -->
+          <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex gap-3">
+            <span class="text-xl flex-shrink-0">💡</span>
+            <div class="text-xs text-green-700">
+              <p class="font-semibold text-green-800 mb-1">Comisión de plataforma: 5%</p>
+              <p>CREO retiene el 5% del pago como comisión. El creador recibe el 95% directamente en su cuenta.</p>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button onclick="submitDeal()" id="submit-deal-btn" class="w-full bg-creo-purple text-white py-3.5 rounded-xl font-bold hover:bg-creo-light transition flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            Publicar Deal
+          </button>
         </div>
-        <div id="detail-budget" class="text-xl font-bold text-creo-mintDark mb-3"></div>
-        <div class="space-y-3 text-sm text-gray-600">
-          <div>
-            <p class="font-semibold text-gray-800 mb-1">Descripción</p>
-            <p id="detail-description" class="whitespace-pre-wrap"></p>
-          </div>
-          <div>
-            <p class="font-semibold text-gray-800 mb-1">Requisitos</p>
-            <p id="detail-requirements" class="whitespace-pre-wrap"></p>
-          </div>
-          <div>
-            <p class="font-semibold text-gray-800 mb-1">Términos y Condiciones</p>
-            <p id="detail-terms" class="whitespace-pre-wrap"></p>
-          </div>
-          <div id="detail-deadline-row" class="hidden">
-            <p class="font-semibold text-gray-800 mb-1">Fecha límite</p>
-            <p id="detail-deadline"></p>
-          </div>
-          <div>
-            <p class="text-xs text-gray-400">Máximo <span id="detail-max-creators">1</span> creador(es)</p>
-          </div>
-        </div>
-        <button id="detail-contact-btn" onclick="contactBrand()" class="w-full mt-6 bg-creo-purple text-white py-3 rounded-xl font-bold hover:bg-creo-light transition">
-          <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-          Contactar Marca
-        </button>
       </div>
     </div>
   </div>
 
-  <!-- Chat Modal -->
+  <!-- ==================== DEAL DETAIL MODAL ==================== -->
+  <div id="deal-detail-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeDealDetail()"></div>
+    <div class="absolute inset-x-0 bottom-0 top-8 md:top-10 bg-white rounded-t-3xl overflow-y-auto shadow-2xl">
+      <div class="max-w-2xl mx-auto p-5 pb-8">
+        <div class="flex items-center justify-between mb-4">
+          <h2 id="detail-title" class="text-lg font-bold text-creo-purple"></h2>
+          <button onclick="closeDealDetail()" class="p-1 text-gray-400 hover:text-gray-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>
+        <div class="flex items-center gap-2 mb-4">
+          <img id="detail-avatar" src="" class="w-10 h-10 rounded-full object-cover border-2 border-creo-purple/20">
+          <div>
+            <span id="detail-brand-name" class="text-sm font-semibold text-gray-800 block"></span>
+            <span id="detail-category" class="text-xs bg-creo-purple/10 text-creo-purple px-2 py-0.5 rounded-full font-semibold"></span>
+          </div>
+        </div>
+
+        <!-- Cover image -->
+        <div id="detail-cover-wrap" class="hidden mb-4">
+          <img id="detail-cover-img" src="" class="w-full h-48 object-cover rounded-xl">
+        </div>
+
+        <div id="detail-budget" class="text-2xl font-bold text-creo-mintDark mb-1"></div>
+        <p id="detail-payment-desc" class="text-sm text-gray-500 mb-4"></p>
+
+        <div class="space-y-4 text-sm text-gray-600">
+          <div class="bg-gray-50 rounded-xl p-4">
+            <p class="font-semibold text-gray-800 mb-1.5 flex items-center gap-2"><svg class="w-4 h-4 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Descripción</p>
+            <p id="detail-description" class="whitespace-pre-wrap"></p>
+          </div>
+
+          <div class="bg-purple-50 rounded-xl p-4">
+            <p class="font-semibold text-purple-800 mb-1.5 flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> Vibe del Video</p>
+            <p id="detail-video-vibe" class="whitespace-pre-wrap text-purple-700"></p>
+          </div>
+
+          <div class="bg-blue-50 rounded-xl p-4">
+            <p class="font-semibold text-blue-800 mb-1.5 flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg> Requisitos</p>
+            <p id="detail-requirements" class="whitespace-pre-wrap text-blue-700"></p>
+          </div>
+
+          <div id="detail-terms-wrap">
+            <div class="bg-gray-50 rounded-xl p-4">
+              <p class="font-semibold text-gray-800 mb-1.5">Términos y Condiciones</p>
+              <p id="detail-terms" class="whitespace-pre-wrap"></p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-6 text-xs text-gray-400 pt-2">
+            <div id="detail-deadline-row" class="hidden flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>Hasta <span id="detail-deadline"></span></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span>Max <span id="detail-max-creators">1</span> creador(es)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="mt-6 space-y-3">
+          <button id="detail-apply-btn" onclick="applyToDeal()" class="w-full bg-creo-purple text-white py-3.5 rounded-xl font-bold hover:bg-creo-light transition flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Aplicar a este Deal
+          </button>
+          <button id="detail-contact-btn" onclick="contactBrand()" class="w-full border-2 border-creo-purple text-creo-purple py-3 rounded-xl font-bold hover:bg-creo-purple/5 transition flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            Contactar Marca
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CHAT MODAL ==================== -->
   <div id="chat-modal" class="fixed inset-0 z-[60] hidden">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeChat()"></div>
     <div class="absolute inset-x-0 bottom-0 top-12 bg-white rounded-t-3xl flex flex-col overflow-hidden shadow-2xl">
-      <!-- Chat header -->
       <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100 bg-white/90 backdrop-blur shrink-0">
         <button onclick="closeChat()" class="p-1"><svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
         <img id="chat-avatar" src="" class="w-10 h-10 rounded-full object-cover border-2 border-creo-purple" alt="">
@@ -124,16 +264,12 @@
           Encriptado
         </div>
       </div>
-
-      <!-- Messages -->
       <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         <div class="text-center text-xs text-gray-400 py-4">
           <svg class="w-8 h-8 mx-auto mb-2 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
           Mensajes encriptados. Solo tú y la otra parte pueden leerlos.
         </div>
       </div>
-
-      <!-- Payment popup (shown inside chat for brand/empresa) -->
       <div id="payment-popup" class="hidden px-4 py-3 bg-creo-mint/10 border-t border-creo-mint/30 shrink-0">
         <div class="flex items-center gap-2 mb-2">
           <svg class="w-5 h-5 text-creo-mintDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -150,8 +286,6 @@
         </div>
         <p class="text-[11px] text-gray-400 mt-1.5">5% comisión de plataforma. El creador recibe el 95%.</p>
       </div>
-
-      <!-- Chat input -->
       <div class="px-4 py-3 border-t border-gray-100 bg-white/90 backdrop-blur flex gap-2 items-end shrink-0">
         <button id="pay-toggle-btn" class="hidden p-2 rounded-full bg-creo-mint/20 text-creo-mintDark hover:bg-creo-mint/30 transition" onclick="togglePaymentPopup()" title="Enviar Pago">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -192,22 +326,6 @@
     let activeCategoryFilter = 'all';
     let currentRole = 'creator';
 
-    function switchRole(role) {
-      currentRole = role;
-      const cBtn = document.getElementById('role-btn-creator');
-      const bBtn = document.getElementById('role-btn-brand');
-      if (role === 'creator') {
-        cBtn.className = 'px-3 py-1 rounded-full bg-white text-creo-purple transition';
-        bBtn.className = 'px-3 py-1 rounded-full text-white/70 transition';
-      } else {
-        bBtn.className = 'px-3 py-1 rounded-full bg-white text-creo-purple transition';
-        cBtn.className = 'px-3 py-1 rounded-full text-white/70 transition';
-      }
-      if (document.getElementById('convos-panel').classList.contains('hidden') === false) {
-        loadMyConversations();
-      }
-    }
-
     async function init() {
       renderBottomNav('deals');
       initTheme();
@@ -217,8 +335,8 @@
         const { data: p } = await sb.from('profiles').select('*').eq('id', user.id).single();
         currentProfile = p;
         document.getElementById('my-convos-btn').classList.remove('hidden');
-        if (isPlatformCreator(p?.email || '')) {
-          document.getElementById('role-toggle').classList.remove('hidden');
+        if (isPlatformCreator(user.email) || p?.account_type === 'empresa' || p?.account_type === 'business') {
+          document.getElementById('post-deal-bar').classList.remove('hidden');
         }
       }
       updateNavAuth();
@@ -230,6 +348,8 @@
         showToast('Pago enviado exitosamente', 'success');
       }
     }
+
+    // ==================== LOAD & RENDER DEALS ====================
 
     async function loadDeals() {
       const { data, error } = await sb
@@ -271,27 +391,111 @@
         const brand = d.brand || {};
         const budget = (d.budget_per_creator_cents / 100).toFixed(0);
         const deadlineText = d.deadline ? new Date(d.deadline).toLocaleDateString('es') : '';
+        const coverImg = d.cover_url ? `<img src="${esc(d.cover_url)}" class="w-full h-40 object-cover" alt="">` : `<div class="w-full h-40 bg-gradient-to-br from-creo-purple to-creo-light flex items-center justify-center"><svg class="w-12 h-12 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>`;
 
         return `
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer" onclick="openDealDetail('${d.id}')">
-            <div class="bg-gradient-to-br from-creo-purple to-creo-light p-4 text-white">
-              <div class="flex items-center gap-2 mb-2">
-                <img src="${esc(brand.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(brand.display_name || 'B'))}" class="w-7 h-7 rounded-full object-cover border border-white/30">
-                <span class="text-xs font-medium opacity-90 truncate">${esc(brand.display_name || brand.username || 'Marca')}</span>
-                ${d.category ? `<span class="ml-auto text-[10px] bg-white/20 px-2 py-0.5 rounded-full">${esc(catLabels[d.category] || d.category)}</span>` : ''}
-              </div>
-              <h3 class="font-bold text-sm line-clamp-2">${esc(d.title)}</h3>
-            </div>
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all cursor-pointer group" onclick="openDealDetail('${d.id}')">
+            ${coverImg}
             <div class="p-4">
-              <p class="text-xs text-gray-500 line-clamp-2 mb-3">${esc(d.description || d.requirements || '')}</p>
-              <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 mb-2">
+                <img src="${esc(brand.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(brand.display_name || 'B'))}" class="w-7 h-7 rounded-full object-cover border border-gray-200">
+                <span class="text-xs font-medium text-gray-500 truncate">${esc(brand.display_name || brand.username || 'Marca')}</span>
+                ${d.category ? `<span class="ml-auto text-[10px] bg-creo-purple/10 text-creo-purple px-2 py-0.5 rounded-full font-semibold">${esc(catLabels[d.category] || d.category)}</span>` : ''}
+              </div>
+              <h3 class="font-bold text-sm text-gray-900 line-clamp-2 mb-2 group-hover:text-creo-purple transition">${esc(d.title)}</h3>
+              <p class="text-xs text-gray-500 line-clamp-2 mb-3">${esc(d.description || '')}</p>
+              ${d.video_vibe ? `<p class="text-xs text-purple-600 line-clamp-2 mb-3 flex items-start gap-1"><svg class="w-3.5 h-3.5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>${esc(d.video_vibe)}</p>` : ''}
+              <div class="flex items-center justify-between pt-2 border-t border-gray-100">
                 <span class="text-lg font-bold text-creo-mintDark">$${budget}</span>
-                ${deadlineText ? `<span class="text-[10px] text-gray-400">hasta ${deadlineText}</span>` : `<span class="text-[10px] text-gray-400">${new Date(d.created_at).toLocaleDateString('es')}</span>`}
+                <div class="text-right">
+                  ${deadlineText ? `<span class="text-[10px] text-gray-400 block">hasta ${deadlineText}</span>` : ''}
+                  <span class="text-[10px] text-gray-400">${d.max_creators || 1} creador(es)</span>
+                </div>
               </div>
             </div>
           </div>`;
       }).join('');
     }
+
+    // ==================== POST DEAL ====================
+
+    function openPostDeal() {
+      document.getElementById('post-deal-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePostDeal() {
+      document.getElementById('post-deal-modal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    async function submitDeal() {
+      if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
+
+      const title = document.getElementById('deal-title').value.trim();
+      const category = document.getElementById('deal-category').value;
+      const description = document.getElementById('deal-description').value.trim();
+      const videoVibe = document.getElementById('deal-video-vibe').value.trim();
+      const requirements = document.getElementById('deal-requirements').value.trim();
+      const budgetUsd = parseFloat(document.getElementById('deal-budget').value);
+      const maxCreators = parseInt(document.getElementById('deal-max-creators').value) || 1;
+      const paymentDesc = document.getElementById('deal-payment-desc').value.trim();
+      const terms = document.getElementById('deal-terms').value.trim();
+      const deadline = document.getElementById('deal-deadline').value || null;
+      const coverUrl = document.getElementById('deal-cover-url').value.trim() || null;
+
+      if (!title) { showToast('Título requerido', 'error'); return; }
+      if (!category) { showToast('Categoría requerida', 'error'); return; }
+      if (!description) { showToast('Descripción requerida', 'error'); return; }
+      if (!videoVibe) { showToast('Vibe del video requerido', 'error'); return; }
+      if (!requirements) { showToast('Requisitos requeridos', 'error'); return; }
+      if (!budgetUsd || budgetUsd < 1) { showToast('Pago mínimo $1', 'error'); return; }
+
+      const btn = document.getElementById('submit-deal-btn');
+      btn.textContent = 'Publicando...';
+      btn.disabled = true;
+
+      const { error } = await sb.from('brand_deals').insert([{
+        brand_id: currentUser.id,
+        title,
+        category,
+        description,
+        video_vibe: videoVibe,
+        requirements,
+        budget_per_creator_cents: Math.round(budgetUsd * 100),
+        max_creators: maxCreators,
+        payment_description: paymentDesc,
+        terms_conditions: terms,
+        deadline,
+        cover_url: coverUrl,
+        status: 'active'
+      }]);
+
+      if (error) {
+        console.error('Error posting deal:', error);
+        showToast('Error: ' + error.message, 'error');
+      } else {
+        showToast('Deal publicado exitosamente', 'success');
+        closePostDeal();
+        document.getElementById('deal-title').value = '';
+        document.getElementById('deal-category').value = '';
+        document.getElementById('deal-description').value = '';
+        document.getElementById('deal-video-vibe').value = '';
+        document.getElementById('deal-requirements').value = '';
+        document.getElementById('deal-budget').value = '';
+        document.getElementById('deal-max-creators').value = '1';
+        document.getElementById('deal-payment-desc').value = '';
+        document.getElementById('deal-terms').value = '';
+        document.getElementById('deal-deadline').value = '';
+        document.getElementById('deal-cover-url').value = '';
+        loadDeals();
+      }
+
+      btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Publicar Deal';
+      btn.disabled = false;
+    }
+
+    // ==================== DEAL DETAIL ====================
 
     function openDealDetail(dealId) {
       selectedDeal = allDeals.find(d => d.id === dealId);
@@ -306,10 +510,19 @@
       document.getElementById('detail-brand-name').textContent = brand.display_name || brand.username || 'Marca';
       document.getElementById('detail-category').textContent = catLabels[selectedDeal.category] || selectedDeal.category || '';
       document.getElementById('detail-budget').textContent = '$' + budget + ' por creador';
+      document.getElementById('detail-payment-desc').textContent = selectedDeal.payment_description || '';
       document.getElementById('detail-description').textContent = selectedDeal.description || 'Sin descripción';
-      document.getElementById('detail-requirements').textContent = selectedDeal.requirements;
-      document.getElementById('detail-terms').textContent = selectedDeal.terms_conditions;
+      document.getElementById('detail-video-vibe').textContent = selectedDeal.video_vibe || 'No especificado';
+      document.getElementById('detail-requirements').textContent = selectedDeal.requirements || 'No especificado';
+      document.getElementById('detail-terms').textContent = selectedDeal.terms_conditions || 'No especificado';
       document.getElementById('detail-max-creators').textContent = selectedDeal.max_creators || 1;
+
+      if (selectedDeal.cover_url) {
+        document.getElementById('detail-cover-img').src = selectedDeal.cover_url;
+        document.getElementById('detail-cover-wrap').classList.remove('hidden');
+      } else {
+        document.getElementById('detail-cover-wrap').classList.add('hidden');
+      }
 
       if (selectedDeal.deadline) {
         document.getElementById('detail-deadline').textContent = new Date(selectedDeal.deadline).toLocaleDateString('es', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -319,32 +532,48 @@
       }
 
       const isOwnDeal = currentUser && currentUser.id === selectedDeal.brand_id;
-      const isPlatform = isPlatformCreator(currentProfile?.email || '');
+      const applyBtn = document.getElementById('detail-apply-btn');
       const contactBtn = document.getElementById('detail-contact-btn');
+
       if (!currentUser) {
-        contactBtn.textContent = 'Inicia sesión para contactar';
-        contactBtn.onclick = () => signInWithGoogle();
-      } else if (isOwnDeal && (!isPlatform || currentRole === 'brand')) {
-        contactBtn.textContent = 'Es tu deal';
-        contactBtn.disabled = true;
+        applyBtn.textContent = 'Inicia sesión para aplicar';
+        applyBtn.onclick = () => signInWithGoogle();
+        contactBtn.classList.add('hidden');
+      } else if (isOwnDeal) {
+        applyBtn.textContent = 'Es tu deal';
+        applyBtn.disabled = true;
+        applyBtn.classList.add('opacity-50');
+        contactBtn.classList.add('hidden');
       } else {
-        contactBtn.innerHTML = '<svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg> Contactar Marca';
-        contactBtn.disabled = false;
+        applyBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Aplicar a este Deal';
+        applyBtn.disabled = false;
+        applyBtn.classList.remove('opacity-50');
+        applyBtn.onclick = () => applyToDeal();
+        contactBtn.classList.remove('hidden');
         contactBtn.onclick = () => contactBrand();
       }
 
       document.getElementById('deal-detail-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
     }
 
     function closeDealDetail() {
       document.getElementById('deal-detail-modal').classList.add('hidden');
+      document.body.style.overflow = '';
       selectedDeal = null;
     }
+
+    async function applyToDeal() {
+      if (!currentUser || !selectedDeal) return;
+      if (!(await requireCreoId('aplicar a deals'))) return;
+      contactBrand();
+    }
+
+    // ==================== CHAT ====================
 
     async function contactBrand() {
       if (!currentUser || !selectedDeal) return;
 
-      // Find or create conversation
       let { data: conv } = await sb
         .from('deal_conversations')
         .select('*')
@@ -370,7 +599,7 @@
     function openChat(conversation, dealTitle, otherName, otherAvatar) {
       activeConversation = conversation;
       const isPlatform = isPlatformCreator(currentProfile?.email || '');
-      const isBrand = isPlatform ? currentRole === 'brand' : currentUser.id === conversation.brand_id;
+      const isBrand = isPlatform ? true : currentUser.id === conversation.brand_id;
 
       document.getElementById('chat-name').textContent = otherName || 'Usuario';
       document.getElementById('chat-deal-title').textContent = dealTitle || 'Brand Deal';
@@ -418,7 +647,7 @@
 
         if (m.message_type === 'payment') {
           const amt = (m.payment_amount_cents / 100).toFixed(2);
-          const statusLabel = m.payment_status === 'completed' ? '✅ Completado' : m.payment_status === 'failed' ? '❌ Fallido' : '⏳ Pendiente';
+          const statusLabel = m.payment_status === 'completed' ? 'Completado' : m.payment_status === 'failed' ? 'Fallido' : 'Pendiente';
           return `<div class="flex ${isMine ? 'justify-end' : 'justify-start'}">
             <div class="payment-bubble px-4 py-3 max-w-[85%] shadow-md">
               <div class="flex items-center gap-2 mb-1">
@@ -509,6 +738,8 @@
       }
     }
 
+    // ==================== CONVERSATIONS ====================
+
     function toggleMyConvos() {
       const panel = document.getElementById('convos-panel');
       if (panel.classList.contains('hidden')) {
@@ -525,10 +756,9 @@
 
       const isPlatform = isPlatformCreator(currentProfile?.email || '');
       const isBrandAccount = currentProfile?.account_type === 'empresa' || currentProfile?.account_type === 'business';
-      const showAsBrand = isPlatform ? currentRole === 'brand' : isBrandAccount;
 
       let convos = [];
-      if (showAsBrand) {
+      if (isPlatform || isBrandAccount) {
         const { data: brandConvos } = await sb
           .from('deal_conversations')
           .select('*, brand_deals(title), other:creator_id(display_name, username, avatar_url)')
@@ -536,15 +766,15 @@
           .eq('status', 'active')
           .order('created_at', { ascending: false });
         if (brandConvos) convos.push(...brandConvos.map(c => ({ ...c, _role: 'brand' })));
-      } else {
-        const { data: creatorConvos } = await sb
-          .from('deal_conversations')
-          .select('*, brand_deals(title), other:brand_id(display_name, username, avatar_url)')
-          .eq('creator_id', currentUser.id)
-          .eq('status', 'active')
-          .order('created_at', { ascending: false });
-        if (creatorConvos) convos.push(...creatorConvos.map(c => ({ ...c, _role: 'creator' })));
       }
+      // Also load creator conversations
+      const { data: creatorConvos } = await sb
+        .from('deal_conversations')
+        .select('*, brand_deals(title), other:brand_id(display_name, username, avatar_url)')
+        .eq('creator_id', currentUser.id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+      if (creatorConvos) convos.push(...creatorConvos.map(c => ({ ...c, _role: 'creator' })));
 
       if (!convos || convos.length === 0) {
         list.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">No tienes conversaciones activas</div>';
