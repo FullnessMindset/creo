@@ -1262,6 +1262,8 @@
         message: '¡Hola {name}!\n\nQueremos invitarte a formar parte de CREO, la plataforma donde los creadores conectan con su comunidad y reciben apoyo directo de quienes creen en su talento.\n\nEn CREO puedes:\n• Crear tu perfil de creador\n• Recibir propinas y apoyo mensual de tus fans\n• Lanzar metas de financiamiento para tus proyectos\n• Conectar con marcas para brand deals\n• Compartir tu contenido con una comunidad que te valora\n\n¡Tu talento merece ser apoyado! Únete hoy y empieza a construir tu comunidad.',
         button_text: 'Unirme a CREO',
         button_url: 'https://fullnessmindset.github.io/creo/explore.html',
+        image_url: 'https://fullnessmindset.github.io/creo/assets/imagina%20una%20red%20social.png',
+        image_position: 'cover',
       },
       'brand-deal': {
         subject: '💼 Nueva oportunidad de Brand Deal disponible',
@@ -1315,6 +1317,17 @@
         if (!matchOption) {
           document.getElementById('email-btn-url').classList.remove('hidden');
         }
+      } else {
+        removeEmailButton();
+      }
+      if (t.image_url) {
+        document.getElementById('email-img-fields').classList.remove('hidden');
+        document.getElementById('email-img-toggle').classList.add('hidden');
+        document.getElementById('email-img-url').value = t.image_url;
+        document.querySelector('input[name="email-img-pos"][value="' + (t.image_position || 'cover') + '"]').checked = true;
+        previewEmailImage();
+      } else {
+        removeEmailImage();
       }
     }
 
