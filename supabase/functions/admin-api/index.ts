@@ -410,7 +410,7 @@ serve(async (req) => {
         });
 
         await client.send({
-          from: `CREO <${gmailUser}>`,
+          from: `CREO Admin <${gmailUser}>`,
           to: toEmail,
           subject: subject,
           content: message,
