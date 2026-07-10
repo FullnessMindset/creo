@@ -532,6 +532,18 @@
           </div>
         </div>
         <div>
+          <label class="text-xs text-gray-500 uppercase font-semibold">Template</label>
+          <select id="email-template" onchange="applyEmailTemplate()" class="w-full bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <option value="">Write from scratch...</option>
+            <option value="invite">🎉 Invite to CREO</option>
+            <option value="brand-deal">💼 New Brand Deal</option>
+            <option value="new-feature">🚀 New Feature</option>
+            <option value="update">📢 Platform Update</option>
+            <option value="welcome">👋 Welcome to CREO</option>
+            <option value="payout">💰 Payout Notification</option>
+          </select>
+        </div>
+        <div>
           <label class="text-xs text-gray-500 uppercase font-semibold">Subject</label>
           <input id="email-subject" type="text" placeholder="Message subject..." class="w-full bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
         </div>
@@ -1244,9 +1256,72 @@
     }
 
     // ===== EMAIL COMPOSE =====
+    const EMAIL_TEMPLATES = {
+      'invite': {
+        subject: '¡Te invitamos a unirte a CREO!',
+        message: '¡Hola {name}!\n\nQueremos invitarte a formar parte de CREO, la plataforma donde los creadores conectan con su comunidad y reciben apoyo directo de quienes creen en su talento.\n\nEn CREO puedes:\n• Crear tu perfil de creador\n• Recibir propinas y apoyo mensual de tus fans\n• Lanzar metas de financiamiento para tus proyectos\n• Conectar con marcas para brand deals\n• Compartir tu contenido con una comunidad que te valora\n\n¡Tu talento merece ser apoyado! Únete hoy y empieza a construir tu comunidad.',
+        button_text: 'Unirme a CREO',
+        button_url: 'https://fullnessmindset.github.io/creo/explore.html',
+      },
+      'brand-deal': {
+        subject: '💼 Nueva oportunidad de Brand Deal disponible',
+        message: '¡Hola {name}!\n\nTenemos una nueva oportunidad de colaboración con una marca que está buscando creadores como tú.\n\nRevisa los detalles en tu sección de Brand Deals y aplica si te interesa. Las marcas buscan creadores auténticos que conecten con su audiencia — y tu perfil encaja perfecto.\n\nRecuerda que las oportunidades son por tiempo limitado, así que no esperes demasiado para aplicar.',
+        button_text: 'Ver Brand Deals',
+        button_url: 'https://fullnessmindset.github.io/creo/brand-deals.html',
+      },
+      'new-feature': {
+        subject: '🚀 Nueva función disponible en CREO',
+        message: '¡Hola {name}!\n\nEstamos emocionados de compartir que hemos lanzado una nueva función en CREO.\n\nQueremos que tu experiencia como creador sea cada vez mejor, así que hemos estado trabajando en mejoras que te van a encantar.\n\nEntra a tu panel para descubrir qué hay de nuevo y empieza a aprovecharlo hoy mismo. Como siempre, tu feedback es super importante para nosotros.',
+        button_text: 'Descubrir Novedades',
+        button_url: 'https://fullnessmindset.github.io/creo/index.html',
+      },
+      'update': {
+        subject: '📢 Actualización importante de CREO',
+        message: '¡Hola {name}!\n\nQueremos mantenerte al día con lo que está pasando en CREO.\n\nHemos realizado algunas mejoras y ajustes en la plataforma para ofrecerte una mejor experiencia. Estos cambios están diseñados para hacer todo más fácil y eficiente para ti como creador.\n\nSi tienes preguntas o sugerencias, no dudes en contactarnos. Estamos aquí para ti.',
+        button_text: 'Ir a CREO',
+        button_url: 'https://fullnessmindset.github.io/creo/index.html',
+      },
+      'welcome': {
+        subject: '👋 ¡Bienvenido/a a CREO!',
+        message: '¡Hola {name}!\n\n¡Bienvenido/a a la familia CREO! Estamos felices de que estés aquí.\n\nAquí tienes unos pasos para empezar:\n1. Completa tu perfil con tu foto, bio y redes sociales\n2. Comparte tu enlace de perfil con tu comunidad\n3. Explora la sección de Brand Deals para oportunidades\n4. Crea tu primera Meta para financiar un proyecto\n\nRecuerda: CREO existe porque creemos en ti y en tu talento. Si necesitas ayuda con cualquier cosa, estamos a un mensaje de distancia.',
+        button_text: 'Completar Mi Perfil',
+        button_url: 'https://fullnessmindset.github.io/creo/index.html',
+      },
+      'payout': {
+        subject: '💰 ¡Tienes fondos disponibles!',
+        message: '¡Hola {name}!\n\nTe escribimos para informarte que se han aprobado fondos a tu cuenta de creador en CREO.\n\nLos fondos serán transferidos a tu cuenta bancaria conectada. El tiempo de procesamiento puede variar dependiendo de tu banco, pero normalmente toma entre 2-5 días hábiles.\n\nSigue creando contenido increíble — tu comunidad te está apoyando. ¡Gracias por ser parte de CREO!',
+        button_text: 'Ver Mi Panel',
+        button_url: 'https://fullnessmindset.github.io/creo/index.html',
+      },
+    };
+
+    function applyEmailTemplate() {
+      const key = document.getElementById('email-template').value;
+      if (!key) return;
+      const t = EMAIL_TEMPLATES[key];
+      if (!t) return;
+      const name = document.getElementById('email-to-name').textContent || '';
+      document.getElementById('email-subject').value = t.subject;
+      document.getElementById('email-message').value = t.message.replace(/\{name\}/g, name || 'creador/a');
+      if (t.button_text && t.button_url) {
+        document.getElementById('email-btn-fields').classList.remove('hidden');
+        document.getElementById('email-btn-toggle').classList.add('hidden');
+        document.getElementById('email-btn-text').value = t.button_text;
+        document.getElementById('email-btn-url').value = t.button_url;
+        document.getElementById('email-btn-url').classList.add('hidden');
+        const presetSelect = document.getElementById('email-btn-preset');
+        const matchOption = Array.from(presetSelect.options).find(o => o.value === t.button_url);
+        presetSelect.value = matchOption ? t.button_url : 'custom';
+        if (!matchOption) {
+          document.getElementById('email-btn-url').classList.remove('hidden');
+        }
+      }
+    }
+
     function openEmailModal(email, name) {
       document.getElementById('email-to').value = email;
       document.getElementById('email-to-name').textContent = name || '';
+      document.getElementById('email-template').value = '';
       document.getElementById('email-subject').value = '';
       document.getElementById('email-message').value = '';
       document.getElementById('email-send-btn').disabled = false;
