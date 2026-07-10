@@ -110,6 +110,10 @@
       </div>
       <div class="flex items-center space-x-4">
         <span id="account-name" class="text-gray-500 text-sm hidden sm:inline"></span>
+        <button onclick="openEmailModal('','',true)" class="text-sm bg-creo-purple text-white px-3 py-1.5 rounded-lg transition hover:bg-creo-light flex items-center space-x-1.5 font-medium shadow-sm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span>Send Email</span>
+        </button>
         <button onclick="browseAsUser()" class="text-sm bg-creo-mint/20 text-creo-purple px-3 py-1.5 rounded-lg transition hover:bg-creo-mint/40 flex items-center space-x-1 font-medium">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
           <span>Browse as User</span>
@@ -514,21 +518,40 @@
   </div>
 
   <!-- Email Compose Modal -->
-  <div id="email-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onclick="if(event.target===this)closeEmailModal()">
-    <div class="bg-white border border-gray-200 rounded-2xl w-full max-w-lg transition-colors">
-      <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+  <div id="email-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 overflow-y-auto" onclick="if(event.target===this)closeEmailModal()">
+    <div class="bg-white border border-gray-200 rounded-2xl w-full max-w-lg transition-colors my-auto max-h-[90vh] flex flex-col">
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
         <div class="flex items-center gap-2">
           <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
           <h3 class="text-lg font-bold text-gray-900">Send Email to User</h3>
         </div>
         <button onclick="closeEmailModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
       </div>
-      <div class="p-6 space-y-4">
+      <div class="p-6 space-y-4 overflow-y-auto flex-1">
         <div>
           <label class="text-xs text-gray-500 uppercase font-semibold">To</label>
           <div class="flex items-center gap-2 mt-1">
-            <input id="email-to" type="email" readonly class="flex-1 bg-gray-100 border border-gray-300 p-2.5 rounded-lg text-sm text-gray-700 cursor-not-allowed">
-            <span id="email-to-name" class="text-xs text-gray-400"></span>
+            <input id="email-to" type="text" placeholder="email@example.com" class="flex-1 bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <span id="email-to-name" class="text-xs text-gray-400 flex-shrink-0"></span>
+          </div>
+          <div id="email-bulk-section" class="mt-2 space-y-2">
+            <div class="flex items-center gap-2">
+              <button onclick="document.getElementById('email-csv-input').click()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                Upload CSV / TXT
+              </button>
+              <button onclick="toggleBulkPaste()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                Paste List
+              </button>
+              <input type="file" id="email-csv-input" accept=".csv,.txt,.xlsx" class="hidden" onchange="handleEmailFileUpload(event)">
+            </div>
+            <div id="email-paste-area" class="hidden">
+              <textarea id="email-paste-input" rows="3" placeholder="Paste emails, one per line or comma-separated..." class="w-full bg-gray-50 border border-gray-300 p-2 rounded-lg text-xs text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple resize-none font-mono"></textarea>
+              <button onclick="parsePastedEmails()" class="text-xs bg-creo-purple text-white px-3 py-1 rounded-lg mt-1 hover:bg-creo-light transition font-medium">Add Emails</button>
+            </div>
+            <div id="email-list-badges" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto"></div>
+            <p id="email-list-count" class="hidden text-xs text-creo-purple font-semibold"></p>
           </div>
         </div>
         <div>
@@ -607,7 +630,7 @@
           <p class="text-xs text-blue-700">This email will be sent from CREO's official email and will appear in the user's inbox.</p>
         </div>
       </div>
-      <div class="p-6 border-t border-gray-200 flex space-x-3">
+      <div class="p-6 border-t border-gray-200 flex space-x-3 flex-shrink-0">
         <button onclick="sendAdminEmail()" id="email-send-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
           Send Email
@@ -1331,17 +1354,84 @@
       }
     }
 
-    function openEmailModal(email, name) {
-      document.getElementById('email-to').value = email;
+    let bulkEmailList = [];
+
+    function openEmailModal(email, name, editable) {
+      const toInput = document.getElementById('email-to');
+      toInput.value = email || '';
+      toInput.readOnly = !editable;
+      toInput.classList.toggle('bg-gray-100', !editable);
+      toInput.classList.toggle('cursor-not-allowed', !editable);
+      toInput.classList.toggle('bg-gray-50', !!editable);
+      toInput.placeholder = editable ? 'email@example.com' : '';
       document.getElementById('email-to-name').textContent = name || '';
       document.getElementById('email-template').value = '';
       document.getElementById('email-subject').value = '';
       document.getElementById('email-message').value = '';
       document.getElementById('email-send-btn').disabled = false;
       document.getElementById('email-send-btn').innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Send Email';
+      bulkEmailList = [];
+      document.getElementById('email-list-badges').innerHTML = '';
+      document.getElementById('email-list-count').classList.add('hidden');
+      document.getElementById('email-paste-area').classList.add('hidden');
+      document.getElementById('email-bulk-section').style.display = editable ? '' : 'none';
       removeEmailButton();
       removeEmailImage();
       document.getElementById('email-modal').classList.remove('hidden');
+    }
+
+    function toggleBulkPaste() {
+      document.getElementById('email-paste-area').classList.toggle('hidden');
+      document.getElementById('email-paste-input').value = '';
+    }
+
+    function parseEmailString(str) {
+      return str.split(/[\n,;\s]+/).map(e => e.trim().toLowerCase()).filter(e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+    }
+
+    function parsePastedEmails() {
+      const raw = document.getElementById('email-paste-input').value;
+      const emails = parseEmailString(raw);
+      emails.forEach(e => { if (!bulkEmailList.includes(e)) bulkEmailList.push(e); });
+      document.getElementById('email-paste-input').value = '';
+      document.getElementById('email-paste-area').classList.add('hidden');
+      renderBulkBadges();
+    }
+
+    function handleEmailFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const emails = parseEmailString(e.target.result);
+        emails.forEach(em => { if (!bulkEmailList.includes(em)) bulkEmailList.push(em); });
+        renderBulkBadges();
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function removeBulkEmail(email) {
+      bulkEmailList = bulkEmailList.filter(e => e !== email);
+      renderBulkBadges();
+    }
+
+    function renderBulkBadges() {
+      const container = document.getElementById('email-list-badges');
+      const countEl = document.getElementById('email-list-count');
+      if (bulkEmailList.length === 0) {
+        container.innerHTML = '';
+        countEl.classList.add('hidden');
+        return;
+      }
+      container.innerHTML = bulkEmailList.map(e =>
+        `<span class="inline-flex items-center gap-1 bg-creo-purple/10 text-creo-purple text-xs px-2 py-1 rounded-full font-medium">
+          ${esc(e)}
+          <button onclick="removeBulkEmail('${esc(e)}')" class="text-creo-purple/60 hover:text-red-500 font-bold ml-0.5">&times;</button>
+        </span>`
+      ).join('');
+      countEl.textContent = bulkEmailList.length + ' recipient' + (bulkEmailList.length > 1 ? 's' : '') + ' added';
+      countEl.classList.remove('hidden');
     }
 
     function closeEmailModal() {
@@ -1420,7 +1510,7 @@
     }
 
     async function sendAdminEmail() {
-      const toEmail = document.getElementById('email-to').value;
+      const toField = document.getElementById('email-to').value.trim();
       const toName = document.getElementById('email-to-name').textContent;
       const subject = document.getElementById('email-subject').value.trim();
       const message = document.getElementById('email-message').value.trim();
@@ -1428,7 +1518,21 @@
       if (!subject) return alert('Please enter a subject');
       if (!message) return alert('Please enter a message');
 
-      const payload = { to_email: toEmail, to_name: toName, subject, message };
+      let recipients = [];
+      if (bulkEmailList.length > 0) {
+        recipients = bulkEmailList.map(e => ({ email: e, name: '' }));
+      }
+      if (toField) {
+        const extras = parseEmailString(toField);
+        extras.forEach(e => {
+          if (!recipients.find(r => r.email === e)) {
+            recipients.push({ email: e, name: toName || '' });
+          }
+        });
+      }
+      if (recipients.length === 0) return alert('Please enter at least one email address');
+
+      const basePayload = { subject, message };
 
       const btnVisible = !document.getElementById('email-btn-fields').classList.contains('hidden');
       if (btnVisible) {
@@ -1438,8 +1542,8 @@
           ? document.getElementById('email-btn-url').value.trim()
           : preset;
         if (btnText && btnUrl) {
-          payload.button_text = btnText;
-          payload.button_url = btnUrl;
+          basePayload.button_text = btnText;
+          basePayload.button_url = btnUrl;
         }
       }
 
@@ -1448,32 +1552,39 @@
         const imgUrl = document.getElementById('email-img-url').value.trim();
         const imgPos = document.querySelector('input[name="email-img-pos"]:checked')?.value || 'cover';
         if (imgUrl) {
-          payload.image_url = imgUrl;
-          payload.image_position = imgPos;
+          basePayload.image_url = imgUrl;
+          basePayload.image_position = imgPos;
         }
       }
 
       const btn = document.getElementById('email-send-btn');
       btn.disabled = true;
-      btn.innerHTML = '<div class="loader" style="width:16px;height:16px;border-width:2px;"></div> Sending...';
+      const total = recipients.length;
+      let sent = 0, failed = 0;
 
-      const res = await apiCall('send-email', payload);
+      for (let i = 0; i < recipients.length; i++) {
+        btn.innerHTML = `<div class="loader" style="width:16px;height:16px;border-width:2px;"></div> Sending ${i + 1}/${total}...`;
+        const payload = { ...basePayload, to_email: recipients[i].email, to_name: recipients[i].name };
+        const res = await apiCall('send-email', payload);
+        if (res.error) { failed++; } else { sent++; }
+      }
 
-      if (res.error) {
+      if (failed > 0 && sent === 0) {
         btn.disabled = false;
         btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Send Email';
-        alert('Error sending email: ' + res.error);
+        alert('All emails failed to send');
         return;
       }
 
-      btn.innerHTML = '✅ Sent!';
+      const label = failed > 0 ? `Sent ${sent}/${total} (${failed} failed)` : (total > 1 ? `All ${total} sent!` : 'Sent!');
+      btn.innerHTML = (failed > 0 ? '⚠️ ' : '✅ ') + label;
       btn.classList.remove('bg-creo-purple');
-      btn.classList.add('bg-green-600');
+      btn.classList.add(failed > 0 ? 'bg-yellow-500' : 'bg-green-600');
       setTimeout(() => {
         closeEmailModal();
-        btn.classList.remove('bg-green-600');
+        btn.classList.remove('bg-green-600', 'bg-yellow-500');
         btn.classList.add('bg-creo-purple');
-      }, 1500);
+      }, 2000);
     }
 
     // ===== META FUND RELEASE REVIEWS =====
