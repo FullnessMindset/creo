@@ -801,7 +801,8 @@ async function initRealtimeNotifications() {
   _realtimeNotifChannel = sb.channel('notif-' + user.id)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + user.id }, (payload) => {
       const notif = payload.new;
-      playNotificationSound();
+      const isMessage = notif.type === 'message' || (notif.type === 'comment' && notif.link && notif.link.includes('messages'));
+      if (isMessage) playNotificationSound();
       showNotifBubble(notif);
       loadNotificationBell();
     })
@@ -822,8 +823,10 @@ async function pollNotifications() {
     if (!user) return;
     const { data, count } = await sb.from('notifications').select('*', { count: 'exact' }).eq('user_id', user.id).eq('is_read', false).order('created_at', { ascending: false }).limit(1);
     if (_lastNotifCount >= 0 && count > _lastNotifCount && data && data[0]) {
-      playNotificationSound();
-      showNotifBubble(data[0]);
+      const notif = data[0];
+      const isMessage = notif.type === 'message' || (notif.type === 'comment' && notif.link && notif.link.includes('messages'));
+      if (isMessage) playNotificationSound();
+      showNotifBubble(notif);
       loadNotificationBell();
     }
     _lastNotifCount = count || 0;
