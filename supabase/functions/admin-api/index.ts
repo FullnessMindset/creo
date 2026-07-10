@@ -348,52 +348,24 @@ serve(async (req) => {
         .replace(/>/g, "&gt;")
         .replace(/\n/g, "<br>");
 
-      const htmlBody = `<div style="font-family:Inter,system-ui,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px;background:#ffffff;">
-  <div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #1a0a3e;">
-    <img src="https://fullnessmindset.github.io/creo/assets/logo-icon.png" alt="CREO" width="60" height="60" style="display:block;margin:0 auto 12px;border-radius:14px;">
-    <h2 style="color:#1a0a3e;font-size:22px;letter-spacing:0.15em;margin:0;">CREO</h2>
-    <p style="color:#a8a29e;font-size:11px;margin:4px 0 0;letter-spacing:0.05em;">Crea. Yo Creo En Ti</p>
-  </div>
-  <p style="color:#1c1917;font-size:15px;margin:0 0 8px;">Hola${toName ? " " + toName : ""},</p>
-  <div style="color:#44403c;font-size:14px;line-height:1.7;margin:16px 0;">${sanitizedMsg}</div>
-  <hr style="border:none;border-top:1px solid #e7e5e4;margin:28px 0 16px;">
-  <p style="color:#a8a29e;font-size:11px;text-align:center;margin:0;">
-    Este mensaje fue enviado por el equipo de CREO.<br>
-    <a href="https://fullnessmindset.github.io/creo/" style="color:#7c3aed;text-decoration:none;">Visitar CREO</a>
+      const htmlBody = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:20px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+    <tr>
+      <td style="text-align:center;padding-bottom:16px;">
+        <img src="https://fullnessmindset.github.io/creo/assets/logo-icon.png" alt="CREO" width="48" height="48" style="border-radius:10px;">
+      </td>
+    </tr>
+  </table>
+  <p style="font-size:15px;color:#333;margin:0 0 12px;">Hola${toName ? " " + toName : ""},</p>
+  <p style="font-size:14px;color:#555;line-height:1.6;margin:0 0 20px;">${sanitizedMsg}</p>
+  <p style="font-size:14px;color:#555;margin:0 0 4px;">Saludos,</p>
+  <p style="font-size:14px;color:#333;font-weight:bold;margin:0;">Equipo CREO</p>
+  <p style="font-size:11px;color:#999;margin:20px 0 0;border-top:1px solid #eee;padding-top:12px;">
+    CREO — Crea. Yo Creo En Ti<br>
+    https://fullnessmindset.github.io/creo/
   </p>
 </div>`;
 
-      const boundary = "----creo" + Date.now();
-      const mimeMessage = [
-        `From: CREO <${gmailUser}>`,
-        `To: ${toName ? toName + " <" + toEmail + ">" : toEmail}`,
-        `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
-        `MIME-Version: 1.0`,
-        `Content-Type: multipart/alternative; boundary="${boundary}"`,
-        ``,
-        `--${boundary}`,
-        `Content-Type: text/plain; charset=UTF-8`,
-        ``,
-        message,
-        ``,
-        `--${boundary}`,
-        `Content-Type: text/html; charset=UTF-8`,
-        ``,
-        htmlBody,
-        ``,
-        `--${boundary}--`,
-      ].join("\r\n");
-
-      const raw = btoa(unescape(encodeURIComponent(mimeMessage)))
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "");
-
-      // Use Gmail SMTP via Google's API with OAuth-less SMTP relay
-      // Since Deno Edge Functions can't do raw SMTP, we use the Gmail API via service account
-      // Fallback: use nodemailer-compatible SMTP via fetch to a relay
-
-      // Direct SMTP approach using Deno's TCP
       try {
         const { SMTPClient } = await import("https://deno.land/x/denomailer@1.6.0/mod.ts");
 
@@ -410,11 +382,16 @@ serve(async (req) => {
         });
 
         await client.send({
-          from: `CREO Admin <${gmailUser}>`,
+          from: gmailUser,
           to: toEmail,
+          replyTo: gmailUser,
           subject: subject,
-          content: message,
+          content: `Hola${toName ? " " + toName : ""},\n\n${message}\n\nSaludos,\nEquipo CREO\nhttps://fullnessmindset.github.io/creo/`,
           html: htmlBody,
+          headers: {
+            "X-Priority": "3",
+            "X-Mailer": "CREO Platform",
+          },
         });
 
         await client.close();
