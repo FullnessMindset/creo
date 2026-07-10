@@ -681,15 +681,7 @@ function acceptCookies() {
 
 // Notification Sound System
 const CREO_SOUNDS = [
-  { id: 'creo-default', name: 'CREO Original' },
-  { id: 'delta-1', name: 'Delta 1' },
-  { id: 'delta-2', name: 'Delta 2' },
-  { id: 'delta-3', name: 'Delta 3' },
-  { id: 'delta-4', name: 'Delta 4' },
-  { id: 'delta-5', name: 'Delta 5' },
-  { id: 'delta-6', name: 'Delta 6' },
-  { id: 'delta-7', name: 'Delta 7' },
-  { id: 'delta-8', name: 'Delta 8' }
+  { id: 'creo-default', name: 'CREO Original' }
 ];
 
 function getNotifSoundPrefs() {
