@@ -340,17 +340,22 @@
       else { reactions[emoji].push(currentUser.id); }
       await sb.from('messages').update({ reactions }).eq('id', msgId);
       const otherUserId = msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id;
-      if (idx < 0) createNotification(otherUserId, 'message', `Reacción ${emoji} a tu mensaje`, null, 'messages.html');
+      if (idx < 0) createNotification(otherUserId, 'message', `Reacción ${emoji} a tu mensaje`, null, 'messages.html#chat-' + currentUser.id);
       loadChatMessages();
     }
 
     document.getElementById('chat-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
 
-    window.onload = () => {
-      init();
+    window.onload = async () => {
+      await init();
       renderBottomNav('messages');
       updateNavAuth();
       loadNotificationBell();
+      const hash = window.location.hash;
+      if (hash && hash.startsWith('#chat-')) {
+        const chatUserId = hash.replace('#chat-', '');
+        if (chatUserId) openChat(chatUserId);
+      }
     };
   </script>
 </body>

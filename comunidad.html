@@ -334,12 +334,16 @@
       } else {
         document.getElementById('safety-cards').classList.remove('hidden');
       }
-      loadFeed();
+      await loadFeed();
       loadStories();
       renderSidebar('comunidad');
       loadNotificationBell();
       window.addEventListener('scroll', onScroll);
       document.getElementById('comment-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitComment(); });
+      if (window.location.hash) {
+        const target = document.querySelector(window.location.hash);
+        if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); target.style.outline = '3px solid #7c3aed'; setTimeout(() => target.style.outline = '', 3000); }
+      }
     }
 
     function setCategory(cat) {
@@ -551,7 +555,7 @@
         btn.classList.add('text-red-500'); btn.classList.remove('text-gray-500'); btn.querySelector('svg').setAttribute('fill', 'currentColor'); countEl.textContent = parseInt(countEl.textContent) + 1;
         await sb.from('community_likes').insert({ post_id: postId, user_id: currentUser.id });
         const authorId = document.getElementById('post-' + postId)?.dataset?.authorId;
-        if (authorId) createNotification(authorId, 'like', 'A alguien le gustó tu publicación', null, 'comunidad.html');
+        if (authorId) createNotification(authorId, 'like', 'A alguien le gustó tu publicación', null, 'comunidad.html#post-' + postId);
       }
     }
 
@@ -571,7 +575,7 @@
       const { error } = await sb.from('community_comments').insert({ post_id: activeCommentPostId, author_id: currentUser.id, body });
       if (error) { showToast('Error', 'error'); return; }
       const authorId = document.getElementById('post-' + activeCommentPostId)?.dataset?.authorId;
-      if (authorId) createNotification(authorId, 'comment', 'Nuevo comentario en tu publicación', body.slice(0, 80), 'comunidad.html');
+      if (authorId) createNotification(authorId, 'comment', 'Nuevo comentario en tu publicación', body.slice(0, 80), 'comunidad.html#post-' + activeCommentPostId);
       loadComments(activeCommentPostId);
     }
     async function deleteComment(id) { if (!confirm('¿Eliminar comentario?')) return; await sb.from('community_comments').delete().eq('id', id); if (activeCommentPostId) loadComments(activeCommentPostId); }
@@ -586,7 +590,7 @@
       const authorId = document.getElementById('post-' + sharePostId)?.dataset?.authorId;
       const { error } = await sb.from('community_posts').insert({ author_id: currentUser.id, post_type: 'share_post', body: body || null, shared_post_id: sharePostId });
       if (error) { showToast('Error al compartir', 'error'); return; }
-      if (authorId) createNotification(authorId, 'share', 'Alguien compartió tu publicación', null, 'comunidad.html');
+      if (authorId) createNotification(authorId, 'share', 'Alguien compartió tu publicación', null, 'comunidad.html#post-' + sharePostId);
       closeShareModal(); showToast('¡Compartido!', 'success'); document.getElementById('community-feed').innerHTML = ''; feedPage = 0; feedDone = false; loadFeed();
     }
     async function deletePost(id) { if (!confirm('¿Eliminar esta publicación?')) return; await sb.from('community_posts').delete().eq('id', id); const el = document.getElementById('post-' + id); if (el) el.remove(); showToast('Publicación eliminada', 'success'); }

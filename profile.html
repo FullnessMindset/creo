@@ -954,7 +954,7 @@
       const { data: { user } } = await sb.auth.getUser();
       const { data: senderProfile } = await sb.from('profiles').select('display_name, username').eq('id', user.id).single();
       const senderName = senderProfile?.display_name || senderProfile?.username || 'Un creador';
-      createNotification(creatorProfile.id, 'payment', `${senderName} te apoyó con $${amount.toFixed(2)} desde su meta`, null, 'profile.html?u=' + creatorProfile.username);
+      createNotification(creatorProfile.id, 'payment', `${senderName} te apoyó con $${amount.toFixed(2)}`, null, 'profile.html?u=' + creatorProfile.username + '#metas-section');
       btn.innerHTML = '<span>🎯</span><span>Enviar desde mi Meta</span>'; btn.disabled = false;
       showToast(`¡Enviaste $${amount.toFixed(2)} a ${creatorProfile.display_name || creatorProfile.username}!`, 'success');
     }
@@ -1044,7 +1044,7 @@
         metaLikesSet.add(activeMetaId);
         document.getElementById('meta-like-icon').setAttribute('fill', '#ef4444');
         document.getElementById('meta-like-icon').setAttribute('stroke', '#ef4444');
-        if (creatorProfile) createNotification(creatorProfile.id, 'meta_like', 'A alguien le gustó tu meta', metasCache[activeMetaId]?.title, 'profile.html?u=' + creatorProfile.username);
+        if (creatorProfile) createNotification(creatorProfile.id, 'meta_like', 'A alguien le gustó tu meta', metasCache[activeMetaId]?.title, 'profile.html?u=' + creatorProfile.username + '#meta-' + activeMetaId);
       } else {
         metaLikesSet.delete(activeMetaId);
         document.getElementById('meta-like-icon').setAttribute('fill', 'none');
@@ -1063,7 +1063,7 @@
       if (error) { showToast('Error', 'error'); return; }
       if (data.liked) {
         metaLikesSet.add(metaId);
-        if (creatorProfile) createNotification(creatorProfile.id, 'meta_like', 'A alguien le gustó tu meta', metasCache[metaId]?.title, 'profile.html?u=' + creatorProfile.username);
+        if (creatorProfile) createNotification(creatorProfile.id, 'meta_like', 'A alguien le gustó tu meta', metasCache[metaId]?.title, 'profile.html?u=' + creatorProfile.username + '#meta-' + metaId);
       } else {
         metaLikesSet.delete(metaId);
       }
@@ -1111,7 +1111,7 @@
       if (error) { showToast(error.message || 'Error', 'error'); return; }
       metasCache[activeMetaId].comment_count = data.count;
       document.getElementById('meta-comment-count').textContent = data.count > 0 ? data.count : '';
-      if (creatorProfile) createNotification(creatorProfile.id, 'meta_comment', 'Nuevo comentario en tu meta', body, 'profile.html?u=' + creatorProfile.username);
+      if (creatorProfile) createNotification(creatorProfile.id, 'meta_comment', 'Nuevo comentario en tu meta', body, 'profile.html?u=' + creatorProfile.username + '#meta-' + activeMetaId);
       loadMetaComments(activeMetaId);
     }
 
@@ -1124,7 +1124,7 @@
         navigator.clipboard.writeText(url);
         showToast('Enlace copiado', 'success');
       }
-      createNotification(creatorProfile.id, 'share', 'Alguien compartió tu meta', metasCache[activeMetaId]?.title, 'profile.html?u=' + creatorProfile.username);
+      createNotification(creatorProfile.id, 'share', 'Alguien compartió tu meta', metasCache[activeMetaId]?.title, 'profile.html?u=' + creatorProfile.username + '#meta-' + activeMetaId);
     }
 
     function shareMetaById(metaId) {
@@ -1136,7 +1136,7 @@
         navigator.clipboard.writeText(url);
         showToast('Enlace copiado', 'success');
       }
-      createNotification(creatorProfile.id, 'share', 'Alguien compartió tu meta', metasCache[metaId]?.title, 'profile.html?u=' + creatorProfile.username);
+      createNotification(creatorProfile.id, 'share', 'Alguien compartió tu meta', metasCache[metaId]?.title, 'profile.html?u=' + creatorProfile.username + '#meta-' + metaId);
     }
 
     function timeAgo(dateStr) {
@@ -1361,7 +1361,8 @@
       const { error } = await sb.from('messages').insert(msg);
       if (error) { showToast('Error al enviar mensaje', 'error'); return; }
       loadDMHistory();
-      createNotification(creatorProfile.id, 'comment', 'Nuevo mensaje privado', body || 'Audio', 'messages.html');
+      const { data: { user: senderUser } } = await sb.auth.getUser();
+      createNotification(creatorProfile.id, 'message', 'Nuevo mensaje privado', body || 'Audio', 'messages.html#chat-' + senderUser.id);
     }
 
     // GIF picker (GIPHY)
@@ -1676,7 +1677,7 @@
       if (error) { showToast(error.message || 'Error', 'error'); return; }
       const countEl = document.getElementById('story-comment-count-' + storyId);
       if (countEl && data?.count != null) countEl.textContent = data.count > 0 ? data.count : '';
-      if (creatorProfile) createNotification(creatorProfile.id, 'comment', 'Nuevo comentario en tu historia', body, 'profile.html?u=' + creatorProfile.username);
+      if (creatorProfile) createNotification(creatorProfile.id, 'comment', 'Nuevo comentario en tu historia', body, 'profile.html?u=' + creatorProfile.username + '#story-card-' + storyId);
       loadStoryComments(storyId);
     }
 
@@ -2096,7 +2097,7 @@
         document.getElementById('follower-count').textContent = data.follower_count || 0;
         updateFollowButton();
         if (isFollowing) {
-          createNotification(creatorProfile.id, 'follow', 'Tienes un nuevo seguidor', null, 'profile.html?u=' + creatorProfile.username);
+          createNotification(creatorProfile.id, 'follow', 'Tienes un nuevo seguidor', null, 'profile.html?u=' + creatorProfile.username + '#followers');
         }
       } catch (e) {
         showToast('Seguimiento no disponible aún', 'info');
@@ -2717,6 +2718,12 @@
       if (status === 'completed') showToast('¡Gracias por tu apoyo!', 'success');
       if (status === 'meta_completed') showToast('¡Gracias por contribuir a la meta!', 'success');
       if (status === 'subscribed') showToast('¡Suscripción activada! Gracias por tu apoyo mensual.', 'success');
+      if (window.location.hash) {
+        setTimeout(() => {
+          const target = document.querySelector(window.location.hash);
+          if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); target.style.outline = '3px solid #7c3aed'; setTimeout(() => target.style.outline = '', 3000); }
+        }, 500);
+      }
     };
   </script>
 </body>
