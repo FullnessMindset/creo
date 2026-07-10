@@ -464,6 +464,91 @@ serve(async (req) => {
       return json({ emails: data || [] });
     }
 
+    // ===== DEAL PAYOUTS (list completed deal payments needing fund release) =====
+    if (action === "deal-payouts") {
+      const [requestsRes, dealsRes, profilesRes] = await Promise.all([
+        sbAdmin
+          .from("brand_deal_requests")
+          .select("*")
+          .in("status", ["accepted", "submitted", "approved", "paid"])
+          .order("created_at", { ascending: false }),
+        sbAdmin.from("brand_deals").select("id, title, budget_per_creator_cents, brand_id"),
+        sbAdmin.from("profiles").select("id, username, display_name, avatar_url, stripe_connect_id"),
+      ]);
+
+      const deals = new Map((dealsRes.data || []).map((d: Record<string, unknown>) => [d.id, d]));
+      const profiles = new Map((profilesRes.data || []).map((p: Record<string, unknown>) => [p.id, p]));
+
+      const items = (requestsRes.data || []).map((r: Record<string, unknown>) => {
+        const deal = deals.get(r.deal_id as string) || {} as Record<string, unknown>;
+        const creator = profiles.get(r.creator_id as string) || {} as Record<string, unknown>;
+        const brand = profiles.get(deal.brand_id as string) || {} as Record<string, unknown>;
+        return {
+          request_id: r.id,
+          deal_id: r.deal_id,
+          deal_title: deal.title || "Unknown Deal",
+          budget_cents: deal.budget_per_creator_cents || 0,
+          creator_id: r.creator_id,
+          creator_username: creator.username || "unknown",
+          creator_display_name: creator.display_name || "",
+          creator_avatar: creator.avatar_url || "",
+          creator_connect_id: creator.stripe_connect_id || null,
+          brand_username: brand.username || "unknown",
+          brand_display_name: brand.display_name || "",
+          status: r.status,
+          paid_at: r.paid_at,
+          approved_at: r.approved_at,
+          submitted_at: r.submitted_at,
+          created_at: r.created_at,
+          stripe_session_id: r.stripe_session_id,
+        };
+      });
+
+      return json({ items });
+    }
+
+    // ===== RELEASE DEAL FUNDS (transfer % of deal budget to creator) =====
+    if (action === "release-deal-funds") {
+      const requestId = body.request_id as string;
+      const connectId = body.connect_id as string;
+      const amountCents = body.amount_cents as number;
+      const percent = body.percent as number;
+      const dealTitle = (body.deal_title as string) || "Brand Deal";
+
+      if (!requestId || !connectId || !amountCents)
+        return json({ error: "Missing request_id, connect_id, or amount_cents" }, 400);
+
+      try {
+        const transfer = await stripe.transfers.create({
+          amount: amountCents,
+          currency: "usd",
+          destination: connectId,
+          description: `CREO Deal Release (${percent || 50}%) — ${dealTitle}`,
+          metadata: { request_id: requestId, type: "deal_payout", percent: String(percent || 50) },
+        });
+
+        try {
+          await sbAdmin.from("payout_log").insert({
+            connect_id: connectId,
+            amount_cents: amountCents,
+            stripe_transfer_id: transfer.id,
+            approved_by: user.email,
+          });
+        } catch (_) {}
+
+        try {
+          await sbAdmin
+            .from("brand_deal_requests")
+            .update({ status: "paid", paid_at: new Date().toISOString() })
+            .eq("id", requestId);
+        } catch (_) {}
+
+        return json({ success: true, transfer_id: transfer.id });
+      } catch (e) {
+        return json({ error: (e as Error).message }, 500);
+      }
+    }
+
     return json({ error: "Unknown action: " + action }, 400);
   } catch (err) {
     return json({ error: (err as Error).message }, 500);
