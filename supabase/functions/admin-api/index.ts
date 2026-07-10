@@ -418,19 +418,19 @@ serve(async (req) => {
 
         await client.close();
 
-        await sbAdmin
-          .from("admin_emails")
-          .insert({
+        const emailId = "gmail-" + Date.now();
+        try {
+          await sbAdmin.from("admin_emails").insert({
             to_email: toEmail,
             to_name: toName,
             subject,
             message,
             sent_by: user.email,
-            resend_id: "gmail-" + Date.now(),
-          })
-          .catch(() => {});
+            resend_id: emailId,
+          });
+        } catch (_) {}
 
-        return json({ success: true, email_id: "gmail-" + Date.now() });
+        return json({ success: true, email_id: emailId });
       } catch (e) {
         return json({ error: "Gmail send failed: " + (e as Error).message }, 500);
       }
