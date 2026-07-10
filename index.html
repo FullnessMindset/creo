@@ -106,6 +106,7 @@
         <button onclick="showTab('verify');closeHerramientas()" id="tab-verify" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">✅ Verificación</button>
         <button onclick="showTab('stripe');closeHerramientas()" id="tab-stripe" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💳 Stripe</button>
         <button onclick="showTab('branding');closeHerramientas()" id="tab-branding" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎨 Mi Branding</button>
+        <button onclick="showTab('sounds');closeHerramientas()" id="tab-sounds" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🔔 Sonidos</button>
       </div>
 
       <!-- TAB: Profile -->
@@ -710,6 +711,34 @@
       </div>
 
 
+      <!-- TAB: Sounds -->
+      <div id="panel-sounds" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
+          <h3 class="font-bold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 6v12m-3.536-2.464a5 5 0 010-7.072M18.364 5.636a9 9 0 010 12.728M5.636 18.364a9 9 0 010-12.728"/></svg>
+            Sonido de Notificación
+          </h3>
+          <p class="text-xs text-gray-500">Elige el sonido que se reproducirá cuando recibas una nueva notificación.</p>
+
+          <div class="flex items-center justify-between">
+            <label class="text-sm font-medium text-gray-700">Activar sonidos</label>
+            <button id="sound-toggle" onclick="toggleSoundEnabled()" class="relative w-11 h-6 rounded-full transition-colors bg-gray-300">
+              <span id="sound-toggle-dot" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"></span>
+            </button>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Sonido</label>
+            <div id="sound-list" class="space-y-1.5 max-h-64 overflow-y-auto"></div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Volumen: <span id="volume-label">70</span>%</label>
+            <input type="range" id="sound-volume" min="0" max="100" value="70" class="w-full accent-creo-mint" oninput="updateVolume(this.value)">
+          </div>
+        </div>
+      </div>
+
       <div id="panel-creoellos" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
           <h3 class="font-bold text-gray-900 flex items-center gap-2">
@@ -765,7 +794,7 @@
       if (!e.target.closest('#tab-herramientas') && !e.target.closest('#herramientas-menu')) closeHerramientas();
     });
 
-    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding'];
+    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'sounds'];
 
     function showTab(tab) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
@@ -784,7 +813,58 @@
       if (tab === 'business') loadMyBusinessLinks();
       if (tab === 'branding') loadBrandingPanel();
       if (tab === 'creoellos') loadCreoEllosPanel();
+      if (tab === 'sounds') renderSoundSettings();
 
+    }
+
+    // ===== SOUND SETTINGS =====
+    function renderSoundSettings() {
+      const prefs = getNotifSoundPrefs();
+      const toggle = document.getElementById('sound-toggle');
+      const dot = document.getElementById('sound-toggle-dot');
+      if (prefs.enabled) {
+        toggle.classList.remove('bg-gray-300'); toggle.classList.add('bg-creo-mint');
+        dot.style.transform = 'translateX(20px)';
+      } else {
+        toggle.classList.remove('bg-creo-mint'); toggle.classList.add('bg-gray-300');
+        dot.style.transform = 'translateX(0)';
+      }
+      document.getElementById('sound-volume').value = Math.round(prefs.volume * 100);
+      document.getElementById('volume-label').textContent = Math.round(prefs.volume * 100);
+
+      const list = document.getElementById('sound-list');
+      list.innerHTML = CREO_SOUNDS.map(s => `
+        <label class="flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition ${s.id === prefs.soundId ? 'bg-creo-purple/10 ring-1 ring-creo-purple' : 'hover:bg-gray-50'}">
+          <input type="radio" name="notif-sound" value="${s.id}" ${s.id === prefs.soundId ? 'checked' : ''} onchange="selectSound('${s.id}')" class="accent-creo-purple">
+          <span class="flex-1 text-sm text-gray-700 font-medium">${s.name}</span>
+          <button onclick="event.preventDefault();previewNotificationSound('${s.id}')" class="p-1.5 rounded-full hover:bg-gray-200 transition" title="Previsualizar">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </button>
+        </label>
+      `).join('');
+    }
+
+    function toggleSoundEnabled() {
+      const prefs = getNotifSoundPrefs();
+      prefs.enabled = !prefs.enabled;
+      saveNotifSoundPrefs(prefs);
+      renderSoundSettings();
+      showToast(prefs.enabled ? 'Sonidos activados' : 'Sonidos desactivados', 'success');
+    }
+
+    function selectSound(soundId) {
+      const prefs = getNotifSoundPrefs();
+      prefs.soundId = soundId;
+      saveNotifSoundPrefs(prefs);
+      renderSoundSettings();
+      previewNotificationSound(soundId);
+    }
+
+    function updateVolume(val) {
+      const prefs = getNotifSoundPrefs();
+      prefs.volume = parseInt(val) / 100;
+      saveNotifSoundPrefs(prefs);
+      document.getElementById('volume-label').textContent = val;
     }
 
     // ===== BRANDING PANEL =====

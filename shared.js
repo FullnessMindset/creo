@@ -679,6 +679,70 @@ function acceptCookies() {
   document.head.appendChild(style);
 })();
 
+// Notification Sound System
+const CREO_SOUNDS = [
+  { id: 'creo-default', name: 'CREO Original' },
+  { id: 'delta-1', name: 'Delta 1' },
+  { id: 'delta-2', name: 'Delta 2' },
+  { id: 'delta-3', name: 'Delta 3' },
+  { id: 'delta-4', name: 'Delta 4' },
+  { id: 'delta-5', name: 'Delta 5' },
+  { id: 'delta-6', name: 'Delta 6' },
+  { id: 'delta-7', name: 'Delta 7' },
+  { id: 'delta-8', name: 'Delta 8' }
+];
+
+function getNotifSoundPrefs() {
+  try {
+    const saved = localStorage.getItem('creo_sound_prefs');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return { soundId: 'creo-default', volume: 0.7, enabled: true };
+}
+
+function saveNotifSoundPrefs(prefs) {
+  localStorage.setItem('creo_sound_prefs', JSON.stringify(prefs));
+}
+
+function playNotificationSound() {
+  const prefs = getNotifSoundPrefs();
+  if (!prefs.enabled) return;
+  try {
+    const audio = new Audio(`assets/sounds/${prefs.soundId}.mp3`);
+    audio.volume = prefs.volume;
+    audio.play().catch(() => {});
+  } catch(e) {}
+}
+
+function previewNotificationSound(soundId) {
+  const prefs = getNotifSoundPrefs();
+  try {
+    const audio = new Audio(`assets/sounds/${soundId || prefs.soundId}.mp3`);
+    audio.volume = prefs.volume;
+    audio.play().catch(() => {});
+  } catch(e) {}
+}
+
+let _lastNotifCount = -1;
+async function pollNotifications() {
+  try {
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
+    const { count } = await sb.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false);
+    if (_lastNotifCount >= 0 && count > _lastNotifCount) {
+      playNotificationSound();
+    }
+    _lastNotifCount = count;
+  } catch(e) {}
+}
+
+(function startNotifPolling() {
+  setTimeout(() => {
+    pollNotifications();
+    setInterval(pollNotifications, 30000);
+  }, 3000);
+})();
+
 // Backward compatibility — old pages still calling renderBottomNav
 function renderBottomNav(activePage) { renderSidebar(activePage); }
 function updateNavAuth() { updateSidebarAuth(); }
