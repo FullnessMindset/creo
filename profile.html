@@ -1044,7 +1044,7 @@
         metaLikesSet.add(activeMetaId);
         document.getElementById('meta-like-icon').setAttribute('fill', '#ef4444');
         document.getElementById('meta-like-icon').setAttribute('stroke', '#ef4444');
-        if (creatorProfile) createNotification(creatorProfile.id, 'meta_like', 'A alguien le gustó tu meta', metasCache[activeMetaId]?.title);
+        if (creatorProfile) createNotification(creatorProfile.id, 'meta_like', 'A alguien le gustó tu meta', metasCache[activeMetaId]?.title, 'profile.html?u=' + creatorProfile.username);
       } else {
         metaLikesSet.delete(activeMetaId);
         document.getElementById('meta-like-icon').setAttribute('fill', 'none');
@@ -1063,7 +1063,7 @@
       if (error) { showToast('Error', 'error'); return; }
       if (data.liked) {
         metaLikesSet.add(metaId);
-        if (creatorProfile) createNotification(creatorProfile.id, 'meta_like', 'A alguien le gustó tu meta', metasCache[metaId]?.title);
+        if (creatorProfile) createNotification(creatorProfile.id, 'meta_like', 'A alguien le gustó tu meta', metasCache[metaId]?.title, 'profile.html?u=' + creatorProfile.username);
       } else {
         metaLikesSet.delete(metaId);
       }
@@ -1124,7 +1124,7 @@
         navigator.clipboard.writeText(url);
         showToast('Enlace copiado', 'success');
       }
-      createNotification(creatorProfile.id, 'share', 'Alguien compartió tu meta', metasCache[activeMetaId]?.title);
+      createNotification(creatorProfile.id, 'share', 'Alguien compartió tu meta', metasCache[activeMetaId]?.title, 'profile.html?u=' + creatorProfile.username);
     }
 
     function shareMetaById(metaId) {
@@ -1136,7 +1136,7 @@
         navigator.clipboard.writeText(url);
         showToast('Enlace copiado', 'success');
       }
-      createNotification(creatorProfile.id, 'share', 'Alguien compartió tu meta', metasCache[metaId]?.title);
+      createNotification(creatorProfile.id, 'share', 'Alguien compartió tu meta', metasCache[metaId]?.title, 'profile.html?u=' + creatorProfile.username);
     }
 
     function timeAgo(dateStr) {

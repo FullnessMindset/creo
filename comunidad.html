@@ -461,7 +461,7 @@
         const sMedia = (sp.media_urls || []).length > 0 ? `<img src="${esc(sp.media_urls[0])}" class="w-full max-h-48 object-cover rounded-lg mt-2">` : '';
         sharedHtml = `<div class="border border-gray-200 rounded-xl p-3 bg-gray-50/50 mt-2"><div class="flex items-center gap-2 mb-2"><a href="profile.html?u=${esc(sa.username || '')}" class="w-6 h-6 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden">${sAvatar}</a><a href="profile.html?u=${esc(sa.username || '')}" class="text-xs font-semibold text-gray-900 hover:text-creo-purple">${esc(sName)}</a><span class="text-[10px] text-gray-400">${timeAgo(sp.created_at)}</span></div>${sp.title ? `<p class="text-sm font-bold text-gray-900 mb-1">${esc(sp.title)}</p>` : ''}${sp.body ? `<p class="text-sm text-gray-700">${linkify(esc(sp.body))}</p>` : ''}${sMedia}</div>`;
       }
-      return `<div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition" id="post-${post.id}"><div class="p-4 space-y-3">
+      return `<div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition" id="post-${post.id}" data-author-id="${post.author_id}"><div class="p-4 space-y-3">
         <div class="flex items-center justify-between"><div class="flex items-center gap-3"><a href="profile.html?u=${esc(a.username || '')}" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-creo-mint transition">${avatar}</a><div><div class="flex items-center gap-1"><a href="profile.html?u=${esc(a.username || '')}" class="font-bold text-sm text-gray-900 hover:text-creo-purple transition">${esc(name)}</a>${verified}</div><p class="text-[10px] text-gray-400">${timeAgo(post.created_at)}</p></div></div>
         ${isOwner ? `<div class="flex items-center gap-1"><button onclick="editCommunityPost('${post.id}')" class="text-gray-300 hover:text-blue-400 transition p-1" title="Editar"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="deletePost('${post.id}')" class="text-gray-300 hover:text-red-400 transition p-1" title="Eliminar"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div>` : ''}</div>
         ${post.post_type === 'evento' ? `<div class="flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-xl px-3 py-2"><span class="text-lg">📅</span><div class="flex-1"><p class="text-xs font-bold text-purple-700">Evento</p>${post.event_date ? `<p class="text-[10px] text-purple-600">${post.event_date}${post.event_time ? ' · ' + post.event_time : ''}</p>` : ''}</div>${post.event_link ? `<a href="${esc(post.event_link)}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-creo-purple hover:underline">Unirse</a>` : ''}</div>` : ''}
@@ -547,7 +547,12 @@
       if (!currentUser) { showToast('Inicia sesión para dar like', 'info'); return; }
       const countEl = btn.querySelector('.like-count'); const isLiked = btn.classList.contains('text-red-500');
       if (isLiked) { btn.classList.remove('text-red-500'); btn.classList.add('text-gray-500'); btn.querySelector('svg').setAttribute('fill', 'none'); countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1); await sb.from('community_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id); }
-      else { btn.classList.add('text-red-500'); btn.classList.remove('text-gray-500'); btn.querySelector('svg').setAttribute('fill', 'currentColor'); countEl.textContent = parseInt(countEl.textContent) + 1; await sb.from('community_likes').insert({ post_id: postId, user_id: currentUser.id }); }
+      else {
+        btn.classList.add('text-red-500'); btn.classList.remove('text-gray-500'); btn.querySelector('svg').setAttribute('fill', 'currentColor'); countEl.textContent = parseInt(countEl.textContent) + 1;
+        await sb.from('community_likes').insert({ post_id: postId, user_id: currentUser.id });
+        const authorId = document.getElementById('post-' + postId)?.dataset?.authorId;
+        if (authorId) createNotification(authorId, 'like', 'A alguien le gustó tu publicación', null, 'comunidad.html');
+      }
     }
 
     async function openComments(postId) { activeCommentPostId = postId; document.getElementById('comments-modal').classList.remove('hidden'); createEmojiPicker('comment-input', 'comment-emoji-btn'); loadComments(postId); }
@@ -560,14 +565,30 @@
         return `<div class="flex gap-2"><a href="profile.html?u=${esc(ca?.username || '')}" class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0">${cAvatar}</a><div class="flex-1 bg-gray-100 rounded-2xl rounded-tl-sm px-3 py-2"><div class="flex items-center justify-between"><a href="profile.html?u=${esc(ca?.username || '')}" class="text-xs font-bold text-gray-900 hover:text-creo-purple">${esc(cName)}</a><div class="flex items-center gap-2"><span class="text-[10px] text-gray-400">${timeAgo(c.created_at)}</span>${isOwner ? `<button onclick="editComment('${c.id}', this)" class="text-gray-300 hover:text-blue-400 text-[10px]">✎</button><button onclick="deleteComment('${c.id}')" class="text-gray-300 hover:text-red-400 text-[10px]">✕</button>` : ''}</div></div><p class="text-sm text-gray-700 mt-0.5">${linkify(esc(c.body))}</p></div></div>`; }).join('');
       list.scrollTop = list.scrollHeight;
     }
-    async function submitComment() { if (!currentUser || !activeCommentPostId) { showToast('Inicia sesión', 'info'); return; } const input = document.getElementById('comment-input'); const body = input.value.trim(); if (!body) return; input.value = ''; const { error } = await sb.from('community_comments').insert({ post_id: activeCommentPostId, author_id: currentUser.id, body }); if (error) { showToast('Error', 'error'); return; } loadComments(activeCommentPostId); }
+    async function submitComment() {
+      if (!currentUser || !activeCommentPostId) { showToast('Inicia sesión', 'info'); return; }
+      const input = document.getElementById('comment-input'); const body = input.value.trim(); if (!body) return; input.value = '';
+      const { error } = await sb.from('community_comments').insert({ post_id: activeCommentPostId, author_id: currentUser.id, body });
+      if (error) { showToast('Error', 'error'); return; }
+      const authorId = document.getElementById('post-' + activeCommentPostId)?.dataset?.authorId;
+      if (authorId) createNotification(authorId, 'comment', 'Nuevo comentario en tu publicación', body.slice(0, 80), 'comunidad.html');
+      loadComments(activeCommentPostId);
+    }
     async function deleteComment(id) { if (!confirm('¿Eliminar comentario?')) return; await sb.from('community_comments').delete().eq('id', id); if (activeCommentPostId) loadComments(activeCommentPostId); }
     function editComment(id, btnEl) { const commentDiv = btnEl.closest('.flex.gap-2'); const bodyP = commentDiv.querySelector('p'); const oldText = bodyP.textContent; bodyP.innerHTML = `<textarea id="edit-comment-${id}" class="w-full border border-gray-300 bg-white p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" rows="2">${esc(oldText)}</textarea><div class="flex gap-2 mt-1"><button onclick="saveCommentEdit('${id}')" class="text-xs px-3 py-1 bg-creo-purple text-white rounded-lg">Guardar</button><button onclick="loadComments(activeCommentPostId)" class="text-xs px-3 py-1 bg-gray-200 text-gray-600 rounded-lg">Cancelar</button></div>`; }
     async function saveCommentEdit(id) { const textarea = document.getElementById('edit-comment-' + id); const body = textarea.value.trim(); if (!body) return showToast('El comentario no puede estar vacío', 'error'); const { error } = await sb.from('community_comments').update({ body }).eq('id', id); if (error) return showToast('Error: ' + error.message, 'error'); showToast('Comentario actualizado', 'success'); loadComments(activeCommentPostId); }
 
     async function openShareModal(postId) { if (!currentUser) { showToast('Inicia sesión', 'info'); return; } sharePostId = postId; const postEl = document.getElementById('post-' + postId); const preview = document.getElementById('share-preview'); const titleEl = postEl?.querySelector('h3'); const bodyEl = postEl?.querySelector('.whitespace-pre-line'); preview.innerHTML = `<p class="text-xs text-gray-500"><span class="font-semibold">${titleEl ? esc(titleEl.textContent) : 'Publicación compartida'}</span></p>${bodyEl ? `<p class="text-xs text-gray-400 truncate mt-1">${esc(bodyEl.textContent.slice(0, 80))}</p>` : ''}`; document.getElementById('share-body').value = ''; document.getElementById('share-modal').classList.remove('hidden'); }
     function closeShareModal() { document.getElementById('share-modal').classList.add('hidden'); sharePostId = null; }
-    async function submitShare() { if (!currentUser || !sharePostId) return; const body = document.getElementById('share-body').value.trim(); const { error } = await sb.from('community_posts').insert({ author_id: currentUser.id, post_type: 'share_post', body: body || null, shared_post_id: sharePostId }); if (error) { showToast('Error al compartir', 'error'); return; } closeShareModal(); showToast('¡Compartido!', 'success'); document.getElementById('community-feed').innerHTML = ''; feedPage = 0; feedDone = false; loadFeed(); }
+    async function submitShare() {
+      if (!currentUser || !sharePostId) return;
+      const body = document.getElementById('share-body').value.trim();
+      const authorId = document.getElementById('post-' + sharePostId)?.dataset?.authorId;
+      const { error } = await sb.from('community_posts').insert({ author_id: currentUser.id, post_type: 'share_post', body: body || null, shared_post_id: sharePostId });
+      if (error) { showToast('Error al compartir', 'error'); return; }
+      if (authorId) createNotification(authorId, 'share', 'Alguien compartió tu publicación', null, 'comunidad.html');
+      closeShareModal(); showToast('¡Compartido!', 'success'); document.getElementById('community-feed').innerHTML = ''; feedPage = 0; feedDone = false; loadFeed();
+    }
     async function deletePost(id) { if (!confirm('¿Eliminar esta publicación?')) return; await sb.from('community_posts').delete().eq('id', id); const el = document.getElementById('post-' + id); if (el) el.remove(); showToast('Publicación eliminada', 'success'); }
 
     async function editCommunityPost(id) {

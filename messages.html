@@ -191,10 +191,20 @@
         else if (m.media_type === 'audio') content = `<audio controls src="${esc(m.media_url)}" class="max-w-48 h-8"></audio>`;
         else if (m.media_type === 'image') content = `<img src="${esc(m.media_url)}" class="max-w-48 rounded-lg" alt="">`;
         if (m.body) content += `<p class="text-sm">${esc(m.body)}</p>`;
-        return `<div class="flex ${isMine ? 'justify-end' : 'justify-start'}">
-          <div class="max-w-[75%] px-3 py-2 rounded-2xl ${isMine ? 'bg-creo-purple text-white rounded-br-sm' : 'bg-gray-100 text-gray-900 rounded-bl-sm'} space-y-1">
-            ${content}
-            <p class="text-[10px] ${isMine ? 'text-white/50' : 'text-gray-400'} text-right">${timeAgo(m.created_at)}</p>
+        const reactions = m.reactions || {};
+        const reactionHtml = Object.keys(reactions).length > 0
+          ? `<div class="flex flex-wrap gap-1 ${isMine ? 'justify-end' : 'justify-start'} -mb-1">${Object.entries(reactions).map(([emoji, users]) => {
+              const myReaction = users.includes(currentUser.id);
+              return `<button onclick="toggleReaction('${m.id}','${emoji}')" class="text-xs px-1.5 py-0.5 rounded-full border transition ${myReaction ? 'bg-creo-purple/20 border-creo-purple' : 'bg-gray-50 border-gray-200 hover:border-creo-mint'}">${emoji} ${users.length > 1 ? users.length : ''}</button>`;
+            }).join('')}</div>` : '';
+        return `<div class="flex ${isMine ? 'justify-end' : 'justify-start'} group relative" id="msg-${m.id}">
+          <div class="max-w-[75%] relative">
+            <div class="px-3 py-2 rounded-2xl ${isMine ? 'bg-creo-purple text-white rounded-br-sm' : 'bg-gray-100 text-gray-900 rounded-bl-sm'} space-y-1" ondblclick="showReactionPicker('${m.id}', ${isMine})">
+              ${content}
+              <p class="text-[10px] ${isMine ? 'text-white/50' : 'text-gray-400'} text-right">${timeAgo(m.created_at)}</p>
+            </div>
+            ${reactionHtml}
+            <button onclick="showReactionPicker('${m.id}', ${isMine})" class="absolute ${isMine ? '-left-8' : '-right-8'} top-1 opacity-0 group-hover:opacity-100 transition text-gray-300 hover:text-gray-500 text-lg" title="Reaccionar">😊</button>
           </div>
         </div>`;
       }).join('');
@@ -291,6 +301,47 @@
       const days = Math.floor(hrs / 24);
       if (days < 30) return days + 'd';
       return Math.floor(days / 30) + 'mes';
+    }
+
+    // Message Reactions
+    const QUICK_REACTIONS = ['❤️','😂','😮','😢','😡','👍','🔥','🙏','💯','✨'];
+
+    function showReactionPicker(msgId, isMine) {
+      const existing = document.getElementById('reaction-picker');
+      if (existing) existing.remove();
+      const msgEl = document.getElementById('msg-' + msgId);
+      if (!msgEl) return;
+      const picker = document.createElement('div');
+      picker.id = 'reaction-picker';
+      picker.className = 'absolute z-50 bg-white rounded-full shadow-xl border border-gray-200 px-2 py-1.5 flex gap-0.5';
+      picker.style.cssText = isMine ? 'right:0;' : 'left:0;';
+      picker.style.bottom = '100%';
+      picker.style.marginBottom = '4px';
+      picker.innerHTML = QUICK_REACTIONS.map(e => `<button onclick="toggleReaction('${msgId}','${e}')" class="w-8 h-8 text-lg hover:scale-125 hover:bg-gray-100 rounded-full transition flex items-center justify-center">${e}</button>`).join('');
+      const bubble = msgEl.querySelector('.max-w-\\[75\\%\\]');
+      if (bubble) { bubble.style.position = 'relative'; bubble.appendChild(picker); }
+      setTimeout(() => document.addEventListener('click', closeReactionPicker), 10);
+    }
+
+    function closeReactionPicker(e) {
+      const picker = document.getElementById('reaction-picker');
+      if (picker && !picker.contains(e?.target)) { picker.remove(); document.removeEventListener('click', closeReactionPicker); }
+    }
+
+    async function toggleReaction(msgId, emoji) {
+      const existing = document.getElementById('reaction-picker');
+      if (existing) existing.remove();
+      const { data: msg } = await sb.from('messages').select('reactions, sender_id, receiver_id').eq('id', msgId).single();
+      if (!msg) return;
+      const reactions = msg.reactions || {};
+      if (!reactions[emoji]) reactions[emoji] = [];
+      const idx = reactions[emoji].indexOf(currentUser.id);
+      if (idx >= 0) { reactions[emoji].splice(idx, 1); if (reactions[emoji].length === 0) delete reactions[emoji]; }
+      else { reactions[emoji].push(currentUser.id); }
+      await sb.from('messages').update({ reactions }).eq('id', msgId);
+      const otherUserId = msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id;
+      if (idx < 0) createNotification(otherUserId, 'message', `Reacción ${emoji} a tu mensaje`, null, 'messages.html');
+      loadChatMessages();
     }
 
     document.getElementById('chat-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
