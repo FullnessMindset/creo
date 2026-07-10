@@ -675,6 +675,36 @@ function acceptCookies() {
     .dark .hover\\:bg-gray-200:hover { background-color: #4b5563 !important; }
     .dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: #374151 !important; }
     body.bg-gray-900 { background-color: #111827 !important; }
+
+    /* Real-time notification bubble */
+    .creo-notif-bubble {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 9999;
+      max-width: 320px;
+      min-width: 220px;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, #1a0a3e 0%, #6b21a8 100%);
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(26,10,62,0.5), 0 0 0 1px rgba(51,240,176,0.3);
+      opacity: 0;
+      transform: translateX(120%);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+    @media(min-width:1024px) {
+      .creo-notif-bubble { right: 24px; top: 20px; }
+    }
+    @keyframes creo-bell-ring {
+      0%,100% { transform: rotate(0); }
+      15% { transform: rotate(14deg); }
+      30% { transform: rotate(-12deg); }
+      45% { transform: rotate(10deg); }
+      60% { transform: rotate(-8deg); }
+      75% { transform: rotate(4deg); }
+    }
+    .creo-bell-ring svg { animation: creo-bell-ring 0.6s ease-in-out; }
   `;
   document.head.appendChild(style);
 })();
@@ -715,24 +745,72 @@ function previewNotificationSound(soundId) {
   } catch(e) {}
 }
 
-let _lastNotifCount = -1;
-async function pollNotifications() {
-  try {
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) return;
-    const { count } = await sb.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false);
-    if (_lastNotifCount >= 0 && count > _lastNotifCount) {
-      playNotificationSound();
-    }
-    _lastNotifCount = count;
-  } catch(e) {}
+// Real-time notification system via Supabase Realtime
+const NOTIF_ICONS = { like: '❤️', comment: '💬', payment: '💰', approval: '✅', rejection: '❌', invite: '🤝', share: '🔗', meta_like: '❤️', meta_comment: '💬' };
+
+function showNotifBubble(notif) {
+  const icon = NOTIF_ICONS[notif.type] || '🔔';
+  const bubble = document.createElement('div');
+  bubble.className = 'creo-notif-bubble';
+  bubble.innerHTML = `
+    <div class="flex items-center gap-2.5">
+      <span class="text-lg flex-shrink-0">${icon}</span>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold text-white truncate">${esc(notif.title || 'Nueva notificación')}</p>
+        ${notif.body ? `<p class="text-xs text-white/70 truncate">${esc(notif.body)}</p>` : ''}
+      </div>
+    </div>`;
+  document.body.appendChild(bubble);
+  requestAnimationFrame(() => {
+    bubble.style.opacity = '1';
+    bubble.style.transform = 'translateX(0)';
+  });
+  setTimeout(() => flyToBell(bubble), 2500);
 }
 
-(function startNotifPolling() {
+function flyToBell(bubble) {
+  const bell = document.getElementById('notif-bell');
+  if (!bell) { bubble.remove(); return; }
+  const bellRect = bell.getBoundingClientRect();
+  const bubbleRect = bubble.getBoundingClientRect();
+  const dx = bellRect.left + bellRect.width / 2 - (bubbleRect.left + bubbleRect.width / 2);
+  const dy = bellRect.top + bellRect.height / 2 - (bubbleRect.top + bubbleRect.height / 2);
+  bubble.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+  bubble.style.transform = `translate(${dx}px, ${dy}px) scale(0.1)`;
+  bubble.style.opacity = '0';
+  bubble.style.borderRadius = '50%';
   setTimeout(() => {
-    pollNotifications();
-    setInterval(pollNotifications, 30000);
-  }, 3000);
+    bubble.remove();
+    if (bell) {
+      bell.classList.add('creo-bell-ring');
+      setTimeout(() => bell.classList.remove('creo-bell-ring'), 600);
+    }
+    loadNotificationBell();
+  }, 500);
+}
+
+let _realtimeNotifChannel = null;
+async function initRealtimeNotifications() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+  if (_realtimeNotifChannel) sb.removeChannel(_realtimeNotifChannel);
+  _realtimeNotifChannel = sb.channel('notif-' + user.id)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + user.id }, (payload) => {
+      const notif = payload.new;
+      playNotificationSound();
+      showNotifBubble(notif);
+    })
+    .subscribe();
+}
+
+(function startRealtimeNotifs() {
+  setTimeout(async () => {
+    try { await initRealtimeNotifications(); } catch(e) {}
+  }, 2000);
+  sb.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_IN') setTimeout(() => initRealtimeNotifications(), 1000);
+    if (event === 'SIGNED_OUT' && _realtimeNotifChannel) { sb.removeChannel(_realtimeNotifChannel); _realtimeNotifChannel = null; }
+  });
 })();
 
 // Backward compatibility — old pages still calling renderBottomNav
