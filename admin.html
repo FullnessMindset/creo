@@ -191,8 +191,7 @@
             <table class="w-full text-sm">
               <thead>
                 <tr class="text-gray-500 text-xs uppercase tracking-wider border-b border-gray-200">
-                  <th class="text-left px-5 py-3">Username</th>
-                  <th class="text-left px-5 py-3">Name</th>
+                  <th class="text-left px-5 py-3">Creator</th>
                   <th class="text-left px-5 py-3">Status</th>
                   <th class="text-left px-5 py-3">Stripe</th>
                   <th class="text-left px-5 py-3">Identity</th>
@@ -890,26 +889,34 @@
       const tbody = document.getElementById('creators-tbody');
       if (!profiles.length) { tbody.innerHTML = ''; document.getElementById('no-creators').classList.remove('hidden'); return; }
       document.getElementById('no-creators').classList.add('hidden');
-      tbody.innerHTML = profiles.map(p => `
-        <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
-          <td class="px-5 py-3 font-medium text-gray-900">
-            <a href="${PROFILE_BASE}${esc(p.username)}" target="_blank" class="hover:text-creo-purple">${esc(p.username)}</a>
+      tbody.innerHTML = profiles.map(p => {
+        const avatar = p.avatar_url
+          ? `<img src="${esc(p.avatar_url)}" class="w-8 h-8 rounded-full object-cover border border-gray-200">`
+          : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center border border-gray-200"><span class="text-xs font-bold text-creo-purple">${esc((p.username || '?')[0].toUpperCase())}</span></div>`;
+        return `<tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+          <td class="px-5 py-3">
+            <a href="${PROFILE_BASE}${esc(p.username)}" target="_blank" class="flex items-center gap-2.5 hover:text-creo-purple">
+              ${avatar}
+              <div>
+                <p class="font-medium text-gray-900 text-sm">${esc(p.username)}</p>
+                <p class="text-xs text-gray-400">${esc(p.display_name || p.full_name || '')}</p>
+              </div>
+            </a>
           </td>
-          <td class="px-5 py-3 text-gray-500">${esc(p.display_name || p.full_name || '-')}</td>
           <td class="px-5 py-3">${statusBadge(p.verification_status)}</td>
           <td class="px-5 py-3">${p.stripe_connect_id ? badge(true) : badge(false)}</td>
           <td class="px-5 py-3">${p.identity_verified ? badge(true) : badge(false)}</td>
-          <td class="px-5 py-3 text-gray-500">${new Date(p.created_at).toLocaleDateString()}</td>
-          <td class="px-5 py-3 space-x-2">
+          <td class="px-5 py-3 text-gray-500 text-xs">${new Date(p.created_at).toLocaleDateString()}</td>
+          <td class="px-5 py-3 space-x-1">
             <button onclick="openReview('${p.id}')" class="text-xs text-creo-purple hover:underline">Review</button>
             <button onclick="editCreator('${p.id}')" class="text-xs text-blue-600 hover:underline">Edit</button>
             <button onclick="deleteCreator('${p.id}', '${esc(p.username)}')" class="text-xs text-red-500 hover:underline">Delete</button>
           </td>
           <td class="px-5 py-3">
-            ${p.email ? `<button onclick="openEmailModal('${esc(p.email)}', '${esc(p.display_name || p.username)}')" class="text-xs bg-creo-purple/10 text-creo-purple px-2.5 py-1 rounded-lg hover:bg-creo-purple/20 transition font-medium">📧 Email</button>` : '<span class="text-xs text-gray-300">No email</span>'}
+            ${p.email ? `<div class="flex items-center gap-2"><span class="text-xs text-gray-500 truncate max-w-[160px]">${esc(p.email)}</span><button onclick="openEmailModal('${esc(p.email)}', '${esc(p.display_name || p.username)}')" class="text-xs bg-creo-purple/10 text-creo-purple px-2 py-0.5 rounded hover:bg-creo-purple/20 transition font-medium flex-shrink-0">Send</button></div>` : '<span class="text-xs text-gray-300">—</span>'}
           </td>
-        </tr>
-      `).join('');
+        </tr>`;
+      }).join('');
     }
 
     function renderTransactions(charges) {

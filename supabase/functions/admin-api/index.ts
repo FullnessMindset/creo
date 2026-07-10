@@ -73,19 +73,35 @@ serve(async (req) => {
 
     // ===== DASHBOARD =====
     if (action === "dashboard") {
-      const [profilesRes, balanceRes, chargesRes] = await Promise.all([
-        sbAdmin
-          .from("profiles")
-          .select("*")
-          .order("created_at", { ascending: false }),
-        stripe.balance.retrieve().catch(() => null),
-        stripe.charges.list({ limit: 20 }).catch(() => ({ data: [] })),
-      ]);
+      const [profilesRes, authUsersRes, balanceRes, chargesRes] =
+        await Promise.all([
+          sbAdmin
+            .from("profiles")
+            .select("*")
+            .order("created_at", { ascending: false }),
+          sbAdmin.auth.admin.listUsers({ page: 1, perPage: 500 }),
+          stripe.balance.retrieve().catch(() => null),
+          stripe.charges.list({ limit: 20 }).catch(() => ({ data: [] })),
+        ]);
 
       const profiles = profilesRes.data || [];
+      const authUsers = authUsersRes.data?.users || [];
+
+      const emailMap = new Map(
+        authUsers.map((u) => [u.id, u.email])
+      );
+      profiles.forEach((p: Record<string, unknown>) => {
+        if (!p.email) p.email = emailMap.get(p.id as string) || null;
+      });
+
       const totalRevenue =
-        (chargesRes as { data: Array<{ application_fee_amount?: number }> }).data?.reduce(
-          (sum: number, c) => sum + ((c.application_fee_amount || 0) / 100),
+        (
+          chargesRes as {
+            data: Array<{ application_fee_amount?: number }>;
+          }
+        ).data?.reduce(
+          (sum: number, c) =>
+            sum + ((c.application_fee_amount || 0) / 100),
           0
         ) || 0;
       const platformBalance =
@@ -101,10 +117,13 @@ serve(async (req) => {
         },
         profiles,
         recentCharges:
-          (chargesRes as { data: Array<Record<string, unknown>> }).data?.map((c) => ({
+          (
+            chargesRes as { data: Array<Record<string, unknown>> }
+          ).data?.map((c) => ({
             id: (c as Record<string, unknown>).id,
             amount: (c as Record<string, unknown>).amount,
-            application_fee_amount: (c as Record<string, unknown>).application_fee_amount,
+            application_fee_amount: (c as Record<string, unknown>)
+              .application_fee_amount,
             status: (c as Record<string, unknown>).status,
             created: (c as Record<string, unknown>).created,
           })) || [],
