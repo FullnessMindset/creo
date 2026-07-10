@@ -363,7 +363,7 @@
         const { data: p } = await sb.from('profiles').select('*').eq('id', user.id).single();
         currentProfile = p;
         document.getElementById('my-convos-btn').classList.remove('hidden');
-        if (isPlatformCreator(user.email) || p?.account_type === 'empresa' || p?.account_type === 'business') {
+        if (p?.identity_verified || isPlatformCreator(user.email) || p?.account_type === 'empresa' || p?.account_type === 'business') {
           document.getElementById('post-deal-bar').classList.remove('hidden');
         }
       }
