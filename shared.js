@@ -789,7 +789,11 @@ function flyToBell(bubble) {
   }, 500);
 }
 
+// Real-time via Supabase Realtime + polling fallback
 let _realtimeNotifChannel = null;
+let _lastNotifCount = -1;
+let _notifPollTimer = null;
+
 async function initRealtimeNotifications() {
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return;
@@ -799,17 +803,60 @@ async function initRealtimeNotifications() {
       const notif = payload.new;
       playNotificationSound();
       showNotifBubble(notif);
+      loadNotificationBell();
     })
-    .subscribe();
+    .subscribe((status) => {
+      console.log('[CREO] Realtime notif status:', status);
+      if (status === 'SUBSCRIBED') {
+        if (_notifPollTimer) { clearInterval(_notifPollTimer); _notifPollTimer = null; }
+      }
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        startNotifPolling();
+      }
+    });
 }
 
-(function startRealtimeNotifs() {
+async function pollNotifications() {
+  try {
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
+    const { data, count } = await sb.from('notifications').select('*', { count: 'exact' }).eq('user_id', user.id).eq('is_read', false).order('created_at', { ascending: false }).limit(1);
+    if (_lastNotifCount >= 0 && count > _lastNotifCount && data && data[0]) {
+      playNotificationSound();
+      showNotifBubble(data[0]);
+      loadNotificationBell();
+    }
+    _lastNotifCount = count || 0;
+  } catch(e) {}
+}
+
+function startNotifPolling() {
+  if (_notifPollTimer) return;
+  _notifPollTimer = setInterval(pollNotifications, 15000);
+  pollNotifications();
+}
+
+(function startNotifSystem() {
   setTimeout(async () => {
-    try { await initRealtimeNotifications(); } catch(e) {}
+    try {
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return;
+      _lastNotifCount = -1;
+      const { count } = await sb.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false);
+      _lastNotifCount = count || 0;
+      await initRealtimeNotifications();
+      startNotifPolling();
+    } catch(e) { console.log('[CREO] Notif init error:', e); startNotifPolling(); }
   }, 2000);
   sb.auth.onAuthStateChange((event) => {
-    if (event === 'SIGNED_IN') setTimeout(() => initRealtimeNotifications(), 1000);
-    if (event === 'SIGNED_OUT' && _realtimeNotifChannel) { sb.removeChannel(_realtimeNotifChannel); _realtimeNotifChannel = null; }
+    if (event === 'SIGNED_IN') {
+      _lastNotifCount = -1;
+      setTimeout(() => { initRealtimeNotifications(); startNotifPolling(); }, 1000);
+    }
+    if (event === 'SIGNED_OUT') {
+      if (_realtimeNotifChannel) { sb.removeChannel(_realtimeNotifChannel); _realtimeNotifChannel = null; }
+      if (_notifPollTimer) { clearInterval(_notifPollTimer); _notifPollTimer = null; }
+    }
   });
 })();
 
