@@ -20,8 +20,10 @@ async function ensureProfileExists(user) {
   const { data: existing } = await sb.from('profiles')
     .select('id').eq('id', user.id).single();
   if (!existing) {
+    const username = 'user_' + Math.floor(Math.random() * 100000);
     await sb.from('profiles').insert([{
       id: user.id,
+      username,
       display_name: user.user_metadata?.full_name || user.user_metadata?.name || null,
       avatar_url: user.user_metadata?.avatar_url || null,
       created_at: new Date().toISOString()
@@ -89,7 +91,7 @@ function showCreoIdModal() {
           <img src="assets/logo-icon.png" class="w-10 h-10 rounded-full" alt="CREO">
         </div>
         <h3 class="text-xl font-bold text-gray-900">Verifica tu Creo ID</h3>
-        <p class="text-sm text-gray-500">Para interactuar en CREO necesitas verificar tu identidad</p>
+        <p class="text-sm text-gray-500">Para publicar deals y recibir pagos necesitas verificar tu identidad</p>
       </div>
 
       <div class="space-y-3">
@@ -164,7 +166,8 @@ async function startCreoIdVerification() {
 
 // ========== THEME ==========
 function initTheme() {
-  applyTheme('light');
+  const saved = localStorage.getItem('creo-theme') || 'light';
+  applyTheme(saved);
 }
 function isDark() { return document.documentElement.classList.contains('dark'); }
 function applyTheme(t) {
@@ -315,9 +318,12 @@ function renderSidebar(activePage) {
   sidebar.id = 'creo-sidebar';
   sidebar.className = 'fixed left-0 top-0 bottom-0 w-[220px] bg-white border-r border-gray-200 z-40 hidden lg:flex flex-col transition-colors';
   sidebar.innerHTML = `
-    <div class="p-5 flex items-center gap-3">
-      <img src="assets/logo-icon.png" class="w-8 h-8 rounded-full" alt="CREO">
-      <span class="text-lg font-bold tracking-[0.15em] text-creo-purple">CREO</span>
+    <div class="p-5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="assets/logo-icon.png" class="w-8 h-8 rounded-full" alt="CREO">
+        <span class="text-lg font-bold tracking-[0.15em] text-creo-purple">CREO</span>
+      </div>
+      <div id="sidebar-bell-area"></div>
     </div>
     <nav class="flex-1 px-3 space-y-1">
       ${items.map(item => `
@@ -455,15 +461,18 @@ async function loadNotificationBell() {
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return;
   const { count } = await sb.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false);
-  const existing = document.getElementById('notif-bell');
-  if (existing) existing.remove();
-  const bell = document.createElement('div');
-  bell.id = 'notif-bell';
-  bell.className = 'cursor-pointer';
-  bell.onclick = () => toggleNotifPanel();
-  bell.innerHTML = `<div class="relative p-2"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>${count > 0 ? `<span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">${count > 9 ? '9+' : count}</span>` : ''}</div>`;
-  const mobileRight = document.getElementById('mobile-header-right');
-  if (mobileRight) mobileRight.appendChild(bell);
+  const bellHTML = `<div class="relative p-2"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>${count > 0 ? `<span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">${count > 9 ? '9+' : count}</span>` : ''}</div>`;
+  document.querySelectorAll('.notif-bell-instance').forEach(el => el.remove());
+  const targets = [document.getElementById('mobile-header-right'), document.getElementById('sidebar-bell-area')];
+  targets.forEach(target => {
+    if (!target) return;
+    const bell = document.createElement('div');
+    bell.id = 'notif-bell';
+    bell.className = 'notif-bell-instance cursor-pointer';
+    bell.onclick = () => toggleNotifPanel();
+    bell.innerHTML = bellHTML;
+    target.appendChild(bell);
+  });
 }
 
 async function toggleNotifPanel() {
@@ -478,7 +487,7 @@ async function toggleNotifPanel() {
   if (!data || data.length === 0) {
     panel.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">Sin notificaciones</p>';
   } else {
-    const icons = { like: '❤️', comment: '💬', payment: '💰', approval: '✅', rejection: '❌', invite: '🤝', share: '🔗', meta_like: '❤️', meta_comment: '💬' };
+    const icons = { like: '❤️', comment: '💬', payment: '💰', approval: '✅', rejection: '❌', invite: '🤝', share: '🔗', meta_like: '❤️', meta_comment: '💬', follow: '👤', message: '✉️' };
     panel.innerHTML = `<div class="p-3 border-b border-gray-200 flex justify-between items-center"><span class="font-bold text-sm text-gray-900">Notificaciones</span><button onclick="markAllRead()" class="text-xs text-creo-mint hover:underline">Marcar leídas</button></div>` +
       data.map(n => {
         const link = n.link || getNotifDefaultLink(n);
@@ -502,8 +511,8 @@ async function toggleNotifPanel() {
 
 function closeNotifOnClickOutside(e) {
   const panel = document.getElementById('notif-panel');
-  const bell = document.getElementById('notif-bell');
-  if (panel && !panel.contains(e.target) && bell && !bell.contains(e.target)) {
+  const isBell = e.target.closest('.notif-bell-instance');
+  if (panel && !panel.contains(e.target) && !isBell) {
     panel.remove();
     document.removeEventListener('click', closeNotifOnClickOutside);
   }
@@ -746,7 +755,7 @@ function previewNotificationSound(soundId) {
 }
 
 // Real-time notification system via Supabase Realtime
-const NOTIF_ICONS = { like: '❤️', comment: '💬', payment: '💰', approval: '✅', rejection: '❌', invite: '🤝', share: '🔗', meta_like: '❤️', meta_comment: '💬' };
+const NOTIF_ICONS = { like: '❤️', comment: '💬', payment: '💰', approval: '✅', rejection: '❌', invite: '🤝', share: '🔗', meta_like: '❤️', meta_comment: '💬', follow: '👤', message: '✉️' };
 
 function showNotifBubble(notif) {
   const icon = NOTIF_ICONS[notif.type] || '🔔';
@@ -769,7 +778,7 @@ function showNotifBubble(notif) {
 }
 
 function flyToBell(bubble) {
-  const bell = document.getElementById('notif-bell');
+  const bell = document.querySelector('.notif-bell-instance');
   if (!bell) { bubble.remove(); return; }
   const bellRect = bell.getBoundingClientRect();
   const bubbleRect = bubble.getBoundingClientRect();
@@ -781,10 +790,10 @@ function flyToBell(bubble) {
   bubble.style.borderRadius = '50%';
   setTimeout(() => {
     bubble.remove();
-    if (bell) {
-      bell.classList.add('creo-bell-ring');
-      setTimeout(() => bell.classList.remove('creo-bell-ring'), 600);
-    }
+    document.querySelectorAll('.notif-bell-instance').forEach(b => {
+      b.classList.add('creo-bell-ring');
+      setTimeout(() => b.classList.remove('creo-bell-ring'), 600);
+    });
     loadNotificationBell();
   }, 500);
 }
