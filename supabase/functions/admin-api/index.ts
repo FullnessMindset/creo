@@ -307,7 +307,7 @@ serve(async (req) => {
       }
     }
 
-    // ===== SEND EMAIL (via Resend) =====
+    // ===== SEND EMAIL (via Gmail SMTP) =====
     if (action === "send-email") {
       const toEmail = body.to_email as string;
       const toName = (body.to_name as string) || "";
@@ -317,12 +317,11 @@ serve(async (req) => {
       if (!toEmail || !subject || !message)
         return json({ error: "Missing to_email, subject, or message" }, 400);
 
-      const resendKey = Deno.env.get("RESEND_API_KEY");
-      if (!resendKey)
-        return json({ error: "RESEND_API_KEY not configured. Add it in Supabase Edge Function secrets." }, 500);
+      const gmailPassword = Deno.env.get("GMAIL_APP_PASSWORD");
+      const gmailUser = "fullnessmindset@gmail.com";
 
-      const fromEmail =
-        Deno.env.get("RESEND_FROM_EMAIL") || "CREO <onboarding@resend.dev>";
+      if (!gmailPassword)
+        return json({ error: "GMAIL_APP_PASSWORD not configured. Generate one at myaccount.google.com/apppasswords" }, 500);
 
       const sanitizedMsg = (message as string)
         .replace(/&/g, "&amp;")
@@ -330,17 +329,7 @@ serve(async (req) => {
         .replace(/>/g, "&gt;")
         .replace(/\n/g, "<br>");
 
-      const emailRes = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: fromEmail,
-          to: [toEmail],
-          subject,
-          html: `<div style="font-family:Inter,system-ui,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px;background:#ffffff;">
+      const htmlBody = `<div style="font-family:Inter,system-ui,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px;background:#ffffff;">
   <div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #1a0a3e;">
     <h2 style="color:#1a0a3e;font-size:22px;letter-spacing:0.15em;margin:0;">CREO</h2>
     <p style="color:#a8a29e;font-size:11px;margin:4px 0 0;letter-spacing:0.05em;">Crea. Yo Creo En Ti</p>
@@ -352,30 +341,80 @@ serve(async (req) => {
     Este mensaje fue enviado por el equipo de CREO.<br>
     <a href="https://fullnessmindset.github.io/creo/" style="color:#7c3aed;text-decoration:none;">Visitar CREO</a>
   </p>
-</div>`,
-        }),
-      });
+</div>`;
 
-      const emailData = await emailRes.json();
-      if (!emailRes.ok)
-        return json(
-          { error: emailData.message || "Email send failed" },
-          emailRes.status
-        );
+      const boundary = "----creo" + Date.now();
+      const mimeMessage = [
+        `From: CREO <${gmailUser}>`,
+        `To: ${toName ? toName + " <" + toEmail + ">" : toEmail}`,
+        `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
+        `MIME-Version: 1.0`,
+        `Content-Type: multipart/alternative; boundary="${boundary}"`,
+        ``,
+        `--${boundary}`,
+        `Content-Type: text/plain; charset=UTF-8`,
+        ``,
+        message,
+        ``,
+        `--${boundary}`,
+        `Content-Type: text/html; charset=UTF-8`,
+        ``,
+        htmlBody,
+        ``,
+        `--${boundary}--`,
+      ].join("\r\n");
 
-      await sbAdmin
-        .from("admin_emails")
-        .insert({
-          to_email: toEmail,
-          to_name: toName,
-          subject,
-          message,
-          sent_by: user.email,
-          resend_id: emailData.id,
-        })
-        .catch(() => {});
+      const raw = btoa(unescape(encodeURIComponent(mimeMessage)))
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
 
-      return json({ success: true, email_id: emailData.id });
+      // Use Gmail SMTP via Google's API with OAuth-less SMTP relay
+      // Since Deno Edge Functions can't do raw SMTP, we use the Gmail API via service account
+      // Fallback: use nodemailer-compatible SMTP via fetch to a relay
+
+      // Direct SMTP approach using Deno's TCP
+      try {
+        const { SMTPClient } = await import("https://deno.land/x/denomailer@1.6.0/mod.ts");
+
+        const client = new SMTPClient({
+          connection: {
+            hostname: "smtp.gmail.com",
+            port: 465,
+            tls: true,
+            auth: {
+              username: gmailUser,
+              password: gmailPassword,
+            },
+          },
+        });
+
+        await client.send({
+          from: `CREO <${gmailUser}>`,
+          to: toEmail,
+          subject: subject,
+          content: message,
+          html: htmlBody,
+        });
+
+        await client.close();
+
+        await sbAdmin
+          .from("admin_emails")
+          .insert({
+            to_email: toEmail,
+            to_name: toName,
+            subject,
+            message,
+            sent_by: user.email,
+            resend_id: "gmail-" + Date.now(),
+          })
+          .catch(() => {});
+
+        return json({ success: true, email_id: "gmail-" + Date.now() });
+      } catch (e) {
+        return json({ error: "Gmail send failed: " + (e as Error).message }, 500);
+      }
     }
 
     // ===== SENT EMAILS LOG =====
