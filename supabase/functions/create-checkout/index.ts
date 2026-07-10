@@ -14,7 +14,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { creator_connect_id, amount_usd, success_url, cancel_url } = await req.json();
+    const { creator_connect_id, creator_id, creator_username, amount_usd, success_url, cancel_url } = await req.json();
 
     if (!creator_connect_id || !amount_usd || amount_usd < 1) {
       return new Response(JSON.stringify({ error: "Missing or invalid parameters" }), {
@@ -43,7 +43,7 @@ serve(async (req) => {
         quantity: 1,
       }],
       payment_intent_data: paymentIntentData,
-      metadata: { type: "tip", creator_connect_id },
+      metadata: { type: "tip", creator_connect_id, creator_id: creator_id || "", creator_username: creator_username || "" },
       success_url: success_url || "https://fullnessmindset.github.io/creo/redirect.html?status=success",
       cancel_url: cancel_url || "https://fullnessmindset.github.io/creo/",
     });

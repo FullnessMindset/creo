@@ -45,17 +45,14 @@ serve(async (req) => {
       const metadata = session.metadata || {};
       const type = metadata.type;
 
+      // META CONTRIBUTION
       if (type === "meta" && metadata.meta_id) {
         const amountCents = session.amount_total || 0;
         const { error } = await supabase.rpc("increment_meta_raised", {
           p_meta_id: metadata.meta_id,
           p_amount: amountCents,
         });
-        if (error) {
-          console.error("Failed to increment meta raised:", error);
-        } else {
-          console.log(`Meta ${metadata.meta_id} raised by ${amountCents} cents`);
-        }
+        if (error) console.error("Failed to increment meta raised:", error);
 
         await supabase.from("meta_contributions").insert({
           meta_id: metadata.meta_id,
@@ -65,35 +62,76 @@ serve(async (req) => {
         });
       }
 
+      // BRAND DEAL PAYMENT
       if (type === "brand_deal" && metadata.conversation_id) {
         const { error } = await supabase.rpc("update_deal_payment_status", {
           p_stripe_session_id: session.id,
           p_status: "completed",
         });
-        if (error) {
-          console.error("Failed to update deal payment:", error);
-        } else {
-          console.log(`Brand deal payment completed: ${session.id}`);
-        }
+        if (error) console.error("Failed to update deal payment:", error);
       }
 
+      // TIP
       if (type === "tip") {
-        console.log(`Tip payment completed: ${session.id}, amount: ${session.amount_total}`);
+        const amountCents = session.amount_total || 0;
+        try {
+          await supabase.from("tips").insert({
+            stripe_session_id: session.id,
+            creator_id: metadata.creator_id || null,
+            creator_username: metadata.creator_username || null,
+            amount_cents: amountCents,
+            tipper_name: session.customer_details?.name || "Anónimo",
+            tipper_email: session.customer_details?.email || null,
+          });
+        } catch (_) {}
+        console.log(`Tip recorded: ${session.id}, $${(amountCents / 100).toFixed(2)}`);
       }
 
+      // SUBSCRIPTION
       if (type === "subscription") {
+        const subscriptionId = (session as unknown as Record<string, unknown>).subscription as string;
+        try {
+          await supabase.from("subscriptions").insert({
+            stripe_session_id: session.id,
+            stripe_subscription_id: subscriptionId || null,
+            creator_id: metadata.creator_id || null,
+            subscriber_email: session.customer_details?.email || null,
+            subscriber_name: session.customer_details?.name || "Anónimo",
+            amount_cents: session.amount_total || 0,
+            status: "active",
+          });
+        } catch (_) {}
         console.log(`Subscription created: ${session.id}, creator: ${metadata.creator_id}`);
       }
     }
 
+    // RECURRING SUBSCRIPTION PAYMENT
     if (event.type === "invoice.payment_succeeded") {
-      const invoice = event.data.object as any;
-      console.log(`Recurring subscription payment: ${invoice.id}, amount: ${invoice.amount_paid}`);
+      const invoice = event.data.object as unknown as Record<string, unknown>;
+      const subId = invoice.subscription as string;
+      if (subId) {
+        try {
+          await supabase
+            .from("subscriptions")
+            .update({ last_payment_at: new Date().toISOString() })
+            .eq("stripe_subscription_id", subId);
+        } catch (_) {}
+      }
     }
 
+    // SUBSCRIPTION CANCELLED
     if (event.type === "customer.subscription.deleted") {
-      const subscription = event.data.object as any;
-      console.log(`Subscription cancelled: ${subscription.id}`);
+      const subscription = event.data.object as unknown as Record<string, unknown>;
+      const subId = subscription.id as string;
+      if (subId) {
+        try {
+          await supabase
+            .from("subscriptions")
+            .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
+            .eq("stripe_subscription_id", subId);
+        } catch (_) {}
+      }
+      console.log(`Subscription cancelled: ${subId}`);
     }
 
     return new Response(JSON.stringify({ received: true }), {
