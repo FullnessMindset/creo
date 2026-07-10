@@ -88,7 +88,7 @@
           </div>
           <div>
             <p class="font-bold text-sm">Verifica tu Creo ID</p>
-            <p class="text-white/70 text-xs">Para publicar y comentar</p>
+            <p class="text-white/70 text-xs">Para publicar deals y recibir pagos</p>
           </div>
         </div>
         <div class="grid grid-cols-3 gap-2 text-center">
@@ -328,7 +328,7 @@
         document.getElementById('compose-avatar').innerHTML = avatarHtml;
         document.getElementById('compose-modal-avatar').innerHTML = avatarHtml;
         const verified = await isCreoIdVerified();
-        if (!verified) document.getElementById('creo-id-banner').classList.remove('hidden');
+        if (!verified) document.getElementById('creo-id-banner').classList.remove('hidden'); // informational only
         document.getElementById('safety-cards').classList.remove('hidden');
         checkWelcomePost();
       } else {
@@ -489,8 +489,6 @@
 
     async function openCompose(type) {
       if (!currentUser) { showToast('Inicia sesión para publicar', 'info'); return; }
-      const ok = await requireCreoId('publicar');
-      if (!ok) return;
       composeType = type || 'text'; composeMediaFiles = []; composePostType = 'normal';
       document.getElementById('compose-media-preview').innerHTML = '';
       document.getElementById('compose-media-preview').classList.add('hidden');
@@ -526,7 +524,6 @@
 
     async function submitPost() {
       if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
-      const ok = await requireCreoId('publicar'); if (!ok) return;
       const title = document.getElementById('compose-title').value.trim();
       const body = document.getElementById('compose-body').value.trim();
       if (!body && composeMediaFiles.length === 0) return;
@@ -548,7 +545,6 @@
 
     async function toggleLike(postId, btn) {
       if (!currentUser) { showToast('Inicia sesión para dar like', 'info'); return; }
-      const ok = await requireCreoId('dar like'); if (!ok) return;
       const countEl = btn.querySelector('.like-count'); const isLiked = btn.classList.contains('text-red-500');
       if (isLiked) { btn.classList.remove('text-red-500'); btn.classList.add('text-gray-500'); btn.querySelector('svg').setAttribute('fill', 'none'); countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1); await sb.from('community_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id); }
       else { btn.classList.add('text-red-500'); btn.classList.remove('text-gray-500'); btn.querySelector('svg').setAttribute('fill', 'currentColor'); countEl.textContent = parseInt(countEl.textContent) + 1; await sb.from('community_likes').insert({ post_id: postId, user_id: currentUser.id }); }
@@ -564,12 +560,12 @@
         return `<div class="flex gap-2"><a href="profile.html?u=${esc(ca?.username || '')}" class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0">${cAvatar}</a><div class="flex-1 bg-gray-100 rounded-2xl rounded-tl-sm px-3 py-2"><div class="flex items-center justify-between"><a href="profile.html?u=${esc(ca?.username || '')}" class="text-xs font-bold text-gray-900 hover:text-creo-purple">${esc(cName)}</a><div class="flex items-center gap-2"><span class="text-[10px] text-gray-400">${timeAgo(c.created_at)}</span>${isOwner ? `<button onclick="editComment('${c.id}', this)" class="text-gray-300 hover:text-blue-400 text-[10px]">✎</button><button onclick="deleteComment('${c.id}')" class="text-gray-300 hover:text-red-400 text-[10px]">✕</button>` : ''}</div></div><p class="text-sm text-gray-700 mt-0.5">${linkify(esc(c.body))}</p></div></div>`; }).join('');
       list.scrollTop = list.scrollHeight;
     }
-    async function submitComment() { if (!currentUser || !activeCommentPostId) { showToast('Inicia sesión', 'info'); return; } const ok = await requireCreoId('comentar'); if (!ok) return; const input = document.getElementById('comment-input'); const body = input.value.trim(); if (!body) return; input.value = ''; const { error } = await sb.from('community_comments').insert({ post_id: activeCommentPostId, author_id: currentUser.id, body }); if (error) { showToast('Error', 'error'); return; } loadComments(activeCommentPostId); }
+    async function submitComment() { if (!currentUser || !activeCommentPostId) { showToast('Inicia sesión', 'info'); return; } const input = document.getElementById('comment-input'); const body = input.value.trim(); if (!body) return; input.value = ''; const { error } = await sb.from('community_comments').insert({ post_id: activeCommentPostId, author_id: currentUser.id, body }); if (error) { showToast('Error', 'error'); return; } loadComments(activeCommentPostId); }
     async function deleteComment(id) { if (!confirm('¿Eliminar comentario?')) return; await sb.from('community_comments').delete().eq('id', id); if (activeCommentPostId) loadComments(activeCommentPostId); }
     function editComment(id, btnEl) { const commentDiv = btnEl.closest('.flex.gap-2'); const bodyP = commentDiv.querySelector('p'); const oldText = bodyP.textContent; bodyP.innerHTML = `<textarea id="edit-comment-${id}" class="w-full border border-gray-300 bg-white p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" rows="2">${esc(oldText)}</textarea><div class="flex gap-2 mt-1"><button onclick="saveCommentEdit('${id}')" class="text-xs px-3 py-1 bg-creo-purple text-white rounded-lg">Guardar</button><button onclick="loadComments(activeCommentPostId)" class="text-xs px-3 py-1 bg-gray-200 text-gray-600 rounded-lg">Cancelar</button></div>`; }
     async function saveCommentEdit(id) { const textarea = document.getElementById('edit-comment-' + id); const body = textarea.value.trim(); if (!body) return showToast('El comentario no puede estar vacío', 'error'); const { error } = await sb.from('community_comments').update({ body }).eq('id', id); if (error) return showToast('Error: ' + error.message, 'error'); showToast('Comentario actualizado', 'success'); loadComments(activeCommentPostId); }
 
-    async function openShareModal(postId) { if (!currentUser) { showToast('Inicia sesión', 'info'); return; } const ok = await requireCreoId('compartir'); if (!ok) return; sharePostId = postId; const postEl = document.getElementById('post-' + postId); const preview = document.getElementById('share-preview'); const titleEl = postEl?.querySelector('h3'); const bodyEl = postEl?.querySelector('.whitespace-pre-line'); preview.innerHTML = `<p class="text-xs text-gray-500"><span class="font-semibold">${titleEl ? esc(titleEl.textContent) : 'Publicación compartida'}</span></p>${bodyEl ? `<p class="text-xs text-gray-400 truncate mt-1">${esc(bodyEl.textContent.slice(0, 80))}</p>` : ''}`; document.getElementById('share-body').value = ''; document.getElementById('share-modal').classList.remove('hidden'); }
+    async function openShareModal(postId) { if (!currentUser) { showToast('Inicia sesión', 'info'); return; } sharePostId = postId; const postEl = document.getElementById('post-' + postId); const preview = document.getElementById('share-preview'); const titleEl = postEl?.querySelector('h3'); const bodyEl = postEl?.querySelector('.whitespace-pre-line'); preview.innerHTML = `<p class="text-xs text-gray-500"><span class="font-semibold">${titleEl ? esc(titleEl.textContent) : 'Publicación compartida'}</span></p>${bodyEl ? `<p class="text-xs text-gray-400 truncate mt-1">${esc(bodyEl.textContent.slice(0, 80))}</p>` : ''}`; document.getElementById('share-body').value = ''; document.getElementById('share-modal').classList.remove('hidden'); }
     function closeShareModal() { document.getElementById('share-modal').classList.add('hidden'); sharePostId = null; }
     async function submitShare() { if (!currentUser || !sharePostId) return; const body = document.getElementById('share-body').value.trim(); const { error } = await sb.from('community_posts').insert({ author_id: currentUser.id, post_type: 'share_post', body: body || null, shared_post_id: sharePostId }); if (error) { showToast('Error al compartir', 'error'); return; } closeShareModal(); showToast('¡Compartido!', 'success'); document.getElementById('community-feed').innerHTML = ''; feedPage = 0; feedDone = false; loadFeed(); }
     async function deletePost(id) { if (!confirm('¿Eliminar esta publicación?')) return; await sb.from('community_posts').delete().eq('id', id); const el = document.getElementById('post-' + id); if (el) el.remove(); showToast('Publicación eliminada', 'success'); }
