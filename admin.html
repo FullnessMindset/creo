@@ -549,16 +549,44 @@
             <div class="relative">
               <select id="email-btn-preset" onchange="applyBtnPreset()" class="w-full bg-white border border-gray-300 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
                 <option value="">Choose destination...</option>
-                <option value="https://fullnessmindset.github.io/creo/feed.html">Feed de Creadores</option>
+                <option value="https://fullnessmindset.github.io/creo/explore.html">Explorar Creadores</option>
                 <option value="https://fullnessmindset.github.io/creo/index.html">Mi Panel (Dashboard)</option>
                 <option value="https://fullnessmindset.github.io/creo/comunidad.html">Comunidad</option>
                 <option value="https://fullnessmindset.github.io/creo/brand-deals.html">Brand Deals</option>
                 <option value="https://fullnessmindset.github.io/creo/messages.html">Mensajes</option>
+                <option value="https://fullnessmindset.github.io/creo/profile.html">Mi Perfil</option>
+                <option value="https://fullnessmindset.github.io/creo/privacidad.html">Privacidad</option>
+                <option value="https://fullnessmindset.github.io/creo/terminos.html">Términos</option>
                 <option value="custom">Custom URL...</option>
               </select>
             </div>
             <input id="email-btn-url" type="url" placeholder="https://..." class="hidden w-full bg-white border border-gray-300 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             <button onclick="removeEmailButton()" class="text-xs text-red-500 hover:underline">Remove button</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between">
+            <label class="text-xs text-gray-500 uppercase font-semibold">Image (optional)</label>
+            <button onclick="toggleEmailImage()" id="email-img-toggle" class="text-xs text-creo-purple font-medium hover:underline">+ Add image</button>
+          </div>
+          <div id="email-img-fields" class="hidden mt-2 space-y-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+            <input id="email-img-url" type="url" placeholder="Paste image URL..." class="w-full bg-white border border-gray-300 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <div class="flex gap-3">
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="radio" name="email-img-pos" value="cover" checked class="accent-creo-purple"> <span class="text-xs text-gray-600">Cover (top)</span>
+              </label>
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="radio" name="email-img-pos" value="center" class="accent-creo-purple"> <span class="text-xs text-gray-600">Center</span>
+              </label>
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="radio" name="email-img-pos" value="bottom" class="accent-creo-purple"> <span class="text-xs text-gray-600">Bottom</span>
+              </label>
+            </div>
+            <div id="email-img-preview" class="hidden rounded-lg overflow-hidden border border-gray-200 bg-white">
+              <img id="email-img-prev-tag" src="" class="w-full max-h-40 object-cover">
+            </div>
+            <button onclick="removeEmailImage()" class="text-xs text-red-500 hover:underline">Remove image</button>
           </div>
         </div>
 
@@ -1224,6 +1252,7 @@
       document.getElementById('email-send-btn').disabled = false;
       document.getElementById('email-send-btn').innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Send Email';
       removeEmailButton();
+      removeEmailImage();
       document.getElementById('email-modal').classList.remove('hidden');
     }
 
@@ -1261,13 +1290,44 @@
       }
       if (!document.getElementById('email-btn-text').value) {
         const labels = {
-          'https://fullnessmindset.github.io/creo/feed.html': 'Ver Creadores',
+          'https://fullnessmindset.github.io/creo/explore.html': 'Explorar Creadores',
           'https://fullnessmindset.github.io/creo/index.html': 'Ir a Mi Panel',
           'https://fullnessmindset.github.io/creo/comunidad.html': 'Ver Comunidad',
           'https://fullnessmindset.github.io/creo/brand-deals.html': 'Ver Brand Deals',
           'https://fullnessmindset.github.io/creo/messages.html': 'Ver Mensajes',
+          'https://fullnessmindset.github.io/creo/profile.html': 'Ver Mi Perfil',
+          'https://fullnessmindset.github.io/creo/privacidad.html': 'Leer Privacidad',
+          'https://fullnessmindset.github.io/creo/terminos.html': 'Leer Términos',
         };
         if (labels[val]) document.getElementById('email-btn-text').value = labels[val];
+      }
+    }
+
+    function toggleEmailImage() {
+      document.getElementById('email-img-fields').classList.remove('hidden');
+      document.getElementById('email-img-toggle').classList.add('hidden');
+      document.getElementById('email-img-url').value = '';
+      document.getElementById('email-img-preview').classList.add('hidden');
+      document.getElementById('email-img-url').addEventListener('input', previewEmailImage);
+    }
+
+    function removeEmailImage() {
+      document.getElementById('email-img-fields').classList.add('hidden');
+      document.getElementById('email-img-toggle').classList.remove('hidden');
+      document.getElementById('email-img-url').value = '';
+      document.getElementById('email-img-preview').classList.add('hidden');
+    }
+
+    function previewEmailImage() {
+      const url = document.getElementById('email-img-url').value.trim();
+      const preview = document.getElementById('email-img-preview');
+      const img = document.getElementById('email-img-prev-tag');
+      if (url) {
+        img.src = url;
+        img.onerror = () => preview.classList.add('hidden');
+        img.onload = () => preview.classList.remove('hidden');
+      } else {
+        preview.classList.add('hidden');
       }
     }
 
@@ -1292,6 +1352,16 @@
         if (btnText && btnUrl) {
           payload.button_text = btnText;
           payload.button_url = btnUrl;
+        }
+      }
+
+      const imgVisible = !document.getElementById('email-img-fields').classList.contains('hidden');
+      if (imgVisible) {
+        const imgUrl = document.getElementById('email-img-url').value.trim();
+        const imgPos = document.querySelector('input[name="email-img-pos"]:checked')?.value || 'cover';
+        if (imgUrl) {
+          payload.image_url = imgUrl;
+          payload.image_position = imgPos;
         }
       }
 

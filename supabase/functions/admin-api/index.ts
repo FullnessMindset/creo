@@ -312,13 +312,15 @@ serve(async (req) => {
           metadata: { meta_id: metaId, type: "meta_payout" },
         });
 
-        await sbAdmin.from("payout_log").insert({
-          meta_id: metaId,
-          connect_id: connectId,
-          amount_cents: amountCents,
-          stripe_transfer_id: transfer.id,
-          approved_by: user.email,
-        }).catch(() => {});
+        try {
+          await sbAdmin.from("payout_log").insert({
+            meta_id: metaId,
+            connect_id: connectId,
+            amount_cents: amountCents,
+            stripe_transfer_id: transfer.id,
+            approved_by: user.email,
+          });
+        } catch (_) {}
 
         return json({ success: true, transfer_id: transfer.id });
       } catch (e) {
@@ -344,6 +346,8 @@ serve(async (req) => {
 
       const buttonText = (body.button_text as string) || "";
       const buttonUrl = (body.button_url as string) || "";
+      const imageUrl = (body.image_url as string) || "";
+      const imagePosition = (body.image_position as string) || "cover";
 
       const sanitizedMsg = (message as string)
         .replace(/&/g, "&amp;")
@@ -365,6 +369,20 @@ serve(async (req) => {
         ? `\n\n${buttonText}: ${buttonUrl}`
         : "";
 
+      const imageHtml = imageUrl
+        ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0;">
+    <tr>
+      <td align="center">
+        <img src="${imageUrl}" alt="" width="520" style="display:block;max-width:100%;height:auto;border-radius:10px;">
+      </td>
+    </tr>
+  </table>`
+        : "";
+
+      const coverImage = imageUrl && imagePosition === "cover" ? imageHtml : "";
+      const centerImage = imageUrl && imagePosition === "center" ? imageHtml : "";
+      const bottomImage = imageUrl && imagePosition === "bottom" ? imageHtml : "";
+
       const htmlBody = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:20px;">
   <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
     <tr>
@@ -373,11 +391,14 @@ serve(async (req) => {
       </td>
     </tr>
   </table>
+  ${coverImage}
   <p style="font-size:15px;color:#333;margin:0 0 12px;">Hola${toName ? " " + toName : ""},</p>
   <p style="font-size:14px;color:#555;line-height:1.6;margin:0 0 20px;">${sanitizedMsg}</p>
+  ${centerImage}
   ${buttonHtml}
   <p style="font-size:14px;color:#555;margin:0 0 4px;">Saludos,</p>
   <p style="font-size:14px;color:#333;font-weight:bold;margin:0;">Equipo CREO</p>
+  ${bottomImage}
   <p style="font-size:11px;color:#999;margin:20px 0 0;border-top:1px solid #eee;padding-top:12px;">
     CREO — Crea. Yo Creo En Ti<br>
     https://fullnessmindset.github.io/creo/
