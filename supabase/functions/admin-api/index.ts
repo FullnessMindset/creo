@@ -342,11 +342,28 @@ serve(async (req) => {
       if (!gmailPassword)
         return json({ error: "GMAIL_APP_PASSWORD not configured. Generate one at myaccount.google.com/apppasswords" }, 500);
 
+      const buttonText = (body.button_text as string) || "";
+      const buttonUrl = (body.button_url as string) || "";
+
       const sanitizedMsg = (message as string)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/\n/g, "<br>");
+
+      const buttonHtml = buttonText && buttonUrl
+        ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+    <tr>
+      <td align="center">
+        <a href="${buttonUrl}" target="_blank" style="display:inline-block;background:#1a0a3e;color:#ffffff;font-size:14px;font-weight:bold;text-decoration:none;padding:12px 32px;border-radius:8px;">${buttonText}</a>
+      </td>
+    </tr>
+  </table>`
+        : "";
+
+      const buttonPlain = buttonText && buttonUrl
+        ? `\n\n${buttonText}: ${buttonUrl}`
+        : "";
 
       const htmlBody = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:20px;">
   <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
@@ -358,6 +375,7 @@ serve(async (req) => {
   </table>
   <p style="font-size:15px;color:#333;margin:0 0 12px;">Hola${toName ? " " + toName : ""},</p>
   <p style="font-size:14px;color:#555;line-height:1.6;margin:0 0 20px;">${sanitizedMsg}</p>
+  ${buttonHtml}
   <p style="font-size:14px;color:#555;margin:0 0 4px;">Saludos,</p>
   <p style="font-size:14px;color:#333;font-weight:bold;margin:0;">Equipo CREO</p>
   <p style="font-size:11px;color:#999;margin:20px 0 0;border-top:1px solid #eee;padding-top:12px;">
@@ -386,7 +404,7 @@ serve(async (req) => {
           to: toEmail,
           replyTo: gmailUser,
           subject: subject,
-          content: `Hola${toName ? " " + toName : ""},\n\n${message}\n\nSaludos,\nEquipo CREO\nhttps://fullnessmindset.github.io/creo/`,
+          content: `Hola${toName ? " " + toName : ""},\n\n${message}${buttonPlain}\n\nSaludos,\nEquipo CREO\nhttps://fullnessmindset.github.io/creo/`,
           html: htmlBody,
           headers: {
             "X-Priority": "3",

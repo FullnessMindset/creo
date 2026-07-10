@@ -539,6 +539,29 @@
           <label class="text-xs text-gray-500 uppercase font-semibold">Message</label>
           <textarea id="email-message" rows="6" placeholder="Write your message here..." class="w-full bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple resize-none"></textarea>
         </div>
+        <div id="email-btn-section">
+          <div class="flex items-center justify-between">
+            <label class="text-xs text-gray-500 uppercase font-semibold">Button (optional)</label>
+            <button onclick="toggleEmailButton()" id="email-btn-toggle" class="text-xs text-creo-purple font-medium hover:underline">+ Add button</button>
+          </div>
+          <div id="email-btn-fields" class="hidden mt-2 space-y-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+            <input id="email-btn-text" type="text" placeholder="Button text... (e.g. Ver mi perfil)" class="w-full bg-white border border-gray-300 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <div class="relative">
+              <select id="email-btn-preset" onchange="applyBtnPreset()" class="w-full bg-white border border-gray-300 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+                <option value="">Choose destination...</option>
+                <option value="https://fullnessmindset.github.io/creo/feed.html">Feed de Creadores</option>
+                <option value="https://fullnessmindset.github.io/creo/index.html">Mi Panel (Dashboard)</option>
+                <option value="https://fullnessmindset.github.io/creo/comunidad.html">Comunidad</option>
+                <option value="https://fullnessmindset.github.io/creo/brand-deals.html">Brand Deals</option>
+                <option value="https://fullnessmindset.github.io/creo/messages.html">Mensajes</option>
+                <option value="custom">Custom URL...</option>
+              </select>
+            </div>
+            <input id="email-btn-url" type="url" placeholder="https://..." class="hidden w-full bg-white border border-gray-300 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <button onclick="removeEmailButton()" class="text-xs text-red-500 hover:underline">Remove button</button>
+          </div>
+        </div>
+
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex gap-2 items-start">
           <span class="text-sm">📧</span>
           <p class="text-xs text-blue-700">This email will be sent from CREO's official email and will appear in the user's inbox.</p>
@@ -1200,11 +1223,52 @@
       document.getElementById('email-message').value = '';
       document.getElementById('email-send-btn').disabled = false;
       document.getElementById('email-send-btn').innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Send Email';
+      removeEmailButton();
       document.getElementById('email-modal').classList.remove('hidden');
     }
 
     function closeEmailModal() {
       document.getElementById('email-modal').classList.add('hidden');
+    }
+
+    function toggleEmailButton() {
+      document.getElementById('email-btn-fields').classList.remove('hidden');
+      document.getElementById('email-btn-toggle').classList.add('hidden');
+      document.getElementById('email-btn-text').value = '';
+      document.getElementById('email-btn-preset').value = '';
+      document.getElementById('email-btn-url').value = '';
+      document.getElementById('email-btn-url').classList.add('hidden');
+    }
+
+    function removeEmailButton() {
+      document.getElementById('email-btn-fields').classList.add('hidden');
+      document.getElementById('email-btn-toggle').classList.remove('hidden');
+      document.getElementById('email-btn-text').value = '';
+      document.getElementById('email-btn-preset').value = '';
+      document.getElementById('email-btn-url').value = '';
+    }
+
+    function applyBtnPreset() {
+      const val = document.getElementById('email-btn-preset').value;
+      const customInput = document.getElementById('email-btn-url');
+      if (val === 'custom') {
+        customInput.classList.remove('hidden');
+        customInput.value = '';
+        customInput.focus();
+      } else {
+        customInput.classList.add('hidden');
+        customInput.value = val;
+      }
+      if (!document.getElementById('email-btn-text').value) {
+        const labels = {
+          'https://fullnessmindset.github.io/creo/feed.html': 'Ver Creadores',
+          'https://fullnessmindset.github.io/creo/index.html': 'Ir a Mi Panel',
+          'https://fullnessmindset.github.io/creo/comunidad.html': 'Ver Comunidad',
+          'https://fullnessmindset.github.io/creo/brand-deals.html': 'Ver Brand Deals',
+          'https://fullnessmindset.github.io/creo/messages.html': 'Ver Mensajes',
+        };
+        if (labels[val]) document.getElementById('email-btn-text').value = labels[val];
+      }
     }
 
     async function sendAdminEmail() {
@@ -1216,11 +1280,26 @@
       if (!subject) return alert('Please enter a subject');
       if (!message) return alert('Please enter a message');
 
+      const payload = { to_email: toEmail, to_name: toName, subject, message };
+
+      const btnVisible = !document.getElementById('email-btn-fields').classList.contains('hidden');
+      if (btnVisible) {
+        const btnText = document.getElementById('email-btn-text').value.trim();
+        const preset = document.getElementById('email-btn-preset').value;
+        const btnUrl = preset === 'custom'
+          ? document.getElementById('email-btn-url').value.trim()
+          : preset;
+        if (btnText && btnUrl) {
+          payload.button_text = btnText;
+          payload.button_url = btnUrl;
+        }
+      }
+
       const btn = document.getElementById('email-send-btn');
       btn.disabled = true;
       btn.innerHTML = '<div class="loader" style="width:16px;height:16px;border-width:2px;"></div> Sending...';
 
-      const res = await apiCall('send-email', { to_email: toEmail, to_name: toName, subject, message });
+      const res = await apiCall('send-email', payload);
 
       if (res.error) {
         btn.disabled = false;
