@@ -350,6 +350,7 @@ serve(async (req) => {
 
       const htmlBody = `<div style="font-family:Inter,system-ui,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px;background:#ffffff;">
   <div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #1a0a3e;">
+    <img src="https://fullnessmindset.github.io/creo/assets/logo-icon.png" alt="CREO" width="60" height="60" style="display:block;margin:0 auto 12px;border-radius:14px;">
     <h2 style="color:#1a0a3e;font-size:22px;letter-spacing:0.15em;margin:0;">CREO</h2>
     <p style="color:#a8a29e;font-size:11px;margin:4px 0 0;letter-spacing:0.05em;">Crea. Yo Creo En Ti</p>
   </div>
