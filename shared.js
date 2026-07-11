@@ -489,15 +489,20 @@ async function toggleNotifPanel() {
   if (!data || data.length === 0) {
     panel.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">Sin notificaciones</p>';
   } else {
-    const icons = { like: '❤️', comment: '💬', payment: '💰', approval: '✅', rejection: '❌', invite: '🤝', share: '🔗', meta_like: '❤️', meta_comment: '💬', follow: '👤', message: '✉️' };
+    const defaultIcons = { like: '❤️', comment: '💬', payment: '💰', approval: '✅', rejection: '❌', invite: '🤝', share: '🔗', meta_like: '❤️', meta_comment: '💬', follow: '👤', message: '✉️' };
+    const categoryColors = { verification: 'border-l-purple-500', payment: 'border-l-creo-mint', admin: 'border-l-blue-500', warning: 'border-l-red-500', general: 'border-l-gray-300' };
+    const priorityBg = { urgent: 'bg-red-50', high: 'bg-yellow-50', normal: '', low: '' };
     panel.innerHTML = `<div class="p-3 border-b border-gray-200 flex justify-between items-center"><span class="font-bold text-sm text-gray-900">Notificaciones</span><button onclick="markAllRead()" class="text-xs text-creo-mint hover:underline">Marcar leídas</button></div>` +
       data.map(n => {
-        const link = n.link || getNotifDefaultLink(n);
-        return `<div class="px-3 py-2.5 border-b border-gray-100 ${n.is_read ? 'opacity-60' : ''} hover:bg-gray-50 transition cursor-pointer" onclick="${link ? `window.location.href='${link}'` : ''}">
+        const link = n.action_url || n.link || getNotifDefaultLink(n);
+        const icon = n.icon || defaultIcons[n.type] || '🔔';
+        const catClass = categoryColors[n.category] || 'border-l-gray-300';
+        const priBg = priorityBg[n.priority] || '';
+        return `<div class="px-3 py-2.5 border-b border-gray-100 border-l-3 ${catClass} ${priBg} ${n.is_read ? 'opacity-60' : ''} hover:bg-gray-50 transition cursor-pointer" style="border-left-width:3px" onclick="${link ? `window.location.href='${link}'` : ''}">
           <div class="flex gap-2">
-            <span>${icons[n.type] || '🔔'}</span>
+            <span>${icon}</span>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-900">${esc(n.title)}</p>
+              <p class="text-sm font-medium text-gray-900">${esc(n.title)}${n.priority === 'urgent' ? ' <span class="text-[10px] text-red-500 font-bold">URGENTE</span>' : ''}</p>
               ${n.body ? `<p class="text-xs text-gray-500 truncate">${esc(n.body)}</p>` : ''}
               <p class="text-[10px] text-gray-400 mt-0.5">${new Date(n.created_at).toLocaleDateString()}</p>
             </div>
@@ -530,11 +535,17 @@ async function markAllRead() {
   showToast('Notificaciones marcadas como leídas', 'success');
 }
 
-async function createNotification(targetUserId, type, title, body, link) {
+async function createNotification(targetUserId, type, title, body, link, opts = {}) {
   if (!targetUserId) return;
   const { data: { user } } = await sb.auth.getUser();
   if (user && user.id === targetUserId) return;
-  await sb.from('notifications').insert([{ user_id: targetUserId, type, title, body, link: link || null }]);
+  await sb.from('notifications').insert([{
+    user_id: targetUserId, type, title, body, link: link || null,
+    category: opts.category || 'general',
+    priority: opts.priority || 'normal',
+    icon: opts.icon || null,
+    action_url: opts.action_url || null
+  }]);
 }
 
 function getNotifDefaultLink(n) {
@@ -766,14 +777,17 @@ function previewNotificationSound(soundId) {
 const NOTIF_ICONS = { like: '❤️', comment: '💬', payment: '💰', approval: '✅', rejection: '❌', invite: '🤝', share: '🔗', meta_like: '❤️', meta_comment: '💬', follow: '👤', message: '✉️' };
 
 function showNotifBubble(notif) {
-  const icon = NOTIF_ICONS[notif.type] || '🔔';
+  const icon = notif.icon || NOTIF_ICONS[notif.type] || '🔔';
+  const catBorders = { verification: '#8b5cf6', payment: '#33f0b0', admin: '#3b82f6', warning: '#ef4444' };
+  const borderColor = catBorders[notif.category] || '#33f0b0';
   const bubble = document.createElement('div');
   bubble.className = 'creo-notif-bubble';
+  bubble.style.borderLeft = `3px solid ${borderColor}`;
   bubble.innerHTML = `
     <div class="flex items-center gap-2.5">
       <span class="text-lg flex-shrink-0">${icon}</span>
       <div class="flex-1 min-w-0">
-        <p class="text-sm font-semibold text-white truncate">${esc(notif.title || 'Nueva notificación')}</p>
+        <p class="text-sm font-semibold text-white truncate">${esc(notif.title || 'Nueva notificación')}${notif.priority === 'urgent' ? ' ⚠️' : ''}</p>
         ${notif.body ? `<p class="text-xs text-white/70 truncate">${esc(notif.body)}</p>` : ''}
       </div>
     </div>`;
@@ -942,3 +956,325 @@ setTimeout(loadAnnouncementBar, 1500);
 
 initTheme();
 initCookieConsent();
+
+// ========== ONBOARDING SYSTEM ==========
+const ONBOARDING_VERSION = '1.0';
+
+let _onboardingTriggered = false;
+let _engagementScore = 0;
+const ENGAGEMENT_THRESHOLD = 3;
+
+function getOnboardingState() {
+  try { return JSON.parse(localStorage.getItem('creo_onboarding') || '{}'); } catch(e) { return {}; }
+}
+function saveOnboardingState(updates) {
+  const state = { ...getOnboardingState(), ...updates };
+  localStorage.setItem('creo_onboarding', JSON.stringify(state));
+}
+
+function trackEngagement(signal) {
+  if (_onboardingTriggered) return;
+  _engagementScore++;
+  if (_engagementScore >= ENGAGEMENT_THRESHOLD) {
+    checkAndTriggerOnboarding();
+  }
+}
+
+async function checkAndTriggerOnboarding() {
+  if (_onboardingTriggered) return;
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+  if (isAdmin(user.email)) return;
+
+  const { data: profile } = await sb.from('profiles')
+    .select('onboarding_completed, terms_accepted_at, identity_verified')
+    .eq('id', user.id).single();
+
+  if (profile?.onboarding_completed || profile?.terms_accepted_at) {
+    saveOnboardingState({ completed: true });
+    return;
+  }
+
+  const state = getOnboardingState();
+  if (state.completed || state.dismissedAt) {
+    const dismissedAge = Date.now() - (state.dismissedAt || 0);
+    if (dismissedAge < 24 * 60 * 60 * 1000) return;
+  }
+
+  _onboardingTriggered = true;
+  showOnboardingModal(user, profile);
+}
+
+function showOnboardingModal(user, profile) {
+  let existing = document.getElementById('creo-onboarding-modal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'creo-onboarding-modal';
+  modal.className = 'fixed inset-0 z-[400] flex items-center justify-center p-4';
+  modal.style.cssText = 'animation: onboard-fade-in 0.4s ease';
+
+  const steps = [
+    { id: 'welcome', render: renderWelcomeStep },
+    { id: 'creoid', render: renderCreoIdStep },
+    { id: 'stripe', render: renderStripeStep },
+    { id: 'terms', render: renderTermsStep },
+  ];
+  let currentStep = 0;
+
+  function render() {
+    const step = steps[currentStep];
+    const progress = ((currentStep + 1) / steps.length) * 100;
+    modal.innerHTML = `
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" style="animation:onboard-fade-in 0.3s ease"></div>
+      <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto" style="animation:onboard-slide-up 0.4s cubic-bezier(0.16,1,0.3,1)">
+        <div class="h-1 bg-gray-100 rounded-t-2xl overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-creo-purple to-creo-mint transition-all duration-500" style="width:${progress}%"></div>
+        </div>
+        <div class="p-6" id="onboard-step-content"></div>
+      </div>`;
+    const container = modal.querySelector('#onboard-step-content');
+    step.render(container);
+  }
+
+  function nextStep() {
+    if (currentStep < steps.length - 1) {
+      currentStep++;
+      render();
+    }
+  }
+
+  function prevStep() {
+    if (currentStep > 0) {
+      currentStep--;
+      render();
+    }
+  }
+
+  window._onboardNext = nextStep;
+  window._onboardPrev = prevStep;
+  window._onboardDismiss = () => {
+    saveOnboardingState({ dismissedAt: Date.now() });
+    modal.remove();
+  };
+  window._onboardAcceptTerms = async () => {
+    const cb1 = document.getElementById('ob-terms-check');
+    const cb2 = document.getElementById('ob-privacy-check');
+    const cb3 = document.getElementById('ob-community-check');
+    const cb4 = document.getElementById('ob-stripe-check');
+    if (!cb1?.checked || !cb2?.checked || !cb3?.checked || !cb4?.checked) {
+      showToast('Debes aceptar todos los términos para continuar', 'error');
+      return;
+    }
+    const btn = document.getElementById('ob-accept-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+    try {
+      await sb.rpc('accept_platform_terms', { p_policy_version: ONBOARDING_VERSION, p_app_version: ONBOARDING_VERSION });
+      saveOnboardingState({ completed: true });
+      modal.remove();
+      showToast('¡Bienvenido a CREO! Tu cuenta está lista.', 'success');
+      _creoIdVerified = null;
+    } catch(e) {
+      console.error('Terms acceptance error:', e);
+      const { data: { user: u } } = await sb.auth.getUser();
+      if (u) {
+        await sb.from('profiles').update({ terms_accepted_at: new Date().toISOString(), onboarding_completed: true, onboarding_completed_at: new Date().toISOString() }).eq('id', u.id);
+      }
+      saveOnboardingState({ completed: true });
+      modal.remove();
+      showToast('¡Bienvenido a CREO!', 'success');
+    }
+  };
+
+  render();
+  document.body.appendChild(modal);
+}
+
+function renderWelcomeStep(container) {
+  container.innerHTML = `
+    <div class="text-center space-y-4">
+      <div class="w-20 h-20 rounded-full bg-gradient-to-br from-creo-purple to-creo-light flex items-center justify-center mx-auto shadow-lg">
+        <img src="assets/logo-icon.png" class="w-12 h-12 rounded-full" alt="CREO">
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900">Bienvenido a CREO</h2>
+      <div class="space-y-3 text-left">
+        <p class="text-sm text-gray-600 leading-relaxed">CREO es una comunidad construida para <strong>creadores reales</strong> y <strong>apoyadores reales</strong>.</p>
+        <p class="text-sm text-gray-600 leading-relaxed">Cada creador que encuentras aquí está verificado como una persona real.</p>
+        <p class="text-sm text-gray-600 leading-relaxed">Los pagos son procesados de forma segura por <strong>Stripe</strong>, uno de los proveedores de pagos más confiables del mundo.</p>
+        <p class="text-sm text-gray-600 leading-relaxed">Nuestro proceso de verificación protege a creadores, apoyadores y marcas contra el fraude, construyendo una <strong>economía de creadores confiable</strong>.</p>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button onclick="_onboardDismiss()" class="flex-1 text-gray-400 text-sm hover:text-gray-600 transition py-2.5">Ahora no</button>
+        <button onclick="_onboardNext()" class="flex-1 bg-creo-purple hover:bg-creo-light text-white font-bold py-2.5 rounded-xl transition">Continuar</button>
+      </div>
+    </div>`;
+}
+
+function renderCreoIdStep(container) {
+  container.innerHTML = `
+    <div class="space-y-4">
+      <div class="flex items-center gap-3">
+        <button onclick="_onboardPrev()" class="p-1.5 rounded-lg hover:bg-gray-100 transition">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <h2 class="text-xl font-bold text-gray-900 flex-1">Creo ID — Verificación de Identidad</h2>
+      </div>
+      <div class="space-y-3">
+        <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex gap-3">
+          <span class="text-xl flex-shrink-0">🛡️</span>
+          <div>
+            <p class="text-sm font-bold text-green-800">Personas Reales</p>
+            <p class="text-xs text-green-700">La verificación de identidad confirma que cada usuario es una persona real. Esto protege a toda la comunidad.</p>
+          </div>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
+          <span class="text-xl flex-shrink-0">🔒</span>
+          <div>
+            <p class="text-sm font-bold text-blue-800">Protección de Datos</p>
+            <p class="text-xs text-blue-700">CREO <strong>nunca almacena</strong> tus documentos de identidad. La verificación es realizada de forma segura por <strong>Stripe Identity</strong>.</p>
+          </div>
+        </div>
+        <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 flex gap-3">
+          <span class="text-xl flex-shrink-0">✅</span>
+          <div>
+            <p class="text-sm font-bold text-purple-800">Comunidad Protegida</p>
+            <p class="text-xs text-purple-700">La verificación protege a creadores, apoyadores y marcas contra fraude y actividad maliciosa.</p>
+          </div>
+        </div>
+      </div>
+      <button onclick="_onboardNext()" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 rounded-xl transition">Continuar</button>
+    </div>`;
+}
+
+function renderStripeStep(container) {
+  container.innerHTML = `
+    <div class="space-y-4">
+      <div class="flex items-center gap-3">
+        <button onclick="_onboardPrev()" class="p-1.5 rounded-lg hover:bg-gray-100 transition">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <h2 class="text-xl font-bold text-gray-900 flex-1">Pagos Seguros con Stripe</h2>
+      </div>
+      <div class="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-5 space-y-3">
+        <div class="flex items-center gap-2">
+          <svg class="w-8 h-8 text-indigo-600" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
+          <span class="text-lg font-bold text-indigo-900">Stripe</span>
+        </div>
+        <p class="text-sm text-indigo-800">Stripe es nuestra infraestructura de pagos segura. Protege:</p>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex items-center gap-2 text-xs text-indigo-700"><span>💳</span> Pagos</div>
+          <div class="flex items-center gap-2 text-xs text-indigo-700"><span>💚</span> Tips</div>
+          <div class="flex items-center gap-2 text-xs text-indigo-700"><span>⭐</span> Suscripciones</div>
+          <div class="flex items-center gap-2 text-xs text-indigo-700"><span>🤝</span> Brand Deals</div>
+          <div class="flex items-center gap-2 text-xs text-indigo-700"><span>🪪</span> Verificación de Identidad</div>
+          <div class="flex items-center gap-2 text-xs text-indigo-700"><span>🔒</span> Datos Bancarios</div>
+        </div>
+      </div>
+      <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 flex gap-3">
+        <span class="text-xl flex-shrink-0">🔐</span>
+        <div>
+          <p class="text-sm font-bold text-gray-800">Tu información está segura</p>
+          <p class="text-xs text-gray-600">CREO <strong>nunca almacena</strong> información bancaria. Toda la información sensible de pago permanece con Stripe.</p>
+        </div>
+      </div>
+      <button onclick="_onboardNext()" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 rounded-xl transition">Continuar</button>
+    </div>`;
+}
+
+function renderTermsStep(container) {
+  container.innerHTML = `
+    <div class="space-y-4">
+      <div class="flex items-center gap-3">
+        <button onclick="_onboardPrev()" class="p-1.5 rounded-lg hover:bg-gray-100 transition">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <h2 class="text-xl font-bold text-gray-900 flex-1">Acepta los Términos</h2>
+      </div>
+      <p class="text-sm text-gray-500">Para usar CREO, acepta los siguientes términos:</p>
+      <div class="space-y-3">
+        <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-creo-mint transition group">
+          <input type="checkbox" id="ob-terms-check" class="accent-creo-mint w-4 h-4 mt-0.5 flex-shrink-0">
+          <div>
+            <span class="text-sm font-medium text-gray-900 group-hover:text-creo-purple transition">Acepto los <a href="terminos.html" target="_blank" class="text-creo-purple underline hover:text-creo-light">Términos de Servicio</a></span>
+          </div>
+        </label>
+        <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-creo-mint transition group">
+          <input type="checkbox" id="ob-privacy-check" class="accent-creo-mint w-4 h-4 mt-0.5 flex-shrink-0">
+          <div>
+            <span class="text-sm font-medium text-gray-900 group-hover:text-creo-purple transition">Acepto la <a href="privacidad.html" target="_blank" class="text-creo-purple underline hover:text-creo-light">Política de Privacidad</a></span>
+          </div>
+        </label>
+        <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-creo-mint transition group">
+          <input type="checkbox" id="ob-community-check" class="accent-creo-mint w-4 h-4 mt-0.5 flex-shrink-0">
+          <div>
+            <span class="text-sm font-medium text-gray-900 group-hover:text-creo-purple transition">Acepto las <a href="normas-comunidad.html" target="_blank" class="text-creo-purple underline hover:text-creo-light">Normas de la Comunidad</a></span>
+          </div>
+        </label>
+        <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-creo-mint transition group">
+          <input type="checkbox" id="ob-stripe-check" class="accent-creo-mint w-4 h-4 mt-0.5 flex-shrink-0">
+          <div>
+            <span class="text-sm font-medium text-gray-900 group-hover:text-creo-purple transition">Entiendo que <a href="terminos.html#stripe" target="_blank" class="text-creo-purple underline hover:text-creo-light">Stripe</a> provee el procesamiento de pagos y la verificación de identidad</span>
+          </div>
+        </label>
+      </div>
+      <button onclick="_onboardAcceptTerms()" id="ob-accept-btn" class="w-full bg-creo-mint hover:bg-creo-mintDark text-creo-purple font-bold py-3.5 rounded-xl transition text-sm">Aceptar y Comenzar</button>
+      <p class="text-[10px] text-gray-400 text-center">Al aceptar, confirmas que has leído y comprendes los términos de la plataforma.</p>
+    </div>`;
+}
+
+// Engagement detection — attach listeners
+(function initEngagementTracking() {
+  if (window.location.pathname.includes('admin.html') || window.location.pathname.includes('redirect.html')) return;
+
+  let scrollTracked = false;
+  let timeTracked = false;
+
+  window.addEventListener('scroll', () => {
+    if (!scrollTracked && window.scrollY > 400) {
+      scrollTracked = true;
+      trackEngagement('scroll');
+    }
+  }, { passive: true });
+
+  setTimeout(() => {
+    if (!timeTracked) {
+      timeTracked = true;
+      trackEngagement('time_spent');
+    }
+  }, 45000);
+
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href*="profile.html"]');
+    if (link) trackEngagement('profile_view');
+    const likeBtn = e.target.closest('[onclick*="Like"], [onclick*="like"]');
+    if (likeBtn) trackEngagement('like');
+    const commentBtn = e.target.closest('[onclick*="Comment"], [onclick*="comment"]');
+    if (commentBtn) trackEngagement('comment');
+    const followBtn = e.target.closest('[onclick*="Follow"], [onclick*="follow"]');
+    if (followBtn) trackEngagement('follow');
+    const dealLink = e.target.closest('a[href*="brand-deals"]');
+    if (dealLink) trackEngagement('brand_deals');
+  }, { passive: true });
+})();
+
+// Onboarding modal animations
+(function() {
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes onboard-fade-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes onboard-slide-up { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    #creo-onboarding-modal label:has(input:checked) { border-color: #33f0b0; background: rgba(51,240,176,0.05); }
+    .notif-payment { border-left: 3px solid #33f0b0; }
+    .notif-admin { border-left: 3px solid #3b82f6; }
+    .notif-warning { border-left: 3px solid #ef4444; }
+    .notif-verification { border-left: 3px solid #8b5cf6; }
+  `;
+  document.head.appendChild(style);
+})();
+
+// Update last_activity_at periodically
+(async function trackActivity() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user || isAdmin(user.email)) return;
+  await sb.from('profiles').update({ last_activity_at: new Date().toISOString() }).eq('id', user.id);
+})();

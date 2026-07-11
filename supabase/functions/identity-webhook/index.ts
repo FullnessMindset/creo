@@ -33,7 +33,23 @@ serve(async (req) => {
       return new Response(`Webhook Error: ${err.message}`, { status: 400 });
     }
 
-    if (event.type === "identity.verification_session.verified") {
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const eventTypeMap: Record<string, string> = {
+      "identity.verification_session.verified": "verified",
+      "identity.verification_session.requires_input": "needs_review",
+      "identity.verification_session.canceled": "cancelled",
+      "identity.verification_session.created": "started",
+      "identity.verification_session.processing": "submitted",
+      "identity.verification_session.redacted": "expired",
+    };
+
+    const status = eventTypeMap[event.type];
+
+    if (status) {
       const session = event.data.object as Stripe.Identity.VerificationSession;
       const userId = session.metadata?.user_id;
 
@@ -42,22 +58,35 @@ serve(async (req) => {
         return new Response("No user_id in metadata", { status: 400 });
       }
 
-      const supabaseAdmin = createClient(
-        Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      const { error: rpcError } = await supabaseAdmin.rpc(
+        "record_verification_event",
+        {
+          p_user_id: userId,
+          p_status: status,
+          p_stripe_session_id: session.id,
+          p_metadata: {
+            stripe_event_type: event.type,
+            stripe_event_id: event.id,
+            user_email: session.metadata?.user_email || "",
+          },
+        }
       );
 
-      const { error } = await supabaseAdmin
-        .from("profiles")
-        .update({ identity_verified: true })
-        .eq("id", userId);
-
-      if (error) {
-        console.error("Failed to update profile:", error);
-        return new Response("DB update failed", { status: 500 });
+      if (rpcError) {
+        console.error("record_verification_event RPC failed:", rpcError);
+        if (status === "verified") {
+          await supabaseAdmin
+            .from("profiles")
+            .update({ identity_verified: true })
+            .eq("id", userId);
+        }
       }
 
-      console.log(`User ${userId} identity verified successfully`);
+      console.log(
+        `User ${userId} verification event: ${status} (${event.type})`
+      );
+    } else {
+      console.log(`Unhandled identity event type: ${event.type}`);
     }
 
     return new Response(JSON.stringify({ received: true }), {

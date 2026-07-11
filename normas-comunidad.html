@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CREO — Normas de la Comunidad</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a0a3e">
+  <link rel="icon" href="assets/logo-icon.png" type="image/png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { creo: { purple: '#1a0a3e', light: '#2d1b69', mint: '#33f0b0', mintDark: '#28c48e' } } } }
+    }
+  </script>
+  <style>
+    input, select, textarea { font-size: max(16px, 1em) !important; }
+    .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
+  <script src="shared.js"></script>
+
+  <div class="max-w-3xl mx-auto px-4 pt-6 pb-24">
+    <div class="text-center mb-8">
+      <a href="index.html" class="inline-block">
+        <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mx-auto shadow"><img src="assets/logo-icon.png" alt="CREO" class="w-9 h-9 rounded-full object-contain"></div>
+      </a>
+      <h1 class="text-2xl font-bold text-creo-purple mt-3">Normas de la Comunidad</h1>
+      <p class="text-xs text-gray-400 mt-1">Última actualización: 11 de julio de 2026</p>
+    </div>
+
+    <div class="glass rounded-2xl p-6 md:p-8 space-y-6 text-sm text-gray-700 leading-relaxed">
+
+      <section>
+        <h2 class="text-lg font-bold text-gray-900 mb-2">1. Nuestra Misión</h2>
+        <p>CREO es una comunidad donde creadores de contenido, emprendedores y apoyadores se conectan de forma auténtica y segura. Estas normas existen para proteger a todos los miembros y mantener un espacio de confianza, respeto y colaboración.</p>
+        <p class="mt-2">Todos los usuarios — creadores, apoyadores y marcas — deben cumplir con estas normas. Las violaciones pueden resultar en advertencias, suspensión temporal o eliminación permanente de la plataforma.</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-bold text-gray-900 mb-2">2. Identidad y Autenticidad</h2>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Todos los creadores deben completar la verificación de identidad (Creo ID) para recibir pagos.</li>
+          <li>No se permiten cuentas falsas, suplantación de identidad ni perfiles engañosos.</li>
+          <li>Usa tu nombre real o nombre artístico legítimo. No te hagas pasar por otra persona.</li>
+          <li>La información de tu perfil debe ser precisa y actualizada.</li>
+          <li>Una persona = una cuenta de creador. No se permiten cuentas duplicadas.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-bold text-gray-900 mb-2">3. Contenido Permitido</h2>
+        <p>CREO da la bienvenida a contenido creativo, educativo, artístico y emprendedor. Esto incluye:</p>
+        <ul class="list-disc pl-5 space-y-1 mt-2">
+          <li>Videos, arte, música, escritura, podcasts y contenido educativo.</li>
+          <li>Contenido sobre emprendimiento, negocios, tecnología y desarrollo personal.</li>
+          <li>Metas financieras legítimas y transparentes.</li>
+          <li>Colaboraciones con marcas alineadas con los valores de la comunidad.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-bold text-gray-900 mb-2">4. Contenido Prohibido</h2>
+        <p>El siguiente contenido está estrictamente prohibido en CREO:</p>
+        <ul class="list-disc pl-5 space-y-1 mt-2">
+          <li><strong>Contenido ilegal:</strong> Cualquier material que viole las leyes aplicables.</li>
+          <li><strong>Discurso de odio:</strong> Contenido que promueva violencia, discriminación o acoso basado en raza, etnia, género, orientación sexual, religión, discapacidad o cualquier otra característica protegida.</li>
+          <li><strong>Acoso y bullying:</strong> Ataques personales, intimidación, amenazas o acoso repetido hacia otros usuarios.</li>
+          <li><strong>Contenido sexual explícito:</strong> Pornografía, desnudez gratuita o contenido sexualmente explícito.</li>
+          <li><strong>Violencia gráfica:</strong> Contenido que glorifique o promueva la violencia real.</li>
+          <li><strong>Spam y estafas:</strong> Publicaciones repetitivas, engañosas o diseñadas para defraudar a otros usuarios.</li>
+          <li><strong>Desinformación:</strong> Información deliberadamente falsa que pueda causar daño.</li>
+          <li><strong>Contenido de menores:</strong> Cualquier contenido que explote o ponga en riesgo a menores de edad.</li>
+          <li><strong>Propiedad intelectual:</strong> Material protegido por derechos de autor sin autorización del titular.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-bold text-gray-900 mb-2">5. Conducta de la Comunidad</h2>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Trata a todos los miembros con respeto y dignidad.</li>
+          <li>Las críticas constructivas son bienvenidas; los ataques personales no.</li>
+          <li>No envíes mensajes no solicitados ni spam a otros usuarios.</li>
+          <li>No manipules métricas, seguidores o estadísticas de la plataforma.</li>
+          <li>No uses bots, scripts u otras herramientas automatizadas sin autorización.</li>
+          <li>Respeta la privacidad de otros usuarios. No compartas información personal sin consentimiento.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-bold text-gray-900 mb-2">6. Integridad Financiera</h2>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Las metas financieras deben ser honestas y transparentes.</li>
+          <li>Los fondos recaudados deben usarse para los fines declarados.</li>
+          <li>No se permiten esquemas piramidales, estafas de inversión ni solicitudes fraudulentas.</li>
+          <li>Los precios de suscripciones deben ser razonables y ofrecer valor real.</li>
+          <li>No se permite el lavado de dinero ni actividades financieras ilícitas.</li>
+          <li>Los creadores deben cumplir con las obligaciones fiscales de su jurisdicción.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-bold text-gray-900 mb-2">7. Marcas y Brand Deals</h2>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Las marcas deben registrarse con información empresarial verificable.</li>
+          <li>Los brand deals deben ser transparentes para la audiencia del creador.</li>
+          <li>No se permiten productos o servicios ilegales, peligrosos o engañosos.</li>
+          <li>Los pagos de brand deals se procesan de forma segura a través de Stripe.</li>
+          <li>Ambas partes deben cumplir con los acuerdos establecidos.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-bold text-gray-900 mb-2">8. Reportes y Moderación</h2>
+        <p>CREO se compromete a mantener una comunidad segura:</p>
+        <ul class="list-disc pl-5 space-y-1 mt-2">
+          <li>Cualquier usuario puede reportar contenido o conducta que viole estas normas.</li>
+          <li>Los reportes son revisados por nuestro equipo dentro de 24-48 horas.</li>
+          <li>Las decisiones de moderación se comunican al usuario afectado.</li>
+          <li>Los reportes falsos o maliciosos también pueden resultar en sanciones.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-bold text-gray-900 mb-2">9. Consecuencias</h2>
+        <p>Las violaciones de estas normas pueden resultar en:</p>
+        <ul class="list-disc pl-5 space-y-1 mt-2">
+          <li><strong>Advertencia:</strong> Notificación y solicitud de corrección para violaciones menores.</li>
+          <li><strong>Restricción temporal:</strong> Limitación de funciones por un período determinado.</li>
+          <li><strong>Suspensión:</strong> Inhabilitación temporal de la cuenta.</li>
+          <li><strong>Eliminación permanente:</strong> Cierre definitivo de la cuenta y pérdida de acceso a fondos pendientes.</li>
+        </ul>
+        <p class="mt-2">Las violaciones graves (contenido ilegal, fraude, explotación de menores) resultarán en eliminación inmediata y reporte a las autoridades correspondientes.</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-bold text-gray-900 mb-2">10. Contacto</h2>
+        <p>Si tienes preguntas sobre estas normas o necesitas reportar una violación:</p>
+        <ul class="list-disc pl-5 space-y-1 mt-2">
+          <li>Email: <strong>fullnessmindset@gmail.com</strong></li>
+          <li>A través de la función de reporte en la plataforma.</li>
+        </ul>
+      </section>
+
+    </div>
+
+    <div class="text-center mt-6">
+      <a href="index.html" class="text-creo-purple text-sm hover:underline">← Volver a CREO</a>
+    </div>
+  </div>
+
+</body>
+</html>
