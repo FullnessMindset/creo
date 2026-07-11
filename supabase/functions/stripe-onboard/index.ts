@@ -53,14 +53,21 @@ serve(async (req) => {
 
     let connectId = profile?.stripe_connect_id;
 
+    if (connectId) {
+      try {
+        const existing = await stripe.accounts.retrieve(connectId);
+        if (existing.details_submitted) {
+          return json({ error: "Stripe account already connected", already_connected: true });
+        }
+      } catch (e) {
+        connectId = null;
+      }
+    }
+
     if (!connectId) {
       const account = await stripe.accounts.create({
         type: "express",
         email: user.email,
-        capabilities: {
-          card_payments: { requested: true },
-          transfers: { requested: true },
-        },
         metadata: { user_id: user.id },
       });
       connectId = account.id;
