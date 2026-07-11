@@ -16,8 +16,8 @@ serve(async (req) => {
   try {
     const { creator_connect_id, creator_id, creator_username, amount_usd, success_url, cancel_url } = await req.json();
 
-    if (!creator_connect_id || !amount_usd || amount_usd < 1) {
-      return new Response(JSON.stringify({ error: "Missing or invalid parameters" }), {
+    if (!creator_connect_id || !amount_usd || amount_usd < 1 || amount_usd > 10000) {
+      return new Response(JSON.stringify({ error: "Missing or invalid parameters (amount: $1–$10,000)" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

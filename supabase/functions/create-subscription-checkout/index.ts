@@ -22,8 +22,8 @@ serve(async (req) => {
   try {
     const { creator_connect_id, creator_id, amount_usd, success_url, cancel_url } = await req.json();
 
-    if (!creator_connect_id || !creator_id || !amount_usd || amount_usd < 3) {
-      return new Response(JSON.stringify({ error: "Missing or invalid parameters" }), {
+    if (!creator_connect_id || !creator_id || !amount_usd || amount_usd < 3 || amount_usd > 1000) {
+      return new Response(JSON.stringify({ error: "Missing or invalid parameters (subscription: $3–$1,000/mo)" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -51,13 +51,26 @@ serve(async (req) => {
         .eq("id", creator_id);
     }
 
-    // Create a dynamic price for the chosen amount
-    const price = await stripe.prices.create({
+    // Reuse existing price for this amount if one exists, otherwise create
+    let price;
+    const existingPrices = await stripe.prices.list({
       product: productId,
-      unit_amount: amountCents,
       currency: "usd",
-      recurring: { interval: "month" },
+      type: "recurring",
+      active: true,
+      limit: 100,
     });
+    price = existingPrices.data.find(
+      (p) => p.unit_amount === amountCents && p.recurring?.interval === "month"
+    );
+    if (!price) {
+      price = await stripe.prices.create({
+        product: productId,
+        unit_amount: amountCents,
+        currency: "usd",
+        recurring: { interval: "month" },
+      });
+    }
 
     const isPlatform = creator_connect_id === "platform";
     const subscriptionData: any = {};

@@ -16,19 +16,38 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+function json(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { conversation_id, sender_id, creator_connect_id, amount_usd, description, success_url, cancel_url } = await req.json();
+    // Verify JWT auth — the caller must be the brand who owns the conversation
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) return json({ error: "No authorization header" }, 401);
 
-    if (!conversation_id || !sender_id || !creator_connect_id || !amount_usd || amount_usd < 1) {
-      return new Response(JSON.stringify({ error: "Missing or invalid parameters" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) return json({ error: "Unauthorized" }, 401);
+
+    const { conversation_id, creator_connect_id, amount_usd, description, success_url, cancel_url } = await req.json();
+
+    if (!conversation_id || !creator_connect_id || !amount_usd || amount_usd < 1) {
+      return json({ error: "Missing or invalid parameters" }, 400);
     }
 
-    // Verify the sender is the brand in this conversation
+    if (amount_usd > 50000) {
+      return json({ error: "Amount exceeds maximum" }, 400);
+    }
+
+    const sender_id = user.id;
+
+    // Verify the authenticated user is the brand in this conversation
     const { data: conv, error: convErr } = await supabase
       .from("deal_conversations")
       .select("brand_id, creator_id")
@@ -36,9 +55,7 @@ serve(async (req) => {
       .single();
 
     if (convErr || !conv || conv.brand_id !== sender_id) {
-      return new Response(JSON.stringify({ error: "Only the brand can send payments" }), {
-        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return json({ error: "Only the brand can send payments" }, 403);
     }
 
     const amountCents = Math.round(amount_usd * 100);

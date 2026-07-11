@@ -1528,12 +1528,16 @@
       showToast('Procesando pago...', 'info');
 
       try {
+        const { data: { session: authSession } } = await sb.auth.getSession();
+        if (!authSession) { showToast('Inicia sesión primero', 'error'); return; }
         const res = await fetch(SUPABASE_FN_URL + '/create-deal-payment', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + authSession.access_token
+          },
           body: JSON.stringify({
             conversation_id: activeConversation.id,
-            sender_id: currentUser.id,
             creator_connect_id: creatorProf.stripe_connect_id,
             amount_usd: amount,
             description: desc

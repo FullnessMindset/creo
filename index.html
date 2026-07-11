@@ -2872,7 +2872,24 @@
     if (window.location.hash === '#post') window.addEventListener('load', () => showTab('posts'));
     const _urlParams = new URLSearchParams(window.location.search);
     if (_urlParams.get('verification') === 'complete') {
-      window.addEventListener('load', () => { showTab('verify'); showToast('Verificación de identidad completada. Envía tu solicitud.', 'success'); });
+      window.addEventListener('load', async () => {
+        showTab('verify');
+        showToast('Verificación completada. Confirmando resultado...', 'info');
+        let verified = false;
+        for (let i = 0; i < 10; i++) {
+          const { data: { user } } = await sb.auth.getUser();
+          if (!user) break;
+          const { data: p } = await sb.from('profiles').select('identity_verified').eq('id', user.id).single();
+          if (p?.identity_verified) { verified = true; break; }
+          await new Promise(r => setTimeout(r, 3000));
+        }
+        if (verified) {
+          showToast('¡Identidad verificada exitosamente!', 'success');
+          checkUser();
+        } else {
+          showToast('Verificación en proceso. Tu estado se actualizará en unos minutos.', 'info');
+        }
+      });
     }
     if (_urlParams.get('stripe') === 'success') {
       window.addEventListener('load', () => { showToast('¡Stripe conectado exitosamente! Ya puedes recibir pagos.', 'success'); });

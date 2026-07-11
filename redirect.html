@@ -83,16 +83,31 @@
 
     (async function() {
       if (status === 'success') {
-        setUI('¡Stripe Conectado!', 'Redirigiendo al panel...');
+        setUI('Verificando conexión con Stripe...', 'Confirmando tu cuenta...');
+        try {
+          const { data: { user } } = await sb.auth.getUser();
+          if (user) {
+            const { data: prof } = await sb.from('profiles').select('stripe_connect_id').eq('id', user.id).single();
+            if (prof?.stripe_connect_id) {
+              setUI('¡Stripe Conectado!', 'Tu cuenta está lista para recibir pagos.');
+            } else {
+              setUI('Stripe Conectado', 'Redirigiendo al panel...');
+            }
+          } else {
+            setUI('¡Stripe Conectado!', 'Redirigiendo al panel...');
+          }
+        } catch (_) {
+          setUI('¡Stripe Conectado!', 'Redirigiendo al panel...');
+        }
         document.getElementById('spinner').classList.add('hidden');
         setTimeout(() => { window.location.href = 'index.html'; }, 1500);
         return;
       }
 
       if (status === 'refresh') {
-        setUI('Configuración incompleta', 'Redirigiendo al panel para reintentar...');
+        setUI('Configuración incompleta', 'La configuración de Stripe no se completó. Puedes reintentar desde tu panel.');
         document.getElementById('spinner').classList.add('hidden');
-        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
         return;
       }
 
