@@ -36,6 +36,12 @@
     .welcome-gradient { background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 50%, #33f0b0 100%); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { scrollbar-width: none; }
+    .reaction-picker { position: absolute; bottom: 100%; left: -8px; display: flex; gap: 2px; background: white; border-radius: 9999px; padding: 4px 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.08); opacity: 0; visibility: hidden; transform: translateY(4px) scale(0.9); transition: all 0.2s ease; z-index: 10; }
+    .reaction-wrap:hover .reaction-picker, .reaction-picker.show { opacity: 1; visibility: visible; transform: translateY(-4px) scale(1); }
+    .reaction-picker button { font-size: 22px; line-height: 1; padding: 3px 4px; border-radius: 9999px; transition: transform 0.15s; cursor: pointer; background: none; border: none; }
+    .reaction-picker button:hover { transform: scale(1.35); }
+    .reaction-badges { display: inline-flex; gap: 1px; margin-right: 4px; }
+    .reaction-badges span { font-size: 14px; cursor: pointer; }
   </style>
 </head>
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
@@ -418,16 +424,23 @@
         if (data && data.length > 0) {
           document.getElementById('feed-empty').classList.add('hidden');
           const likesMap = {};
+          const postIds = data.map(p => p.id);
           if (currentUser) {
-            const postIds = data.map(p => p.id);
-            const { data: likes } = await sb.from('community_likes').select('post_id').eq('user_id', currentUser.id).in('post_id', postIds);
-            (likes || []).forEach(l => likesMap[l.post_id] = true);
+            const { data: likes } = await sb.from('community_likes').select('post_id, reaction_type').eq('user_id', currentUser.id).in('post_id', postIds);
+            (likes || []).forEach(l => likesMap[l.post_id] = l.reaction_type || '❤️');
           }
+          const { data: allReactions } = await sb.from('community_likes').select('post_id, reaction_type').in('post_id', postIds);
+          const reactionSummary = {};
+          (allReactions || []).forEach(r => {
+            if (!reactionSummary[r.post_id]) reactionSummary[r.post_id] = {};
+            const t = r.reaction_type || '❤️';
+            reactionSummary[r.post_id][t] = (reactionSummary[r.post_id][t] || 0) + 1;
+          });
           const countPromises = data.map(p => sb.from('community_likes').select('id', { count: 'exact', head: true }).eq('post_id', p.id));
           const commentCountPromises = data.map(p => sb.from('community_comments').select('id', { count: 'exact', head: true }).eq('post_id', p.id));
           const [likeCounts, commentCounts] = await Promise.all([Promise.all(countPromises), Promise.all(commentCountPromises)]);
           const feed = document.getElementById('community-feed');
-          data.forEach((post, i) => { feed.insertAdjacentHTML('beforeend', renderPost(post, likesMap[post.id], likeCounts[i].count || 0, commentCounts[i].count || 0)); });
+          data.forEach((post, i) => { feed.insertAdjacentHTML('beforeend', renderPost(post, likesMap[post.id], likeCounts[i].count || 0, commentCounts[i].count || 0, reactionSummary[post.id] || {})); });
           feedPage++;
         }
         if (feedDone && feedPage > 0) document.getElementById('feed-end').classList.remove('hidden');
@@ -441,7 +454,9 @@
 
     function onScroll() { if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 400) loadFeed(); }
 
-    function renderPost(post, liked, likeCount, commentCount) {
+    const REACTIONS = ['❤️','🔥','😂','😮','😢','👏','🌱'];
+
+    function renderPost(post, liked, likeCount, commentCount, reactions) {
       const a = post.author;
       if (!a) return '';
       const name = a.display_name || a.username || 'Usuario';
@@ -475,7 +490,11 @@
         ${post.body ? `<p class="text-sm text-gray-800 leading-relaxed whitespace-pre-line">${linkify(esc(post.body))}</p>` : ''}
         ${mediaHtml}${sharedHtml}
         <div class="flex items-center justify-between pt-2 border-t border-gray-100">
-          <button onclick="toggleLike('${post.id}', this)" class="flex items-center gap-1.5 text-sm transition ${liked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}"><svg class="w-5 h-5" fill="${liked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg><span class="like-count">${likeCount}</span></button>
+          <div class="reaction-wrap relative flex items-center gap-1">
+            <div class="reaction-picker" id="picker-${post.id}">${REACTIONS.map(r => `<button onclick="reactToPost('${post.id}','${r}',this)" title="${r}">${r}</button>`).join('')}</div>
+            <button onclick="quickReact('${post.id}', this)" data-reacted="${liked || ''}" class="flex items-center gap-1 text-sm transition ${liked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}"><span class="current-reaction text-lg">${liked || '❤️'}</span><span class="like-count">${likeCount}</span></button>
+            ${Object.keys(reactions || {}).length > 0 ? `<button onclick="openReactions('${post.id}')" class="reaction-badges ml-1 hover:opacity-70 transition">${Object.entries(reactions).sort((a,b) => b[1]-a[1]).slice(0,4).map(([r]) => `<span>${r}</span>`).join('')}</button>` : ''}
+          </div>
           <button onclick="openComments('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-purple transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span>${commentCount}</span></button>
           <button onclick="openShareModal('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-mint transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>Compartir</button>
         </div></div></div>`;
@@ -548,17 +567,100 @@
       btn.disabled = false; btn.textContent = 'Publicar';
     }
 
-    async function toggleLike(postId, btn) {
-      if (!currentUser) { showToast('Inicia sesión para dar like', 'info'); return; }
-      const countEl = btn.querySelector('.like-count'); const isLiked = btn.classList.contains('text-red-500');
-      if (isLiked) { btn.classList.remove('text-red-500'); btn.classList.add('text-gray-500'); btn.querySelector('svg').setAttribute('fill', 'none'); countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1); await sb.from('community_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id); }
-      else {
-        btn.classList.add('text-red-500'); btn.classList.remove('text-gray-500'); btn.querySelector('svg').setAttribute('fill', 'currentColor'); countEl.textContent = parseInt(countEl.textContent) + 1;
-        await sb.from('community_likes').insert({ post_id: postId, user_id: currentUser.id });
-        const authorId = document.getElementById('post-' + postId)?.dataset?.authorId;
-        if (authorId) createNotification(authorId, 'like', 'A alguien le gustó tu publicación', null, 'comunidad.html#post-' + postId);
+    function quickReact(postId, btn) {
+      if (!currentUser) { showToast('Inicia sesión para reaccionar', 'info'); return; }
+      const current = btn.dataset.reacted;
+      if (current) {
+        btn.dataset.reacted = '';
+        btn.classList.remove('text-red-500'); btn.classList.add('text-gray-500');
+        btn.querySelector('.current-reaction').textContent = '❤️';
+        const countEl = btn.querySelector('.like-count');
+        countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1);
+        sb.from('community_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+      } else {
+        reactToPost(postId, '❤️', null, btn);
       }
     }
+
+    async function reactToPost(postId, emoji, pickerBtn, mainBtn) {
+      if (!currentUser) { showToast('Inicia sesión para reaccionar', 'info'); return; }
+      const wrap = document.querySelector(`#post-${postId} .reaction-wrap`);
+      const btn = mainBtn || wrap?.querySelector('button[data-reacted]');
+      if (!btn) return;
+      const picker = document.getElementById('picker-' + postId);
+      if (picker) picker.classList.remove('show');
+      const current = btn.dataset.reacted;
+      if (current === emoji) { quickReact(postId, btn); return; }
+      const countEl = btn.querySelector('.like-count');
+      if (!current) countEl.textContent = parseInt(countEl.textContent) + 1;
+      btn.dataset.reacted = emoji;
+      btn.classList.add('text-red-500'); btn.classList.remove('text-gray-500');
+      btn.querySelector('.current-reaction').textContent = emoji;
+      await sb.from('community_likes').upsert({ post_id: postId, user_id: currentUser.id, reaction_type: emoji }, { onConflict: 'post_id,user_id' });
+      const authorId = document.getElementById('post-' + postId)?.dataset?.authorId;
+      if (authorId && authorId !== currentUser.id) createNotification(authorId, 'like', `Alguien reaccionó ${emoji} a tu publicación`, null, 'comunidad.html#post-' + postId);
+    }
+
+    async function openReactions(postId) {
+      const { data } = await sb.from('community_likes').select('reaction_type, user:user_id(id, username, display_name, avatar_url)').eq('post_id', postId).order('created_at', { ascending: false });
+      if (!data || !data.length) { showToast('Sin reacciones aún', 'info'); return; }
+      const grouped = {};
+      data.forEach(r => { const t = r.reaction_type || '❤️'; if (!grouped[t]) grouped[t] = []; grouped[t].push(r.user); });
+      const allTypes = Object.keys(grouped);
+      let existing = document.getElementById('reactions-modal'); if (existing) existing.remove();
+      const modal = document.createElement('div'); modal.id = 'reactions-modal'; modal.className = 'fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4';
+      modal.innerHTML = `<div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('reactions-modal').remove()"></div>
+        <div class="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md max-h-[70vh] flex flex-col overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+            <h3 class="font-bold text-gray-900">Reacciones</h3>
+            <button onclick="document.getElementById('reactions-modal').remove()" class="text-gray-400 hover:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+          </div>
+          <div class="flex gap-1 px-5 py-2 border-b border-gray-100 overflow-x-auto no-scrollbar">
+            <button onclick="filterReactions('all')" class="reaction-tab active px-3 py-1.5 rounded-full text-xs font-semibold bg-creo-purple text-white transition">Todas ${data.length}</button>
+            ${allTypes.map(t => `<button onclick="filterReactions('${t}')" class="reaction-tab px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">${t} ${grouped[t].length}</button>`).join('')}
+          </div>
+          <div id="reactions-list" class="flex-1 overflow-y-auto px-5 py-2 space-y-1">
+            ${data.map(r => {
+              const u = r.user; const name = u?.display_name || u?.username || '?';
+              const avatar = u?.avatar_url ? `<img src="${esc(u.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-xs">${esc(name[0])}</span>`;
+              return `<div class="flex items-center gap-3 py-2 reaction-item" data-type="${r.reaction_type || '❤️'}">
+                <a href="profile.html?u=${esc(u?.username || '')}" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition">${avatar}</a>
+                <a href="profile.html?u=${esc(u?.username || '')}" class="flex-1 font-semibold text-sm text-gray-900 hover:text-creo-purple transition">${esc(name)}</a>
+                <span class="text-xl">${r.reaction_type || '❤️'}</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+    }
+
+    function filterReactions(type) {
+      document.querySelectorAll('.reaction-tab').forEach(b => { b.className = b.className.replace('bg-creo-purple text-white', 'bg-gray-100 text-gray-600'); });
+      event.target.className = event.target.className.replace('bg-gray-100 text-gray-600', 'bg-creo-purple text-white');
+      document.querySelectorAll('.reaction-item').forEach(el => {
+        el.style.display = (type === 'all' || el.dataset.type === type) ? 'flex' : 'none';
+      });
+    }
+
+    document.addEventListener('touchstart', function(e) {
+      const btn = e.target.closest('button[data-reacted]');
+      if (!btn) return;
+      const postEl = btn.closest('[id^="post-"]');
+      if (!postEl) return;
+      const postId = postEl.id.replace('post-', '');
+      const picker = document.getElementById('picker-' + postId);
+      if (!picker) return;
+      let timer = setTimeout(() => { picker.classList.add('show'); timer = null; }, 400);
+      const cancel = () => { if (timer) clearTimeout(timer); };
+      btn.addEventListener('touchend', cancel, { once: true });
+      btn.addEventListener('touchmove', cancel, { once: true });
+    }, { passive: true });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.reaction-wrap')) {
+        document.querySelectorAll('.reaction-picker.show').forEach(p => p.classList.remove('show'));
+      }
+    });
 
     async function openComments(postId) { activeCommentPostId = postId; document.getElementById('comments-modal').classList.remove('hidden'); createEmojiPicker('comment-input', 'comment-emoji-btn'); loadComments(postId); }
     function closeComments() { document.getElementById('comments-modal').classList.add('hidden'); activeCommentPostId = null; }
