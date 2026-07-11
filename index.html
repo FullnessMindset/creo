@@ -55,6 +55,13 @@
         <span class="text-lg">🛡️</span>
         <p class="text-xs text-green-700">CREO usa exclusivamente Google para inicio de sesión. Tu cuenta está protegida por la autenticación de Google.</p>
       </div>
+      <div class="text-center pt-2 border-t border-gray-200">
+        <p class="text-xs text-gray-500 mb-2">¿Eres una empresa o marca?</p>
+        <a href="registro-empresa.html" class="inline-flex items-center gap-2 bg-creo-purple/10 hover:bg-creo-purple/20 text-creo-purple px-4 py-2.5 rounded-lg font-semibold text-sm transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          Registrar como Empresa
+        </a>
+      </div>
     </div>
 
     <!-- VERIFICATION STATUS BANNER -->
@@ -2940,8 +2947,15 @@
     }
 
     if (window.location.hash === '#post') window.addEventListener('load', () => showTab('posts'));
-    if (new URLSearchParams(window.location.search).get('verification') === 'complete') {
+    const _urlParams = new URLSearchParams(window.location.search);
+    if (_urlParams.get('verification') === 'complete') {
       window.addEventListener('load', () => { showTab('verify'); showToast('Verificación de identidad completada. Envía tu solicitud.', 'success'); });
+    }
+    if (_urlParams.get('stripe') === 'success') {
+      window.addEventListener('load', () => { showToast('¡Stripe conectado exitosamente! Ya puedes recibir pagos.', 'success'); });
+    }
+    if (_urlParams.get('stripe') === 'refresh') {
+      window.addEventListener('load', () => { showToast('Configuración de Stripe incompleta. Intenta de nuevo.', 'error'); });
     }
 
     // ===== ONBOARDING GUIDE =====

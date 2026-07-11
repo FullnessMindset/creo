@@ -145,9 +145,11 @@ async function startCreoIdVerification() {
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { showToast('Inicia sesión primero', 'error'); return; }
+    const returnUrl = window.location.href.split('?')[0] + '?verification=complete';
     const res = await fetch(SUPABASE_URL + '/functions/v1/create-identity-session', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token }
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ return_url: returnUrl })
     });
     const result = await res.json();
     if (result.error) { showToast('Error: ' + result.error, 'error'); return; }
@@ -923,6 +925,20 @@ function dismissAnnouncement(id) {
   if (bar) bar.remove();
 }
 setTimeout(loadAnnouncementBar, 1500);
+
+// ========== RETURN URL HANDLERS ==========
+(function handleReturnParams() {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('verification') === 'complete' && !window.location.pathname.includes('index.html')) {
+    setTimeout(() => showToast('Verificación de identidad completada.', 'success'), 1000);
+  }
+  if (p.get('stripe') === 'success' && !window.location.pathname.includes('index.html') && !window.location.pathname.includes('redirect.html')) {
+    setTimeout(() => showToast('¡Stripe conectado exitosamente!', 'success'), 1000);
+  }
+  if (p.get('status') === 'payment_sent' && !window.location.pathname.includes('brand-deals.html')) {
+    setTimeout(() => showToast('Pago enviado exitosamente.', 'success'), 1000);
+  }
+})();
 
 initTheme();
 initCookieConsent();

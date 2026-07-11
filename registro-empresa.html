@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CREO — Registro de Empresa</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a0a3e">
+  <link rel="icon" href="assets/logo-icon.png" type="image/png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { creo: { purple: '#1a0a3e', light: '#2d1b69', mint: '#33f0b0', mintDark: '#28c48e' } } } }
+    }
+  </script>
+  <style>
+    input, select, textarea { font-size: max(16px, 1em) !important; }
+    .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
+    @keyframes slide-up { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .animate-in { animation: slide-up 0.4s ease-out; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
+  <script src="shared.js"></script>
+
+  <div class="max-w-2xl mx-auto px-4 pt-6 pb-24 space-y-6">
+    <!-- Header -->
+    <div class="text-center space-y-2">
+      <a href="index.html"><div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto shadow"><img src="assets/logo-icon.png" alt="CREO" class="w-12 h-12 rounded-full object-contain"></div></a>
+      <h1 class="text-2xl font-bold tracking-[0.15em] text-creo-purple">CREO</h1>
+      <p class="text-sm text-gray-500">Portal de Empresas & Brand Deals</p>
+    </div>
+
+    <!-- What is this -->
+    <div class="glass rounded-2xl p-6 space-y-4 animate-in">
+      <h2 class="text-lg font-bold text-gray-900">🏢 Registro como Empresa</h2>
+      <p class="text-sm text-gray-600 leading-relaxed">Las empresas e instituciones pueden apoyar creadores a través de <strong>Brand Deals orgánicos</strong> en CREO. Al registrarte, tendrás acceso a un portal exclusivo para conectar con creadores verificados.</p>
+
+      <div class="bg-creo-mint/10 border border-creo-mint/30 rounded-xl p-4 space-y-3">
+        <h3 class="font-bold text-sm text-creo-purple">¿Cómo funcionan los Brand Deals en CREO?</h3>
+        <p class="text-xs text-gray-600 leading-relaxed">Nuestro modelo es diferente. No queremos que el creador diga <em>"compra aquí"</em> o <em>"cómpralo ya"</em>. Queremos <strong>awareness orgánico</strong> integrado en la historia del creador.</p>
+        <div class="space-y-2 text-xs text-gray-700">
+          <div class="flex gap-2">
+            <span class="text-green-500 flex-shrink-0">✅</span>
+            <span><strong>Correcto:</strong> <em>"Esta casa de Realtors me ayudó a recibir la pre aprobación de esta casa que es mi meta."</em> — mención natural dentro de su historia.</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-red-500 flex-shrink-0">❌</span>
+            <span><strong>Incorrecto:</strong> <em>"Esta casa de Realtors es la mejor compra, ya compra aquí, agenda hoy mismo."</em> — venta directa, no es lo que buscamos.</span>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 leading-relaxed">El creador menciona tu marca como parte de su viaje. El público lo siente real porque <strong>es</strong> real. No hay scripts forzados — solo historias auténticas donde tu marca aparece naturalmente.</p>
+      </div>
+    </div>
+
+    <!-- Auth Section -->
+    <div id="auth-section" class="glass rounded-2xl p-6 space-y-4 animate-in">
+      <h3 class="font-bold text-gray-900">1. Crea tu cuenta empresarial</h3>
+      <input id="biz-email" type="email" placeholder="Email corporativo" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+      <input id="biz-password" type="password" placeholder="Contraseña" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+      <button onclick="registerBusiness()" id="biz-register-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Crear Cuenta de Empresa</button>
+      <p class="text-center text-xs text-gray-400">¿Ya tienes cuenta? <a href="index.html" class="text-creo-purple underline">Inicia sesión</a></p>
+    </div>
+
+    <!-- Company Info (shown after auth) -->
+    <div id="company-section" class="hidden space-y-6">
+      <div class="glass rounded-2xl p-6 space-y-4 animate-in">
+        <h3 class="font-bold text-gray-900">2. Información de la Empresa</h3>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Nombre de la Empresa *</label>
+          <input id="company-name" type="text" placeholder="Tu Planta PR, Inc." class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Tipo de Organización *</label>
+          <select id="company-type" class="w-full border border-gray-300 bg-white p-3 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <option value="">Selecciona...</option>
+            <option value="llc">LLC</option>
+            <option value="corp">Corporación</option>
+            <option value="nonprofit">Sin fines de lucro</option>
+            <option value="sole">Persona física con negocio</option>
+            <option value="institution">Institución / Gobierno</option>
+            <option value="other">Otro</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Industria / Sector *</label>
+          <input id="company-industry" type="text" placeholder="Tecnología, Alimentos, Moda, Educación..." class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Sitio Web</label>
+          <input id="company-website" type="url" placeholder="https://tuempresa.com" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Persona de Contacto *</label>
+          <input id="company-contact" type="text" placeholder="Nombre completo" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Teléfono de Contacto</label>
+          <input id="company-phone" type="tel" placeholder="+1 787 000 0000" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Descripción del negocio *</label>
+          <textarea id="company-desc" rows="3" placeholder="¿A qué se dedica tu empresa? ¿Qué tipo de creadores te interesan?" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+        </div>
+      </div>
+
+      <div class="glass rounded-2xl p-6 space-y-4 animate-in">
+        <h3 class="font-bold text-gray-900">3. Documentos de la Empresa</h3>
+        <p class="text-xs text-gray-500">Sube los documentos que validen tu empresa. Esto nos ayuda a verificar tu identidad comercial y proteger a nuestros creadores.</p>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Logo de la Empresa *</label>
+          <input type="file" id="company-logo" accept="image/*" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
+          <div id="logo-preview" class="mt-2 hidden"><img class="w-20 h-20 object-contain rounded-lg border"></div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Registro Comercial / Incorporación *</label>
+          <input type="file" id="company-registration" accept="image/*,.pdf" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
+          <p class="text-[10px] text-gray-400 mt-1">Articles of Incorporation, registro mercantil o equivalente (PDF o imagen)</p>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">EIN / Tax ID (opcional)</label>
+          <input type="file" id="company-tax" accept="image/*,.pdf" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Documento adicional (opcional)</label>
+          <input type="file" id="company-extra" accept="image/*,.pdf" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
+        </div>
+      </div>
+
+      <div class="glass rounded-2xl p-6 space-y-4 animate-in">
+        <h3 class="font-bold text-gray-900">4. Política de Brand Deals</h3>
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-xs text-amber-800 leading-relaxed space-y-2">
+          <p><strong>Al registrarte como empresa en CREO, aceptas que:</strong></p>
+          <ul class="list-disc pl-4 space-y-1">
+            <li>Los Brand Deals deben ser <strong>orgánicos y basados en la historia del creador</strong>. No se permiten scripts de venta directa.</li>
+            <li>El creador menciona tu marca naturalmente como parte de su contenido — no como un comercial.</li>
+            <li>No puedes exigir al creador que use frases como "compra aquí", "usa mi código", "link en la bio" o cualquier llamado a la acción de venta directa.</li>
+            <li>El objetivo es <strong>awareness</strong>, no conversión directa. La audiencia conecta con la marca porque confía en el creador.</li>
+            <li>CREO se reserva el derecho de rechazar o suspender empresas que violen esta política.</li>
+          </ul>
+        </div>
+        <label class="flex items-start gap-2 cursor-pointer">
+          <input type="checkbox" id="accept-brand-policy" class="mt-0.5 accent-creo-purple">
+          <span class="text-xs text-gray-600">Acepto la política de Brand Deals orgánicos de CREO, los <a href="terminos.html" target="_blank" class="text-creo-purple underline">Términos de Servicio</a> y la <a href="privacidad.html" target="_blank" class="text-creo-purple underline">Política de Privacidad</a>.</span>
+        </label>
+        <button onclick="submitCompanyRegistration()" id="submit-company-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-bold transition text-sm">Enviar Solicitud de Empresa</button>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div id="success-section" class="hidden text-center space-y-4 py-12 animate-in">
+      <div class="text-5xl">🎉</div>
+      <h2 class="text-xl font-bold text-gray-900">¡Solicitud Enviada!</h2>
+      <p class="text-sm text-gray-600 max-w-xs mx-auto">Nuestro equipo revisará tu documentación en las próximas 48 horas. Te notificaremos por email cuando tu cuenta empresarial esté aprobada.</p>
+      <p class="text-xs text-gray-400">¿Preguntas? Escríbenos a <a href="mailto:osvaldo@fullnessmindset.com" class="text-creo-purple underline">osvaldo@fullnessmindset.com</a></p>
+      <a href="index.html" class="inline-block bg-creo-purple text-white px-6 py-3 rounded-xl font-semibold hover:bg-creo-light transition mt-4">Ir al Inicio</a>
+    </div>
+  </div>
+
+  <script>
+    let bizUser = null;
+
+    async function registerBusiness() {
+      const email = document.getElementById('biz-email').value.trim();
+      const password = document.getElementById('biz-password').value;
+      if (!email || !password) return showToast('Ingresa email y contraseña', 'error');
+      if (password.length < 6) return showToast('La contraseña debe tener al menos 6 caracteres', 'error');
+      const btn = document.getElementById('biz-register-btn');
+      btn.innerText = 'Creando...'; btn.disabled = true;
+      const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: 'https://fullnessmindset.github.io/creo/redirect.html' } });
+      if (error) { btn.innerText = 'Crear Cuenta de Empresa'; btn.disabled = false; return showToast(error.message, 'error'); }
+      bizUser = data.user;
+      await sb.from('profiles').insert([{
+        id: bizUser.id,
+        username: 'biz_' + Math.floor(Math.random() * 100000),
+        account_type: 'business',
+        accepted_terms: true,
+        accepted_conduct: true
+      }]);
+      document.getElementById('auth-section').classList.add('hidden');
+      document.getElementById('company-section').classList.remove('hidden');
+      showToast('Cuenta creada. Completa la información de tu empresa.', 'success');
+    }
+
+    document.getElementById('company-logo').addEventListener('change', async function() {
+      const file = this.files[0];
+      if (!file) return;
+      const preview = document.getElementById('logo-preview');
+      preview.classList.remove('hidden');
+      preview.querySelector('img').src = URL.createObjectURL(file);
+    });
+
+    async function submitCompanyRegistration() {
+      if (!bizUser) return showToast('Primero crea tu cuenta', 'error');
+      const name = document.getElementById('company-name').value.trim();
+      const type = document.getElementById('company-type').value;
+      const industry = document.getElementById('company-industry').value.trim();
+      const contact = document.getElementById('company-contact').value.trim();
+      const desc = document.getElementById('company-desc').value.trim();
+      if (!name || !type || !industry || !contact || !desc) return showToast('Completa todos los campos obligatorios (*)', 'error');
+      if (!document.getElementById('accept-brand-policy').checked) return showToast('Debes aceptar la política de Brand Deals', 'error');
+      const logoFile = document.getElementById('company-logo').files[0];
+      const regFile = document.getElementById('company-registration').files[0];
+      if (!logoFile) return showToast('Sube el logo de tu empresa', 'error');
+      if (!regFile) return showToast('Sube el registro comercial', 'error');
+
+      const btn = document.getElementById('submit-company-btn');
+      btn.innerText = 'Enviando...'; btn.disabled = true;
+
+      const logoUrl = await uploadToStorage(logoFile, 'documents', 5);
+      const regUrl = await uploadToStorage(regFile, 'documents', 10);
+      const taxFile = document.getElementById('company-tax').files[0];
+      const extraFile = document.getElementById('company-extra').files[0];
+      const taxUrl = taxFile ? await uploadToStorage(taxFile, 'documents', 10) : null;
+      const extraUrl = extraFile ? await uploadToStorage(extraFile, 'documents', 10) : null;
+
+      const docs = [regUrl, taxUrl, extraUrl].filter(Boolean);
+
+      await sb.from('profiles').update({
+        display_name: name,
+        avatar_url: logoUrl,
+        bio: desc,
+        account_type: 'business',
+        business_name: name,
+        business_type: type,
+        business_docs: {
+          industry,
+          website: document.getElementById('company-website').value.trim(),
+          contact_person: contact,
+          contact_phone: document.getElementById('company-phone').value.trim(),
+          documents: docs,
+          brand_policy_accepted: true,
+          submitted_at: new Date().toISOString()
+        }
+      }).eq('id', bizUser.id);
+
+      document.getElementById('company-section').classList.add('hidden');
+      document.getElementById('success-section').classList.remove('hidden');
+      showToast('¡Solicitud enviada exitosamente!', 'success');
+    }
+
+    (async () => {
+      const { data: { user } } = await sb.auth.getUser();
+      if (user) {
+        bizUser = user;
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('company-section').classList.remove('hidden');
+      }
+    })();
+
+    initTheme();
+    renderBottomNav('');
+    updateNavAuth();
+  </script>
+</body>
+</html>
