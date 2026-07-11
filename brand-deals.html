@@ -27,6 +27,12 @@
     .payment-bubble { background: linear-gradient(135deg, #33f0b0 0%, #28c48e 100%); color: #1a0a3e; border-radius: 16px; }
     .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .video-circle { width: 160px; height: 160px; border-radius: 50%; overflow: hidden; position: relative; border: 3px solid #1a0a3e; }
+    .video-circle video { width: 100%; height: 100%; object-fit: cover; }
+    .video-circle .creo-badge { position: absolute; bottom: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: white; padding: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    .video-circle .creo-badge img { width: 100%; height: 100%; border-radius: 50%; object-fit: contain; }
+    @keyframes pulse-rec { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .rec-pulse { animation: pulse-rec 1s infinite; }
   </style>
 </head>
 <body class="bg-white min-h-screen">
@@ -36,9 +42,9 @@
     <button onclick="filterDeals('all')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-creo-purple text-white" data-cat="all">Todos</button>
   </div>
 
-  <!-- Post Deal button (admin/brand only) -->
-  <div id="post-deal-bar" class="hidden px-4 pb-3">
-    <button onclick="openPostDeal()" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-creo-purple to-creo-light text-white py-3 rounded-xl font-bold hover:opacity-90 transition shadow-md">
+  <!-- Post Deal button (admin/brand only) — fixed bottom center -->
+  <div id="post-deal-bar" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-30">
+    <button onclick="openPostDeal()" class="flex items-center justify-center gap-2 bg-gradient-to-r from-creo-purple to-creo-light text-white py-3 px-8 rounded-full font-bold hover:opacity-90 transition shadow-lg whitespace-nowrap">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
       Publicar Nuevo Deal
     </button>
@@ -338,9 +344,10 @@
   <!-- ==================== CHAT MODAL ==================== -->
   <div id="chat-modal" class="fixed inset-0 z-[60] hidden">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeChat()"></div>
-    <div class="absolute inset-x-0 bottom-0 top-12 bg-white rounded-t-3xl flex flex-col overflow-hidden shadow-2xl">
+    <div class="absolute inset-x-0 bottom-0 top-8 bg-white rounded-t-3xl flex flex-col overflow-hidden shadow-2xl">
+      <!-- Header -->
       <div class="flex items-center gap-3 px-4 py-3 border-b border-gray-100 bg-white/90 backdrop-blur shrink-0">
-        <button onclick="closeChat()" class="p-1"><svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        <button onclick="closeChat()" class="p-1"><svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
         <img id="chat-avatar" src="" class="w-10 h-10 rounded-full object-cover border-2 border-creo-purple" alt="">
         <div class="flex-1 min-w-0">
           <p id="chat-name" class="font-bold text-sm truncate"></p>
@@ -351,12 +358,58 @@
           Encriptado
         </div>
       </div>
+
+      <!-- Deal Info Card -->
+      <div id="deal-card" class="hidden mx-4 mt-3 bg-gradient-to-r from-creo-purple to-creo-light rounded-2xl p-4 text-white shrink-0 shadow-md">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex-1 min-w-0">
+            <p id="deal-card-title" class="font-bold text-sm truncate"></p>
+            <p id="deal-card-desc" class="text-white/70 text-xs line-clamp-2 mt-1"></p>
+          </div>
+          <div class="text-right shrink-0">
+            <p id="deal-card-budget" class="text-lg font-bold text-creo-mint"></p>
+            <p id="deal-card-delivery" class="text-[10px] text-white/60 mt-0.5"></p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 mt-3 pt-3 border-t border-white/20">
+          <div id="deal-card-vibe" class="flex-1 text-[11px] text-white/80 line-clamp-1"></div>
+          <button onclick="document.getElementById('deal-card').classList.add('hidden')" class="text-white/50 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Messages -->
       <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         <div class="text-center text-xs text-gray-400 py-4">
           <svg class="w-8 h-8 mx-auto mb-2 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
           Mensajes encriptados. Solo tú y la otra parte pueden leerlos.
         </div>
       </div>
+
+      <!-- Trato Hecho Panel (brand pays creator — final payout) -->
+      <div id="trato-hecho-panel" class="hidden px-4 py-4 bg-gradient-to-r from-creo-mint/10 to-creo-mint/5 border-t border-creo-mint/30 shrink-0">
+        <div class="flex items-center gap-3 mb-3">
+          <img id="trato-creator-avatar" src="" class="w-12 h-12 rounded-full border-2 border-creo-mint object-cover">
+          <div class="flex-1 min-w-0">
+            <p id="trato-creator-name" class="font-bold text-sm text-gray-800 truncate"></p>
+            <p id="trato-creator-username" class="text-xs text-gray-400 truncate"></p>
+          </div>
+          <button onclick="toggleTratoHecho()" class="text-gray-400 hover:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>
+        <div class="flex gap-2 mb-2">
+          <div class="relative flex-1">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+            <input id="trato-amount" type="number" min="1" step="0.01" placeholder="0.00" class="w-full pl-8 pr-3 py-2.5 border border-gray-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-creo-mint focus:border-creo-mint">
+          </div>
+          <input id="trato-desc" type="text" placeholder="Descripción del pago" value="Pago por Brand Deal" class="flex-1 px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-mint">
+        </div>
+        <button onclick="sendTratoHecho()" class="w-full bg-gradient-to-r from-creo-mint to-creo-mintDark text-creo-purple py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
+          <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
+          Trato Hecho
+        </button>
+        <p class="text-[11px] text-gray-400 mt-1.5 text-center">5% comisión de plataforma. El creador recibe el 95%.</p>
+      </div>
+
+      <!-- Payment popup (legacy — kept for backwards compat) -->
       <div id="payment-popup" class="hidden px-4 py-3 bg-creo-mint/10 border-t border-creo-mint/30 shrink-0">
         <div class="flex items-center gap-2 mb-2">
           <svg class="w-5 h-5 text-creo-mintDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -373,16 +426,107 @@
         </div>
         <p class="text-[11px] text-gray-400 mt-1.5">5% comisión de plataforma. El creador recibe el 95%.</p>
       </div>
-      <div class="px-4 py-3 border-t border-gray-100 bg-white/90 backdrop-blur flex gap-2 items-end shrink-0">
-        <button id="pay-toggle-btn" class="hidden p-2 rounded-full bg-creo-mint/20 text-creo-mintDark hover:bg-creo-mint/30 transition" onclick="togglePaymentPopup()" title="Enviar Pago">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </button>
-        <textarea id="chat-input" rows="1" placeholder="Escribe un mensaje..." class="flex-1 px-4 py-2.5 border border-gray-300 rounded-2xl text-sm resize-none max-h-24 focus:ring-2 focus:ring-creo-purple focus:border-creo-purple" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
-        <button onclick="sendMessage()" class="p-2.5 bg-creo-purple text-white rounded-full hover:bg-creo-light transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-        </button>
+
+      <!-- Image preview -->
+      <div id="dc-image-preview" class="hidden px-4 py-2 border-t border-gray-100 bg-gray-50 shrink-0">
+        <div class="flex items-center gap-2">
+          <img id="dc-image-thumb" src="" class="w-16 h-16 rounded-xl object-cover border border-gray-200">
+          <div class="flex-1">
+            <p class="text-xs text-gray-500">Imagen lista para enviar</p>
+          </div>
+          <button onclick="cancelDealImage()" class="p-1.5 bg-red-100 text-red-500 rounded-full hover:bg-red-200 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Audio preview -->
+      <div id="dc-audio-preview" class="hidden px-4 py-2 border-t border-gray-100 bg-gray-50 shrink-0">
+        <div class="flex items-center gap-2">
+          <audio id="dc-audio-player" controls class="h-8 max-w-[180px]"></audio>
+          <button onclick="sendDealAudioNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-creo-light transition">Enviar</button>
+          <button onclick="cancelDealAudio()" class="p-1.5 bg-red-100 text-red-500 rounded-full hover:bg-red-200 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-7 7-7-7"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Video preview -->
+      <div id="dc-video-preview" class="hidden px-4 py-2 border-t border-gray-100 bg-gray-50 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="video-circle w-[80px] h-[80px]">
+            <video id="dc-video-thumb" playsinline muted loop autoplay class="w-full h-full object-cover"></video>
+            <div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <button onclick="sendDealVideoNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold">Enviar</button>
+            <button onclick="cancelDealVideo()" class="bg-red-100 text-red-500 px-3 py-1 rounded-full text-xs font-semibold">Borrar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recording indicator -->
+      <div id="dc-recording-indicator" class="hidden px-4 py-2 border-t border-gray-100 bg-red-50 shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-red-500 rounded-full rec-pulse"></div>
+          <span class="text-xs text-red-600 font-semibold">Grabando...</span>
+          <span id="dc-rec-timer" class="text-xs text-red-400 ml-1">0:00</span>
+        </div>
+      </div>
+
+      <!-- GIF picker -->
+      <div id="dc-gif-picker" class="hidden border-t border-gray-200 bg-white shrink-0" style="max-height: 260px;">
+        <div class="px-3 py-2">
+          <input type="text" placeholder="Buscar GIFs..." oninput="searchDealGifs(this.value)" class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple">
+        </div>
+        <div id="dc-gif-results" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1 px-3 pb-2 overflow-y-auto" style="max-height: 180px;"></div>
+        <p class="text-[9px] text-gray-300 text-center pb-1">Powered by GIPHY</p>
+      </div>
+
+      <!-- Input bar -->
+      <div class="px-3 py-2.5 border-t border-gray-100 bg-white/90 backdrop-blur shrink-0">
+        <div class="flex gap-1.5 items-end">
+          <!-- Image upload -->
+          <input type="file" id="dc-image-input" accept="image/*" class="hidden" onchange="handleDealImage(this)">
+          <button onclick="document.getElementById('dc-image-input').click()" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 transition shrink-0" title="Imagen">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </button>
+          <!-- Audio record (desktop: tap, mobile: hold) -->
+          <button id="dc-audio-btn" onclick="toggleDealAudioRecord()" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 transition shrink-0" title="Audio">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+          </button>
+          <!-- Text input -->
+          <textarea id="chat-input" rows="1" placeholder="Escribe un mensaje..." class="flex-1 px-3 py-2 border border-gray-300 rounded-2xl text-sm resize-none max-h-20 focus:ring-2 focus:ring-creo-purple focus:border-creo-purple" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
+          <!-- GIF button -->
+          <button onclick="toggleDealGif()" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 transition shrink-0" title="GIF">
+            <span class="text-xs font-black">GIF</span>
+          </button>
+          <!-- Video record -->
+          <button onclick="startDealVideoRecord()" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 transition shrink-0" title="Video">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </button>
+          <!-- Payment / Trato Hecho button (brand only) -->
+          <button id="pay-toggle-btn" class="hidden p-2 rounded-full bg-creo-mint/20 text-creo-mintDark hover:bg-creo-mint/30 transition shrink-0" onclick="toggleTratoHecho()" title="Trato Hecho — Enviar Pago">
+            <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
+          </button>
+          <!-- Send button -->
+          <button onclick="sendMessage()" class="p-2.5 bg-creo-purple text-white rounded-full hover:bg-creo-light transition shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+          </button>
+        </div>
       </div>
     </div>
+  </div>
+
+  <!-- Video Record Modal -->
+  <div id="dc-video-record-modal" class="fixed inset-0 z-[70] hidden bg-black flex flex-col items-center justify-center">
+    <div class="absolute top-4 right-4 z-10">
+      <button onclick="cancelDealVideoRecord()" class="bg-white/20 text-white p-2 rounded-full backdrop-blur"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="w-56 h-56 rounded-full overflow-hidden border-4 border-creo-mint mb-6">
+      <video id="dc-video-live-preview" autoplay playsinline muted class="w-full h-full object-cover" style="transform:scaleX(-1)"></video>
+    </div>
+    <p id="dc-video-rec-status" class="text-white text-sm mb-2">Listo para grabar</p>
+    <p id="dc-video-rec-timer" class="text-white/60 text-xs mb-4">0:00</p>
+    <button onclick="toggleDealVideoRecording()" class="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center hover:bg-red-600 transition shadow-lg">
+      <div id="dc-video-rec-icon" class="w-6 h-6 rounded-full bg-white"></div>
+    </button>
   </div>
 
   <!-- My Conversations FAB -->
@@ -409,10 +553,20 @@
     let allDeals = [];
     let activeConversation = null;
     let selectedDeal = null;
+    let chatDeal = null;
     let chatPollInterval = null;
     let activeCategoryFilter = 'all';
     let allCategories = [];
     let pendingCoverFile = null;
+    let dcPendingImageFile = null;
+    let dcAudioBlob = null;
+    let dcRecorder = null;
+    let dcPendingVideoBlob = null;
+    let dcVideoStream = null;
+    let dcVideoRecorder = null;
+    let dcRecStartTime = 0;
+    let dcRecTimerInterval = null;
+    let dcIsHoldRecording = false;
 
     // Default categories (always available)
     const DEFAULT_CATEGORIES = [
@@ -892,32 +1046,69 @@
 
       const brand = selectedDeal.brand || {};
       closeDealDetail();
-      openChat(conv, selectedDeal.title, brand.display_name || brand.username, brand.avatar_url);
+      openChat(conv, selectedDeal, brand.display_name || brand.username, brand.avatar_url);
     }
 
-    function openChat(conversation, dealTitle, otherName, otherAvatar) {
+    function openChat(conversation, deal, otherName, otherAvatar) {
       activeConversation = conversation;
+      chatDeal = deal || null;
       const isPlatform = isPlatformCreator(currentProfile?.email || '');
       const isBrand = isPlatform ? true : currentUser.id === conversation.brand_id;
 
       document.getElementById('chat-name').textContent = otherName || 'Usuario';
-      document.getElementById('chat-deal-title').textContent = dealTitle || 'Brand Deal';
+      document.getElementById('chat-deal-title').textContent = (deal?.title) || 'Brand Deal';
       document.getElementById('chat-avatar').src = otherAvatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(otherName || 'U');
 
       document.getElementById('pay-toggle-btn').classList.toggle('hidden', !isBrand);
       document.getElementById('payment-popup').classList.add('hidden');
+      document.getElementById('trato-hecho-panel').classList.add('hidden');
+
+      // Populate deal card
+      if (chatDeal) {
+        const budget = chatDeal.budget_per_creator_cents ? '$' + (chatDeal.budget_per_creator_cents / 100).toFixed(0) : '';
+        document.getElementById('deal-card-title').textContent = chatDeal.title || '';
+        document.getElementById('deal-card-desc').textContent = chatDeal.description || '';
+        document.getElementById('deal-card-budget').textContent = budget;
+        document.getElementById('deal-card-delivery').textContent = chatDeal.delivery_deadline ? 'Entrega: ' + new Date(chatDeal.delivery_deadline).toLocaleDateString('es') : '';
+        document.getElementById('deal-card-vibe').textContent = chatDeal.video_vibe ? '🎬 ' + chatDeal.video_vibe : '';
+        document.getElementById('deal-card').classList.remove('hidden');
+      } else {
+        document.getElementById('deal-card').classList.add('hidden');
+      }
+
+      // Load creator info for trato hecho panel
+      if (isBrand && conversation.creator_id) {
+        sb.from('profiles').select('display_name, username, avatar_url').eq('id', conversation.creator_id).single().then(({ data: cp }) => {
+          if (cp) {
+            document.getElementById('trato-creator-avatar').src = cp.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(cp.display_name || 'C');
+            document.getElementById('trato-creator-name').textContent = cp.display_name || cp.username || 'Creador';
+            document.getElementById('trato-creator-username').textContent = '@' + (cp.username || '');
+          }
+        });
+        if (chatDeal?.budget_per_creator_cents) {
+          document.getElementById('trato-amount').value = (chatDeal.budget_per_creator_cents / 100).toFixed(2);
+        }
+      }
+
+      // Reset media states
+      cancelDealImage(); cancelDealAudio(); cancelDealVideo();
+      document.getElementById('dc-gif-picker').classList.add('hidden');
 
       document.getElementById('chat-modal').classList.remove('hidden');
       document.body.style.overflow = 'hidden';
       loadMessages();
       chatPollInterval = setInterval(loadMessages, 4000);
+
+      setupDealMobileHoldToRecord();
     }
 
     function closeChat() {
       document.getElementById('chat-modal').classList.add('hidden');
       document.body.style.overflow = '';
       activeConversation = null;
+      chatDeal = null;
       if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
+      cancelDealAudio(); cancelDealVideo();
     }
 
     async function loadMessages() {
@@ -940,53 +1131,121 @@
 
       if (!data || data.length === 0) { container.innerHTML = banner; return; }
 
-      container.innerHTML = banner + data.map(m => {
-        const isMine = m.sender_id === currentUser.id;
-        const time = new Date(m.created_at).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+      container.innerHTML = banner + data.map(m => renderDealMessage(m)).join('');
+      if (wasAtBottom) container.scrollTop = container.scrollHeight;
+    }
 
-        if (m.message_type === 'payment') {
-          const amt = (m.payment_amount_cents / 100).toFixed(2);
-          const statusLabel = m.payment_status === 'completed' ? 'Completado' : m.payment_status === 'failed' ? 'Fallido' : 'Pendiente';
-          return `<div class="flex ${isMine ? 'justify-end' : 'justify-start'}">
-            <div class="payment-bubble px-4 py-3 max-w-[85%] shadow-md">
-              <div class="flex items-center gap-2 mb-1">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span class="font-bold">Pago: $${amt}</span>
-              </div>
-              <p class="text-sm">${esc(m.content)}</p>
-              <div class="flex items-center justify-between mt-2 text-xs opacity-80">
-                <span>${statusLabel}</span><span>${time}</span>
-              </div>
-            </div>
-          </div>`;
-        }
+    function renderDealMessage(m) {
+      const isMine = m.sender_id === currentUser.id;
+      const time = new Date(m.created_at).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
 
-        if (m.message_type === 'system') {
-          return `<div class="text-center text-xs text-gray-400 py-1">${esc(m.content)}</div>`;
-        }
-
+      if (m.message_type === 'payment') {
+        const amt = (m.payment_amount_cents / 100).toFixed(2);
+        const statusLabel = m.payment_status === 'completed' ? 'Completado' : m.payment_status === 'failed' ? 'Fallido' : 'Pendiente';
         return `<div class="flex ${isMine ? 'justify-end' : 'justify-start'}">
-          <div class="${isMine ? 'chat-bubble-mine' : 'chat-bubble-theirs'} px-4 py-2.5 max-w-[80%] shadow-sm">
-            <p class="text-sm whitespace-pre-wrap break-words">${esc(m.content)}</p>
-            <p class="text-[10px] ${isMine ? 'text-white/60' : 'text-gray-400'} text-right mt-1">${time}</p>
+          <div class="payment-bubble px-4 py-3 max-w-[85%] shadow-md">
+            <div class="flex items-center gap-2 mb-1">
+              <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
+              <span class="font-bold">Trato Hecho — $${amt}</span>
+            </div>
+            <p class="text-sm">${esc(m.content)}</p>
+            <div class="flex items-center justify-between mt-2 text-xs opacity-80">
+              <span>${statusLabel}</span><span>${time}</span>
+            </div>
           </div>
         </div>`;
-      }).join('');
+      }
 
-      if (wasAtBottom) container.scrollTop = container.scrollHeight;
+      if (m.message_type === 'system') {
+        return `<div class="text-center text-xs text-gray-400 py-1">${esc(m.content)}</div>`;
+      }
+
+      // Media messages — URL is stored in content field
+      let mediaHtml = '';
+      let textContent = '';
+      const mt = m.message_type || 'text';
+      const raw = m.content || '';
+
+      if (mt === 'gif') {
+        mediaHtml = `<img src="${esc(raw)}" class="max-w-[200px] rounded-xl" alt="GIF" loading="lazy">`;
+      } else if (mt === 'audio') {
+        mediaHtml = `<audio controls src="${esc(raw)}" class="max-w-[200px] h-8"></audio>`;
+      } else if (mt === 'image') {
+        const parts = raw.split('\n');
+        const url = parts[0];
+        const caption = parts.slice(1).join('\n').trim();
+        mediaHtml = `<img src="${esc(url)}" class="max-w-[200px] rounded-xl cursor-pointer" alt="" loading="lazy" onclick="window.open(this.src,'_blank')">`;
+        if (caption) textContent = `<p class="text-sm whitespace-pre-wrap break-words">${esc(caption)}</p>`;
+      } else if (mt === 'video') {
+        const parts = raw.split('\n');
+        const url = parts[0];
+        const caption = parts.slice(1).join('\n').trim();
+        mediaHtml = `<div class="video-circle cursor-pointer" onclick="this.querySelector('video').paused?this.querySelector('video').play():this.querySelector('video').pause()">
+          <video src="${esc(url)}" playsinline class="w-full h-full object-cover"></video>
+          <div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div>
+        </div>`;
+        if (caption) textContent = `<p class="text-sm whitespace-pre-wrap break-words">${esc(caption)}</p>`;
+      } else {
+        textContent = raw ? `<p class="text-sm whitespace-pre-wrap break-words">${esc(raw)}</p>` : '';
+      }
+
+      return `<div class="flex ${isMine ? 'justify-end' : 'justify-start'}">
+        <div class="${isMine ? 'chat-bubble-mine' : 'chat-bubble-theirs'} px-4 py-2.5 max-w-[80%] shadow-sm space-y-1">
+          ${mediaHtml}${textContent}
+          <p class="text-[10px] ${isMine ? 'text-white/60' : 'text-gray-400'} text-right mt-1">${time}</p>
+        </div>
+      </div>`;
     }
 
     async function sendMessage() {
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
-      if (!text || !activeConversation) return;
+      if (!text && !dcPendingImageFile && !dcAudioBlob && !dcPendingVideoBlob) return;
+      if (!activeConversation) return;
+
+      let mediaUrl = null;
+      let mediaType = null;
+
+      if (dcPendingImageFile) {
+        const ext = dcPendingImageFile.name.split('.').pop() || 'jpg';
+        const fileName = `deal_img_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+        const { data, error } = await sb.storage.from('dm-media').upload(fileName, dcPendingImageFile, { contentType: dcPendingImageFile.type });
+        if (!error && data) {
+          const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
+          mediaUrl = u.publicUrl; mediaType = 'image';
+        }
+        cancelDealImage();
+      }
+      if (dcAudioBlob) {
+        const fileName = `deal_audio_${Date.now()}.webm`;
+        const { data, error } = await sb.storage.from('dm-media').upload(fileName, dcAudioBlob, { contentType: 'audio/webm' });
+        if (!error && data) {
+          const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
+          mediaUrl = u.publicUrl; mediaType = 'audio';
+        }
+        cancelDealAudio();
+      }
+      if (dcPendingVideoBlob) {
+        const fileName = `deal_video_${Date.now()}.webm`;
+        const { data, error } = await sb.storage.from('dm-media').upload(fileName, dcPendingVideoBlob, { contentType: 'video/webm' });
+        if (!error && data) {
+          const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
+          mediaUrl = u.publicUrl; mediaType = 'video';
+        }
+        cancelDealVideo();
+      }
+
+      const msgType = mediaType || 'text';
+      const finalContent = mediaUrl ? (text ? mediaUrl + '\n' + text : mediaUrl) : text;
       input.value = '';
+
+      if (!finalContent) return;
 
       const { error } = await sb.rpc('send_deal_message', {
         p_conversation_id: activeConversation.id,
         p_sender_id: currentUser.id,
-        p_content: text,
-        p_message_type: 'text'
+        p_content: finalContent,
+        p_message_type: msgType
       });
 
       if (error) { showToast('Error al enviar mensaje', 'error'); console.error(error); return; }
@@ -994,8 +1253,256 @@
       document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
     }
 
+    // ===== DEAL CHAT — IMAGE =====
+    function handleDealImage(input) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) { showToast('Imagen máx 10MB', 'error'); return; }
+      dcPendingImageFile = file;
+      document.getElementById('dc-image-thumb').src = URL.createObjectURL(file);
+      document.getElementById('dc-image-preview').classList.remove('hidden');
+      input.value = '';
+    }
+    function cancelDealImage() {
+      dcPendingImageFile = null;
+      document.getElementById('dc-image-preview')?.classList.add('hidden');
+    }
+
+    // ===== DEAL CHAT — GIF =====
+    let dcGifTimer = null;
+    function toggleDealGif() { document.getElementById('dc-gif-picker').classList.toggle('hidden'); searchDealGifs(''); }
+    async function searchDealGifs(q) {
+      clearTimeout(dcGifTimer);
+      dcGifTimer = setTimeout(async () => {
+        const query = (q || '').trim() || 'trending';
+        const url = query === 'trending'
+          ? 'https://api.giphy.com/v1/gifs/trending?api_key=GlVGYHkr3WSBnllca54iNt0yFbjz7L65&limit=18&rating=g'
+          : `https://api.giphy.com/v1/gifs/search?api_key=GlVGYHkr3WSBnllca54iNt0yFbjz7L65&q=${encodeURIComponent(query)}&limit=18&rating=g`;
+        try {
+          const res = await fetch(url);
+          const json = await res.json();
+          document.getElementById('dc-gif-results').innerHTML = (json.data || []).map(g =>
+            `<img src="${g.images.fixed_width_small.url}" class="w-full h-16 object-cover rounded cursor-pointer hover:opacity-80 transition" onclick="sendDealGif('${g.images.fixed_width.url}')" alt="GIF" loading="lazy">`
+          ).join('');
+        } catch(e) {}
+      }, 300);
+    }
+    async function sendDealGif(url) {
+      if (!activeConversation) return;
+      const { error } = await sb.rpc('send_deal_message', {
+        p_conversation_id: activeConversation.id,
+        p_sender_id: currentUser.id,
+        p_content: url,
+        p_message_type: 'gif'
+      });
+      if (error) { showToast('Error al enviar GIF', 'error'); console.error(error); }
+      document.getElementById('dc-gif-picker').classList.add('hidden');
+      loadMessages();
+    }
+
+    // ===== DEAL CHAT — AUDIO (desktop: tap to record/stop) =====
+    function dcStartRecTimer() {
+      dcRecStartTime = Date.now();
+      dcRecTimerInterval = setInterval(() => {
+        const s = Math.floor((Date.now() - dcRecStartTime) / 1000);
+        const el = document.getElementById('dc-rec-timer');
+        if (el) el.textContent = Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+      }, 500);
+    }
+    function dcStopRecTimer() { clearInterval(dcRecTimerInterval); }
+
+    async function toggleDealAudioRecord() {
+      if (dcRecorder && dcRecorder.state === 'recording') { stopDealAudioRecord(); return; }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        dcRecorder = new MediaRecorder(stream);
+        const chunks = [];
+        dcRecorder.ondataavailable = e => chunks.push(e.data);
+        dcRecorder.onstop = () => {
+          dcAudioBlob = new Blob(chunks, { type: 'audio/webm' });
+          document.getElementById('dc-audio-player').src = URL.createObjectURL(dcAudioBlob);
+          document.getElementById('dc-audio-preview').classList.remove('hidden');
+          document.getElementById('dc-recording-indicator').classList.add('hidden');
+          dcStopRecTimer();
+          stream.getTracks().forEach(t => t.stop());
+        };
+        dcRecorder.start();
+        document.getElementById('dc-recording-indicator').classList.remove('hidden');
+        document.getElementById('dc-audio-btn').classList.add('text-red-500');
+        dcStartRecTimer();
+      } catch(e) { showToast('No se pudo acceder al micrófono', 'error'); }
+    }
+
+    function stopDealAudioRecord() {
+      if (dcRecorder && dcRecorder.state === 'recording') dcRecorder.stop();
+    }
+
+    function cancelDealAudio() {
+      dcAudioBlob = null;
+      document.getElementById('dc-audio-preview')?.classList.add('hidden');
+      document.getElementById('dc-recording-indicator')?.classList.add('hidden');
+      dcStopRecTimer();
+      document.getElementById('dc-audio-btn')?.classList.remove('text-red-500');
+      if (dcRecorder && dcRecorder.state === 'recording') {
+        dcRecorder.stop();
+        dcRecorder.stream?.getTracks().forEach(t => t.stop());
+      }
+      dcRecorder = null;
+    }
+
+    async function sendDealAudioNow() {
+      if (!dcAudioBlob || !activeConversation) return;
+      const fileName = `deal_audio_${Date.now()}.webm`;
+      const { data, error } = await sb.storage.from('dm-media').upload(fileName, dcAudioBlob, { contentType: 'audio/webm' });
+      let mediaUrl = null;
+      if (!error && data) {
+        const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
+        mediaUrl = u.publicUrl;
+      }
+      cancelDealAudio();
+      if (!mediaUrl) { showToast('Error al subir audio', 'error'); return; }
+      const { error: e2 } = await sb.rpc('send_deal_message', { p_conversation_id: activeConversation.id, p_sender_id: currentUser.id, p_content: mediaUrl, p_message_type: 'audio' });
+      if (e2) { showToast('Error al enviar audio', 'error'); console.error(e2); return; }
+      loadMessages();
+    }
+
+    // ===== DEAL CHAT — AUDIO (mobile: hold to record) =====
+    function setupDealMobileHoldToRecord() {
+      const btn = document.getElementById('dc-audio-btn');
+      if (!btn || btn._holdSetup) return;
+      btn._holdSetup = true;
+      let holdStream = null;
+
+      async function startHold(e) {
+        if (window.innerWidth >= 768) return;
+        e.preventDefault();
+        dcIsHoldRecording = true;
+        try {
+          holdStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          dcRecorder = new MediaRecorder(holdStream);
+          const chunks = [];
+          dcRecorder.ondataavailable = e => chunks.push(e.data);
+          dcRecorder.onstop = () => {
+            dcAudioBlob = new Blob(chunks, { type: 'audio/webm' });
+            document.getElementById('dc-audio-player').src = URL.createObjectURL(dcAudioBlob);
+            document.getElementById('dc-audio-preview').classList.remove('hidden');
+            document.getElementById('dc-recording-indicator').classList.add('hidden');
+            dcStopRecTimer();
+            holdStream?.getTracks().forEach(t => t.stop());
+          };
+          dcRecorder.start();
+          document.getElementById('dc-recording-indicator').classList.remove('hidden');
+          btn.classList.add('text-red-500');
+          dcStartRecTimer();
+        } catch(e) { showToast('No se pudo acceder al micrófono', 'error'); dcIsHoldRecording = false; }
+      }
+
+      function endHold(e) {
+        if (!dcIsHoldRecording) return;
+        e.preventDefault();
+        dcIsHoldRecording = false;
+        btn.classList.remove('text-red-500');
+        if (dcRecorder && dcRecorder.state === 'recording') dcRecorder.stop();
+      }
+
+      btn.addEventListener('touchstart', startHold, { passive: false });
+      btn.addEventListener('touchend', endHold, { passive: false });
+      btn.addEventListener('touchcancel', endHold, { passive: false });
+    }
+
+    // ===== DEAL CHAT — VIDEO RECORDING =====
+    async function startDealVideoRecord() {
+      const modal = document.getElementById('dc-video-record-modal');
+      modal.classList.remove('hidden');
+      document.getElementById('dc-video-rec-status').textContent = 'Listo para grabar';
+      document.getElementById('dc-video-rec-timer').textContent = '0:00';
+      document.getElementById('dc-video-rec-icon').className = 'w-6 h-6 rounded-full bg-white';
+      try {
+        dcVideoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
+        document.getElementById('dc-video-live-preview').srcObject = dcVideoStream;
+      } catch(e) {
+        showToast('No se pudo acceder a la cámara', 'error');
+        modal.classList.add('hidden');
+      }
+    }
+
+    function toggleDealVideoRecording() {
+      if (dcVideoRecorder && dcVideoRecorder.state === 'recording') {
+        dcVideoRecorder.stop();
+        document.getElementById('dc-video-rec-status').textContent = 'Procesando...';
+        document.getElementById('dc-video-rec-icon').className = 'w-6 h-6 rounded-full bg-white';
+        dcStopRecTimer();
+        return;
+      }
+      const chunks = [];
+      dcVideoRecorder = new MediaRecorder(dcVideoStream, { mimeType: 'video/webm' });
+      dcVideoRecorder.ondataavailable = e => chunks.push(e.data);
+      dcVideoRecorder.onstop = () => {
+        dcPendingVideoBlob = new Blob(chunks, { type: 'video/webm' });
+        dcVideoStream?.getTracks().forEach(t => t.stop());
+        document.getElementById('dc-video-live-preview').srcObject = null;
+        document.getElementById('dc-video-record-modal').classList.add('hidden');
+        const vt = document.getElementById('dc-video-thumb');
+        if (vt) { vt.src = URL.createObjectURL(dcPendingVideoBlob); vt.play(); }
+        document.getElementById('dc-video-preview').classList.remove('hidden');
+      };
+      dcVideoRecorder.start();
+      document.getElementById('dc-video-rec-status').textContent = 'Grabando...';
+      document.getElementById('dc-video-rec-icon').className = 'w-5 h-5 rounded bg-white';
+      dcRecStartTime = Date.now();
+      dcRecTimerInterval = setInterval(() => {
+        const s = Math.floor((Date.now() - dcRecStartTime) / 1000);
+        document.getElementById('dc-video-rec-timer').textContent = Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+      }, 500);
+    }
+
+    function cancelDealVideoRecord() {
+      if (dcVideoRecorder && dcVideoRecorder.state === 'recording') dcVideoRecorder.stop();
+      dcVideoStream?.getTracks().forEach(t => t.stop());
+      document.getElementById('dc-video-live-preview').srcObject = null;
+      document.getElementById('dc-video-record-modal').classList.add('hidden');
+      dcStopRecTimer();
+      dcVideoRecorder = null;
+    }
+
+    function cancelDealVideo() {
+      dcPendingVideoBlob = null;
+      document.getElementById('dc-video-preview')?.classList.add('hidden');
+    }
+
+    async function sendDealVideoNow() {
+      if (!dcPendingVideoBlob || !activeConversation) return;
+      const fileName = `deal_video_${Date.now()}.webm`;
+      const { data, error } = await sb.storage.from('dm-media').upload(fileName, dcPendingVideoBlob, { contentType: 'video/webm' });
+      let mediaUrl = null;
+      if (!error && data) {
+        const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
+        mediaUrl = u.publicUrl;
+      }
+      cancelDealVideo();
+      if (!mediaUrl) { showToast('Error al subir video', 'error'); return; }
+      const { error: e2 } = await sb.rpc('send_deal_message', { p_conversation_id: activeConversation.id, p_sender_id: currentUser.id, p_content: mediaUrl, p_message_type: 'video' });
+      if (e2) { showToast('Error al enviar video', 'error'); console.error(e2); return; }
+      loadMessages();
+    }
+
+    // ===== TRATO HECHO & PAYMENT =====
+    function toggleTratoHecho() {
+      document.getElementById('trato-hecho-panel').classList.toggle('hidden');
+      document.getElementById('payment-popup').classList.add('hidden');
+    }
+
     function togglePaymentPopup() {
       document.getElementById('payment-popup').classList.toggle('hidden');
+      document.getElementById('trato-hecho-panel').classList.add('hidden');
+    }
+
+    async function sendTratoHecho() {
+      const amount = parseFloat(document.getElementById('trato-amount').value);
+      const desc = document.getElementById('trato-desc').value.trim() || 'Pago por Brand Deal';
+      if (!amount || amount < 1) { showToast('Monto mínimo $1', 'error'); return; }
+      if (!activeConversation) return;
+      await processDealPayment(amount, desc);
     }
 
     async function sendPayment() {
@@ -1003,7 +1510,10 @@
       const desc = document.getElementById('payment-desc').value.trim();
       if (!amount || amount < 1) { showToast('Monto mínimo $1', 'error'); return; }
       if (!activeConversation) return;
+      await processDealPayment(amount, desc);
+    }
 
+    async function processDealPayment(amount, desc) {
       const { data: creatorProf } = await sb
         .from('profiles')
         .select('stripe_connect_id')
@@ -1096,12 +1606,16 @@
       }).join('');
     }
 
-    function openConvoFromList(convoId, dealTitle, name, avatar) {
-      sb.from('deal_conversations').select('*').eq('id', convoId).single().then(({ data }) => {
-        if (!data) return;
-        document.getElementById('convos-panel').classList.add('hidden');
-        openChat(data, dealTitle, name, avatar);
-      });
+    async function openConvoFromList(convoId, dealTitle, name, avatar) {
+      const { data: conv } = await sb.from('deal_conversations').select('*').eq('id', convoId).single();
+      if (!conv) return;
+      document.getElementById('convos-panel').classList.add('hidden');
+      let deal = allDeals.find(d => d.id === conv.deal_id) || null;
+      if (!deal && conv.deal_id) {
+        const { data: d } = await sb.from('brand_deals').select('*').eq('id', conv.deal_id).single();
+        deal = d;
+      }
+      openChat(conv, deal, name, avatar);
     }
 
     window.addEventListener('beforeunload', () => {
