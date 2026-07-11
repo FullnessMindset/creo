@@ -459,7 +459,7 @@
 
     function onScroll() { if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 400) loadFeed(); }
 
-    const REACTIONS = ['❤️','🔥','😂','😮','😢','👏','🌱'];
+    const REACTIONS = ['❤️','🔥','😂','😮','😢','😡','😊','👏','🌱'];
 
     function renderPost(post, liked, likeCount, commentCount, reactions, reactionUsersList) {
       const a = post.author;
@@ -500,7 +500,7 @@
               <div class="reaction-picker" id="picker-${post.id}">${REACTIONS.map(r => `<button onclick="reactToPost('${post.id}','${r}',this)" title="${r}">${r}</button>`).join('')}</div>
               <button onclick="quickReact('${post.id}', this)" data-reacted="${liked || ''}" class="flex items-center gap-1 text-sm transition ${liked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}"><span class="current-reaction text-lg">${liked || '❤️'}</span><span class="like-count">${likeCount}</span></button>
             </div>
-            ${Object.keys(reactions || {}).length > 0 ? `<div class="relative group inline-flex"><button onclick="openReactions('${post.id}')" class="reaction-badges ml-1 hover:opacity-70 transition text-xs text-gray-400 flex items-center gap-0.5">${Object.entries(reactions).sort((a,b) => b[1]-a[1]).slice(0,4).map(([r,c]) => `<span>${r}</span>`).join('')}<span class="ml-0.5">Reacciones</span></button><div class="absolute bottom-full left-0 mb-1 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-20 shadow-lg"><p class="font-semibold mb-1">Reacciones</p>${(reactionUsersList || []).slice(0, 8).map(u => `<p>${u.type} ${esc(u.name)}</p>`).join('')}${(reactionUsersList || []).length > 8 ? `<p class="text-gray-400">+${reactionUsersList.length - 8} más</p>` : ''}</div></div>` : ''}
+            ${Object.keys(reactions || {}).length > 0 ? `<div class="relative group inline-flex"><button onclick="openReactions('${post.id}')" class="ml-1 hover:opacity-70 transition text-xs text-gray-400">Reacciones</button><div class="absolute bottom-full left-0 mb-1 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-20 shadow-lg"><p class="font-semibold mb-1">Reacciones</p>${(reactionUsersList || []).slice(0, 8).map(u => `<p>${u.type} ${esc(u.name)}</p>`).join('')}${(reactionUsersList || []).length > 8 ? `<p class="text-gray-400">+${reactionUsersList.length - 8} más</p>` : ''}</div></div>` : ''}
           </div>
           <button onclick="openComments('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-purple transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span>${commentCount}</span></button>
           <button onclick="openShareModal('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-mint transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>Compartir</button>
