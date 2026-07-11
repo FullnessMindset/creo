@@ -1601,7 +1601,7 @@
       if (!token) { btn.innerText = "Iniciar Verificación — $1.50"; btn.disabled = false; return showToast('Inicia sesión primero', 'error'); }
 
       try {
-        const res = await fetch(`${SUPABASE_URL}/functions/v1/create-identity-verification`, {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/create-identity-session`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ return_url: window.location.href.split('?')[0] + '?verification=complete' })

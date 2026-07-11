@@ -38,7 +38,7 @@
   <script src="shared.js"></script>
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const status = urlParams.get('status');
+    const status = urlParams.get('status') || urlParams.get('stripe');
 
     function setUI(title, desc) {
       document.getElementById('title').textContent = title;
@@ -85,23 +85,25 @@
       if (status === 'success') {
         const isUpgrade = localStorage.getItem('creo-cocreator-upgrade') === '1';
         if (isUpgrade) {
-          setUI('¡Ahora eres Creador!', 'Redirigiendo...');
+          setUI('¡Ahora eres Creador!', 'Redirigiendo al panel...');
           localStorage.removeItem('creo-cocreator-upgrade');
           const { data: { user } } = await sb.auth.getUser();
           if (user) {
             await sb.from('profiles').update({ account_type: 'creator', verification_status: 'approved' }).eq('id', user.id);
           }
-          setTimeout(() => { window.location.href = 'comunidad.html'; }, 1500);
+          setTimeout(() => { window.location.href = 'index.html'; }, 1500);
           return;
         }
-        setUI('Stripe Verificado', 'Redirigiendo...');
-        setTimeout(() => { window.location.href = 'comunidad.html'; }, 1500);
+        setUI('¡Stripe Conectado!', 'Redirigiendo al panel...');
+        document.getElementById('spinner').classList.add('hidden');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
         return;
       }
 
       if (status === 'refresh') {
-        setUI('Incompleto', 'Redirigiendo para reintentar...');
-        setTimeout(() => { window.location.href = 'comunidad.html'; }, 1500);
+        setUI('Configuración incompleta', 'Redirigiendo al panel para reintentar...');
+        document.getElementById('spinner').classList.add('hidden');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
         return;
       }
 

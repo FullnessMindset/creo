@@ -36,6 +36,14 @@ serve(async (req) => {
       });
     }
 
+    const body = await req.json().catch(() => ({}));
+    const returnUrl = body.return_url || "https://fullnessmindset.github.io/creo/index.html?verification=complete";
+
+    const sbAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
       apiVersion: "2023-10-16",
       httpClient: Stripe.createFetchHttpClient(),
@@ -52,8 +60,12 @@ serve(async (req) => {
           require_matching_selfie: true,
         },
       },
-      return_url: `https://fullnessmindset.github.io/creo/comunidad.html?verified=1`,
+      return_url: returnUrl,
     });
+
+    await sbAdmin.from("profiles").update({
+      identity_session_id: session.id,
+    }).eq("id", user.id);
 
     return new Response(
       JSON.stringify({ url: session.url, session_id: session.id }),
