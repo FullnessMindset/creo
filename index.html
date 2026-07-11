@@ -536,36 +536,7 @@
 
       <!-- TAB: Stripe -->
       <div id="panel-stripe" class="tab-panel hidden space-y-4">
-        <!-- Co-creator upgrade CTA (shown only for co-creators) -->
-        <div id="cocreator-upgrade" class="hidden">
-          <div class="bg-gradient-to-br from-creo-purple to-creo-light p-6 rounded-2xl shadow-lg text-white space-y-4">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <svg class="w-7 h-7 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-              </div>
-              <div>
-                <h3 class="font-bold text-lg">Conviértete en Creador</h3>
-                <p class="text-white/70 text-xs">Desbloquea la recaudación de fondos y metas</p>
-              </div>
-            </div>
-            <div class="bg-white/10 rounded-xl p-4 space-y-2 text-sm">
-              <p class="font-semibold">Al convertirte en Creador podrás:</p>
-              <ul class="space-y-1 text-white/90 text-xs">
-                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-creo-mint flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Recibir apoyo económico de tus seguidores</li>
-                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-creo-mint flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Crear metas de recaudación colaborativas</li>
-                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-creo-mint flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Ofrecer suscripciones mensuales</li>
-                <li class="flex items-center gap-2"><svg class="w-4 h-4 text-creo-mint flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Obtener la insignia de creador verificado</li>
-              </ul>
-            </div>
-            <p class="text-white/60 text-[11px]">Stripe verificará tu identidad para proteger a los supporters. El proceso toma unos minutos.</p>
-            <button onclick="upgradeToCreator()" id="upgrade-btn" class="w-full bg-creo-mint hover:bg-creo-mintDark text-creo-purple font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
-              <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-              Convertirme en Creador
-            </button>
-          </div>
-        </div>
-
-        <!-- Regular Stripe connect (shown for creators) -->
+        <!-- Stripe connect -->
         <div id="stripe-connect-regular">
           <div class="bg-amber-50 p-6 rounded-xl border border-amber-200 space-y-3">
             <h3 class="font-bold text-amber-800">Conexión con Stripe</h3>
@@ -1439,27 +1410,6 @@
       const status = profile.verification_status || 'pending';
       const metaLocked = document.getElementById('meta-locked');
       const metaForm = document.getElementById('meta-form-container');
-
-      // Co-creators don't need verification — hide the whole section
-      // Show/hide stripe panels based on account type
-      const upgradePanel = document.getElementById('cocreator-upgrade');
-      const regularStripe = document.getElementById('stripe-connect-regular');
-
-      if (profile.account_type === 'co-creator') {
-        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center"><svg class="w-6 h-6 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><div><p class="font-bold text-creo-mintDark">Co-Creador</p><p class="text-xs text-gray-500">Puedes editar tu perfil, compartir tu historia y promover tu negocio</p></div></div>';
-        const verifyForm = document.getElementById('verify-form');
-        if (verifyForm) verifyForm.classList.add('hidden');
-        banner.classList.add('hidden');
-        metaLocked.classList.remove('hidden');
-        metaLocked.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">Las metas de recaudación están disponibles solo para Creadores verificados. <button onclick="showTab(\'stripe\')" class="text-creo-purple underline font-semibold">Conviértete en Creador →</button></p>';
-        metaForm.classList.add('hidden');
-        if (upgradePanel) upgradePanel.classList.remove('hidden');
-        if (regularStripe) regularStripe.classList.add('hidden');
-        return;
-      }
-
-      if (upgradePanel) upgradePanel.classList.add('hidden');
-      if (regularStripe) regularStripe.classList.remove('hidden');
 
       if (profile.identity_verified) {
         document.getElementById('identity-status').innerHTML = '<span class="text-green-600">✓ Identidad verificada</span>';
@@ -2626,33 +2576,6 @@
       const data = await response.json();
       if (data.url) window.location.href = data.url;
       else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); document.getElementById('stripe-btn').innerText = "Conectar Stripe"; }
-    }
-
-    async function upgradeToCreator() {
-      const session = await sb.auth.getSession();
-      const token = session.data.session?.access_token;
-      if (!token) return showToast('Inicia sesión primero', 'error');
-      const btn = document.getElementById('upgrade-btn');
-      btn.innerText = "Preparando verificación...";
-      btn.disabled = true;
-
-      // Mark that this is a co-creator upgrade so redirect.html knows
-      localStorage.setItem('creo-cocreator-upgrade', '1');
-
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/stripe-onboard`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ redirect_url: 'https://fullnessmindset.github.io/creo/redirect.html' })
-      });
-      const data = await response.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        showToast('Error: ' + (data.error || 'Unknown'), 'error');
-        btn.innerText = "Convertirme en Creador";
-        btn.disabled = false;
-        localStorage.removeItem('creo-cocreator-upgrade');
-      }
     }
 
     // ===== STORIES MANAGEMENT =====

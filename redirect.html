@@ -83,17 +83,6 @@
 
     (async function() {
       if (status === 'success') {
-        const isUpgrade = localStorage.getItem('creo-cocreator-upgrade') === '1';
-        if (isUpgrade) {
-          setUI('¡Ahora eres Creador!', 'Redirigiendo al panel...');
-          localStorage.removeItem('creo-cocreator-upgrade');
-          const { data: { user } } = await sb.auth.getUser();
-          if (user) {
-            await sb.from('profiles').update({ account_type: 'creator', verification_status: 'approved' }).eq('id', user.id);
-          }
-          setTimeout(() => { window.location.href = 'index.html'; }, 1500);
-          return;
-        }
         setUI('¡Stripe Conectado!', 'Redirigiendo al panel...');
         document.getElementById('spinner').classList.add('hidden');
         setTimeout(() => { window.location.href = 'index.html'; }, 1500);

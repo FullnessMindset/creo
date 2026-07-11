@@ -2342,19 +2342,6 @@
       }).join('');
     }
 
-    // ===== CO-CREATOR HANDLING =====
-    function handleAccountType() {
-      if (!creatorProfile) return;
-      const type = creatorProfile.account_type;
-      const isCocreator = type === 'co-creator' || (creatorProfile.verification_status === 'not_required' && !creatorProfile.stripe_connect_id);
-      if (isCocreator) {
-        document.getElementById('payment-tabs').classList.add('hidden');
-        document.querySelectorAll('.pay-panel').forEach(p => p.classList.add('hidden'));
-        const banner = document.getElementById('not-verified-banner');
-        if (banner) banner.classList.add('hidden');
-      }
-    }
-
     // ===== CREATOR POSTS (horizontal scroll) =====
     async function loadCreatorPosts(creatorId) {
       const user = (await sb.auth.getUser()).data.user;
@@ -2890,7 +2877,6 @@
         loadCreatorPosts(creatorProfile.id);
         loadBusinessLinks(creatorProfile.id);
         loadProfileActions();
-        handleAccountType();
         loadCompletedMetas(creatorProfile.id);
         loadCreoEnEllos(creatorProfile.id);
         applyBranding(creatorProfile.profile_colors);
