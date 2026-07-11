@@ -143,7 +143,7 @@ serve(async (req) => {
 
       const { data: profiles } = await sbAdmin
         .from("profiles")
-        .select("id, username, display_name, avatar_url, email");
+        .select("id, username, display_name, avatar_url, email, account_type");
 
       const profileMap = new Map(
         (profiles || []).map((p: Record<string, unknown>) => [p.id, p])

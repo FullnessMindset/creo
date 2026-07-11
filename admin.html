@@ -315,6 +315,7 @@
                   <th class="text-left px-5 py-3">Username</th>
                   <th class="text-left px-5 py-3">Registered</th>
                   <th class="text-left px-5 py-3">Last Sign In</th>
+                  <th class="text-left px-5 py-3">Type</th>
                   <th class="text-left px-5 py-3">Actions</th>
                 </tr>
               </thead>
@@ -1417,6 +1418,16 @@
         const providerBadge = u.provider === 'google'
           ? '<span class="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700">Google</span>'
           : '<span class="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">' + esc(u.provider) + '</span>';
+        const acctType = u.profile?.account_type || 'creator';
+        const profileId = u.profile?.id || u.auth_id;
+        const typeSelect = u.has_profile
+          ? `<select onchange="changeUserType('${profileId}', this.value)" class="text-xs border border-gray-300 rounded-lg px-2 py-1 bg-white text-gray-700 focus:ring-2 focus:ring-creo-purple outline-none cursor-pointer">
+              <option value="creator" ${acctType === 'creator' ? 'selected' : ''}>Creador</option>
+              <option value="empresa" ${acctType === 'empresa' ? 'selected' : ''}>Brand</option>
+              <option value="admin" ${acctType === 'admin' ? 'selected' : ''}>Admin</option>
+              <option value="co-creator" ${acctType === 'co-creator' ? 'selected' : ''}>Co-Creator</option>
+            </select>`
+          : '<span class="text-xs text-gray-400">—</span>';
 
         return `<tr class="border-b border-gray-100 hover:bg-gray-50 transition">
           <td class="px-5 py-3 text-gray-900 text-sm">${esc(u.email || '-')}</td>
@@ -1425,6 +1436,7 @@
           <td class="px-5 py-3 text-gray-500">${username !== '-' ? '<a href="${PROFILE_BASE}' + esc(username) + '" target="_blank" class="text-creo-purple hover:underline">@' + esc(username) + '</a>' : '-'}${displayName ? ' <span class="text-gray-400 text-xs">(' + esc(displayName) + ')</span>' : ''}</td>
           <td class="px-5 py-3 text-gray-500 text-xs">${registered}</td>
           <td class="px-5 py-3 text-gray-500 text-xs">${lastLogin}</td>
+          <td class="px-5 py-3">${typeSelect}</td>
           <td class="px-5 py-3">
             ${u.email ? '<button onclick="openEmailModal(\'' + esc(u.email) + '\', \'' + esc(displayName || username) + '\')" class="text-xs bg-creo-purple/10 text-creo-purple px-2.5 py-1 rounded-lg hover:bg-creo-purple/20 transition font-medium">📧 Email</button>' : ''}
           </td>
@@ -1439,6 +1451,18 @@
         (u.profile?.username || '').toLowerCase().includes(q) ||
         (u.profile?.display_name || '').toLowerCase().includes(q)
       ));
+    }
+
+    async function changeUserType(profileId, newType) {
+      const res = await apiCall('update-profile', { profile_id: profileId, updates: { account_type: newType } });
+      if (res.error) {
+        showToast('Error changing type: ' + res.error, 'error');
+        return;
+      }
+      const u = allUsersData.find(u => (u.profile?.id || u.auth_id) === profileId);
+      if (u && u.profile) u.profile.account_type = newType;
+      const labels = { creator: 'Creador', empresa: 'Brand', admin: 'Admin', 'co-creator': 'Co-Creator' };
+      showToast(`User type changed to ${labels[newType] || newType}`, 'success');
     }
 
     // ===== EMAIL COMPOSE =====
