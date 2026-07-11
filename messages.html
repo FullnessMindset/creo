@@ -150,9 +150,9 @@
           </button>
         </div>
         <!-- GIF Picker -->
-        <div id="chat-gif-picker" class="hidden mx-3 mb-2 bg-white border border-gray-200 rounded-xl p-2 max-h-48 overflow-y-auto shadow-lg">
+        <div id="chat-gif-picker" class="hidden mx-3 mb-2 bg-white border border-gray-200 rounded-xl p-2 max-h-52 overflow-y-auto shadow-lg">
           <input id="chat-gif-search" type="text" placeholder="Buscar GIF..." class="w-full bg-gray-100 rounded-lg px-3 py-2 text-xs mb-2 outline-none" oninput="searchChatGifs(this.value)">
-          <div id="chat-gif-results" class="grid grid-cols-3 gap-1"></div>
+          <div id="chat-gif-results" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1"></div>
           <p class="text-[9px] text-gray-300 text-center mt-1">Powered by GIPHY</p>
         </div>
         <!-- Recording indicator -->
@@ -455,7 +455,7 @@
           const res = await fetch(url);
           const json = await res.json();
           document.getElementById('chat-gif-results').innerHTML = (json.data || []).map(g =>
-            `<img src="${g.images.fixed_width_small.url}" class="w-full rounded cursor-pointer hover:opacity-80 transition" onclick="sendGif('${g.images.fixed_width.url}')" alt="GIF" loading="lazy">`
+            `<img src="${g.images.fixed_width_small.url}" class="w-full h-20 md:h-16 object-cover rounded cursor-pointer hover:opacity-80 transition" onclick="sendGif('${g.images.fixed_width.url}')" alt="GIF" loading="lazy">`
           ).join('');
         } catch(e) {}
       }, 300);
