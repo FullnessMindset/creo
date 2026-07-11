@@ -42,6 +42,7 @@
     .reaction-picker button:hover { transform: scale(1.35); }
     .reaction-badges { display: inline-flex; gap: 1px; margin-right: 4px; }
     .reaction-badges span { font-size: 14px; cursor: pointer; }
+    .reaction-badges + div p { line-height: 1.6; }
   </style>
 </head>
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
@@ -429,18 +430,22 @@
             const { data: likes } = await sb.from('community_likes').select('post_id, reaction_type').eq('user_id', currentUser.id).in('post_id', postIds);
             (likes || []).forEach(l => likesMap[l.post_id] = l.reaction_type || '❤️');
           }
-          const { data: allReactions } = await sb.from('community_likes').select('post_id, reaction_type').in('post_id', postIds);
+          const { data: allReactions } = await sb.from('community_likes').select('post_id, reaction_type, user:user_id(display_name, username)').in('post_id', postIds);
           const reactionSummary = {};
+          const reactionUsers = {};
           (allReactions || []).forEach(r => {
             if (!reactionSummary[r.post_id]) reactionSummary[r.post_id] = {};
+            if (!reactionUsers[r.post_id]) reactionUsers[r.post_id] = [];
             const t = r.reaction_type || '❤️';
             reactionSummary[r.post_id][t] = (reactionSummary[r.post_id][t] || 0) + 1;
+            const uName = r.user?.display_name || r.user?.username || '?';
+            reactionUsers[r.post_id].push({ name: uName, type: t });
           });
           const countPromises = data.map(p => sb.from('community_likes').select('id', { count: 'exact', head: true }).eq('post_id', p.id));
           const commentCountPromises = data.map(p => sb.from('community_comments').select('id', { count: 'exact', head: true }).eq('post_id', p.id));
           const [likeCounts, commentCounts] = await Promise.all([Promise.all(countPromises), Promise.all(commentCountPromises)]);
           const feed = document.getElementById('community-feed');
-          data.forEach((post, i) => { feed.insertAdjacentHTML('beforeend', renderPost(post, likesMap[post.id], likeCounts[i].count || 0, commentCounts[i].count || 0, reactionSummary[post.id] || {})); });
+          data.forEach((post, i) => { feed.insertAdjacentHTML('beforeend', renderPost(post, likesMap[post.id], likeCounts[i].count || 0, commentCounts[i].count || 0, reactionSummary[post.id] || {}, reactionUsers[post.id] || [])); });
           feedPage++;
         }
         if (feedDone && feedPage > 0) document.getElementById('feed-end').classList.remove('hidden');
@@ -456,7 +461,7 @@
 
     const REACTIONS = ['❤️','🔥','😂','😮','😢','👏','🌱'];
 
-    function renderPost(post, liked, likeCount, commentCount, reactions) {
+    function renderPost(post, liked, likeCount, commentCount, reactions, reactionUsersList) {
       const a = post.author;
       if (!a) return '';
       const name = a.display_name || a.username || 'Usuario';
@@ -493,7 +498,7 @@
           <div class="reaction-wrap relative flex items-center gap-1">
             <div class="reaction-picker" id="picker-${post.id}">${REACTIONS.map(r => `<button onclick="reactToPost('${post.id}','${r}',this)" title="${r}">${r}</button>`).join('')}</div>
             <button onclick="quickReact('${post.id}', this)" data-reacted="${liked || ''}" class="flex items-center gap-1 text-sm transition ${liked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}"><span class="current-reaction text-lg">${liked || '❤️'}</span><span class="like-count">${likeCount}</span></button>
-            ${Object.keys(reactions || {}).length > 0 ? `<button onclick="openReactions('${post.id}')" class="reaction-badges ml-1 hover:opacity-70 transition">${Object.entries(reactions).sort((a,b) => b[1]-a[1]).slice(0,4).map(([r]) => `<span>${r}</span>`).join('')}</button>` : ''}
+            ${Object.keys(reactions || {}).length > 0 ? `<div class="relative group inline-flex"><button onclick="openReactions('${post.id}')" class="reaction-badges ml-1 hover:opacity-70 transition text-xs text-gray-400 flex items-center gap-0.5">${Object.entries(reactions).sort((a,b) => b[1]-a[1]).slice(0,4).map(([r,c]) => `<span>${r}</span>`).join('')}<span class="ml-0.5">Reacciones</span></button><div class="absolute bottom-full left-0 mb-1 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-20 shadow-lg"><p class="font-semibold mb-1">Reacciones</p>${(reactionUsersList || []).slice(0, 8).map(u => `<p>${u.type} ${esc(u.name)}</p>`).join('')}${(reactionUsersList || []).length > 8 ? `<p class="text-gray-400">+${reactionUsersList.length - 8} más</p>` : ''}</div></div>` : ''}
           </div>
           <button onclick="openComments('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-purple transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span>${commentCount}</span></button>
           <button onclick="openShareModal('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-mint transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>Compartir</button>
