@@ -25,6 +25,7 @@
     }
   </script>
   <style>
+    input, select, textarea { font-size: max(16px, 1em) !important; }
     .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
     .glass-dark { background: rgba(26,10,62,0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); }
     .glass-mint { background: rgba(51,240,176,0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(51,240,176,0.3); }
@@ -336,9 +337,10 @@
 
     <!-- PAYMENT: Yo Creo en Ti -->
     <div id="pay-tip" class="pay-panel hidden glass p-6 rounded-2xl shadow-xl space-y-4">
+      <div id="mec-tip-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
       <div class="text-center">
-        <h3 class="text-lg font-bold text-gray-900">Yo Creo en Ti</h3>
-        <p class="text-xs text-gray-500 mt-1">Envía un apoyo único al creador</p>
+        <h3 id="mec-tip-heading" class="text-lg font-bold text-gray-900">Yo Creo en Ti</h3>
+        <p id="mec-tip-subtext" class="text-xs text-gray-500 mt-1">Envía un apoyo único al creador</p>
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad (USD)</label>
@@ -406,9 +408,10 @@
     <!-- PAYMENT: Apoyo Full -->
     <div id="pay-sub" class="pay-panel hidden">
       <div class="glass p-6 rounded-2xl shadow-xl space-y-4">
+        <div id="mec-sub-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
         <div class="text-center">
-          <h3 class="text-lg font-bold text-gray-900">Apoyo Full</h3>
-          <p class="text-xs text-gray-500 mt-1">Apoya mensualmente con una cantidad que tú elijas</p>
+          <h3 id="mec-sub-heading" class="text-lg font-bold text-gray-900">Apoyo Full</h3>
+          <p id="mec-sub-subtext" class="text-xs text-gray-500 mt-1">Apoya mensualmente con una cantidad que tú elijas</p>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad Mensual (USD)</label>
@@ -616,7 +619,51 @@
       }
 
       await loadCreatorMetas(data.id);
+      applyMecenasSettings(data);
       showCreamosForOwner();
+    }
+
+    function applyMecenasSettings(profile) {
+      const ms = profile.mecenas_settings || {};
+      // Yo Creo en Ti
+      const tip = ms.tip || {};
+      if (tip.title) document.getElementById('mec-tip-heading').textContent = tip.title;
+      if (tip.description) document.getElementById('mec-tip-subtext').textContent = tip.description;
+      if (tip.button_color) document.getElementById('tip-btn').style.background = tip.button_color;
+      if (tip.card_color) document.getElementById('pay-tip').style.background = tip.card_color;
+      if (tip.image_url) {
+        const hero = document.getElementById('mec-tip-hero');
+        const isVid = /\.(mp4|webm|mov)$/i.test(tip.image_url);
+        hero.innerHTML = isVid
+          ? `<video src="${tip.image_url}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
+          : `<img src="${tip.image_url}" class="w-full h-40 object-cover rounded-xl" alt="">`;
+        hero.classList.remove('hidden');
+      }
+      // Update tab label
+      if (tip.title) document.getElementById('pay-tab-tip').textContent = tip.title;
+
+      // Apoyo Full
+      const sub = ms.sub || {};
+      if (sub.title) document.getElementById('mec-sub-heading').textContent = sub.title;
+      if (sub.description) document.getElementById('mec-sub-subtext').textContent = sub.description;
+      if (sub.button_color) document.getElementById('sub-btn').style.background = sub.button_color;
+      if (sub.card_color) {
+        const paySubCard = document.getElementById('pay-sub').querySelector('.glass');
+        if (paySubCard) paySubCard.style.background = sub.card_color;
+      }
+      if (sub.image_url) {
+        const hero = document.getElementById('mec-sub-hero');
+        const isVid = /\.(mp4|webm|mov)$/i.test(sub.image_url);
+        hero.innerHTML = isVid
+          ? `<video src="${sub.image_url}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
+          : `<img src="${sub.image_url}" class="w-full h-40 object-cover rounded-xl" alt="">`;
+        hero.classList.remove('hidden');
+      }
+      if (sub.title) document.getElementById('pay-tab-sub').textContent = sub.title;
+
+      // Mi Meta tab label
+      const meta = ms.meta || {};
+      if (meta.title) document.getElementById('pay-tab-metas').textContent = meta.title;
     }
 
     function disablePayments() {
@@ -742,16 +789,81 @@
             </a>`).join('')}
           </div>` : '';
 
-        return `<div class="glass p-5 rounded-2xl shadow-xl space-y-4">
-          <div class="flex justify-between items-start">
-            <div class="flex-1">
-              <h3 class="text-lg font-bold text-gray-900">${esc(m.title)}</h3>
-              <p class="text-sm text-gray-500 mt-1">${esc(m.description || '')}</p>
+        const descText = esc(m.description || '');
+        const descId = 'meta-desc-' + m.id;
+        const needsVerMas = descText.length > 120;
+        const descHtml = needsVerMas
+          ? `<p id="${descId}" class="text-sm text-gray-600 mt-2 line-clamp-2">${descText}</p><button onclick="toggleMetaDesc('${m.id}')" id="btn-${descId}" class="text-xs font-semibold text-creo-purple hover:text-creo-light transition mt-1">Ver más</button>`
+          : (descText ? `<p class="text-sm text-gray-600 mt-2">${descText}</p>` : '');
+
+        return `<div class="glass rounded-2xl shadow-xl overflow-hidden">
+          ${images.length ? `
+          <div class="meta-media-card relative" id="meta-media-${m.id}">
+            <!-- Title overlay on top of media -->
+            <div class="absolute top-0 left-0 right-0 z-20 p-4 bg-gradient-to-b from-black/60 to-transparent">
+              <div class="flex justify-between items-start gap-2">
+                <h3 class="text-lg font-bold text-white drop-shadow-lg leading-tight">${esc(m.title)}</h3>
+                ${statusBadge}
+              </div>
             </div>
-            ${statusBadge}
+            <div class="meta-media-slider" onscroll="updateMetaDots('${m.id}')">
+              ${images.map((img, i) => {
+                const isVideo = /\.(mp4|webm|mov)$/i.test(img) || /youtube|tiktok|youtu\.be/i.test(img);
+                if (isVideo) {
+                  return `<div class="meta-slide relative aspect-[4/5] bg-gray-900 cursor-pointer" onclick="openMetaPost('${m.id}', ${i})">
+                    <video src="${img}" class="w-full h-full object-cover" preload="metadata"></video>
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/20"><svg class="w-14 h-14 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                  </div>`;
+                }
+                return `<div class="meta-slide cursor-pointer" onclick="openMetaPost('${m.id}', ${i})"><img src="${img}" class="w-full aspect-[4/5] object-cover" alt=""></div>`;
+              }).join('')}
+            </div>
+            ${images.length > 1 ? `
+              <button class="slider-arrow left" onclick="slideMetaMedia('${m.id}',-1)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
+              <button class="slider-arrow right" onclick="slideMetaMedia('${m.id}',1)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+              <div class="meta-dots" id="dots-${m.id}">${images.map((_, i) => `<span class="dot${i === 0 ? ' active' : ''}"></span>`).join('')}</div>
+            ` : ''}
+            <!-- Progress overlay on media -->
+            <div class="meta-progress-overlay p-3">
+              <div class="glass-dark rounded-xl p-3">
+                <div class="flex justify-between text-xs mb-1.5">
+                  <span class="font-bold text-creo-mint">$${raised}</span>
+                  <span class="text-white/70">de $${goal}</span>
+                </div>
+                <div class="w-full bg-white/20 rounded-full h-2 overflow-hidden">
+                  <div class="bg-gradient-to-r from-creo-mint to-creo-mintDark h-full rounded-full transition-all duration-700" style="width:${pct}%"></div>
+                </div>
+                <p class="text-[10px] text-white/60 mt-1 text-right">${pct}%</p>
+              </div>
+            </div>
           </div>
-          ${mediaSection}
-          ${linkSection}
+          ` : `
+          <!-- No media — title + plain progress -->
+          <div class="p-5 space-y-3">
+            <div class="flex justify-between items-start">
+              <h3 class="text-lg font-bold text-gray-900">${esc(m.title)}</h3>
+              ${statusBadge}
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-2">
+                <span class="font-bold text-creo-purple">$${raised}</span>
+                <span class="text-gray-500">de $${goal}</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div class="bg-gradient-to-r from-creo-purple to-creo-mint h-full rounded-full transition-all duration-700" style="width:${pct}%"></div>
+              </div>
+              <div class="flex justify-between text-xs text-gray-400 mt-2">
+                <span>${pct}% alcanzado</span>
+                <span>${m.start_date} — ${m.end_date}</span>
+              </div>
+            </div>
+          </div>
+          `}
+          <!-- Content below media -->
+          <div class="p-4 space-y-3">
+            ${images.length ? '' : ''}
+            ${descHtml}
+            ${linkSection}
           <!-- Collaborators -->
           ${(() => {
             const metacollabs = collabMap[m.id] || [];
@@ -800,6 +912,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
             Creamos
           </button>
+          </div>
         </div>`;
       }).join('');
 
@@ -1054,6 +1167,19 @@
       metasCache[activeMetaId].like_count = data.count;
       const inlineCount = document.getElementById('meta-lc-' + activeMetaId);
       if (inlineCount) inlineCount.textContent = data.count > 0 ? data.count : '';
+    }
+
+    function toggleMetaDesc(metaId) {
+      const el = document.getElementById('meta-desc-' + metaId);
+      const btn = document.getElementById('btn-meta-desc-' + metaId);
+      if (!el || !btn) return;
+      if (el.classList.contains('line-clamp-2')) {
+        el.classList.remove('line-clamp-2');
+        btn.textContent = 'Ver menos';
+      } else {
+        el.classList.add('line-clamp-2');
+        btn.textContent = 'Ver más';
+      }
     }
 
     async function toggleMetaLikeInline(metaId) {

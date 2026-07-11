@@ -24,6 +24,7 @@
     }
   </script>
   <style>
+    input, select, textarea { font-size: max(16px, 1em) !important; }
     .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
     .glass-dark { background: rgba(26,10,62,0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
@@ -97,8 +98,23 @@
         <button onclick="showTab('business')" id="tab-business" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400">💼 Mis Creaciones</button>
         <button onclick="showTab('creoellos')" id="tab-creoellos" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1"><img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="CREO"> Creo en Ellos</button>
 
+        <button onclick="toggleMecenas()" id="tab-mecenas" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1">
+          <img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt=""> Mecenas <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
         <button onclick="toggleHerramientas()" id="tab-herramientas" class="flex-shrink-0 px-3 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1">
           🛠️ Herramientas <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+      </div>
+      <!-- Mecenas dropdown -->
+      <div id="mecenas-menu" class="hidden bg-white rounded-xl shadow-xl border border-gray-200 z-50 py-1 text-[12px]">
+        <button onclick="showTab('mecenas-tip');closeMecenas()" id="tab-mecenas-tip" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-creo-mint/20 flex items-center justify-center text-[10px]">💚</span> Yo Creo en Ti
+        </button>
+        <button onclick="showTab('mecenas-meta');closeMecenas()" id="tab-mecenas-meta" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-creo-purple/10 flex items-center justify-center text-[10px]">🎯</span> Mi Meta
+        </button>
+        <button onclick="showTab('mecenas-sub');closeMecenas()" id="tab-mecenas-sub" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center text-[10px]">⭐</span> Apoyo Full
         </button>
       </div>
       <!-- Herramientas dropdown — outside the overflow container -->
@@ -764,6 +780,182 @@
         </div>
       </div>
 
+      <!-- TAB: Mecenas — Yo Creo en Ti -->
+      <div id="panel-mecenas-tip" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center text-lg">💚</div>
+            <div>
+              <h3 class="font-bold text-gray-900">Yo Creo en Ti</h3>
+              <p class="text-xs text-gray-500">Personaliza cómo se ve la sección de tips en tu perfil</p>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Título</label>
+            <input id="mec-tip-title" type="text" placeholder="Yo Creo en Ti" maxlength="60" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
+            <textarea id="mec-tip-desc" rows="2" maxlength="200" placeholder="Envía un apoyo único al creador" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Imagen o Video</label>
+            <input type="file" id="mec-tip-media" accept="image/*,video/*" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
+            <div id="mec-tip-media-preview" class="mt-2 hidden"><img class="w-full h-32 object-cover rounded-lg border border-gray-200" alt=""></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Color del botón</label>
+              <div class="flex items-center gap-2">
+                <div class="brand-swatch"><input type="color" id="mec-tip-btn-color" value="#1a0a3e"></div>
+                <span class="text-[10px] text-gray-400 font-mono" id="mec-tip-btn-hex">#1a0a3e</span>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Color de la tarjeta</label>
+              <div class="flex items-center gap-2">
+                <div class="brand-swatch"><input type="color" id="mec-tip-card-color" value="#ffffff"></div>
+                <span class="text-[10px] text-gray-400 font-mono" id="mec-tip-card-hex">#ffffff</span>
+              </div>
+            </div>
+          </div>
+          <!-- Preview -->
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-2">Vista previa</label>
+            <div id="mec-tip-preview" class="p-5 rounded-2xl border border-gray-200 space-y-3 transition-all" style="background:#ffffff">
+              <div class="text-center">
+                <h3 class="text-lg font-bold" style="color:#1f2937">Yo Creo en Ti</h3>
+                <p class="text-xs mt-1" style="color:#6b7280">Envía un apoyo único al creador</p>
+              </div>
+              <button class="w-full py-3 rounded-xl font-bold text-white text-sm transition" style="background:#1a0a3e">Apoyar Creador</button>
+            </div>
+          </div>
+          <button onclick="saveMecenasSettings('tip')" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-bold transition">Guardar</button>
+        </div>
+      </div>
+
+      <!-- TAB: Mecenas — Mi Meta -->
+      <div id="panel-mecenas-meta" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center text-lg">🎯</div>
+            <div>
+              <h3 class="font-bold text-gray-900">Mi Meta</h3>
+              <p class="text-xs text-gray-500">Personaliza la sección de metas en tu perfil</p>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Título de la sección</label>
+            <input id="mec-meta-title" type="text" placeholder="Mi Meta" maxlength="60" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
+            <textarea id="mec-meta-desc" rows="2" maxlength="200" placeholder="Apoya mis metas como creador" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Imagen o Video</label>
+            <input type="file" id="mec-meta-media" accept="image/*,video/*" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
+            <div id="mec-meta-media-preview" class="mt-2 hidden"><img class="w-full h-32 object-cover rounded-lg border border-gray-200" alt=""></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Color del botón</label>
+              <div class="flex items-center gap-2">
+                <div class="brand-swatch"><input type="color" id="mec-meta-btn-color" value="#1a0a3e"></div>
+                <span class="text-[10px] text-gray-400 font-mono" id="mec-meta-btn-hex">#1a0a3e</span>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Color de la tarjeta</label>
+              <div class="flex items-center gap-2">
+                <div class="brand-swatch"><input type="color" id="mec-meta-card-color" value="#ffffff"></div>
+                <span class="text-[10px] text-gray-400 font-mono" id="mec-meta-card-hex">#ffffff</span>
+              </div>
+            </div>
+          </div>
+          <!-- Collaborative Meta Info -->
+          <div class="bg-creo-mint/10 p-4 rounded-xl border border-creo-mint/30 space-y-2">
+            <h4 class="font-semibold text-sm text-creo-purple flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              Metas Conjuntas (Creamos)
+            </h4>
+            <p class="text-xs text-gray-600">Puedes invitar a otros creadores a colaborar en una meta. Los fondos se dividen en partes iguales entre todos los colaboradores, después del 5% de comisión de la plataforma.</p>
+            <div class="bg-white rounded-lg p-3 text-[11px] text-gray-500 space-y-1">
+              <p><strong>Ejemplo:</strong> Meta de $1,000 con 2 colaboradores</p>
+              <p>Comisión CREO (5%): $50</p>
+              <p>Cada colaborador recibe: $475 (50/50 del restante)</p>
+            </div>
+            <p class="text-[10px] text-gray-400">Para invitar creadores, ve a la pestaña "Metas" y usa el botón "Creamos" en cada meta.</p>
+          </div>
+          <!-- Preview -->
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-2">Vista previa</label>
+            <div id="mec-meta-preview" class="p-5 rounded-2xl border border-gray-200 space-y-3 transition-all" style="background:#ffffff">
+              <div class="text-center">
+                <h3 class="text-lg font-bold" style="color:#1f2937">Mi Meta</h3>
+                <p class="text-xs mt-1" style="color:#6b7280">Apoya mis metas como creador</p>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-gradient-to-r from-creo-purple to-creo-mint h-full rounded-full" style="width:45%"></div></div>
+              <button class="w-full py-3 rounded-xl font-bold text-white text-sm transition" style="background:#1a0a3e">Contribuir</button>
+            </div>
+          </div>
+          <button onclick="saveMecenasSettings('meta')" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-bold transition">Guardar</button>
+        </div>
+      </div>
+
+      <!-- TAB: Mecenas — Apoyo Full -->
+      <div id="panel-mecenas-sub" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-lg">⭐</div>
+            <div>
+              <h3 class="font-bold text-gray-900">Apoyo Full</h3>
+              <p class="text-xs text-gray-500">Personaliza la sección de suscripciones mensuales</p>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Título</label>
+            <input id="mec-sub-title" type="text" placeholder="Apoyo Full" maxlength="60" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
+            <textarea id="mec-sub-desc" rows="2" maxlength="200" placeholder="Apoya mensualmente con una cantidad que tú elijas" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Imagen o Video</label>
+            <input type="file" id="mec-sub-media" accept="image/*,video/*" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
+            <div id="mec-sub-media-preview" class="mt-2 hidden"><img class="w-full h-32 object-cover rounded-lg border border-gray-200" alt=""></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Color del botón</label>
+              <div class="flex items-center gap-2">
+                <div class="brand-swatch"><input type="color" id="mec-sub-btn-color" value="#1a0a3e"></div>
+                <span class="text-[10px] text-gray-400 font-mono" id="mec-sub-btn-hex">#1a0a3e</span>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Color de la tarjeta</label>
+              <div class="flex items-center gap-2">
+                <div class="brand-swatch"><input type="color" id="mec-sub-card-color" value="#ffffff"></div>
+                <span class="text-[10px] text-gray-400 font-mono" id="mec-sub-card-hex">#ffffff</span>
+              </div>
+            </div>
+          </div>
+          <!-- Preview -->
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-2">Vista previa</label>
+            <div id="mec-sub-preview" class="p-5 rounded-2xl border border-gray-200 space-y-3 transition-all" style="background:#ffffff">
+              <div class="text-center">
+                <h3 class="text-lg font-bold" style="color:#1f2937">Apoyo Full</h3>
+                <p class="text-xs mt-1" style="color:#6b7280">Apoya mensualmente con una cantidad que tú elijas</p>
+              </div>
+              <button class="w-full py-3 rounded-xl font-bold text-white text-sm transition" style="background:#1a0a3e">Suscribirme Mensualmente</button>
+            </div>
+          </div>
+          <button onclick="saveMecenasSettings('sub')" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-bold transition">Guardar</button>
+        </div>
+      </div>
 
     </div>
   </div>
@@ -784,24 +976,39 @@
   </style>
 
   <script>
+    function toggleMecenas() {
+      document.getElementById('mecenas-menu').classList.toggle('hidden');
+      document.getElementById('herramientas-menu').classList.add('hidden');
+    }
+    function closeMecenas() {
+      document.getElementById('mecenas-menu').classList.add('hidden');
+    }
     function toggleHerramientas() {
       document.getElementById('herramientas-menu').classList.toggle('hidden');
+      document.getElementById('mecenas-menu').classList.add('hidden');
     }
     function closeHerramientas() {
       document.getElementById('herramientas-menu').classList.add('hidden');
     }
     document.addEventListener('click', (e) => {
       if (!e.target.closest('#tab-herramientas') && !e.target.closest('#herramientas-menu')) closeHerramientas();
+      if (!e.target.closest('#tab-mecenas') && !e.target.closest('#mecenas-menu')) closeMecenas();
     });
 
     const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'sounds'];
+    const MECENAS_TABS = ['mecenas-tip', 'mecenas-meta', 'mecenas-sub'];
 
     function showTab(tab) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
       document.querySelectorAll('.flex.glass.rounded-xl > button[id^="tab-"]').forEach(t => { t.classList.remove('tab-active'); t.classList.add('text-gray-400'); });
       document.getElementById('panel-' + tab).classList.remove('hidden');
       const tabBtn = document.getElementById('tab-' + tab);
-      if (HERRAMIENTAS_TABS.includes(tab)) {
+      if (MECENAS_TABS.includes(tab)) {
+        const mecBtn = document.getElementById('tab-mecenas');
+        mecBtn.classList.add('tab-active');
+        mecBtn.classList.remove('text-gray-400');
+        loadMecenasPanel(tab);
+      } else if (HERRAMIENTAS_TABS.includes(tab)) {
         const herrBtn = document.getElementById('tab-herramientas');
         herrBtn.classList.add('tab-active');
         herrBtn.classList.remove('text-gray-400');
@@ -1025,6 +1232,96 @@
       if (error) { showToast('Error al guardar', 'error'); return; }
       currentProfile.profile_colors = colors;
       showToast('Branding guardado. Visita tu perfil para verlo.', 'success');
+    }
+
+    // ===== MECENAS SETTINGS =====
+    function loadMecenasPanel(tab) {
+      if (!currentProfile) return;
+      const ms = currentProfile.mecenas_settings || {};
+      const key = tab === 'mecenas-tip' ? 'tip' : tab === 'mecenas-meta' ? 'meta' : 'sub';
+      const s = ms[key] || {};
+      document.getElementById('mec-' + key + '-title').value = s.title || '';
+      document.getElementById('mec-' + key + '-desc').value = s.description || '';
+      document.getElementById('mec-' + key + '-btn-color').value = s.button_color || '#1a0a3e';
+      document.getElementById('mec-' + key + '-btn-hex').textContent = s.button_color || '#1a0a3e';
+      document.getElementById('mec-' + key + '-card-color').value = s.card_color || '#ffffff';
+      document.getElementById('mec-' + key + '-card-hex').textContent = s.card_color || '#ffffff';
+      const previewEl = document.getElementById('mec-' + key + '-media-preview');
+      if (s.image_url) {
+        const isVid = /\.(mp4|webm|mov)$/i.test(s.image_url);
+        previewEl.innerHTML = isVid
+          ? `<video src="${s.image_url}" class="w-full h-32 object-cover rounded-lg border border-gray-200" controls></video>`
+          : `<img src="${s.image_url}" class="w-full h-32 object-cover rounded-lg border border-gray-200" alt="">`;
+        previewEl.classList.remove('hidden');
+      } else {
+        previewEl.classList.add('hidden');
+      }
+      updateMecenasPreview(key);
+      document.getElementById('mec-' + key + '-btn-color').addEventListener('input', () => updateMecenasPreview(key));
+      document.getElementById('mec-' + key + '-card-color').addEventListener('input', () => updateMecenasPreview(key));
+      document.getElementById('mec-' + key + '-title').addEventListener('input', () => updateMecenasPreview(key));
+      document.getElementById('mec-' + key + '-desc').addEventListener('input', () => updateMecenasPreview(key));
+    }
+
+    function updateMecenasPreview(key) {
+      const title = document.getElementById('mec-' + key + '-title').value || getDefaultMecTitle(key);
+      const desc = document.getElementById('mec-' + key + '-desc').value || getDefaultMecDesc(key);
+      const btnColor = document.getElementById('mec-' + key + '-btn-color').value;
+      const cardColor = document.getElementById('mec-' + key + '-card-color').value;
+      document.getElementById('mec-' + key + '-btn-hex').textContent = btnColor;
+      document.getElementById('mec-' + key + '-card-hex').textContent = cardColor;
+      const preview = document.getElementById('mec-' + key + '-preview');
+      if (!preview) return;
+      preview.style.background = cardColor;
+      const titleEl = preview.querySelector('h3');
+      const descEl = preview.querySelector('p');
+      const btnEl = preview.querySelector('button');
+      if (titleEl) titleEl.textContent = title;
+      if (descEl) descEl.textContent = desc;
+      if (btnEl) btnEl.style.background = btnColor;
+    }
+
+    function getDefaultMecTitle(key) {
+      return key === 'tip' ? 'Yo Creo en Ti' : key === 'meta' ? 'Mi Meta' : 'Apoyo Full';
+    }
+    function getDefaultMecDesc(key) {
+      return key === 'tip' ? 'Envía un apoyo único al creador' : key === 'meta' ? 'Apoya mis metas como creador' : 'Apoya mensualmente con una cantidad que tú elijas';
+    }
+
+    async function saveMecenasSettings(key) {
+      if (!currentProfile) return;
+      const ms = currentProfile.mecenas_settings || {};
+      const settings = {
+        title: document.getElementById('mec-' + key + '-title').value.trim(),
+        description: document.getElementById('mec-' + key + '-desc').value.trim(),
+        button_color: document.getElementById('mec-' + key + '-btn-color').value,
+        card_color: document.getElementById('mec-' + key + '-card-color').value,
+        image_url: ms[key]?.image_url || null
+      };
+
+      const fileInput = document.getElementById('mec-' + key + '-media');
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const bucket = file.type.startsWith('video/') ? 'videos' : 'meta-images';
+        const maxMB = file.type.startsWith('video/') ? 50 : 5;
+        const url = await uploadToStorage(file, bucket, maxMB);
+        if (url) settings.image_url = url;
+      }
+
+      ms[key] = settings;
+      const { error } = await sb.from('profiles').update({ mecenas_settings: ms }).eq('id', currentProfile.id);
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      currentProfile.mecenas_settings = ms;
+      showToast('Mecenas guardado', 'success');
+
+      if (settings.image_url) {
+        const previewEl = document.getElementById('mec-' + key + '-media-preview');
+        const isVid = /\.(mp4|webm|mov)$/i.test(settings.image_url);
+        previewEl.innerHTML = isVid
+          ? `<video src="${settings.image_url}" class="w-full h-32 object-cover rounded-lg border border-gray-200" controls></video>`
+          : `<img src="${settings.image_url}" class="w-full h-32 object-cover rounded-lg border border-gray-200" alt="">`;
+        previewEl.classList.remove('hidden');
+      }
     }
 
     async function uploadBrandAvatar() {
@@ -1617,12 +1914,26 @@
               <input id="edit-meta-end" type="date" value="${m.end_date || ''}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
             </div>
           </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Imágenes / Videos</label>
+            <div id="edit-meta-media-preview" class="flex flex-wrap gap-2 mb-2">${(m.images || []).map((url, i) => '<div class="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 group"><img src="' + url + '" class="w-full h-full object-cover"><button onclick="removeEditMetaMedia(' + i + ')" class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-xs rounded-bl opacity-0 group-hover:opacity-100 transition">&times;</button></div>').join('')}</div>
+            <input type="file" id="edit-meta-media-file" accept="image/*,video/*" multiple class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
+          </div>
           <div class="flex gap-3">
             <button onclick="saveMetaEdit('${m.id}')" id="save-meta-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Cambios</button>
             <button onclick="document.getElementById('edit-meta-modal').remove()" class="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition">Cancelar</button>
           </div>
         </div>`;
       document.body.appendChild(modal);
+      editMetaMediaUrls = [...(m.images || [])];
+    }
+
+    let editMetaMediaUrls = [];
+
+    function removeEditMetaMedia(index) {
+      editMetaMediaUrls.splice(index, 1);
+      const preview = document.getElementById('edit-meta-media-preview');
+      preview.innerHTML = editMetaMediaUrls.map((url, i) => '<div class="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 group"><img src="' + url + '" class="w-full h-full object-cover"><button onclick="removeEditMetaMedia(' + i + ')" class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-xs rounded-bl opacity-0 group-hover:opacity-100 transition">&times;</button></div>').join('');
     }
 
     async function saveMetaEdit(id) {
@@ -1636,7 +1947,15 @@
       const end_date = document.getElementById('edit-meta-end').value;
       if (!title) { btn.textContent = 'Guardar Cambios'; btn.disabled = false; return showToast('El titulo es requerido', 'error'); }
       if (goal_amount_cents < 100) { btn.textContent = 'Guardar Cambios'; btn.disabled = false; return showToast('La meta debe ser al menos $1', 'error'); }
-      const { error } = await sb.from('metas').update({ title, description: description || null, goal_amount_cents, is_active, start_date, end_date }).eq('id', id).eq('creator_id', currentUser.id);
+
+      const newFiles = document.getElementById('edit-meta-media-file').files;
+      for (const file of newFiles) {
+        const bucket = file.type.startsWith('video/') ? 'videos' : 'meta-images';
+        const url = await uploadToStorage(file, bucket, file.type.startsWith('video/') ? 50 : 5);
+        if (url) editMetaMediaUrls.push(url);
+      }
+
+      const { error } = await sb.from('metas').update({ title, description: description || null, goal_amount_cents, is_active, start_date, end_date, images: editMetaMediaUrls }).eq('id', id).eq('creator_id', currentUser.id);
       btn.textContent = 'Guardar Cambios'; btn.disabled = false;
       if (error) { showToast('Error: ' + error.message, 'error'); return; }
       document.getElementById('edit-meta-modal').remove();
@@ -2246,12 +2565,32 @@
             <label class="block text-xs font-medium text-gray-500 mb-1">Contenido</label>
             <textarea id="edit-post-body" rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(p.body || '')}</textarea>
           </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Media</label>
+            <div id="edit-post-media-preview" class="flex flex-wrap gap-2 mb-2">${(p.media_urls || []).map((url, i) => {
+              const isVideo = /\.(mp4|mov|webm)/i.test(url);
+              return '<div class="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 group">' + (isVideo ? '<video src="' + url + '" class="w-full h-full object-cover"></video>' : '<img src="' + url + '" class="w-full h-full object-cover">') + '<button onclick="removeEditPostMedia(' + i + ')" class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-xs rounded-bl opacity-0 group-hover:opacity-100 transition">&times;</button></div>';
+            }).join('')}</div>
+            <input type="file" id="edit-post-media-file" accept="image/*,video/*" multiple class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
+          </div>
           <div class="flex gap-3">
             <button onclick="savePostEdit('${p.id}')" id="save-post-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Cambios</button>
             <button onclick="document.getElementById('edit-post-modal').remove()" class="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition">Cancelar</button>
           </div>
         </div>`;
       document.body.appendChild(modal);
+      editPostMediaUrls = [...(p.media_urls || [])];
+    }
+
+    let editPostMediaUrls = [];
+
+    function removeEditPostMedia(index) {
+      editPostMediaUrls.splice(index, 1);
+      const preview = document.getElementById('edit-post-media-preview');
+      preview.innerHTML = editPostMediaUrls.map((url, i) => {
+        const isVideo = /\.(mp4|mov|webm)/i.test(url);
+        return '<div class="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 group">' + (isVideo ? '<video src="' + url + '" class="w-full h-full object-cover"></video>' : '<img src="' + url + '" class="w-full h-full object-cover">') + '<button onclick="removeEditPostMedia(' + i + ')" class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-xs rounded-bl opacity-0 group-hover:opacity-100 transition">&times;</button></div>';
+      }).join('');
     }
 
     async function savePostEdit(id) {
@@ -2259,7 +2598,16 @@
       btn.textContent = 'Guardando...'; btn.disabled = true;
       const title = document.getElementById('edit-post-title').value.trim();
       const body = document.getElementById('edit-post-body').value.trim();
-      const { error } = await sb.from('community_posts').update({ title: title || null, body: body || null, updated_at: new Date().toISOString() }).eq('id', id).eq('author_id', currentUser.id);
+
+      const newFiles = document.getElementById('edit-post-media-file').files;
+      for (const file of newFiles) {
+        const bucket = file.type.startsWith('video/') ? 'videos' : 'meta-images';
+        const url = await uploadToStorage(file, bucket, file.type.startsWith('video/') ? 50 : 5);
+        if (url) editPostMediaUrls.push(url);
+      }
+
+      const postType = editPostMediaUrls.some(u => /\.(mp4|mov|webm)/i.test(u)) ? 'video' : (editPostMediaUrls.length > 0 ? 'photo' : 'text');
+      const { error } = await sb.from('community_posts').update({ title: title || null, body: body || null, media_urls: editPostMediaUrls, post_type: postType, updated_at: new Date().toISOString() }).eq('id', id).eq('author_id', currentUser.id);
       btn.textContent = 'Guardar Cambios'; btn.disabled = false;
       if (error) { showToast('Error: ' + error.message, 'error'); return; }
       document.getElementById('edit-post-modal').remove();

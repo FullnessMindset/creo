@@ -20,6 +20,7 @@
   </script>
   <style>
     body { overscroll-behavior: contain; }
+    input, select, textarea { font-size: max(16px, 1em) !important; }
     .glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
     .chat-bubble-mine { background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 100%); color: white; border-radius: 18px 18px 4px 18px; }
     .chat-bubble-theirs { background: #f3f4f6; color: #1f2937; border-radius: 18px 18px 18px 4px; }
@@ -259,6 +260,85 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
             Contactar Marca
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== EDIT DEAL MODAL ==================== -->
+  <div id="edit-deal-modal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeEditDeal()"></div>
+    <div class="absolute inset-x-0 bottom-0 top-4 md:top-10 bg-white rounded-t-3xl overflow-y-auto shadow-2xl">
+      <div class="max-w-2xl mx-auto p-5 pb-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-creo-purple">Editar Brand Deal</h2>
+          <button onclick="closeEditDeal()" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>
+        <div class="space-y-5">
+          <input type="hidden" id="edit-deal-id">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Título del Deal *</label>
+            <input id="edit-deal-title" type="text" maxlength="120" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Categoría *</label>
+            <select id="edit-deal-category" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple bg-white">
+              <option value="">Seleccionar...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Descripción *</label>
+            <textarea id="edit-deal-description" rows="3" maxlength="1000" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Vibe del Video / Dirección Creativa *</label>
+            <textarea id="edit-deal-video-vibe" rows="3" maxlength="800" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Requisitos del Creador *</label>
+            <textarea id="edit-deal-requirements" rows="3" maxlength="800" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Pago por Creador (USD) *</label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+                <input id="edit-deal-budget" type="number" min="1" step="0.01" class="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Max Creadores</label>
+              <input id="edit-deal-max-creators" type="number" min="1" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Descripción del Pago</label>
+            <input id="edit-deal-payment-desc" type="text" maxlength="200" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Términos y Condiciones</label>
+            <textarea id="edit-deal-terms" rows="2" maxlength="800" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Fecha Límite para Aplicar</label>
+              <input id="edit-deal-deadline" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Fecha Límite de Entrega *</label>
+              <input id="edit-deal-delivery-deadline" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+            </div>
+          </div>
+          <!-- Cover image -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Imagen de Portada</label>
+            <div id="edit-cover-preview" class="hidden mb-3 relative">
+              <img id="edit-cover-preview-img" src="" class="w-full h-40 object-cover rounded-xl border border-gray-200">
+              <button type="button" onclick="removeEditCover()" class="absolute top-2 right-2 bg-black/60 text-white w-7 h-7 rounded-full flex items-center justify-center hover:bg-black/80 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <input type="file" id="edit-deal-cover-file" accept="image/*" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer" onchange="handleEditCoverFile(this)">
+          </div>
+          <button onclick="saveEditDeal()" id="save-edit-deal-btn" class="w-full bg-creo-purple text-white py-3.5 rounded-xl font-bold hover:bg-creo-light transition">Guardar Cambios</button>
         </div>
       </div>
     </div>
@@ -661,9 +741,10 @@
         applyBtn.onclick = () => signInWithGoogle();
         contactBtn.classList.add('hidden');
       } else if (isOwnDeal) {
-        applyBtn.textContent = 'Es tu deal';
-        applyBtn.disabled = true;
-        applyBtn.classList.add('opacity-50');
+        applyBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg> Editar Deal';
+        applyBtn.disabled = false;
+        applyBtn.classList.remove('opacity-50');
+        applyBtn.onclick = () => { closeDealDetail(); openEditDeal(selectedDeal); };
         contactBtn.classList.add('hidden');
       } else {
         applyBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Aplicar a este Deal';
@@ -688,6 +769,112 @@
       if (!currentUser || !selectedDeal) return;
       if (!(await requireCreoId('aplicar a deals'))) return;
       contactBrand();
+    }
+
+    // ==================== EDIT DEAL ====================
+
+    let editDealCoverUrl = null;
+    let editDealCoverFile = null;
+
+    function openEditDeal(deal) {
+      document.getElementById('edit-deal-id').value = deal.id;
+      document.getElementById('edit-deal-title').value = deal.title || '';
+      document.getElementById('edit-deal-description').value = deal.description || '';
+      document.getElementById('edit-deal-video-vibe').value = deal.video_vibe || '';
+      document.getElementById('edit-deal-requirements').value = deal.requirements || '';
+      document.getElementById('edit-deal-budget').value = deal.budget_per_creator_cents ? (deal.budget_per_creator_cents / 100).toFixed(2) : '';
+      document.getElementById('edit-deal-max-creators').value = deal.max_creators || 1;
+      document.getElementById('edit-deal-payment-desc').value = deal.payment_description || '';
+      document.getElementById('edit-deal-terms').value = deal.terms_conditions || '';
+      document.getElementById('edit-deal-deadline').value = deal.deadline || '';
+      document.getElementById('edit-deal-delivery-deadline').value = deal.delivery_deadline || '';
+
+      const catSelect = document.getElementById('edit-deal-category');
+      catSelect.innerHTML = '<option value="">Seleccionar...</option>' +
+        allCategories.map(c => `<option value="${esc(c.slug)}" ${deal.category === c.slug ? 'selected' : ''}>${esc(c.label)}</option>`).join('');
+
+      editDealCoverUrl = deal.cover_url || null;
+      editDealCoverFile = null;
+      if (editDealCoverUrl) {
+        document.getElementById('edit-cover-preview-img').src = editDealCoverUrl;
+        document.getElementById('edit-cover-preview').classList.remove('hidden');
+      } else {
+        document.getElementById('edit-cover-preview').classList.add('hidden');
+      }
+      document.getElementById('edit-deal-cover-file').value = '';
+
+      document.getElementById('edit-deal-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditDeal() {
+      document.getElementById('edit-deal-modal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function handleEditCoverFile(input) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) { showToast('Imagen máx 10MB', 'error'); input.value = ''; return; }
+      if (!file.type.startsWith('image/')) { showToast('Solo imágenes', 'error'); input.value = ''; return; }
+      editDealCoverFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('edit-cover-preview-img').src = e.target.result;
+        document.getElementById('edit-cover-preview').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeEditCover() {
+      editDealCoverUrl = null;
+      editDealCoverFile = null;
+      document.getElementById('edit-cover-preview').classList.add('hidden');
+      document.getElementById('edit-deal-cover-file').value = '';
+    }
+
+    async function saveEditDeal() {
+      const id = document.getElementById('edit-deal-id').value;
+      const btn = document.getElementById('save-edit-deal-btn');
+      btn.textContent = 'Guardando...'; btn.disabled = true;
+
+      const title = document.getElementById('edit-deal-title').value.trim();
+      const category = document.getElementById('edit-deal-category').value;
+      const description = document.getElementById('edit-deal-description').value.trim();
+      const videoVibe = document.getElementById('edit-deal-video-vibe').value.trim();
+      const requirements = document.getElementById('edit-deal-requirements').value.trim();
+      const budgetUsd = parseFloat(document.getElementById('edit-deal-budget').value);
+      const maxCreators = parseInt(document.getElementById('edit-deal-max-creators').value) || 1;
+      const paymentDesc = document.getElementById('edit-deal-payment-desc').value.trim();
+      const terms = document.getElementById('edit-deal-terms').value.trim();
+      const deadline = document.getElementById('edit-deal-deadline').value || null;
+      const deliveryDeadline = document.getElementById('edit-deal-delivery-deadline').value || null;
+
+      if (!title || !category || !description || !videoVibe || !requirements || !budgetUsd || !deliveryDeadline) {
+        showToast('Completa los campos requeridos (*)', 'error');
+        btn.textContent = 'Guardar Cambios'; btn.disabled = false;
+        return;
+      }
+
+      let coverUrl = editDealCoverUrl;
+      if (editDealCoverFile) {
+        const uploaded = await uploadToStorage(editDealCoverFile, 'brand-deals', 10);
+        if (uploaded) coverUrl = uploaded;
+      }
+
+      const { error } = await sb.from('brand_deals').update({
+        title, category, description, video_vibe: videoVibe, requirements,
+        budget_per_creator_cents: Math.round(budgetUsd * 100),
+        max_creators: maxCreators, payment_description: paymentDesc,
+        terms_conditions: terms, deadline, delivery_deadline: deliveryDeadline,
+        cover_url: coverUrl
+      }).eq('id', id).eq('brand_id', currentUser.id);
+
+      btn.textContent = 'Guardar Cambios'; btn.disabled = false;
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      closeEditDeal();
+      showToast('Deal actualizado', 'success');
+      loadDeals();
     }
 
     // ==================== CHAT ====================
