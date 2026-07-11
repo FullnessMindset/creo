@@ -868,7 +868,7 @@
       try {
         const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ creator_connect_id: creatorProfile.stripe_connect_id || 'platform', amount_usd: amount, success_url: window.location.href.split('?')[0] + '?u=' + username + '&status=completed', cancel_url: window.location.href })
+          body: JSON.stringify({ creator_connect_id: creatorProfile.stripe_connect_id || 'platform', creator_id: creatorProfile.id, creator_username: username, amount_usd: amount, success_url: window.location.href.split('?')[0] + '?u=' + username + '&status=completed', cancel_url: window.location.href })
         });
         const data = await response.json();
         if (data.url) window.location.href = data.url;
