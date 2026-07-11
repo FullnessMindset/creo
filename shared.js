@@ -882,5 +882,47 @@ function startNotifPolling() {
 function renderBottomNav(activePage) { renderSidebar(activePage); }
 function updateNavAuth() { updateSidebarAuth(); }
 
+// ========== ANNOUNCEMENT BAR ==========
+async function loadAnnouncementBar() {
+  try {
+    const { data: { user } } = await sb.auth.getUser();
+    const { data: anns } = await sb.from('announcements').select('*').eq('is_active', true).order('created_at', { ascending: false });
+    if (!anns || !anns.length) return;
+    let profile = null;
+    if (user) {
+      const { data: p } = await sb.from('profiles').select('account_type').eq('id', user.id).single();
+      profile = p;
+    }
+    const dismissed = JSON.parse(localStorage.getItem('creo_dismissed_anns') || '[]');
+    const matching = anns.filter(a => {
+      if (dismissed.includes(a.id)) return false;
+      if (a.target_type === 'global') return true;
+      if (a.target_type === 'user') return user && a.target_user_id === user.id;
+      if (!profile) return false;
+      const t = profile.account_type || 'creator';
+      if (a.target_type === 'creator') return t === 'creator';
+      if (a.target_type === 'empresa') return t === 'empresa' || t === 'business';
+      if (a.target_type === 'admin') return t === 'admin';
+      return false;
+    });
+    if (!matching.length) return;
+    const a = matching[0];
+    const colors = { info: 'bg-blue-600', success: 'bg-green-600', warning: 'bg-yellow-500 text-yellow-900', error: 'bg-red-600' };
+    const bar = document.createElement('div');
+    bar.id = 'announcement-bar';
+    bar.className = `${colors[a.style] || colors.info} text-white text-sm text-center py-2 px-4 relative z-50 font-medium`;
+    bar.innerHTML = `<span>${a.message.replace(/</g,'&lt;')}</span><button onclick="dismissAnnouncement('${a.id}')" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>`;
+    document.body.prepend(bar);
+  } catch(e) { console.log('Announcement bar:', e); }
+}
+function dismissAnnouncement(id) {
+  const dismissed = JSON.parse(localStorage.getItem('creo_dismissed_anns') || '[]');
+  dismissed.push(id);
+  localStorage.setItem('creo_dismissed_anns', JSON.stringify(dismissed));
+  const bar = document.getElementById('announcement-bar');
+  if (bar) bar.remove();
+}
+setTimeout(loadAnnouncementBar, 1500);
+
 initTheme();
 initCookieConsent();

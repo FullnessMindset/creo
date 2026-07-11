@@ -163,6 +163,8 @@
         <button onclick="showTab('allusers')" id="tab-allusers" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">All Users</button>
         <button onclick="showTab('metareviews')" id="tab-metareviews" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Meta Reviews</button>
         <button onclick="showTab('dealpayouts')" id="tab-dealpayouts" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Deal Payouts</button>
+        <button onclick="showTab('reports')" id="tab-reports" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Reports</button>
+        <button onclick="showTab('announcements')" id="tab-announcements" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Announcements</button>
         <button onclick="showTab('stripe')" id="tab-stripe" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
           Stripe
@@ -202,6 +204,7 @@
                   <th class="text-left px-5 py-3">Stripe</th>
                   <th class="text-left px-5 py-3">Identity</th>
                   <th class="text-left px-5 py-3">Joined</th>
+                  <th class="text-left px-5 py-3">Type</th>
                   <th class="text-left px-5 py-3">Actions</th>
                   <th class="text-left px-5 py-3">Email</th>
                 </tr>
@@ -357,6 +360,75 @@
           </div>
           <div id="deal-payouts-list" class="divide-y divide-gray-200"></div>
           <div id="deal-payouts-empty" class="p-8 text-center text-gray-400 text-sm">Loading deals...</div>
+        </div>
+      </div>
+
+      <!-- Reports Panel -->
+      <div id="panel-reports" class="hidden fade-in">
+        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="font-semibold text-gray-900">User Reports</h2>
+            <div class="flex items-center gap-2">
+              <select id="report-filter" onchange="filterReports()" class="bg-gray-50 border border-gray-300 px-3 py-1.5 rounded-lg text-sm text-gray-900 outline-none">
+                <option value="pending">Pending</option>
+                <option value="reviewed">Reviewed</option>
+                <option value="resolved">Resolved</option>
+                <option value="all">All</option>
+              </select>
+              <button onclick="loadReports()" class="text-xs text-creo-purple font-semibold hover:underline">Refresh</button>
+            </div>
+          </div>
+          <div id="reports-list" class="divide-y divide-gray-100"></div>
+          <div id="no-reports" class="hidden px-5 py-12 text-center text-gray-400">No reports found.</div>
+          <div id="reports-loading" class="px-5 py-12 text-center text-gray-400">Loading reports...</div>
+        </div>
+      </div>
+
+      <!-- Announcements Panel -->
+      <div id="panel-announcements" class="hidden fade-in">
+        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="font-semibold text-gray-900">Announcement Bar</h2>
+            <button onclick="openAnnouncementForm()" class="bg-creo-purple text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-creo-light transition">+ New Announcement</button>
+          </div>
+          <div id="announcement-form" class="hidden px-5 py-4 border-b border-gray-200 bg-gray-50/50 space-y-3">
+            <div>
+              <label class="text-xs text-gray-500 uppercase">Message</label>
+              <input id="ann-message" type="text" maxlength="200" placeholder="Your announcement message..." class="w-full bg-white border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs text-gray-500 uppercase">Target</label>
+                <select id="ann-target" onchange="toggleAnnUserSelect()" class="w-full bg-white border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900 outline-none">
+                  <option value="global">Global (everyone)</option>
+                  <option value="creator">Creadores only</option>
+                  <option value="empresa">Brands only</option>
+                  <option value="admin">Admins only</option>
+                  <option value="user">Specific user</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 uppercase">Style</label>
+                <select id="ann-style" class="w-full bg-white border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900 outline-none">
+                  <option value="info">Info (blue)</option>
+                  <option value="success">Success (green)</option>
+                  <option value="warning">Warning (yellow)</option>
+                  <option value="error">Urgent (red)</option>
+                </select>
+              </div>
+            </div>
+            <div id="ann-user-select" class="hidden">
+              <label class="text-xs text-gray-500 uppercase">Select User</label>
+              <select id="ann-user-id" class="w-full bg-white border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900 outline-none"></select>
+            </div>
+            <div class="flex gap-2 pt-1">
+              <button onclick="sendAnnouncement()" id="ann-send-btn" class="bg-creo-purple text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-creo-light transition">Broadcast</button>
+              <button onclick="closeAnnouncementForm()" class="bg-gray-100 text-gray-600 px-5 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200 transition">Cancel</button>
+            </div>
+          </div>
+          <div id="announcements-list" class="divide-y divide-gray-100"></div>
+          <div id="no-announcements" class="hidden px-5 py-12 text-center text-gray-400">No announcements yet.</div>
+          <div id="announcements-loading" class="px-5 py-12 text-center text-gray-400">Loading announcements...</div>
         </div>
       </div>
 
@@ -527,6 +599,15 @@
       <div>
         <label class="text-xs text-gray-500 uppercase">Bio</label>
         <textarea id="edit-bio" rows="3" class="w-full bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900"></textarea>
+      </div>
+      <div>
+        <label class="text-xs text-gray-500 uppercase">User Type</label>
+        <select id="edit-type" class="w-full bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900">
+          <option value="creator">Creador</option>
+          <option value="empresa">Brand</option>
+          <option value="admin">Admin</option>
+          <option value="co-creator">Co-Creator</option>
+        </select>
       </div>
       <div id="edit-stripe-info" class="text-xs text-gray-500 p-3 bg-gray-50 rounded-lg font-mono"></div>
       <div class="flex space-x-3 pt-2">
@@ -990,6 +1071,14 @@
       return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 border border-gray-200">Not Started</span>';
     }
 
+    function typeBadge(type) {
+      const t = type || 'creator';
+      if (t === 'admin') return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">Admin</span>';
+      if (t === 'empresa' || t === 'business') return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">Brand</span>';
+      if (t === 'co-creator') return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700 border border-teal-200">Co-Creator</span>';
+      return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">Creador</span>';
+    }
+
     function renderCreators(profiles) {
       const tbody = document.getElementById('creators-tbody');
       if (!profiles.length) { tbody.innerHTML = ''; document.getElementById('no-creators').classList.remove('hidden'); return; }
@@ -1012,6 +1101,7 @@
           <td class="px-5 py-3">${p.stripe_connect_id ? badge(true) : badge(false)}</td>
           <td class="px-5 py-3">${p.identity_verified ? badge(true) : badge(false)}</td>
           <td class="px-5 py-3 text-gray-500 text-xs">${new Date(p.created_at).toLocaleDateString()}</td>
+          <td class="px-5 py-3">${typeBadge(p.account_type)}</td>
           <td class="px-5 py-3 space-x-1">
             <button onclick="openReview('${p.id}')" class="text-xs text-creo-purple hover:underline">Review</button>
             <button onclick="editCreator('${p.id}')" class="text-xs text-blue-600 hover:underline">Edit</button>
@@ -1054,12 +1144,14 @@
       const active = document.getElementById('tab-' + tab);
       active.classList.add('bg-creo-purple', 'text-white');
       active.classList.remove('text-gray-500');
-      ['verification', 'creators', 'transactions', 'accounts', 'links', 'allusers', 'metareviews', 'dealpayouts', 'stripe'].forEach(p => {
+      ['verification', 'creators', 'transactions', 'accounts', 'links', 'allusers', 'metareviews', 'dealpayouts', 'reports', 'announcements', 'stripe'].forEach(p => {
         document.getElementById('panel-' + p).classList.toggle('hidden', p !== tab);
       });
       if (tab === 'stripe' && !stripeDataLoaded) loadStripeData();
       if (tab === 'allusers' && !allUsersLoaded) loadAllUsers();
       if (tab === 'dealpayouts' && !dealPayoutsLoaded) loadDealPayouts();
+      if (tab === 'reports' && !reportsLoaded) loadReports();
+      if (tab === 'announcements' && !announcementsLoaded) loadAnnouncements();
     }
 
     // ===== DEAL PAYOUTS TAB =====
@@ -1339,6 +1431,7 @@
       document.getElementById('edit-username').value = p.username || '';
       document.getElementById('edit-display').value = p.display_name || '';
       document.getElementById('edit-bio').value = p.bio || '';
+      document.getElementById('edit-type').value = p.account_type || 'creator';
       let info = 'No Stripe account connected.';
       if (p.stripe_connect_id) {
         info = 'Stripe ID: ' + p.stripe_connect_id + ' — loading...';
@@ -1354,7 +1447,7 @@
       const id = document.getElementById('edit-id').value;
       const res = await apiCall('update-profile', {
         profile_id: id,
-        updates: { username: document.getElementById('edit-username').value.trim(), display_name: document.getElementById('edit-display').value.trim(), bio: document.getElementById('edit-bio').value.trim() }
+        updates: { username: document.getElementById('edit-username').value.trim(), display_name: document.getElementById('edit-display').value.trim(), bio: document.getElementById('edit-bio').value.trim(), account_type: document.getElementById('edit-type').value }
       });
       if (res.error) return alert('Error: ' + res.error);
       closeModal(); loadDashboard();
@@ -1374,6 +1467,182 @@
     function closeModal() { document.getElementById('edit-modal').classList.add('hidden'); }
     function refresh() { loadDashboard(); }
     async function logout() { sessionStorage.removeItem('browse_as_user'); sessionStorage.removeItem('admin_mode'); authToken = null; await sb.auth.signOut(); location.reload(); }
+
+    // ===== REPORTS =====
+    let reportsLoaded = false;
+    let allReports = [];
+
+    async function loadReports() {
+      reportsLoaded = true;
+      document.getElementById('reports-loading').classList.remove('hidden');
+      document.getElementById('no-reports').classList.add('hidden');
+      document.getElementById('reports-list').innerHTML = '';
+      const { data, error } = await sb.from('reports')
+        .select('*, reporter:reporter_id(id, username, display_name, avatar_url), reported:reported_id(id, username, display_name, avatar_url, email)')
+        .order('created_at', { ascending: false });
+      document.getElementById('reports-loading').classList.add('hidden');
+      if (error) { document.getElementById('no-reports').textContent = 'Error: ' + error.message; document.getElementById('no-reports').classList.remove('hidden'); return; }
+      allReports = data || [];
+      filterReports();
+    }
+
+    function filterReports() {
+      const filter = document.getElementById('report-filter').value;
+      const filtered = filter === 'all' ? allReports : allReports.filter(r => r.status === filter);
+      renderReports(filtered);
+    }
+
+    function renderReports(reports) {
+      const list = document.getElementById('reports-list');
+      if (!reports.length) { list.innerHTML = ''; document.getElementById('no-reports').classList.remove('hidden'); return; }
+      document.getElementById('no-reports').classList.add('hidden');
+      list.innerHTML = reports.map(r => {
+        const reporter = r.reporter?.display_name || r.reporter?.username || '?';
+        const reported = r.reported?.display_name || r.reported?.username || '?';
+        const reportedAvatar = r.reported?.avatar_url ? `<img src="${esc(r.reported.avatar_url)}" class="w-8 h-8 rounded-full object-cover">` : `<div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center"><span class="text-xs font-bold text-red-600">${esc(reported[0])}</span></div>`;
+        const statusColor = r.status === 'pending' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : r.status === 'reviewed' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-green-100 text-green-700 border-green-200';
+        return `<div class="px-5 py-4 hover:bg-gray-50 transition">
+          <div class="flex items-start gap-3">
+            ${reportedAvatar}
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-semibold text-sm text-gray-900">${esc(reported)}</span>
+                <span class="text-xs text-gray-400">reported by ${esc(reporter)}</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColor} border">${esc(r.status)}</span>
+              </div>
+              <p class="text-sm text-red-600 font-medium mt-1">${esc(r.reason)}</p>
+              ${r.details ? `<p class="text-xs text-gray-500 mt-0.5">${esc(r.details)}</p>` : ''}
+              <p class="text-xs text-gray-400 mt-1">${new Date(r.created_at).toLocaleString()}</p>
+            </div>
+            <div class="flex items-center gap-1 flex-shrink-0">
+              ${r.status === 'pending' ? `<button onclick="updateReport('${r.id}', 'reviewed')" class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-lg hover:bg-blue-100 font-medium">Review</button>` : ''}
+              ${r.status !== 'resolved' ? `<button onclick="updateReport('${r.id}', 'resolved')" class="text-xs bg-green-50 text-green-600 px-2.5 py-1 rounded-lg hover:bg-green-100 font-medium">Resolve</button>` : ''}
+              <button onclick="notifyReportedUser('${r.reported?.id}', '${esc(reported)}', '${esc(r.reason)}')" class="text-xs bg-red-50 text-red-600 px-2.5 py-1 rounded-lg hover:bg-red-100 font-medium">Notify</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    async function updateReport(id, status) {
+      const { error } = await sb.from('reports').update({ status }).eq('id', id);
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      const r = allReports.find(x => x.id === id);
+      if (r) r.status = status;
+      filterReports();
+      showToast('Report ' + status, 'success');
+    }
+
+    async function notifyReportedUser(userId, userName, reason) {
+      if (!userId) return;
+      const msg = `Hola ${userName}, hemos recibido un reporte sobre tu cuenta por: "${reason}". Por favor revisa tu comportamiento en la plataforma. Si crees que esto es un error, puedes responder a este mensaje. — Admin CREO`;
+      const adminId = currentUser.id;
+      const { data: existing } = await sb.from('conversations').select('id').or(`and(user1_id.eq.${adminId},user2_id.eq.${userId}),and(user1_id.eq.${userId},user2_id.eq.${adminId})`).limit(1);
+      let convoId;
+      if (existing && existing.length > 0) {
+        convoId = existing[0].id;
+      } else {
+        const { data: newConvo, error: cErr } = await sb.from('conversations').insert({ user1_id: adminId, user2_id: userId }).select('id').single();
+        if (cErr) { showToast('Error creating conversation: ' + cErr.message, 'error'); return; }
+        convoId = newConvo.id;
+      }
+      const { error: mErr } = await sb.from('messages').insert({ conversation_id: convoId, sender_id: adminId, content: msg, message_type: 'text' });
+      if (mErr) { showToast('Error sending: ' + mErr.message, 'error'); return; }
+      await sb.from('conversations').update({ last_message: msg, last_message_at: new Date().toISOString() }).eq('id', convoId);
+      await sb.from('notifications').insert([{ user_id: userId, type: 'admin_report', title: 'Notificación del Admin sobre un reporte', body: 'Revisa tus mensajes para más detalles', link: 'messages.html' }]);
+      showToast('Notification sent to ' + userName, 'success');
+    }
+
+    // ===== ANNOUNCEMENTS =====
+    let announcementsLoaded = false;
+    let allAnnouncements = [];
+
+    async function loadAnnouncements() {
+      announcementsLoaded = true;
+      document.getElementById('announcements-loading').classList.remove('hidden');
+      document.getElementById('no-announcements').classList.add('hidden');
+      document.getElementById('announcements-list').innerHTML = '';
+      const { data, error } = await sb.from('announcements').select('*').order('created_at', { ascending: false }).limit(50);
+      document.getElementById('announcements-loading').classList.add('hidden');
+      if (error) { document.getElementById('no-announcements').textContent = 'Error: ' + error.message; document.getElementById('no-announcements').classList.remove('hidden'); return; }
+      allAnnouncements = data || [];
+      renderAnnouncements(allAnnouncements);
+    }
+
+    function renderAnnouncements(anns) {
+      const list = document.getElementById('announcements-list');
+      if (!anns.length) { list.innerHTML = ''; document.getElementById('no-announcements').classList.remove('hidden'); return; }
+      document.getElementById('no-announcements').classList.add('hidden');
+      const styleColors = { info: 'bg-blue-50 text-blue-700 border-blue-200', success: 'bg-green-50 text-green-700 border-green-200', warning: 'bg-yellow-50 text-yellow-700 border-yellow-200', error: 'bg-red-50 text-red-700 border-red-200' };
+      const targetLabels = { global: 'Global', creator: 'Creadores', empresa: 'Brands', admin: 'Admins', user: 'User' };
+      list.innerHTML = anns.map(a => {
+        const sc = styleColors[a.style] || styleColors.info;
+        return `<div class="px-5 py-3 hover:bg-gray-50 transition flex items-center gap-3">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${sc} border">${esc(a.style || 'info')}</span>
+              <span class="text-xs text-gray-400">${esc(targetLabels[a.target_type] || a.target_type)}${a.target_user_id ? ' → ' + esc(a.target_username || a.target_user_id) : ''}</span>
+              <span class="text-xs text-gray-300">${new Date(a.created_at).toLocaleDateString()}</span>
+            </div>
+            <p class="text-sm text-gray-900">${esc(a.message)}</p>
+          </div>
+          <div class="flex gap-1 flex-shrink-0">
+            <button onclick="toggleAnnouncement('${a.id}', ${!a.is_active})" class="text-xs px-2.5 py-1 rounded-lg font-medium ${a.is_active ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}">${a.is_active ? 'Disable' : 'Enable'}</button>
+            <button onclick="deleteAnnouncement('${a.id}')" class="text-xs px-2.5 py-1 rounded-lg font-medium bg-gray-50 text-gray-500 hover:bg-gray-100">Delete</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function openAnnouncementForm() {
+      document.getElementById('announcement-form').classList.remove('hidden');
+      document.getElementById('ann-message').value = '';
+      document.getElementById('ann-target').value = 'global';
+      document.getElementById('ann-style').value = 'info';
+      document.getElementById('ann-user-select').classList.add('hidden');
+      const sel = document.getElementById('ann-user-id');
+      sel.innerHTML = allProfiles.map(p => `<option value="${p.id}">${esc(p.display_name || p.username)} (@${esc(p.username)})</option>`).join('');
+    }
+
+    function closeAnnouncementForm() { document.getElementById('announcement-form').classList.add('hidden'); }
+
+    function toggleAnnUserSelect() {
+      document.getElementById('ann-user-select').classList.toggle('hidden', document.getElementById('ann-target').value !== 'user');
+    }
+
+    async function sendAnnouncement() {
+      const message = document.getElementById('ann-message').value.trim();
+      if (!message) { showToast('Enter a message', 'error'); return; }
+      const target = document.getElementById('ann-target').value;
+      const style = document.getElementById('ann-style').value;
+      const insert = { message, target_type: target, style, is_active: true, created_by: currentUser.id };
+      if (target === 'user') {
+        insert.target_user_id = document.getElementById('ann-user-id').value;
+        const p = allProfiles.find(x => x.id === insert.target_user_id);
+        insert.target_username = p?.username || '';
+      }
+      const btn = document.getElementById('ann-send-btn');
+      btn.disabled = true; btn.textContent = 'Sending...';
+      const { error } = await sb.from('announcements').insert(insert);
+      btn.disabled = false; btn.textContent = 'Broadcast';
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      closeAnnouncementForm();
+      showToast('Announcement broadcasted!', 'success');
+      loadAnnouncements();
+    }
+
+    async function toggleAnnouncement(id, active) {
+      const { error } = await sb.from('announcements').update({ is_active: active }).eq('id', id);
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      loadAnnouncements();
+    }
+
+    async function deleteAnnouncement(id) {
+      if (!confirm('Delete this announcement?')) return;
+      const { error } = await sb.from('announcements').delete().eq('id', id);
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      loadAnnouncements();
+    }
 
     // ===== ALL USERS =====
     let allUsersLoaded = false;
