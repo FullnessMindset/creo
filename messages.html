@@ -17,63 +17,233 @@
   <style>
     input, select, textarea { font-size: max(16px, 1em) !important; }
     .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
-    .glass-dark { background: rgba(26,10,62,0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); }
     .msg-mine { background: linear-gradient(135deg, #6C3AED 0%, #7C3AED 100%); color: white; border-radius: 18px 18px 4px 18px; }
     .msg-theirs { background: #f3f4f6; color: #1f2937; border-radius: 18px 18px 18px 4px; }
-    .search-result:hover { background: rgba(51,240,176,0.1); }
     .convo-item { transition: all 0.15s; }
-    .convo-item:hover { background: rgba(51,240,176,0.08); transform: translateX(2px); }
-    .convo-item:active { transform: scale(0.98); }
-    .online-dot { width: 10px; height: 10px; border: 2px solid white; }
-    @keyframes typing { 0%, 60%, 100% { opacity: 0.3; } 30% { opacity: 1; } }
-    .typing-dot { animation: typing 1.4s infinite; }
-    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    .convo-item:hover { background: rgba(51,240,176,0.08); }
+    .convo-item.active { background: rgba(108,58,237,0.08); border-left: 3px solid #6C3AED; }
+    .search-result:hover { background: rgba(51,240,176,0.1); }
+    .video-circle { width: 200px; height: 200px; border-radius: 50%; overflow: hidden; position: relative; border: 3px solid #6C3AED; }
+    .video-circle video { width: 100%; height: 100%; object-fit: cover; }
+    .video-circle .creo-badge { position: absolute; bottom: 4px; right: 4px; width: 28px; height: 28px; border-radius: 50%; background: white; padding: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    .video-circle .creo-badge img { width: 100%; height: 100%; border-radius: 50%; object-fit: contain; }
+    .audio-controls-bar { display: flex; align-items: center; gap: 8px; background: #f9fafb; border-radius: 12px; padding: 8px 12px; }
+    @keyframes pulse-rec { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .rec-pulse { animation: pulse-rec 1s infinite; }
   </style>
 </head>
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
   <script src="shared.js"></script>
 
-  <div class="max-w-2xl mx-auto pb-24">
-    <!-- Header -->
+  <!-- DESKTOP LAYOUT: sidebar + chat -->
+  <div class="hidden md:flex h-screen">
+    <!-- Left Sidebar: conversations -->
+    <div class="w-80 lg:w-96 border-r border-gray-200 flex flex-col bg-white flex-shrink-0">
+      <div class="px-4 pt-4 pb-3 border-b border-gray-100">
+        <div class="flex items-center justify-between mb-3">
+          <h1 class="text-xl font-bold text-creo-purple tracking-wider">Mensajes</h1>
+          <button onclick="openNewMessage()" class="w-9 h-9 rounded-full bg-creo-purple/10 flex items-center justify-center hover:bg-creo-purple/20 transition" title="Nuevo mensaje">
+            <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          </button>
+        </div>
+        <div class="relative">
+          <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input id="search-creators" type="text" placeholder="Buscar creadores..." class="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-creo-mint/50 focus:bg-white border border-transparent focus:border-creo-mint/30 transition" oninput="searchCreators(this.value)">
+          <div id="search-results" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-200 max-h-64 overflow-y-auto z-30"></div>
+        </div>
+      </div>
+      <div id="desktop-convos" class="flex-1 overflow-y-auto px-2 pt-1"></div>
+      <p id="no-messages-desktop" class="hidden text-center text-gray-400 text-sm py-8">💬 Sin mensajes</p>
+    </div>
+
+    <!-- Right Panel: active chat or empty state -->
+    <div class="flex-1 flex flex-col bg-gray-50/50" id="desktop-chat-panel">
+      <div id="desktop-empty-state" class="flex-1 flex flex-col items-center justify-center text-gray-300">
+        <svg class="w-20 h-20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        <p class="text-lg font-semibold">Selecciona una conversación</p>
+        <p class="text-sm mt-1">o busca un creador para iniciar</p>
+      </div>
+      <!-- Desktop chat area (hidden until a chat is opened) -->
+      <div id="desktop-chat-area" class="hidden flex-1 flex flex-col">
+        <div class="px-4 py-3 border-b border-gray-200 flex items-center gap-3 bg-white">
+          <a id="d-chat-profile-link" href="#" class="relative">
+            <div class="w-10 h-10 rounded-full bg-creo-purple/10 overflow-hidden flex items-center justify-center hover:ring-2 hover:ring-creo-mint transition">
+              <div id="d-chat-avatar"></div>
+            </div>
+          </a>
+          <div class="flex-1 min-w-0">
+            <a id="d-chat-profile-link-name" href="#" class="font-bold text-sm text-gray-900 hover:text-creo-purple transition block truncate"><span id="d-chat-name"></span></a>
+            <p id="d-chat-username" class="text-[10px] text-gray-400"></p>
+          </div>
+          <a id="d-chat-view-btn" href="#" class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-creo-mint/20 transition" title="Ver perfil">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          </a>
+        </div>
+        <div id="d-chat-messages" class="flex-1 overflow-y-auto px-4 py-3 space-y-2"></div>
+        <!-- Desktop input area -->
+        <div class="border-t border-gray-200 bg-white">
+          <div id="d-audio-preview" class="hidden px-4 pt-2 flex items-center gap-2 bg-gray-50">
+            <audio id="d-audio-player" controls class="flex-1 h-8"></audio>
+            <button onclick="sendAudioNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-creo-light transition">Enviar</button>
+            <button onclick="cancelAudio()" class="text-red-400 hover:text-red-600 text-xs font-semibold">✕</button>
+          </div>
+          <div id="d-video-preview" class="hidden px-4 pt-2">
+            <div class="relative inline-block">
+              <div class="video-circle w-[120px] h-[120px]"><video id="d-video-thumb" class="w-full h-full object-cover" playsinline muted loop></video><div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div></div>
+              <div class="flex gap-2 mt-2 justify-center">
+                <button onclick="sendVideoNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold">Enviar</button>
+                <button onclick="cancelVideo()" class="text-red-400 text-xs font-semibold">✕</button>
+              </div>
+            </div>
+          </div>
+          <div id="d-image-preview" class="hidden px-4 pt-2">
+            <div class="relative inline-block">
+              <img id="d-image-thumb" class="h-20 rounded-lg border border-gray-200" alt="">
+              <button onclick="cancelImage()" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">✕</button>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 px-3 py-2.5">
+            <button onclick="startVideoRecord()" id="d-video-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Grabar video">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </button>
+            <button onclick="document.getElementById('d-image-input').click()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Enviar imagen">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </button>
+            <input type="file" id="d-image-input" accept="image/*" class="hidden" onchange="handleChatImage(this)">
+            <button onclick="toggleAudioRecord()" id="d-audio-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-red-500 transition" title="Grabar audio (tap)">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
+            </button>
+            <div class="flex-1 relative flex items-center bg-gray-100 rounded-full border border-gray-200 focus-within:border-creo-mint/50 transition">
+              <input id="d-chat-input" type="text" placeholder="Aa" class="flex-1 bg-transparent rounded-full px-4 py-2 text-sm outline-none border-none !border-0" onkeydown="if(event.key==='Enter')sendMessage()">
+              <span id="d-emoji-btn" class="cursor-pointer text-lg hover:scale-110 transition pr-3">😊</span>
+            </div>
+            <button onclick="toggleChatGif()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition" title="GIF">
+              <span class="text-xs font-black">GIF</span>
+            </button>
+            <button onclick="sendMessage()" class="w-9 h-9 rounded-full bg-creo-purple flex items-center justify-center hover:bg-creo-light transition flex-shrink-0" title="Enviar">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <div id="d-gif-picker" class="hidden mx-3 mb-2 bg-white border border-gray-200 rounded-xl p-2 max-h-52 overflow-y-auto shadow-lg">
+            <input id="d-gif-search" type="text" placeholder="Buscar GIF..." class="w-full bg-gray-100 rounded-lg px-3 py-2 text-xs mb-2 outline-none" oninput="searchChatGifs(this.value)">
+            <div id="d-gif-results" class="grid grid-cols-5 lg:grid-cols-6 gap-1"></div>
+            <p class="text-[9px] text-gray-300 text-center mt-1">Powered by GIPHY</p>
+          </div>
+          <div id="d-recording-indicator" class="hidden mx-3 mb-2 flex items-center gap-2 text-red-500 text-xs bg-red-50 rounded-xl px-3 py-2">
+            <span class="w-2 h-2 rounded-full bg-red-500 rec-pulse"></span> Grabando...
+            <span id="d-rec-timer" class="font-mono text-red-400">0:00</span>
+            <button onclick="stopAudioRecord()" class="ml-auto bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-semibold hover:bg-red-200 transition">Detener</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE LAYOUT -->
+  <div class="md:hidden pb-24">
     <div class="sticky top-0 z-20 bg-white/95 backdrop-blur-lg border-b border-gray-100 px-4 pt-4 pb-3">
       <div class="flex items-center justify-between mb-3">
         <h1 class="text-xl font-bold text-creo-purple tracking-wider">Mensajes</h1>
-        <button onclick="openNewMessage()" class="w-9 h-9 rounded-full bg-creo-purple/10 flex items-center justify-center hover:bg-creo-purple/20 transition" title="Nuevo mensaje">
+        <button onclick="openNewMessage()" class="w-9 h-9 rounded-full bg-creo-purple/10 flex items-center justify-center hover:bg-creo-purple/20 transition">
           <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
         </button>
       </div>
-      <!-- Search Bar -->
       <div class="relative">
         <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input id="search-creators" type="text" placeholder="Buscar creadores..." class="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-creo-mint/50 focus:bg-white border border-transparent focus:border-creo-mint/30 transition" oninput="searchCreators(this.value)">
-        <div id="search-results" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-200 max-h-64 overflow-y-auto z-30"></div>
+        <input id="m-search-creators" type="text" placeholder="Buscar creadores..." class="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-creo-mint/50 transition" oninput="searchCreators(this.value, 'm-')">
+        <div id="m-search-results" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-200 max-h-64 overflow-y-auto z-30"></div>
       </div>
     </div>
-
     <div id="auth-required" class="hidden px-4 pt-8">
       <div class="glass p-8 rounded-2xl text-center space-y-3">
-        <div class="w-16 h-16 rounded-full bg-creo-purple/10 flex items-center justify-center mx-auto mb-2">
-          <svg class="w-8 h-8 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        </div>
         <p class="text-gray-500 text-sm">Inicia sesión para ver tus mensajes</p>
-        <button onclick="signInWithGoogle()" class="inline-block bg-creo-purple text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-creo-light transition">Iniciar Sesión</button>
+        <button onclick="signInWithGoogle()" class="bg-creo-purple text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-creo-light transition">Iniciar Sesión</button>
       </div>
     </div>
+    <div id="mobile-convos" class="px-2 pt-2"></div>
+    <p id="no-messages-mobile" class="hidden text-center text-gray-400 text-sm py-12">💬 No tienes mensajes aún<br><span class="text-xs text-gray-300">Busca un creador para iniciar</span></p>
+  </div>
 
-    <!-- Conversations List -->
-    <div id="conversations-list" class="px-2 pt-2"></div>
-    <p id="no-messages" class="hidden text-center text-gray-400 text-sm py-12">
-      <span class="block text-4xl mb-3">💬</span>
-      No tienes mensajes aún<br>
-      <span class="text-xs text-gray-300">Busca un creador arriba para iniciar una conversación</span>
-    </p>
+  <!-- MOBILE CHAT MODAL -->
+  <div id="chat-modal" class="fixed inset-0 z-[35] hidden md:!hidden">
+    <div class="absolute inset-0 bg-white flex flex-col">
+      <div class="px-4 py-3 border-b border-gray-200 flex items-center gap-3 bg-white/95 backdrop-blur-lg">
+        <button onclick="closeChat()" class="text-gray-400 hover:text-gray-600 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <a id="m-chat-profile-link" href="#">
+          <div class="w-10 h-10 rounded-full bg-creo-purple/10 overflow-hidden flex items-center justify-center hover:ring-2 hover:ring-creo-mint transition"><div id="m-chat-avatar"></div></div>
+        </a>
+        <div class="flex-1 min-w-0">
+          <a id="m-chat-profile-link-name" href="#" class="font-bold text-sm text-gray-900 hover:text-creo-purple transition block truncate"><span id="m-chat-name"></span></a>
+          <p id="m-chat-username" class="text-[10px] text-gray-400"></p>
+        </div>
+      </div>
+      <div id="m-chat-messages" class="flex-1 overflow-y-auto px-4 py-3 space-y-2"></div>
+      <div class="border-t border-gray-200 bg-white pb-safe">
+        <div id="m-audio-preview" class="hidden px-4 pt-2">
+          <div class="audio-controls-bar">
+            <audio id="m-audio-player" controls class="flex-1 h-8"></audio>
+            <button onclick="sendAudioNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold">Enviar</button>
+            <button onclick="cancelAudio()" class="text-red-400 text-xs font-semibold">✕</button>
+          </div>
+        </div>
+        <div id="m-video-preview" class="hidden px-4 pt-2">
+          <div class="relative inline-block">
+            <div class="video-circle w-[100px] h-[100px]"><video id="m-video-thumb" class="w-full h-full object-cover" playsinline muted loop></video><div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div></div>
+            <div class="flex gap-2 mt-2 justify-center">
+              <button onclick="sendVideoNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold">Enviar</button>
+              <button onclick="cancelVideo()" class="text-red-400 text-xs font-semibold">✕</button>
+            </div>
+          </div>
+        </div>
+        <div id="m-image-preview" class="hidden px-4 pt-2">
+          <div class="relative inline-block">
+            <img id="m-image-thumb" class="h-20 rounded-lg border border-gray-200" alt="">
+            <button onclick="cancelImage()" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">✕</button>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 px-3 py-2.5">
+          <button onclick="startVideoRecord()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Video">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </button>
+          <button onclick="document.getElementById('m-image-input').click()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Imagen">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </button>
+          <input type="file" id="m-image-input" accept="image/*" class="hidden" onchange="handleChatImage(this)">
+          <!-- MOBILE: hold-to-record mic -->
+          <button id="m-audio-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition" title="Mantén para grabar">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
+          </button>
+          <div class="flex-1 relative flex items-center bg-gray-100 rounded-full border border-gray-200 focus-within:border-creo-mint/50 transition">
+            <input id="m-chat-input" type="text" placeholder="Aa" class="flex-1 bg-transparent rounded-full px-4 py-2 text-sm outline-none border-none !border-0" onkeydown="if(event.key==='Enter')sendMessage()">
+            <span id="m-emoji-btn" class="cursor-pointer text-lg hover:scale-110 transition pr-3">😊</span>
+          </div>
+          <button onclick="toggleChatGif()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition">
+            <span class="text-xs font-black">GIF</span>
+          </button>
+          <button onclick="sendMessage()" class="w-9 h-9 rounded-full bg-creo-purple flex items-center justify-center hover:bg-creo-light transition flex-shrink-0">
+            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+        <div id="m-gif-picker" class="hidden mx-3 mb-2 bg-white border border-gray-200 rounded-xl p-2 max-h-52 overflow-y-auto shadow-lg">
+          <input id="m-gif-search" type="text" placeholder="Buscar GIF..." class="w-full bg-gray-100 rounded-lg px-3 py-2 text-xs mb-2 outline-none" oninput="searchChatGifs(this.value)">
+          <div id="m-gif-results" class="grid grid-cols-3 gap-1"></div>
+          <p class="text-[9px] text-gray-300 text-center mt-1">Powered by GIPHY</p>
+        </div>
+        <div id="m-recording-indicator" class="hidden mx-3 mb-2 flex items-center gap-2 text-red-500 text-xs bg-red-50 rounded-xl px-3 py-2">
+          <span class="w-2 h-2 rounded-full bg-red-500 rec-pulse"></span> Grabando...
+          <span id="m-rec-timer" class="font-mono text-red-400">0:00</span>
+          <span class="ml-auto text-gray-400 text-[10px]">Suelta para enviar</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- New Message Modal -->
   <div id="new-msg-modal" class="fixed inset-0 z-[36] hidden">
     <div class="absolute inset-0 bg-black/40" onclick="closeNewMessage()"></div>
-    <div class="absolute inset-x-0 bottom-0 bg-white rounded-t-2xl max-h-[80vh] flex flex-col animate-slide-up" style="animation: slideUp 0.25s ease-out">
+    <div class="absolute inset-x-0 bottom-0 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[420px] bg-white rounded-t-2xl md:rounded-2xl max-h-[80vh] flex flex-col shadow-2xl">
       <div class="p-4 border-b border-gray-100 flex items-center justify-between">
         <h3 class="font-bold text-gray-900">Nuevo Mensaje</h3>
         <button onclick="closeNewMessage()" class="text-gray-400 hover:text-gray-600 transition">
@@ -90,77 +260,23 @@
     </div>
   </div>
 
-  <!-- Chat Modal -->
-  <div id="chat-modal" class="fixed inset-0 z-[35] hidden">
-    <div class="absolute inset-0 bg-white flex flex-col" id="chat-bg">
-      <!-- Chat Header -->
-      <div class="px-4 py-3 border-b border-gray-200 flex items-center gap-3 bg-white/95 backdrop-blur-lg">
-        <button onclick="closeChat()" class="text-gray-400 hover:text-gray-600 transition">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        </button>
-        <a id="chat-profile-link" href="#" class="relative">
-          <div class="w-10 h-10 rounded-full bg-creo-purple/10 overflow-hidden flex items-center justify-center hover:ring-2 hover:ring-creo-mint transition">
-            <div id="chat-avatar"></div>
-          </div>
-        </a>
-        <div class="flex-1 min-w-0">
-          <a id="chat-profile-link-name" href="#" class="font-bold text-sm text-gray-900 hover:text-creo-purple transition block truncate"><span id="chat-name"></span></a>
-          <p id="chat-username" class="text-[10px] text-gray-400"></p>
-        </div>
-        <a id="chat-call-btn" href="#" class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-creo-mint/20 transition" title="Ir al perfil">
-          <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-        </a>
+  <!-- Video Record Modal -->
+  <div id="video-record-modal" class="fixed inset-0 z-[40] hidden bg-black/90 flex flex-col items-center justify-center">
+    <div class="relative">
+      <div class="video-circle w-[260px] h-[260px] md:w-[300px] md:h-[300px] mx-auto">
+        <video id="video-live-preview" autoplay playsinline muted class="w-full h-full object-cover" style="transform:scaleX(-1)"></video>
+        <div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div>
       </div>
-
-      <!-- Chat Messages -->
-      <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-3 space-y-2"></div>
-
-      <!-- Chat Input Area -->
-      <div class="border-t border-gray-200 bg-white pb-safe">
-        <!-- Audio preview -->
-        <div id="chat-audio-preview" class="hidden px-4 pt-2 flex items-center gap-2 bg-gray-50">
-          <audio id="chat-audio-player" controls class="flex-1 h-8"></audio>
-          <button onclick="cancelAudio()" class="text-red-400 hover:text-red-600 text-xs font-semibold">✕</button>
-        </div>
-        <!-- Image preview -->
-        <div id="chat-image-preview" class="hidden px-4 pt-2">
-          <div class="relative inline-block">
-            <img id="chat-image-thumb" class="h-20 rounded-lg border border-gray-200" alt="">
-            <button onclick="cancelImage()" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">✕</button>
-          </div>
-        </div>
-        <!-- Main input row -->
-        <div class="flex items-center gap-1.5 px-3 py-2.5">
-          <button onclick="document.getElementById('chat-image-input').click()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Enviar imagen">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          </button>
-          <input type="file" id="chat-image-input" accept="image/*" class="hidden" onchange="handleChatImage(this)">
-          <button onclick="toggleAudioRecord()" id="chat-audio-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-red-500 transition" title="Grabar audio">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
-          </button>
-          <div class="flex-1 relative flex items-center bg-gray-100 rounded-full border border-gray-200 focus-within:border-creo-mint/50 transition">
-            <input id="chat-input" type="text" placeholder="Aa" class="flex-1 bg-transparent rounded-full px-4 py-2 text-sm outline-none border-none !border-0">
-            <span id="chat-emoji-btn" class="cursor-pointer text-lg hover:scale-110 transition pr-3">😊</span>
-          </div>
-          <button onclick="toggleChatGif()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition" title="Enviar GIF">
-            <span class="text-xs font-black">GIF</span>
-          </button>
-          <button onclick="sendMessage()" class="w-9 h-9 rounded-full bg-creo-purple flex items-center justify-center hover:bg-creo-light transition flex-shrink-0" title="Enviar">
-            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-          </button>
-        </div>
-        <!-- GIF Picker -->
-        <div id="chat-gif-picker" class="hidden mx-3 mb-2 bg-white border border-gray-200 rounded-xl p-2 max-h-52 overflow-y-auto shadow-lg">
-          <input id="chat-gif-search" type="text" placeholder="Buscar GIF..." class="w-full bg-gray-100 rounded-lg px-3 py-2 text-xs mb-2 outline-none" oninput="searchChatGifs(this.value)">
-          <div id="chat-gif-results" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1"></div>
-          <p class="text-[9px] text-gray-300 text-center mt-1">Powered by GIPHY</p>
-        </div>
-        <!-- Recording indicator -->
-        <div id="chat-recording-indicator" class="hidden mx-3 mb-2 flex items-center gap-2 text-red-500 text-xs bg-red-50 rounded-xl px-3 py-2">
-          <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Grabando audio...
-          <button onclick="stopAudioRecord()" class="ml-auto bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-semibold hover:bg-red-200 transition">Detener</button>
-        </div>
-      </div>
+      <p id="video-rec-status" class="text-white text-center mt-4 text-sm">Listo para grabar</p>
+      <p id="video-rec-timer" class="text-white/60 text-center text-xs font-mono mt-1">0:00</p>
+    </div>
+    <div class="flex gap-4 mt-6">
+      <button onclick="cancelVideoRecord()" class="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <button id="video-rec-btn" onclick="toggleVideoRecording()" class="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white hover:bg-red-600 transition border-4 border-white">
+        <div id="video-rec-icon" class="w-6 h-6 rounded-full bg-white"></div>
+      </button>
     </div>
   </div>
 
@@ -171,12 +287,36 @@
     let recorder = null;
     let audioBlob = null;
     let pendingImageFile = null;
+    let pendingVideoBlob = null;
     let searchTimer = null;
+    let recTimerInterval = null;
+    let recStartTime = 0;
+    let videoRecorder = null;
+    let videoStream = null;
+    let isDesktop = window.innerWidth >= 768;
+    let holdTimer = null;
+    let isHoldRecording = false;
+
+    function P(id) { return document.getElementById(id); }
+
+    function getPrefix() { return isDesktop ? 'd-' : 'm-'; }
+    function chatInput() { return P(getPrefix() + 'chat-input'); }
+    function chatMsgList() { return P(getPrefix() + 'chat-messages'); }
+    function audioPreview() { return P(getPrefix() + 'audio-preview'); }
+    function audioPlayer() { return P(getPrefix() + 'audio-player'); }
+    function imagePreview() { return P(getPrefix() + 'image-preview'); }
+    function imageThumb() { return P(getPrefix() + 'image-thumb'); }
+    function videoPreview() { return P(getPrefix() + 'video-preview'); }
+    function videoThumb() { return P(getPrefix() + 'video-thumb'); }
+    function gifPicker() { return P(getPrefix() + 'gif-picker'); }
+    function gifResults() { return P(getPrefix() + 'gif-results'); }
+    function recIndicator() { return P(getPrefix() + 'recording-indicator'); }
+    function recTimer() { return P(getPrefix() + 'rec-timer'); }
 
     async function init() {
       const { data: { user } } = await sb.auth.getUser();
       if (!user) {
-        document.getElementById('auth-required').classList.remove('hidden');
+        P('auth-required')?.classList.remove('hidden');
         return;
       }
       currentUser = user;
@@ -184,11 +324,12 @@
       setInterval(loadConversations, 10000);
     }
 
-    // ===== SEARCH CREATORS =====
-    async function searchCreators(q) {
+    // ===== SEARCH =====
+    async function searchCreators(q, prefix) {
       clearTimeout(searchTimer);
-      const container = document.getElementById('search-results');
-      if (!q || q.trim().length < 2) { container.classList.add('hidden'); return; }
+      const pfx = prefix || '';
+      const container = P(pfx + 'search-results');
+      if (!q || q.trim().length < 2) { container?.classList.add('hidden'); return; }
       searchTimer = setTimeout(async () => {
         const term = q.trim().toLowerCase();
         const { data: profiles } = await sb.from('profiles')
@@ -201,18 +342,19 @@
           container.classList.remove('hidden');
           return;
         }
-        container.innerHTML = profiles.map(p => renderSearchResult(p)).join('');
+        const clearSrc = pfx ? `document.getElementById('${pfx}search-creators').value=''` : `document.getElementById('search-creators').value=''`;
+        container.innerHTML = profiles.map(p => renderSearchResult(p, pfx + 'search-results', clearSrc)).join('');
         container.classList.remove('hidden');
       }, 300);
     }
 
-    function renderSearchResult(p) {
+    function renderSearchResult(p, containerId, clearSrc) {
       const name = p.display_name || p.username || 'Usuario';
       const verified = p.verification_status === 'approved' ? '<svg class="w-3.5 h-3.5 text-creo-mint inline ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' : '';
       const avatar = p.avatar_url
         ? `<img src="${esc(p.avatar_url)}" class="w-10 h-10 rounded-full object-cover">`
         : `<div class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-creo-purple font-bold">${esc(name[0].toUpperCase())}</span></div>`;
-      return `<button onclick="openChat('${p.id}');document.getElementById('search-results').classList.add('hidden');document.getElementById('search-creators').value=''" class="w-full search-result flex items-center gap-3 p-3 rounded-xl transition text-left">
+      return `<button onclick="openChat('${p.id}');document.getElementById('${containerId}').classList.add('hidden');${clearSrc}" class="w-full search-result flex items-center gap-3 p-3 rounded-xl transition text-left">
         ${avatar}
         <div class="min-w-0">
           <p class="font-semibold text-sm text-gray-900 truncate">${esc(name)}${verified}</p>
@@ -223,7 +365,7 @@
 
     async function searchNewMsgCreators(q) {
       clearTimeout(searchTimer);
-      const container = document.getElementById('new-msg-results');
+      const container = P('new-msg-results');
       if (!q || q.trim().length < 2) { container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Escribe al menos 2 caracteres</p>'; return; }
       searchTimer = setTimeout(async () => {
         const term = q.trim().toLowerCase();
@@ -236,25 +378,27 @@
           container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">No se encontraron creadores</p>';
           return;
         }
-        container.innerHTML = profiles.map(p => renderSearchResult(p).replace("document.getElementById('search-results').classList.add('hidden');document.getElementById('search-creators').value=''", "closeNewMessage()")).join('');
+        container.innerHTML = profiles.map(p => {
+          const name = p.display_name || p.username || 'Usuario';
+          const avatar = p.avatar_url
+            ? `<img src="${esc(p.avatar_url)}" class="w-10 h-10 rounded-full object-cover">`
+            : `<div class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-creo-purple font-bold">${esc(name[0].toUpperCase())}</span></div>`;
+          return `<button onclick="openChat('${p.id}');closeNewMessage()" class="w-full search-result flex items-center gap-3 p-3 rounded-xl transition text-left">${avatar}<div class="min-w-0"><p class="font-semibold text-sm text-gray-900 truncate">${esc(name)}</p><p class="text-xs text-gray-400 truncate">@${esc(p.username || '')}</p></div></button>`;
+        }).join('');
       }, 300);
     }
 
     function openNewMessage() {
-      document.getElementById('new-msg-modal').classList.remove('hidden');
-      document.getElementById('new-msg-results').innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Escribe al menos 2 caracteres</p>';
-      setTimeout(() => document.getElementById('new-msg-search').focus(), 100);
+      P('new-msg-modal').classList.remove('hidden');
+      P('new-msg-results').innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Escribe al menos 2 caracteres</p>';
+      setTimeout(() => P('new-msg-search').focus(), 100);
     }
-    function closeNewMessage() {
-      document.getElementById('new-msg-modal').classList.add('hidden');
-      document.getElementById('new-msg-search').value = '';
-    }
+    function closeNewMessage() { P('new-msg-modal').classList.add('hidden'); P('new-msg-search').value = ''; }
 
-    // Close search results when clicking outside
     document.addEventListener('click', e => {
-      const sr = document.getElementById('search-results');
-      const si = document.getElementById('search-creators');
-      if (sr && !sr.contains(e.target) && e.target !== si) sr.classList.add('hidden');
+      ['search-results', 'm-search-results'].forEach(id => {
+        const sr = P(id); if (sr && !sr.contains(e.target)) sr.classList.add('hidden');
+      });
     });
 
     // ===== CONVERSATIONS =====
@@ -265,35 +409,37 @@
         .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
         .order('created_at', { ascending: false });
 
+      const noMsgD = P('no-messages-desktop');
+      const noMsgM = P('no-messages-mobile');
       if (!msgs || msgs.length === 0) {
-        document.getElementById('no-messages').classList.remove('hidden');
+        noMsgD?.classList.remove('hidden');
+        noMsgM?.classList.remove('hidden');
         return;
       }
-      document.getElementById('no-messages').classList.add('hidden');
+      noMsgD?.classList.add('hidden');
+      noMsgM?.classList.add('hidden');
 
       const convos = {};
       msgs.forEach(m => {
         const other = m.sender_id === currentUser.id ? m.receiver : m.sender;
         if (!other) return;
-        if (!convos[other.id]) {
-          convos[other.id] = { user: other, lastMsg: m, unread: 0 };
-        }
+        if (!convos[other.id]) convos[other.id] = { user: other, lastMsg: m, unread: 0 };
         if (m.receiver_id === currentUser.id && !m.is_read) convos[other.id].unread++;
       });
 
       const sorted = Object.values(convos).sort((a, b) => new Date(b.lastMsg.created_at) - new Date(a.lastMsg.created_at));
-      const list = document.getElementById('conversations-list');
-      list.innerHTML = sorted.map(c => {
+      const html = sorted.map(c => {
         const name = c.user.display_name || c.user.username || 'Usuario';
         const avatar = c.user.avatar_url
           ? `<img src="${esc(c.user.avatar_url)}" class="w-full h-full object-cover">`
           : `<span class="text-creo-purple font-bold text-sm">${esc(name[0].toUpperCase())}</span>`;
-        const preview = c.lastMsg.body ? esc(c.lastMsg.body).slice(0, 45) : (c.lastMsg.media_type === 'gif' ? '🎬 GIF' : c.lastMsg.media_type === 'audio' ? '🎤 Audio' : c.lastMsg.media_type === 'image' ? '📷 Imagen' : '📷 Media');
+        const preview = c.lastMsg.body ? esc(c.lastMsg.body).slice(0, 40) : (c.lastMsg.media_type === 'gif' ? '🎬 GIF' : c.lastMsg.media_type === 'audio' ? '🎤 Audio' : c.lastMsg.media_type === 'image' ? '📷 Imagen' : c.lastMsg.media_type === 'video' ? '🎥 Video' : '📎 Media');
         const isMine = c.lastMsg.sender_id === currentUser.id;
         const hasUnread = c.unread > 0;
-        return `<button onclick="openChat('${c.user.id}')" class="w-full convo-item rounded-2xl p-3 flex items-center gap-3 text-left">
+        const isActive = activeChatUser && activeChatUser.id === c.user.id;
+        return `<button onclick="openChat('${c.user.id}')" class="w-full convo-item rounded-2xl p-3 flex items-center gap-3 text-left ${isActive ? 'active' : ''}">
           <div class="relative flex-shrink-0">
-            <div class="w-14 h-14 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden">${avatar}</div>
+            <div class="w-12 h-12 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden">${avatar}</div>
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex justify-between items-center">
@@ -302,9 +448,14 @@
             </div>
             <p class="text-xs ${hasUnread ? 'text-gray-700 font-medium' : 'text-gray-400'} truncate mt-0.5">${isMine ? 'Tú: ' : ''}${preview}</p>
           </div>
-          ${hasUnread ? `<span class="w-6 h-6 rounded-full bg-creo-mint text-creo-purple text-[11px] font-bold flex items-center justify-center flex-shrink-0">${c.unread}</span>` : ''}
+          ${hasUnread ? `<span class="w-5 h-5 rounded-full bg-creo-mint text-creo-purple text-[10px] font-bold flex items-center justify-center flex-shrink-0">${c.unread}</span>` : ''}
         </button>`;
       }).join('');
+
+      const dc = P('desktop-convos');
+      const mc = P('mobile-convos');
+      if (dc) dc.innerHTML = html;
+      if (mc) mc.innerHTML = html;
     }
 
     // ===== CHAT =====
@@ -314,27 +465,44 @@
       activeChatUser = profile;
       const name = profile.display_name || profile.username || 'Usuario';
       const profileUrl = profile.username ? `profile.html?u=${encodeURIComponent(profile.username)}` : '#';
-      document.getElementById('chat-name').textContent = name;
-      document.getElementById('chat-username').textContent = '@' + (profile.username || '');
-      document.getElementById('chat-profile-link').href = profileUrl;
-      document.getElementById('chat-profile-link-name').href = profileUrl;
-      document.getElementById('chat-call-btn').href = profileUrl;
-      const avatar = document.getElementById('chat-avatar');
-      avatar.innerHTML = profile.avatar_url
-        ? `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">`
-        : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
-      document.getElementById('chat-modal').classList.remove('hidden');
+
+      if (isDesktop) {
+        P('desktop-empty-state').classList.add('hidden');
+        P('desktop-chat-area').classList.remove('hidden');
+        P('d-chat-name').textContent = name;
+        P('d-chat-username').textContent = '@' + (profile.username || '');
+        P('d-chat-profile-link').href = profileUrl;
+        P('d-chat-profile-link-name').href = profileUrl;
+        P('d-chat-view-btn').href = profileUrl;
+        const av = P('d-chat-avatar');
+        av.innerHTML = profile.avatar_url
+          ? `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">`
+          : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
+        createEmojiPicker('d-chat-input', 'd-emoji-btn');
+      } else {
+        P('chat-modal').classList.remove('hidden');
+        P('m-chat-name').textContent = name;
+        P('m-chat-username').textContent = '@' + (profile.username || '');
+        P('m-chat-profile-link').href = profileUrl;
+        P('m-chat-profile-link-name').href = profileUrl;
+        const av = P('m-chat-avatar');
+        av.innerHTML = profile.avatar_url
+          ? `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">`
+          : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
+        createEmojiPicker('m-chat-input', 'm-emoji-btn');
+      }
+
+      if (chatPolling) clearInterval(chatPolling);
       loadChatMessages();
       chatPolling = setInterval(loadChatMessages, 4000);
-      createEmojiPicker('chat-input', 'chat-emoji-btn');
+      loadConversations();
     }
 
     function closeChat() {
-      document.getElementById('chat-modal').classList.add('hidden');
+      P('chat-modal').classList.add('hidden');
       if (chatPolling) { clearInterval(chatPolling); chatPolling = null; }
       activeChatUser = null;
-      cancelAudio();
-      cancelImage();
+      cancelAudio(); cancelImage(); cancelVideo();
       loadConversations();
     }
 
@@ -345,82 +513,133 @@
         .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${activeChatUser.id}),and(sender_id.eq.${activeChatUser.id},receiver_id.eq.${currentUser.id})`)
         .order('created_at', { ascending: true })
         .limit(200);
-      const list = document.getElementById('chat-messages');
+
+      const list = chatMsgList();
+      if (!list) return;
       if (!msgs || msgs.length === 0) {
-        const name = activeChatUser.display_name || activeChatUser.username || '';
+        const n = activeChatUser.display_name || activeChatUser.username || '';
         const av = activeChatUser.avatar_url
           ? `<img src="${esc(activeChatUser.avatar_url)}" class="w-16 h-16 rounded-full object-cover">`
-          : `<div class="w-16 h-16 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-creo-purple font-bold text-2xl">${esc(name[0]?.toUpperCase() || '?')}</span></div>`;
-        list.innerHTML = `<div class="flex flex-col items-center justify-center py-12 space-y-3">
-          ${av}
-          <p class="font-bold text-gray-900">${esc(name)}</p>
-          <p class="text-xs text-gray-400">Envía un mensaje para iniciar la conversación</p>
-        </div>`;
+          : `<div class="w-16 h-16 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-creo-purple font-bold text-2xl">${esc(n[0]?.toUpperCase()||'?')}</span></div>`;
+        list.innerHTML = `<div class="flex flex-col items-center justify-center py-12 space-y-3">${av}<p class="font-bold text-gray-900">${esc(n)}</p><p class="text-xs text-gray-400">Envía un mensaje para iniciar</p></div>`;
         return;
       }
-      list.innerHTML = msgs.map(m => {
-        const isMine = m.sender_id === currentUser.id;
-        let content = '';
-        if (m.media_type === 'gif') content = `<img src="${esc(m.media_url)}" class="max-w-[200px] rounded-xl" alt="GIF" loading="lazy">`;
-        else if (m.media_type === 'audio') content = `<audio controls src="${esc(m.media_url)}" class="max-w-[200px] h-8"></audio>`;
-        else if (m.media_type === 'image') content = `<img src="${esc(m.media_url)}" class="max-w-[200px] rounded-xl cursor-pointer" alt="" loading="lazy" onclick="window.open(this.src,'_blank')">`;
-        if (m.body) content += `<p class="text-sm leading-relaxed">${esc(m.body)}</p>`;
-        const reactions = m.reactions || {};
-        const reactionHtml = Object.keys(reactions).length > 0
-          ? `<div class="flex flex-wrap gap-1 ${isMine ? 'justify-end' : 'justify-start'} mt-0.5">${Object.entries(reactions).map(([emoji, users]) => {
-              const myReaction = users.includes(currentUser.id);
-              return `<button onclick="toggleReaction('${m.id}','${emoji}')" class="text-xs px-1.5 py-0.5 rounded-full border transition ${myReaction ? 'bg-creo-purple/20 border-creo-purple' : 'bg-gray-50 border-gray-200 hover:border-creo-mint'}">${emoji}${users.length > 1 ? ' ' + users.length : ''}</button>`;
-            }).join('')}</div>` : '';
-        return `<div class="flex ${isMine ? 'justify-end' : 'justify-start'} group" id="msg-${m.id}">
-          <div class="max-w-[75%] relative">
-            <div class="${isMine ? 'msg-mine' : 'msg-theirs'} px-3.5 py-2 space-y-1" ondblclick="showReactionPicker('${m.id}', ${isMine})">
-              ${content}
-              <p class="text-[10px] ${isMine ? 'text-white/40' : 'text-gray-400'} text-right leading-none">${timeAgo(m.created_at)}</p>
-            </div>
-            ${reactionHtml}
-            <button onclick="showReactionPicker('${m.id}', ${isMine})" class="absolute ${isMine ? '-left-7' : '-right-7'} top-1 opacity-0 group-hover:opacity-100 transition text-gray-300 hover:text-gray-500 text-sm" title="Reaccionar">😊</button>
-          </div>
-        </div>`;
-      }).join('');
-      list.scrollTop = list.scrollHeight;
+
+      const wasAtBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+      list.innerHTML = msgs.map(m => renderMessage(m)).join('');
+      if (wasAtBottom) list.scrollTop = list.scrollHeight;
+
       const unread = msgs.filter(m => m.sender_id === activeChatUser.id && !m.is_read).map(m => m.id);
       if (unread.length) sb.from('messages').update({ is_read: true }).in('id', unread).then(() => {});
     }
 
+    function renderMessage(m) {
+      const isMine = m.sender_id === currentUser.id;
+      let content = '';
+      if (m.media_type === 'gif') {
+        content = `<img src="${esc(m.media_url)}" class="max-w-[200px] rounded-xl" alt="GIF" loading="lazy">`;
+      } else if (m.media_type === 'audio') {
+        content = `<audio controls src="${esc(m.media_url)}" class="max-w-[220px] h-8"></audio>`;
+      } else if (m.media_type === 'image') {
+        content = `<img src="${esc(m.media_url)}" class="max-w-[200px] rounded-xl cursor-pointer" alt="" loading="lazy" onclick="window.open(this.src,'_blank')">`;
+      } else if (m.media_type === 'video') {
+        content = `<div class="video-circle w-[160px] h-[160px] cursor-pointer" onclick="this.querySelector('video').paused?this.querySelector('video').play():this.querySelector('video').pause()">
+          <video src="${esc(m.media_url)}" playsinline class="w-full h-full object-cover"></video>
+          <div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div>
+        </div>`;
+      }
+      if (m.body) content += `<p class="text-sm leading-relaxed">${esc(m.body)}</p>`;
+      const reactions = m.reactions || {};
+      const reactionHtml = Object.keys(reactions).length > 0
+        ? `<div class="flex flex-wrap gap-1 ${isMine ? 'justify-end' : 'justify-start'} mt-0.5">${Object.entries(reactions).map(([emoji, users]) => {
+            const my = users.includes(currentUser.id);
+            return `<button onclick="toggleReaction('${m.id}','${emoji}')" class="text-xs px-1.5 py-0.5 rounded-full border transition ${my ? 'bg-creo-purple/20 border-creo-purple' : 'bg-gray-50 border-gray-200 hover:border-creo-mint'}">${emoji}${users.length>1?' '+users.length:''}</button>`;
+          }).join('')}</div>` : '';
+      return `<div class="flex ${isMine?'justify-end':'justify-start'} group" id="msg-${m.id}">
+        <div class="max-w-[75%] relative">
+          <div class="${isMine?'msg-mine':'msg-theirs'} px-3.5 py-2 space-y-1" ondblclick="showReactionPicker('${m.id}',${isMine})">
+            ${content}
+            <p class="text-[10px] ${isMine?'text-white/40':'text-gray-400'} text-right leading-none">${timeAgo(m.created_at)}</p>
+          </div>
+          ${reactionHtml}
+          <button onclick="showReactionPicker('${m.id}',${isMine})" class="absolute ${isMine?'-left-7':'-right-7'} top-1 opacity-0 group-hover:opacity-100 transition text-gray-300 hover:text-gray-500 text-sm">😊</button>
+        </div>
+      </div>`;
+    }
+
+    // ===== SEND MESSAGE =====
     async function sendMessage() {
       if (!currentUser || !activeChatUser) return;
-      const input = document.getElementById('chat-input');
-      const body = input.value.trim();
-      if (!body && !audioBlob && !pendingImageFile) return;
+      const input = chatInput();
+      const body = input ? input.value.trim() : '';
+      if (!body && !audioBlob && !pendingImageFile && !pendingVideoBlob) return;
       const msg = { sender_id: currentUser.id, receiver_id: activeChatUser.id, body: body || null, media_url: null, media_type: null };
 
       if (pendingImageFile) {
-        const ext = pendingImageFile.name.split('.').pop();
+        const ext = pendingImageFile.name.split('.').pop() || 'jpg';
         const fileName = `dm_img_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-        const { data: upData, error: upErr } = await sb.storage.from('dm-media').upload(fileName, pendingImageFile, { contentType: pendingImageFile.type });
-        if (!upErr && upData) {
-          const { data: urlData } = sb.storage.from('dm-media').getPublicUrl(fileName);
-          msg.media_url = urlData.publicUrl;
-          msg.media_type = 'image';
+        const { data, error } = await sb.storage.from('dm-media').upload(fileName, pendingImageFile, { contentType: pendingImageFile.type });
+        if (!error && data) {
+          const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
+          msg.media_url = u.publicUrl; msg.media_type = 'image';
         }
         cancelImage();
       }
-
+      if (pendingVideoBlob) {
+        const fileName = `dm_video_${Date.now()}.webm`;
+        const { data, error } = await sb.storage.from('dm-media').upload(fileName, pendingVideoBlob, { contentType: 'video/webm' });
+        if (!error && data) {
+          const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
+          msg.media_url = u.publicUrl; msg.media_type = 'video';
+        }
+        cancelVideo();
+      }
       if (audioBlob) {
         const fileName = `dm_audio_${Date.now()}.webm`;
-        const { data: upData, error: upErr } = await sb.storage.from('dm-media').upload(fileName, audioBlob, { contentType: 'audio/webm' });
-        if (!upErr && upData) {
-          const { data: urlData } = sb.storage.from('dm-media').getPublicUrl(fileName);
-          msg.media_url = urlData.publicUrl;
-          msg.media_type = 'audio';
+        const { data, error } = await sb.storage.from('dm-media').upload(fileName, audioBlob, { contentType: 'audio/webm' });
+        if (!error && data) {
+          const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
+          msg.media_url = u.publicUrl; msg.media_type = 'audio';
         }
         cancelAudio();
       }
-
-      input.value = '';
+      if (input) input.value = '';
       const { error } = await sb.from('messages').insert(msg);
-      if (error) { showToast('Error al enviar', 'error'); return; }
-      createNotification(activeChatUser.id, 'message', body || '📷 Media', null, 'messages.html#chat-' + currentUser.id);
+      if (error) { showToast('Error al enviar', 'error'); console.error(error); return; }
+      const label = msg.media_type === 'video' ? '🎥 Video' : msg.media_type === 'image' ? '📷 Imagen' : msg.media_type === 'audio' ? '🎤 Audio' : body;
+      createNotification(activeChatUser.id, 'message', label, null, 'messages.html#chat-' + currentUser.id);
+      loadChatMessages();
+    }
+
+    async function sendAudioNow() {
+      if (!audioBlob) return;
+      const msg = { sender_id: currentUser.id, receiver_id: activeChatUser.id, body: null, media_url: null, media_type: null };
+      const fileName = `dm_audio_${Date.now()}.webm`;
+      const { data, error } = await sb.storage.from('dm-media').upload(fileName, audioBlob, { contentType: 'audio/webm' });
+      if (!error && data) {
+        const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
+        msg.media_url = u.publicUrl; msg.media_type = 'audio';
+      }
+      cancelAudio();
+      const { error: insErr } = await sb.from('messages').insert(msg);
+      if (insErr) { showToast('Error al enviar audio', 'error'); return; }
+      createNotification(activeChatUser.id, 'message', '🎤 Audio', null, 'messages.html#chat-' + currentUser.id);
+      loadChatMessages();
+    }
+
+    async function sendVideoNow() {
+      if (!pendingVideoBlob) return;
+      const msg = { sender_id: currentUser.id, receiver_id: activeChatUser.id, body: null, media_url: null, media_type: null };
+      const fileName = `dm_video_${Date.now()}.webm`;
+      const { data, error } = await sb.storage.from('dm-media').upload(fileName, pendingVideoBlob, { contentType: 'video/webm' });
+      if (!error && data) {
+        const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
+        msg.media_url = u.publicUrl; msg.media_type = 'video';
+      }
+      cancelVideo();
+      const { error: insErr } = await sb.from('messages').insert(msg);
+      if (insErr) { showToast('Error al enviar video', 'error'); return; }
+      createNotification(activeChatUser.id, 'message', '🎥 Video', null, 'messages.html#chat-' + currentUser.id);
       loadChatMessages();
     }
 
@@ -430,20 +649,20 @@
       if (!file) return;
       if (file.size > 10 * 1024 * 1024) { showToast('Imagen máx 10MB', 'error'); return; }
       pendingImageFile = file;
-      const thumb = document.getElementById('chat-image-thumb');
-      thumb.src = URL.createObjectURL(file);
-      document.getElementById('chat-image-preview').classList.remove('hidden');
+      const thumb = imageThumb();
+      if (thumb) thumb.src = URL.createObjectURL(file);
+      imagePreview()?.classList.remove('hidden');
       input.value = '';
     }
     function cancelImage() {
       pendingImageFile = null;
-      document.getElementById('chat-image-preview').classList.add('hidden');
-      document.getElementById('chat-image-thumb').src = '';
+      imagePreview()?.classList.add('hidden');
+      const t = imageThumb(); if (t) t.src = '';
     }
 
     // ===== GIF =====
     let gifTimer = null;
-    function toggleChatGif() { document.getElementById('chat-gif-picker').classList.toggle('hidden'); }
+    function toggleChatGif() { gifPicker()?.classList.toggle('hidden'); }
     async function searchChatGifs(q) {
       clearTimeout(gifTimer);
       gifTimer = setTimeout(async () => {
@@ -454,8 +673,9 @@
         try {
           const res = await fetch(url);
           const json = await res.json();
-          document.getElementById('chat-gif-results').innerHTML = (json.data || []).map(g =>
-            `<img src="${g.images.fixed_width_small.url}" class="w-full h-20 md:h-16 object-cover rounded cursor-pointer hover:opacity-80 transition" onclick="sendGif('${g.images.fixed_width.url}')" alt="GIF" loading="lazy">`
+          const gr = gifResults();
+          if (gr) gr.innerHTML = (json.data || []).map(g =>
+            `<img src="${g.images.fixed_width_small.url}" class="w-full h-16 object-cover rounded cursor-pointer hover:opacity-80 transition" onclick="sendGif('${g.images.fixed_width.url}')" alt="GIF" loading="lazy">`
           ).join('');
         } catch(e) {}
       }, 300);
@@ -463,12 +683,22 @@
     async function sendGif(url) {
       if (!currentUser || !activeChatUser) return;
       await sb.from('messages').insert({ sender_id: currentUser.id, receiver_id: activeChatUser.id, body: null, media_url: url, media_type: 'gif' });
-      document.getElementById('chat-gif-picker').classList.add('hidden');
+      gifPicker()?.classList.add('hidden');
       createNotification(activeChatUser.id, 'message', '🎬 GIF', null, 'messages.html#chat-' + currentUser.id);
       loadChatMessages();
     }
 
-    // ===== AUDIO =====
+    // ===== AUDIO — DESKTOP: tap to record / tap to stop =====
+    function startRecTimer() {
+      recStartTime = Date.now();
+      recTimerInterval = setInterval(() => {
+        const s = Math.floor((Date.now() - recStartTime) / 1000);
+        const rt = recTimer();
+        if (rt) rt.textContent = Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+      }, 500);
+    }
+    function stopRecTimer() { clearInterval(recTimerInterval); }
+
     async function toggleAudioRecord() {
       if (recorder && recorder.state === 'recording') { stopAudioRecord(); return; }
       try {
@@ -478,40 +708,158 @@
         recorder.ondataavailable = e => chunks.push(e.data);
         recorder.onstop = () => {
           audioBlob = new Blob(chunks, { type: 'audio/webm' });
-          document.getElementById('chat-audio-player').src = URL.createObjectURL(audioBlob);
-          document.getElementById('chat-audio-preview').classList.remove('hidden');
-          document.getElementById('chat-recording-indicator').classList.add('hidden');
+          const ap = audioPlayer();
+          if (ap) ap.src = URL.createObjectURL(audioBlob);
+          audioPreview()?.classList.remove('hidden');
+          recIndicator()?.classList.add('hidden');
+          stopRecTimer();
           stream.getTracks().forEach(t => t.stop());
         };
         recorder.start();
-        document.getElementById('chat-recording-indicator').classList.remove('hidden');
-        document.getElementById('chat-audio-btn').classList.add('text-red-500');
+        recIndicator()?.classList.remove('hidden');
+        const btn = P(getPrefix() + 'audio-btn') || P('d-audio-btn');
+        if (btn) btn.classList.add('text-red-500');
+        startRecTimer();
       } catch(e) { showToast('No se pudo acceder al micrófono', 'error'); }
     }
-    function stopAudioRecord() { if (recorder && recorder.state === 'recording') recorder.stop(); }
+
+    function stopAudioRecord() {
+      if (recorder && recorder.state === 'recording') recorder.stop();
+    }
+
     function cancelAudio() {
       audioBlob = null;
-      document.getElementById('chat-audio-preview').classList.add('hidden');
-      document.getElementById('chat-recording-indicator').classList.add('hidden');
-      document.getElementById('chat-audio-btn').classList.remove('text-red-500');
-      if (recorder && recorder.state === 'recording') { recorder.stop(); recorder.stream?.getTracks().forEach(t => t.stop()); }
+      audioPreview()?.classList.add('hidden');
+      recIndicator()?.classList.add('hidden');
+      stopRecTimer();
+      const btn = P(getPrefix() + 'audio-btn') || P('d-audio-btn');
+      if (btn) btn.classList.remove('text-red-500');
+      if (recorder && recorder.state === 'recording') {
+        recorder.stop();
+        recorder.stream?.getTracks().forEach(t => t.stop());
+      }
       recorder = null;
+    }
+
+    // ===== AUDIO — MOBILE: hold to record =====
+    function setupMobileHoldToRecord() {
+      const btn = P('m-audio-btn');
+      if (!btn) return;
+      let holdStream = null;
+
+      async function startHold(e) {
+        e.preventDefault();
+        isHoldRecording = true;
+        try {
+          holdStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          recorder = new MediaRecorder(holdStream);
+          const chunks = [];
+          recorder.ondataavailable = e => chunks.push(e.data);
+          recorder.onstop = () => {
+            audioBlob = new Blob(chunks, { type: 'audio/webm' });
+            const ap = P('m-audio-player');
+            if (ap) ap.src = URL.createObjectURL(audioBlob);
+            P('m-audio-preview')?.classList.remove('hidden');
+            P('m-recording-indicator')?.classList.add('hidden');
+            stopRecTimer();
+            holdStream?.getTracks().forEach(t => t.stop());
+          };
+          recorder.start();
+          P('m-recording-indicator')?.classList.remove('hidden');
+          btn.classList.add('text-red-500');
+          startRecTimer();
+        } catch(e) { showToast('No se pudo acceder al micrófono', 'error'); isHoldRecording = false; }
+      }
+
+      function endHold(e) {
+        e.preventDefault();
+        if (!isHoldRecording) return;
+        isHoldRecording = false;
+        btn.classList.remove('text-red-500');
+        if (recorder && recorder.state === 'recording') recorder.stop();
+      }
+
+      btn.addEventListener('touchstart', startHold, { passive: false });
+      btn.addEventListener('touchend', endHold, { passive: false });
+      btn.addEventListener('touchcancel', endHold, { passive: false });
+      btn.addEventListener('mousedown', startHold);
+      btn.addEventListener('mouseup', endHold);
+      btn.addEventListener('mouseleave', endHold);
+    }
+
+    // ===== VIDEO RECORDING =====
+    async function startVideoRecord() {
+      const modal = P('video-record-modal');
+      modal.classList.remove('hidden');
+      P('video-rec-status').textContent = 'Listo para grabar';
+      P('video-rec-timer').textContent = '0:00';
+      P('video-rec-icon').className = 'w-6 h-6 rounded-full bg-white';
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
+        P('video-live-preview').srcObject = videoStream;
+      } catch(e) {
+        showToast('No se pudo acceder a la cámara', 'error');
+        modal.classList.add('hidden');
+      }
+    }
+
+    function toggleVideoRecording() {
+      if (videoRecorder && videoRecorder.state === 'recording') {
+        videoRecorder.stop();
+        P('video-rec-status').textContent = 'Procesando...';
+        P('video-rec-icon').className = 'w-6 h-6 rounded-full bg-white';
+        stopRecTimer();
+        return;
+      }
+      const chunks = [];
+      videoRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm' });
+      videoRecorder.ondataavailable = e => chunks.push(e.data);
+      videoRecorder.onstop = () => {
+        pendingVideoBlob = new Blob(chunks, { type: 'video/webm' });
+        videoStream?.getTracks().forEach(t => t.stop());
+        P('video-live-preview').srcObject = null;
+        P('video-record-modal').classList.add('hidden');
+        const vt = videoThumb();
+        if (vt) { vt.src = URL.createObjectURL(pendingVideoBlob); vt.play(); }
+        videoPreview()?.classList.remove('hidden');
+      };
+      videoRecorder.start();
+      P('video-rec-status').textContent = 'Grabando...';
+      P('video-rec-icon').className = 'w-5 h-5 rounded bg-white';
+      recStartTime = Date.now();
+      recTimerInterval = setInterval(() => {
+        const s = Math.floor((Date.now() - recStartTime) / 1000);
+        P('video-rec-timer').textContent = Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+      }, 500);
+    }
+
+    function cancelVideoRecord() {
+      if (videoRecorder && videoRecorder.state === 'recording') videoRecorder.stop();
+      videoStream?.getTracks().forEach(t => t.stop());
+      P('video-live-preview').srcObject = null;
+      P('video-record-modal').classList.add('hidden');
+      stopRecTimer();
+      videoRecorder = null;
+    }
+
+    function cancelVideo() {
+      pendingVideoBlob = null;
+      videoPreview()?.classList.add('hidden');
+      const vt = videoThumb(); if (vt) vt.src = '';
     }
 
     // ===== REACTIONS =====
     const QUICK_REACTIONS = ['❤️','😂','😮','😢','😡','👍','🔥','🙏','💯','✨'];
 
     function showReactionPicker(msgId, isMine) {
-      const existing = document.getElementById('reaction-picker');
+      const existing = P('reaction-picker');
       if (existing) existing.remove();
-      const msgEl = document.getElementById('msg-' + msgId);
+      const msgEl = P('msg-' + msgId);
       if (!msgEl) return;
       const picker = document.createElement('div');
       picker.id = 'reaction-picker';
       picker.className = 'absolute z-50 bg-white rounded-full shadow-xl border border-gray-200 px-2 py-1.5 flex gap-0.5';
-      picker.style.cssText = isMine ? 'right:0;' : 'left:0;';
-      picker.style.bottom = '100%';
-      picker.style.marginBottom = '4px';
+      picker.style.cssText = (isMine ? 'right:0;' : 'left:0;') + 'bottom:100%;margin-bottom:4px;';
       picker.innerHTML = QUICK_REACTIONS.map(e => `<button onclick="toggleReaction('${msgId}','${e}')" class="w-7 h-7 text-base hover:scale-125 hover:bg-gray-100 rounded-full transition flex items-center justify-center">${e}</button>`).join('');
       const bubble = msgEl.querySelector('.max-w-\\[75\\%\\]');
       if (bubble) { bubble.style.position = 'relative'; bubble.appendChild(picker); }
@@ -519,23 +867,23 @@
     }
 
     function closeReactionPicker(e) {
-      const picker = document.getElementById('reaction-picker');
-      if (picker && !picker.contains(e?.target)) { picker.remove(); document.removeEventListener('click', closeReactionPicker); }
+      const p = P('reaction-picker');
+      if (p && !p.contains(e?.target)) { p.remove(); document.removeEventListener('click', closeReactionPicker); }
     }
 
     async function toggleReaction(msgId, emoji) {
-      const existing = document.getElementById('reaction-picker');
+      const existing = P('reaction-picker');
       if (existing) existing.remove();
       const { data: msg } = await sb.from('messages').select('reactions, sender_id, receiver_id').eq('id', msgId).single();
       if (!msg) return;
       const reactions = msg.reactions || {};
       if (!reactions[emoji]) reactions[emoji] = [];
       const idx = reactions[emoji].indexOf(currentUser.id);
-      if (idx >= 0) { reactions[emoji].splice(idx, 1); if (reactions[emoji].length === 0) delete reactions[emoji]; }
+      if (idx >= 0) { reactions[emoji].splice(idx, 1); if (!reactions[emoji].length) delete reactions[emoji]; }
       else { reactions[emoji].push(currentUser.id); }
       await sb.from('messages').update({ reactions }).eq('id', msgId);
-      const otherUserId = msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id;
-      if (idx < 0) createNotification(otherUserId, 'message', `Reacción ${emoji} a tu mensaje`, null, 'messages.html#chat-' + currentUser.id);
+      const other = msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id;
+      if (idx < 0) createNotification(other, 'message', `Reacción ${emoji}`, null, 'messages.html#chat-' + currentUser.id);
       loadChatMessages();
     }
 
@@ -552,13 +900,14 @@
       return Math.floor(days / 30) + 'mes';
     }
 
-    document.getElementById('chat-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+    window.addEventListener('resize', () => { isDesktop = window.innerWidth >= 768; });
 
     window.onload = async () => {
       await init();
       renderBottomNav('messages');
       updateNavAuth();
       loadNotificationBell();
+      setupMobileHoldToRecord();
       const hash = window.location.hash;
       if (hash && hash.startsWith('#chat-')) {
         const chatUserId = hash.replace('#chat-', '');
