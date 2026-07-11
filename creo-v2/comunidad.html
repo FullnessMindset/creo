@@ -393,7 +393,7 @@
         mediaHtml = `<div class="${gridClass} rounded-xl overflow-hidden">${shown.map((m, idx) => {
           const isVideo = /\.(mp4|webm|mov)$/i.test(m) || /video/i.test(post.post_type);
           if (isVideo) return `<div class="relative aspect-video bg-black cursor-pointer" onclick="openLightbox('${esc(m)}', true)">
-            <video src="${esc(m)}" class="w-full h-full object-cover" preload="metadata"></video>
+            <video src="${esc(m)}" class="w-full h-full object-cover" autoplay muted loop playsinline></video>
             <div class="absolute inset-0 flex items-center justify-center"><svg class="w-12 h-12 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
           </div>`;
           return `<img src="${esc(m)}" class="w-full ${media.length === 1 ? 'max-h-96' : 'aspect-square'} object-cover cursor-pointer hover:opacity-95 transition" onclick="openLightbox('${esc(m)}', false)">`;

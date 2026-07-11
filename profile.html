@@ -740,7 +740,7 @@
                 const isVideo = /\.(mp4|webm|mov)$/i.test(img) || /youtube|tiktok|youtu\.be/i.test(img);
                 if (isVideo) {
                   return `<div class="meta-slide relative aspect-video bg-gray-900 cursor-pointer" onclick="openMetaPost('${m.id}', ${i})">
-                    <video src="${img}" class="w-full h-full object-cover" preload="metadata"></video>
+                    <video src="${img}" class="w-full h-full object-cover" autoplay muted loop playsinline></video>
                     <div class="absolute inset-0 flex items-center justify-center bg-black/20"><svg class="w-12 h-12 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                   </div>`;
                 }
@@ -811,7 +811,7 @@
                 const isVideo = /\.(mp4|webm|mov)$/i.test(img) || /youtube|tiktok|youtu\.be/i.test(img);
                 if (isVideo) {
                   return `<div class="meta-slide relative aspect-[4/5] bg-gray-900 cursor-pointer" onclick="openMetaPost('${m.id}', ${i})">
-                    <video src="${img}" class="w-full h-full object-cover" preload="metadata"></video>
+                    <video src="${img}" class="w-full h-full object-cover" autoplay muted loop playsinline></video>
                     <div class="absolute inset-0 flex items-center justify-center bg-black/20"><svg class="w-14 h-14 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                   </div>`;
                 }
@@ -1595,7 +1595,7 @@
 
         const mainVideoHTML = s.main_video_url ? `
           <div class="relative rounded-2xl overflow-hidden bg-black">
-            <video src="${esc(s.main_video_url)}" class="w-full aspect-video object-cover story-autoplay-video" muted playsinline preload="metadata" loop></video>
+            <video src="${esc(s.main_video_url)}" class="w-full aspect-video object-cover story-autoplay-video" autoplay muted playsinline loop></video>
             <button onclick="toggleStoryVideo(this)" class="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition group story-play-overlay">
               <div class="w-14 h-14 rounded-full bg-white/90 shadow-lg flex items-center justify-center group-hover:scale-110 transition">
                 <svg class="w-7 h-7 text-creo-purple ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -2323,7 +2323,7 @@
           const url = mediaUrls[0];
           const isVid = /\.(mp4|webm|mov)$/i.test(url);
           if (isVid) {
-            mediaHTML = `<video src="${esc(url)}" class="w-full aspect-video object-contain bg-black rounded-t-xl" loop playsinline preload="metadata" muted></video>`;
+            mediaHTML = `<video src="${esc(url)}" class="w-full aspect-video object-contain bg-black rounded-t-xl" autoplay muted loop playsinline></video>`;
           } else {
             mediaHTML = `<img src="${esc(url)}" class="w-full aspect-video object-cover rounded-t-xl" loading="lazy">`;
           }

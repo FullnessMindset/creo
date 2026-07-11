@@ -454,7 +454,7 @@
         const gridClass = media.length === 1 ? 'media-grid-1' : media.length === 2 ? 'media-grid-2' : media.length === 3 ? 'media-grid-3' : 'media-grid-4';
         mediaHtml = `<div class="${gridClass} rounded-xl overflow-hidden">${media.slice(0, 4).map(m => {
           const isVideo = /\.(mp4|webm|mov)$/i.test(m);
-          if (isVideo) return `<div class="relative aspect-video bg-black cursor-pointer" onclick="openLightbox('${esc(m)}', true)"><video src="${esc(m)}" class="w-full h-full object-cover" preload="metadata"></video><div class="absolute inset-0 flex items-center justify-center"><svg class="w-12 h-12 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>`;
+          if (isVideo) return `<div class="relative aspect-video bg-black cursor-pointer" onclick="openLightbox('${esc(m)}', true)"><video src="${esc(m)}" class="w-full h-full object-cover" autoplay muted loop playsinline></video><div class="absolute inset-0 flex items-center justify-center"><svg class="w-12 h-12 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>`;
           return `<img src="${esc(m)}" class="w-full ${media.length === 1 ? 'max-h-96' : 'aspect-square'} object-cover cursor-pointer hover:opacity-95 transition" onclick="openLightbox('${esc(m)}', false)">`;
         }).join('')}${media.length > 4 ? `<div class="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">+${media.length - 4}</div>` : ''}</div>`;
       }

@@ -166,13 +166,13 @@
             const vid = s.main_video_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
             thumb = vid ? `<img src="https://img.youtube.com/vi/${vid[1]}/mqdefault.jpg" class="w-full h-full object-cover">` : '';
           } else {
-            thumb = `<video src="${esc(s.main_video_url)}" class="w-full h-full object-cover" preload="metadata" muted></video>`;
+            thumb = `<video src="${esc(s.main_video_url)}" class="w-full h-full object-cover" autoplay muted loop playsinline></video>`;
           }
         } else if (s.media_urls && s.media_urls.length > 0) {
           const first = s.media_urls[0];
           const isVid = /\.(mp4|webm|mov)$/i.test(first);
           thumb = isVid
-            ? `<video src="${esc(first)}" class="w-full h-full object-cover" preload="metadata" muted></video>`
+            ? `<video src="${esc(first)}" class="w-full h-full object-cover" autoplay muted loop playsinline></video>`
             : `<img src="${esc(first)}" class="w-full h-full object-cover">`;
         } else {
           thumb = `<div class="w-full h-full bg-gradient-to-br from-creo-purple to-creo-light flex items-center justify-center">
@@ -211,13 +211,13 @@
           const vid = s.main_video_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
           media = vid ? `<iframe data-src="https://www.youtube.com/embed/${vid[1]}?rel=0" class="w-full h-full" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>` : '';
         } else {
-          media = `<video data-src="${esc(s.main_video_url)}" controls playsinline preload="none" class="w-full h-full object-contain"></video>`;
+          media = `<video data-src="${esc(s.main_video_url)}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`;
         }
       } else if (s.media_urls && s.media_urls.length > 0) {
         const first = s.media_urls[0];
         const isVid = /\.(mp4|webm|mov)$/i.test(first);
         media = isVid
-          ? `<video data-src="${esc(first)}" controls playsinline preload="none" class="w-full h-full object-contain"></video>`
+          ? `<video data-src="${esc(first)}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`
           : `<img src="${esc(first)}" class="w-full h-full object-contain">`;
       } else {
         media = `<div class="w-full h-full flex items-center justify-center"><div class="max-w-md p-8 text-center text-white space-y-4">

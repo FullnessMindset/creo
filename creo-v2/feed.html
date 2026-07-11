@@ -474,7 +474,7 @@
         const isLiked = userLikes.has(post.id);
         const isDirectVideo = post.video_type === 'direct' && post.video_url && !post.video_url.includes('youtube');
         const videoHTML = isDirectVideo
-          ? `<video src="${esc(post.video_url)}" class="w-full aspect-video object-contain bg-black feed-video" loop playsinline preload="metadata"></video>`
+          ? `<video src="${esc(post.video_url)}" class="w-full aspect-video object-contain bg-black feed-video" autoplay muted loop playsinline></video>`
           : getAutoplayEmbedHTML(post.video_url, post.video_type);
 
         card.innerHTML = `
@@ -548,7 +548,7 @@
       if (type === 'instagram') {
         return `<iframe src="${url.replace(/\/$/, '')}/embed" class="w-full ${cls}" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
       }
-      return `<video src="${esc(url)}" class="w-full ${cls} object-contain bg-black feed-video" loop playsinline preload="metadata"></video>`;
+      return `<video src="${esc(url)}" class="w-full ${cls} object-contain bg-black feed-video" autoplay muted loop playsinline></video>`;
     }
 
     function toggleMute(btn) {
