@@ -903,7 +903,7 @@ async function loadAnnouncementBar() {
       if (!profile) return false;
       const t = profile.account_type || 'creator';
       if (a.target_type === 'creator') return t === 'creator';
-      if (a.target_type === 'empresa') return t === 'empresa' || t === 'business';
+      if (a.target_type === 'empresa' || a.target_type === 'brand') return t === 'brand' || t === 'empresa' || t === 'business';
       if (a.target_type === 'admin') return t === 'admin';
       return false;
     });

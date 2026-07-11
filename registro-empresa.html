@@ -174,7 +174,7 @@
       await sb.from('profiles').insert([{
         id: bizUser.id,
         username: 'biz_' + Math.floor(Math.random() * 100000),
-        account_type: 'business',
+        account_type: 'brand',
         accepted_terms: true,
         accepted_conduct: true
       }]);
@@ -221,7 +221,7 @@
         display_name: name,
         avatar_url: logoUrl,
         bio: desc,
-        account_type: 'business',
+        account_type: 'brand',
         business_name: name,
         business_type: type,
         business_docs: {

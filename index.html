@@ -1598,10 +1598,11 @@
       const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: 'https://fullnessmindset.github.io/creo/redirect.html' } });
       if (error) return showToast(error.message, 'error');
       const language = document.getElementById('reg-language')?.value || 'es';
-      const accountType = document.getElementById('reg-account-type')?.value || 'creator';
-      const isEmpresa = accountType === 'empresa';
+      let accountType = document.getElementById('reg-account-type')?.value || 'creator';
+      if (accountType === 'empresa' || accountType === 'business') accountType = 'brand';
+      const isBrand = accountType === 'brand';
       await sb.from('profiles').insert([{ id: data.user.id, username: 'user_' + Math.floor(Math.random() * 100000), verification_status: 'pending', account_type: accountType, accepted_terms: true, accepted_conduct: true, language }]);
-      if (isEmpresa) { window.location.href = 'registro-empresa.html'; return; }
+      if (isBrand) { window.location.href = 'registro-empresa.html'; return; }
       showToast('Cuenta creada. Revisa tu email para confirmar.', 'success');
       checkUser();
     }
