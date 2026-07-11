@@ -1134,7 +1134,9 @@
             document.getElementById('cover-preview').innerHTML = `<img src="${data.cover_url}" class="w-full h-full object-cover">`;
           }
 
-          if (data.stripe_connect_id) {
+          if (user.email === ADMIN_EMAIL) {
+            document.getElementById('stripe-connect-regular').innerHTML = '<div class="bg-green-50 p-6 rounded-xl border border-green-200 space-y-2"><h3 class="font-bold text-green-800 flex items-center gap-2">✅ Cuenta de Plataforma</h3><p class="text-sm text-green-700">Esta es la cuenta principal de CREO. Las comisiones del 5% se depositan directamente aquí.</p></div>';
+          } else if (data.stripe_connect_id) {
             document.getElementById('stripe-btn').innerText = "Stripe Conectado ✓";
             document.getElementById('stripe-btn').disabled = true;
             document.getElementById('stripe-btn').className = "w-full bg-green-600 text-white py-3 rounded-xl font-bold cursor-default";
