@@ -42,6 +42,10 @@ const CREO_TRANSLATIONS = {
     notifVerifIniciada: 'Verificación Iniciada', notifVerifEnviada: 'Verificación Enviada',
     notifVerificada: '¡Identidad Verificada!', notifVerifRechazada: 'Verificación Rechazada',
     y: 'y', noNotifs: 'No hay notificaciones', marcarLeidas: 'Leer todas',
+    entrarCreoId: 'Iniciar sesión con CREO ID', sesionCerrada: 'Sesión cerrada',
+    errorGoogle: 'Error al conectar con Google', ingresaEmail: 'Ingresa tu email',
+    emailPlaceholder: 'tu@email.com', continuar: 'Continuar', cancelar: 'Cancelar',
+    linkEnviado: 'Link de acceso enviado a tu email',
   },
   en: {
     comunidad: 'Community', explorar: 'Explore', mensajes: 'Messages', perfil: 'Profile',
@@ -57,6 +61,10 @@ const CREO_TRANSLATIONS = {
     notifVerifIniciada: 'Verification Started', notifVerifEnviada: 'Verification Submitted',
     notifVerificada: 'Identity Verified!', notifVerifRechazada: 'Verification Rejected',
     y: 'and', noNotifs: 'No notifications', marcarLeidas: 'Mark all read',
+    entrarCreoId: 'Sign in with CREO ID', sesionCerrada: 'Session closed',
+    errorGoogle: 'Error connecting to Google', ingresaEmail: 'Enter your email',
+    emailPlaceholder: 'you@email.com', continuar: 'Continue', cancelar: 'Cancel',
+    linkEnviado: 'Access link sent to your email',
   }
 };
 
@@ -105,15 +113,46 @@ async function signInWithGoogle() {
       console.error('Google sign-in error:', error);
     }
   } catch (err) {
-    showToast('Error al conectar con Google', 'error');
+    showToast(t('errorGoogle'), 'error');
     console.error(err);
   }
 }
 
 async function signOut() {
   await sb.auth.signOut();
-  showToast('Sesión cerrada', 'success');
+  showToast(t('sesionCerrada'), 'success');
   setTimeout(() => { window.location.href = 'comunidad.html'; }, 500);
+}
+
+async function signInWithCreoId() {
+  const emailInput = document.getElementById('creo-id-email-input');
+  if (!emailInput) return;
+  const email = emailInput.value.trim();
+  if (!email || !email.includes('@')) { showToast(t('ingresaEmail'), 'error'); return; }
+  try {
+    const { error } = await sb.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: 'https://fullnessmindset.github.io/creo/redirect.html' }
+    });
+    if (error) { showToast('Error: ' + error.message, 'error'); return; }
+    showToast(t('linkEnviado'), 'success');
+    document.querySelectorAll('.creo-id-form').forEach(f => f.remove());
+  } catch(e) { showToast(t('errorGoogle'), 'error'); }
+}
+
+function showCreoIdForm(container) {
+  const existing = container.querySelector('.creo-id-form');
+  if (existing) { existing.remove(); return; }
+  const form = document.createElement('div');
+  form.className = 'creo-id-form mt-2 space-y-2';
+  form.innerHTML = `
+    <input id="creo-id-email-input" type="email" placeholder="${t('emailPlaceholder')}" class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-creo-purple focus:ring-1 focus:ring-creo-purple">
+    <div class="flex gap-2">
+      <button onclick="signInWithCreoId()" class="flex-1 bg-creo-purple text-white text-sm font-semibold py-2 rounded-lg hover:bg-creo-light transition">${t('continuar')}</button>
+      <button onclick="this.closest('.creo-id-form').remove()" class="px-3 py-2 text-sm text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition">${t('cancelar')}</button>
+    </div>`;
+  container.appendChild(form);
+  form.querySelector('input').focus();
 }
 
 // ========== CREO ID (Stripe Identity Verification Gate) ==========
@@ -517,9 +556,16 @@ async function updateSidebarAuth() {
     const ma = document.getElementById('mobile-auth-area');
     if (ma) ma.innerHTML = authHtml;
   } else {
-    const loginHtml = `<a href="index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold bg-creo-purple text-white hover:bg-creo-light transition w-full justify-center">
-      <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#fff"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#fff"/></svg>
-      ${t('entrarGoogle')}</a>`;
+    const googleIcon = `<svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>`;
+    const creoIdIcon = `<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full flex-shrink-0" alt="CREO">`;
+    const loginHtml = `<div class="space-y-2">
+      <button onclick="signInWithGoogle()" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 transition w-full shadow-sm">
+        ${googleIcon} ${t('entrarGoogle')}
+      </button>
+      <button onclick="showCreoIdForm(this.parentElement)" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold bg-creo-purple text-white hover:bg-creo-light transition w-full">
+        ${creoIdIcon} ${t('entrarCreoId')}
+      </button>
+    </div>`;
     const sa = document.getElementById('sidebar-auth-area');
     if (sa) sa.innerHTML = loginHtml;
     const ma = document.getElementById('mobile-auth-area');
