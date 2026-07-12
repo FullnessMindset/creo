@@ -1492,7 +1492,7 @@
       document.getElementById('no-reports').classList.add('hidden');
       document.getElementById('reports-list').innerHTML = '';
       const { data, error } = await sb.from('reports')
-        .select('*, reporter:reporter_id(id, username, display_name, avatar_url), reported:reported_id(id, username, display_name, avatar_url, email)')
+        .select('*, reporter:reporter_id(id, username, display_name, avatar_url), reported:reported_user_id(id, username, display_name, avatar_url, email)')
         .order('created_at', { ascending: false });
       document.getElementById('reports-loading').classList.add('hidden');
       if (error) { document.getElementById('no-reports').textContent = 'Error: ' + error.message; document.getElementById('no-reports').classList.remove('hidden'); return; }
