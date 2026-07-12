@@ -773,42 +773,25 @@ function saveNotifSoundPrefs(prefs) {
   localStorage.setItem('creo_sound_prefs', JSON.stringify(prefs));
 }
 
-function _playCreoTone(volume) {
+let _creoAudio = null;
+function _playCreoMp3(volume) {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const g = ctx.createGain();
-    g.connect(ctx.destination);
-    g.gain.setValueAtTime(volume * 0.3, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-    const o1 = ctx.createOscillator();
-    o1.type = 'sine';
-    o1.frequency.setValueAtTime(880, ctx.currentTime);
-    o1.connect(g);
-    o1.start(ctx.currentTime);
-    o1.stop(ctx.currentTime + 0.15);
-    const g2 = ctx.createGain();
-    g2.connect(ctx.destination);
-    g2.gain.setValueAtTime(volume * 0.25, ctx.currentTime + 0.15);
-    g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-    const o2 = ctx.createOscillator();
-    o2.type = 'sine';
-    o2.frequency.setValueAtTime(1174.66, ctx.currentTime + 0.15);
-    o2.connect(g2);
-    o2.start(ctx.currentTime + 0.15);
-    o2.stop(ctx.currentTime + 0.5);
-    setTimeout(() => ctx.close(), 600);
+    if (_creoAudio) { _creoAudio.pause(); _creoAudio.currentTime = 0; }
+    _creoAudio = new Audio('assets/sounds/creo-default.mp3');
+    _creoAudio.volume = Math.min(1, Math.max(0, volume));
+    _creoAudio.play().catch(() => {});
   } catch(e) {}
 }
 
 function playNotificationSound() {
   const prefs = getNotifSoundPrefs();
   if (!prefs.enabled) return;
-  _playCreoTone(prefs.volume);
+  _playCreoMp3(prefs.volume);
 }
 
 function previewNotificationSound(soundId) {
   const prefs = getNotifSoundPrefs();
-  _playCreoTone(prefs.volume);
+  _playCreoMp3(prefs.volume);
 }
 
 // Real-time notification system via Supabase Realtime
@@ -993,8 +976,8 @@ async function showVerificationReminder() {
     const bar = document.createElement('div');
     bar.id = 'verify-reminder-bar';
     bar.className = 'bg-gradient-to-r from-creo-purple to-purple-700 text-white text-sm text-center py-2.5 px-4 relative z-50';
-    const link = needsStripe ? 'index.html#stripe' : 'index.html#creo-id';
-    bar.innerHTML = `<a href="${link}" class="hover:underline font-medium">${msgs.join(' y ')} →</a><button onclick="dismissVerifyBar()" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>`;
+    const action = needsStripe ? 'startVerifyStripe' : 'startVerifyCreoId';
+    bar.innerHTML = `<a href="#" onclick="event.preventDefault();window.${action}(this)" class="hover:underline font-medium">${msgs.join(' y ')} →</a><button onclick="dismissVerifyBar()" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>`;
     const existing = document.getElementById('announcement-bar');
     if (existing) existing.after(bar);
     else document.body.prepend(bar);
@@ -1005,6 +988,40 @@ function dismissVerifyBar() {
   const bar = document.getElementById('verify-reminder-bar');
   if (bar) bar.remove();
 }
+
+window.startVerifyStripe = async function(el) {
+  try {
+    if (el) el.textContent = 'Conectando...';
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'index.html'; return; }
+    const res = await fetch(SUPABASE_URL + '/functions/v1/stripe-onboard', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ redirect_url: window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'redirect.html' })
+    });
+    const data = await res.json();
+    if (data.url) { window.location.href = data.url; }
+    else if (data.already_connected) { showToast('Tu cuenta de Stripe ya está conectada.', 'success'); dismissVerifyBar(); }
+    else { showToast(data.error || 'Error al conectar Stripe.', 'error'); if (el) el.textContent = 'Conecta tu cuenta de Stripe →'; }
+  } catch(e) { showToast('Error al conectar con Stripe.', 'error'); if (el) el.textContent = 'Conecta tu cuenta de Stripe →'; }
+};
+
+window.startVerifyCreoId = async function(el) {
+  try {
+    if (el) el.textContent = 'Iniciando verificación...';
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'index.html'; return; }
+    const res = await fetch(SUPABASE_URL + '/functions/v1/create-identity-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ return_url: window.location.href.split('?')[0] + '?verification=complete' })
+    });
+    const data = await res.json();
+    if (data.url) { window.location.href = data.url; }
+    else { showToast(data.error || 'Error al iniciar verificación.', 'error'); if (el) el.textContent = 'Completa tu verificación CREO ID →'; }
+  } catch(e) { showToast('Error al iniciar verificación.', 'error'); if (el) el.textContent = 'Completa tu verificación CREO ID →'; }
+};
+
 setTimeout(showVerificationReminder, 2000);
 
 // ========== RETURN URL HANDLERS ==========
