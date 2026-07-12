@@ -217,7 +217,7 @@
           </button>
           <div class="flex-1 relative flex items-center bg-gray-100 rounded-full border border-gray-200 focus-within:border-creo-mint/50 transition">
             <input id="m-chat-input" type="text" placeholder="Aa" class="flex-1 bg-transparent rounded-full px-4 py-2 text-sm outline-none border-none !border-0" onkeydown="if(event.key==='Enter')sendMessage()">
-            <span id="m-emoji-btn" class="cursor-pointer text-lg hover:scale-110 transition pr-3">😊</span>
+            <span id="m-emoji-btn" class="hidden">😊</span>
           </div>
           <button onclick="toggleChatGif()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition">
             <span class="text-xs font-black">GIF</span>
@@ -489,7 +489,7 @@
         av.innerHTML = profile.avatar_url
           ? `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">`
           : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
-        createEmojiPicker('m-chat-input', 'm-emoji-btn');
+        // Emoji picker removed from mobile messages — users use native keyboard emoji
       }
 
       if (chatPolling) clearInterval(chatPolling);
@@ -530,7 +530,10 @@
       if (wasAtBottom) list.scrollTop = list.scrollHeight;
 
       const unread = msgs.filter(m => m.sender_id === activeChatUser.id && !m.is_read).map(m => m.id);
-      if (unread.length) sb.from('messages').update({ is_read: true }).in('id', unread).then(() => {});
+      if (unread.length) {
+        playNotificationSound();
+        sb.from('messages').update({ is_read: true }).in('id', unread).then(() => {});
+      }
     }
 
     function renderMessage(m) {

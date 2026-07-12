@@ -1640,6 +1640,16 @@
       const { error } = await sb.from('announcements').insert(insert);
       btn.disabled = false; btn.textContent = 'Broadcast';
       if (error) { showToast('Error: ' + error.message, 'error'); return; }
+
+      if (target === 'all') {
+        for (const p of allProfiles) {
+          if (p.id === currentUser.id) continue;
+          await sb.from('notifications').insert([{ user_id: p.id, type: 'admin_report', title: 'Anuncio de CREO', body: message.substring(0, 120), category: 'admin', priority: 'high', icon: '📢', link: 'comunidad.html' }]);
+        }
+      } else if (target === 'user' && insert.target_user_id) {
+        await sb.from('notifications').insert([{ user_id: insert.target_user_id, type: 'admin_report', title: 'Mensaje del Admin', body: message.substring(0, 120), category: 'admin', priority: 'high', icon: '📢', link: 'comunidad.html' }]);
+      }
+
       closeAnnouncementForm();
       showToast('Announcement broadcasted!', 'success');
       loadAnnouncements();

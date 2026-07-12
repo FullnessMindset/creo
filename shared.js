@@ -1,4 +1,23 @@
 // CREO Platform — Shared utilities
+
+// CSP: restrict script/connect sources to trusted origins only
+(function injectCSP() {
+  if (document.querySelector('meta[http-equiv="Content-Security-Policy"]')) return;
+  const csp = document.createElement('meta');
+  csp.httpEquiv = 'Content-Security-Policy';
+  csp.content = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net",
+    "style-src 'self' 'unsafe-inline'",
+    "connect-src 'self' https://qddxoyjtoxtdcezwuvcq.supabase.co wss://qddxoyjtoxtdcezwuvcq.supabase.co https://api.giphy.com",
+    "img-src 'self' data: blob: https: http:",
+    "media-src 'self' blob: https://qddxoyjtoxtdcezwuvcq.supabase.co",
+    "frame-src https://checkout.stripe.com https://connect.stripe.com https://js.stripe.com",
+    "font-src 'self' data:",
+  ].join('; ');
+  document.head.prepend(csp);
+})();
+
 const SUPABASE_URL = "https://qddxoyjtoxtdcezwuvcq.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZHhveWp0b3h0ZGNlend1dmNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MTUxNDIsImV4cCI6MjA5Nzk5MTE0Mn0.MEaMfib77T0B7HW-jI6nctc1a7WbIf1n7rKBhdc-Gm8";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -754,23 +773,42 @@ function saveNotifSoundPrefs(prefs) {
   localStorage.setItem('creo_sound_prefs', JSON.stringify(prefs));
 }
 
+function _playCreoTone(volume) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const g = ctx.createGain();
+    g.connect(ctx.destination);
+    g.gain.setValueAtTime(volume * 0.3, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    const o1 = ctx.createOscillator();
+    o1.type = 'sine';
+    o1.frequency.setValueAtTime(880, ctx.currentTime);
+    o1.connect(g);
+    o1.start(ctx.currentTime);
+    o1.stop(ctx.currentTime + 0.15);
+    const g2 = ctx.createGain();
+    g2.connect(ctx.destination);
+    g2.gain.setValueAtTime(volume * 0.25, ctx.currentTime + 0.15);
+    g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    const o2 = ctx.createOscillator();
+    o2.type = 'sine';
+    o2.frequency.setValueAtTime(1174.66, ctx.currentTime + 0.15);
+    o2.connect(g2);
+    o2.start(ctx.currentTime + 0.15);
+    o2.stop(ctx.currentTime + 0.5);
+    setTimeout(() => ctx.close(), 600);
+  } catch(e) {}
+}
+
 function playNotificationSound() {
   const prefs = getNotifSoundPrefs();
   if (!prefs.enabled) return;
-  try {
-    const audio = new Audio(`assets/sounds/${prefs.soundId}.mp3`);
-    audio.volume = prefs.volume;
-    audio.play().catch(() => {});
-  } catch(e) {}
+  _playCreoTone(prefs.volume);
 }
 
 function previewNotificationSound(soundId) {
   const prefs = getNotifSoundPrefs();
-  try {
-    const audio = new Audio(`assets/sounds/${soundId || prefs.soundId}.mp3`);
-    audio.volume = prefs.volume;
-    audio.play().catch(() => {});
-  } catch(e) {}
+  _playCreoTone(prefs.volume);
 }
 
 // Real-time notification system via Supabase Realtime
@@ -832,8 +870,7 @@ async function initRealtimeNotifications() {
   _realtimeNotifChannel = sb.channel('notif-' + user.id)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + user.id }, (payload) => {
       const notif = payload.new;
-      const isMessage = notif.type === 'message' || (notif.type === 'comment' && notif.link && notif.link.includes('messages'));
-      if (isMessage) playNotificationSound();
+      playNotificationSound();
       showNotifBubble(notif);
       loadNotificationBell();
     })
@@ -855,8 +892,7 @@ async function pollNotifications() {
     const { data, count } = await sb.from('notifications').select('*', { count: 'exact' }).eq('user_id', user.id).eq('is_read', false).order('created_at', { ascending: false }).limit(1);
     if (_lastNotifCount >= 0 && count > _lastNotifCount && data && data[0]) {
       const notif = data[0];
-      const isMessage = notif.type === 'message' || (notif.type === 'comment' && notif.link && notif.link.includes('messages'));
-      if (isMessage) playNotificationSound();
+      playNotificationSound();
       showNotifBubble(notif);
       loadNotificationBell();
     }

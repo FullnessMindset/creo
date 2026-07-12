@@ -35,6 +35,16 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) return json({ error: "Unauthorized" }, 401);
 
+    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const { data: allowed } = await supabase.rpc("check_rate_limit", {
+      p_key: `deal-payment:${user.id}`,
+      p_max_requests: 5,
+      p_window_seconds: 60,
+    });
+    if (allowed === false) {
+      return json({ error: "Too many requests. Please wait a moment." }, 429);
+    }
+
     const { conversation_id, creator_connect_id, amount_usd, description, success_url, cancel_url } = await req.json();
 
     if (!conversation_id || !creator_connect_id || !amount_usd || amount_usd < 1) {

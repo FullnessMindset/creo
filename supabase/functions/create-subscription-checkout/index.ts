@@ -20,6 +20,18 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const { data: allowed } = await supabase.rpc("check_rate_limit", {
+      p_key: `sub-checkout:${clientIP}`,
+      p_max_requests: 5,
+      p_window_seconds: 60,
+    });
+    if (allowed === false) {
+      return new Response(JSON.stringify({ error: "Too many requests. Please wait a moment." }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { creator_connect_id, creator_id, amount_usd, success_url, cancel_url } = await req.json();
 
     if (!creator_connect_id || !creator_id || !amount_usd || amount_usd < 3 || amount_usd > 1000) {

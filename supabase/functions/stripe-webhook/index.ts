@@ -45,6 +45,29 @@ serve(async (req) => {
       const metadata = session.metadata || {};
       const type = metadata.type;
 
+      // Idempotency: check if this event was already processed
+      const { data: existing } = await supabase
+        .from("processed_webhook_events")
+        .select("id")
+        .eq("stripe_event_id", event.id)
+        .maybeSingle();
+
+      if (existing) {
+        console.log(`Event ${event.id} already processed, skipping`);
+        return new Response(JSON.stringify({ received: true, duplicate: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // Record this event as processed
+      await supabase.from("processed_webhook_events").insert({
+        stripe_event_id: event.id,
+        event_type: event.type,
+        stripe_session_id: session.id,
+        metadata: { type, ...metadata },
+      });
+
       // META CONTRIBUTION
       if (type === "meta" && metadata.meta_id) {
         const amountCents = session.amount_total || 0;
