@@ -23,9 +23,9 @@
     .convo-item:hover { background: rgba(51,240,176,0.08); }
     .convo-item.active { background: rgba(108,58,237,0.08); border-left: 3px solid #6C3AED; }
     .search-result:hover { background: rgba(51,240,176,0.1); }
-    .video-circle { width: 200px; height: 200px; border-radius: 50%; overflow: hidden; position: relative; border: 3px solid #6C3AED; }
-    .video-circle video { width: 100%; height: 100%; object-fit: cover; }
-    .video-circle .creo-badge { position: absolute; bottom: 4px; right: 4px; width: 28px; height: 28px; border-radius: 50%; background: white; padding: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    .video-circle { position: relative; border-radius: 50%; border: 3px solid #6C3AED; }
+    .video-circle video { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .video-circle .creo-badge { position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px; border-radius: 50%; background: white; padding: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 5; }
     .video-circle .creo-badge img { width: 100%; height: 100%; border-radius: 50%; object-fit: contain; }
     .audio-controls-bar { display: flex; align-items: center; gap: 8px; background: #f9fafb; border-radius: 12px; padding: 8px 12px; }
     @keyframes pulse-rec { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -591,8 +591,9 @@
         cancelImage();
       }
       if (pendingVideoBlob) {
-        const fileName = `dm_video_${Date.now()}.webm`;
-        const { data, error } = await sb.storage.from('dm-media').upload(fileName, pendingVideoBlob, { contentType: 'video/webm' });
+        const vext = pendingVideoBlob.type.includes('mp4') ? 'mp4' : 'webm';
+        const fileName = `dm_video_${Date.now()}.${vext}`;
+        const { data, error } = await sb.storage.from('dm-media').upload(fileName, pendingVideoBlob, { contentType: pendingVideoBlob.type });
         if (!error && data) {
           const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
           msg.media_url = u.publicUrl; msg.media_type = 'video';
@@ -635,8 +636,9 @@
     async function sendVideoNow() {
       if (!pendingVideoBlob) return;
       const msg = { sender_id: currentUser.id, receiver_id: activeChatUser.id, body: null, media_url: null, media_type: null };
-      const fileName = `dm_video_${Date.now()}.webm`;
-      const { data, error } = await sb.storage.from('dm-media').upload(fileName, pendingVideoBlob, { contentType: 'video/webm' });
+      const vext = pendingVideoBlob.type.includes('mp4') ? 'mp4' : 'webm';
+      const fileName = `dm_video_${Date.now()}.${vext}`;
+      const { data, error } = await sb.storage.from('dm-media').upload(fileName, pendingVideoBlob, { contentType: pendingVideoBlob.type });
       if (!error && data) {
         const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
         msg.media_url = u.publicUrl; msg.media_type = 'video';
@@ -817,10 +819,11 @@
         return;
       }
       const chunks = [];
-      videoRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm' });
-      videoRecorder.ondataavailable = e => chunks.push(e.data);
+      const vmime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : 'video/mp4';
+      videoRecorder = new MediaRecorder(videoStream, { mimeType: vmime });
+      videoRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
       videoRecorder.onstop = () => {
-        pendingVideoBlob = new Blob(chunks, { type: 'video/webm' });
+        pendingVideoBlob = new Blob(chunks, { type: vmime });
         videoStream?.getTracks().forEach(t => t.stop());
         P('video-live-preview').srcObject = null;
         P('video-record-modal').classList.add('hidden');

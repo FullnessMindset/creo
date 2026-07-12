@@ -976,6 +976,37 @@ function dismissAnnouncement(id) {
 }
 setTimeout(loadAnnouncementBar, 1500);
 
+// ========== VERIFICATION REMINDER BAR ==========
+async function showVerificationReminder() {
+  try {
+    if (localStorage.getItem('creo_dismiss_verify_bar')) return;
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user || user.email === ADMIN_EMAIL) return;
+    const { data: p } = await sb.from('profiles').select('stripe_connect_id, identity_verified, account_type').eq('id', user.id).single();
+    if (!p) return;
+    const needsStripe = !p.stripe_connect_id;
+    const needsCreoId = !p.identity_verified;
+    if (!needsStripe && !needsCreoId) return;
+    const msgs = [];
+    if (needsStripe) msgs.push('Conecta tu cuenta de Stripe para recibir pagos');
+    if (needsCreoId) msgs.push('Completa tu verificación CREO ID');
+    const bar = document.createElement('div');
+    bar.id = 'verify-reminder-bar';
+    bar.className = 'bg-gradient-to-r from-creo-purple to-purple-700 text-white text-sm text-center py-2.5 px-4 relative z-50';
+    const link = needsStripe ? 'index.html#stripe' : 'index.html#creo-id';
+    bar.innerHTML = `<a href="${link}" class="hover:underline font-medium">${msgs.join(' y ')} →</a><button onclick="dismissVerifyBar()" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>`;
+    const existing = document.getElementById('announcement-bar');
+    if (existing) existing.after(bar);
+    else document.body.prepend(bar);
+  } catch(e) {}
+}
+function dismissVerifyBar() {
+  localStorage.setItem('creo_dismiss_verify_bar', '1');
+  const bar = document.getElementById('verify-reminder-bar');
+  if (bar) bar.remove();
+}
+setTimeout(showVerificationReminder, 2000);
+
 // ========== RETURN URL HANDLERS ==========
 (function handleReturnParams() {
   const p = new URLSearchParams(window.location.search);

@@ -27,9 +27,9 @@
     .payment-bubble { background: linear-gradient(135deg, #33f0b0 0%, #28c48e 100%); color: #1a0a3e; border-radius: 16px; }
     .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-    .video-circle { width: 160px; height: 160px; border-radius: 50%; overflow: hidden; position: relative; border: 3px solid #1a0a3e; }
-    .video-circle video { width: 100%; height: 100%; object-fit: cover; }
-    .video-circle .creo-badge { position: absolute; bottom: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: white; padding: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    .video-circle { position: relative; border-radius: 50%; border: 3px solid #1a0a3e; }
+    .video-circle video { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .video-circle .creo-badge { position: absolute; bottom: 2px; right: 2px; width: 24px; height: 24px; border-radius: 50%; background: white; padding: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 5; }
     .video-circle .creo-badge img { width: 100%; height: 100%; border-radius: 50%; object-fit: contain; }
     @keyframes pulse-rec { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     .rec-pulse { animation: pulse-rec 1s infinite; }
@@ -588,9 +588,7 @@
         const { data: p } = await sb.from('profiles').select('*').eq('id', user.id).single();
         currentProfile = p;
         document.getElementById('my-convos-btn').classList.remove('hidden');
-        if (p?.identity_verified || isPlatformCreator(user.email) || p?.account_type === 'brand' || p?.account_type === 'empresa' || p?.account_type === 'business') {
-          document.getElementById('post-deal-bar').classList.remove('hidden');
-        }
+        document.getElementById('post-deal-bar').classList.remove('hidden');
       }
       updateNavAuth();
       loadNotificationBell();
@@ -1226,8 +1224,9 @@
         cancelDealAudio();
       }
       if (dcPendingVideoBlob) {
-        const fileName = `deal_video_${Date.now()}.webm`;
-        const { data, error } = await sb.storage.from('dm-media').upload(fileName, dcPendingVideoBlob, { contentType: 'video/webm' });
+        const dvext = dcPendingVideoBlob.type.includes('mp4') ? 'mp4' : 'webm';
+        const fileName = `deal_video_${Date.now()}.${dvext}`;
+        const { data, error } = await sb.storage.from('dm-media').upload(fileName, dcPendingVideoBlob, { contentType: dcPendingVideoBlob.type });
         if (!error && data) {
           const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
           mediaUrl = u.publicUrl; mediaType = 'video';
@@ -1435,10 +1434,11 @@
         return;
       }
       const chunks = [];
-      dcVideoRecorder = new MediaRecorder(dcVideoStream, { mimeType: 'video/webm' });
-      dcVideoRecorder.ondataavailable = e => chunks.push(e.data);
+      const dcVmime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : 'video/mp4';
+      dcVideoRecorder = new MediaRecorder(dcVideoStream, { mimeType: dcVmime });
+      dcVideoRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
       dcVideoRecorder.onstop = () => {
-        dcPendingVideoBlob = new Blob(chunks, { type: 'video/webm' });
+        dcPendingVideoBlob = new Blob(chunks, { type: dcVmime });
         dcVideoStream?.getTracks().forEach(t => t.stop());
         document.getElementById('dc-video-live-preview').srcObject = null;
         document.getElementById('dc-video-record-modal').classList.add('hidden');
@@ -1472,8 +1472,9 @@
 
     async function sendDealVideoNow() {
       if (!dcPendingVideoBlob || !activeConversation) return;
-      const fileName = `deal_video_${Date.now()}.webm`;
-      const { data, error } = await sb.storage.from('dm-media').upload(fileName, dcPendingVideoBlob, { contentType: 'video/webm' });
+      const svext = dcPendingVideoBlob.type.includes('mp4') ? 'mp4' : 'webm';
+      const fileName = `deal_video_${Date.now()}.${svext}`;
+      const { data, error } = await sb.storage.from('dm-media').upload(fileName, dcPendingVideoBlob, { contentType: dcPendingVideoBlob.type });
       let mediaUrl = null;
       if (!error && data) {
         const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
