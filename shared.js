@@ -26,6 +26,48 @@ const ADMIN_EMAIL = 'fullnessmindset@gmail.com';
 function isAdmin(email) { return email === ADMIN_EMAIL; }
 function isPlatformCreator(email) { return email === ADMIN_EMAIL; }
 
+// ========== INTERNATIONALIZATION (i18n) ==========
+const CREO_TRANSLATIONS = {
+  es: {
+    comunidad: 'Comunidad', explorar: 'Explorar', mensajes: 'Mensajes', perfil: 'Perfil',
+    brandDeals: 'Brand Deals', panel: 'Panel', admin: 'Admin', tema: 'Tema', salir: 'Salir',
+    entrarGoogle: 'Entrar con Google', idioma: 'Idioma',
+    connectStripe: 'Conecta tu cuenta de Stripe para recibir pagos',
+    completaCreoId: 'Completa tu verificación CREO ID',
+    conectando: 'Conectando...', iniciandoVerif: 'Iniciando verificación...',
+    stripeYaConectado: 'Tu cuenta de Stripe ya está conectada.',
+    errorStripe: 'Error al conectar con Stripe.', errorVerif: 'Error al iniciar verificación.',
+    errorSubiendo: 'Error subiendo archivo',
+    reporteEnviado: 'Reporte enviado. Gracias por ayudar a la comunidad.',
+    notifVerifIniciada: 'Verificación Iniciada', notifVerifEnviada: 'Verificación Enviada',
+    notifVerificada: '¡Identidad Verificada!', notifVerifRechazada: 'Verificación Rechazada',
+    y: 'y', noNotifs: 'No hay notificaciones', marcarLeidas: 'Leer todas',
+  },
+  en: {
+    comunidad: 'Community', explorar: 'Explore', mensajes: 'Messages', perfil: 'Profile',
+    brandDeals: 'Brand Deals', panel: 'Dashboard', admin: 'Admin', tema: 'Theme', salir: 'Sign Out',
+    entrarGoogle: 'Sign in with Google', idioma: 'Language',
+    connectStripe: 'Connect your Stripe account to receive payments',
+    completaCreoId: 'Complete your CREO ID verification',
+    conectando: 'Connecting...', iniciandoVerif: 'Starting verification...',
+    stripeYaConectado: 'Your Stripe account is already connected.',
+    errorStripe: 'Error connecting to Stripe.', errorVerif: 'Error starting verification.',
+    errorSubiendo: 'Error uploading file',
+    reporteEnviado: 'Report sent. Thank you for helping the community.',
+    notifVerifIniciada: 'Verification Started', notifVerifEnviada: 'Verification Submitted',
+    notifVerificada: 'Identity Verified!', notifVerifRechazada: 'Verification Rejected',
+    y: 'and', noNotifs: 'No notifications', marcarLeidas: 'Mark all read',
+  }
+};
+
+function getCreoLang() { return localStorage.getItem('creo_lang') || 'es'; }
+function setCreoLang(lang) {
+  localStorage.setItem('creo_lang', lang);
+  window.location.reload();
+}
+function t(key) { return (CREO_TRANSLATIONS[getCreoLang()] || CREO_TRANSLATIONS.es)[key] || (CREO_TRANSLATIONS.es)[key] || key; }
+function toggleCreoLang() { setCreoLang(getCreoLang() === 'es' ? 'en' : 'es'); }
+
 // ========== AUTHENTICATION (Google-only) ==========
 
 async function handlePostLoginRedirect() {
@@ -326,12 +368,12 @@ function showToast(message, type) {
 
 function renderSidebar(activePage) {
   const items = [
-    { id: 'comunidad', label: 'Comunidad', href: 'comunidad.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>' },
-    { id: 'explore', label: 'Explorar', href: 'explore.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>' },
-    { id: 'messages', label: 'Mensajes', href: 'messages.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>', authOnly: true },
-    { id: 'profile', label: 'Perfil', href: 'profile.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>' },
-    { id: 'deals', label: 'Brand Deals', href: 'brand-deals.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>' },
-    { id: 'dashboard', label: 'Panel', href: 'index.html?panel=1', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>', authOnly: true }
+    { id: 'comunidad', label: t('comunidad'), href: 'comunidad.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>' },
+    { id: 'explore', label: t('explorar'), href: 'explore.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>' },
+    { id: 'messages', label: t('mensajes'), href: 'messages.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>', authOnly: true },
+    { id: 'profile', label: t('perfil'), href: 'profile.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>' },
+    { id: 'deals', label: t('brandDeals'), href: 'brand-deals.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>' },
+    { id: 'dashboard', label: t('panel'), href: 'index.html?panel=1', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>', authOnly: true }
   ];
 
   // Desktop sidebar
@@ -354,14 +396,18 @@ function renderSidebar(activePage) {
         </a>`).join('')}
       <a href="admin.html" data-admin-only="true" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition text-gray-600 hover:bg-gray-100 hover:text-gray-900" style="display:none">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        Admin
+        ${t('admin')}
       </a>
     </nav>
     <div class="p-4 border-t border-gray-200 space-y-2">
+      <button onclick="toggleCreoLang()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-100 transition w-full">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+        ${getCreoLang() === 'es' ? 'English' : 'Español'}
+      </button>
       <button onclick="toggleTheme()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-100 transition w-full">
         <svg class="w-5 h-5 theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
         <svg class="w-5 h-5 theme-icon-moon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-        Tema
+        ${t('tema')}
       </button>
       <div id="sidebar-auth-area"></div>
     </div>`;
@@ -408,14 +454,18 @@ function renderSidebar(activePage) {
           </a>`).join('')}
         <a href="admin.html" data-admin-only="true" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition text-gray-600 hover:bg-gray-100" style="display:none">
           <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          Admin
+          ${t('admin')}
         </a>
       </nav>
       <div class="p-4 border-t border-gray-200 space-y-2">
+        <button onclick="toggleCreoLang()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-100 transition w-full">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+          ${getCreoLang() === 'es' ? 'English' : 'Español'}
+        </button>
         <button onclick="toggleTheme()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-100 transition w-full">
           <svg class="w-5 h-5 theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
           <svg class="w-5 h-5 theme-icon-moon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-          Tema
+          ${t('tema')}
         </button>
         <div id="mobile-auth-area"></div>
       </div>
@@ -461,7 +511,7 @@ async function updateSidebarAuth() {
     }
     const authHtml = `<button onclick="signOut()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-400 hover:text-red-500 hover:bg-red-50 transition w-full">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-      Salir</button>`;
+      ${t('salir')}</button>`;
     const sa = document.getElementById('sidebar-auth-area');
     if (sa) sa.innerHTML = authHtml;
     const ma = document.getElementById('mobile-auth-area');
@@ -469,7 +519,7 @@ async function updateSidebarAuth() {
   } else {
     const loginHtml = `<a href="index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold bg-creo-purple text-white hover:bg-creo-light transition w-full justify-center">
       <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#fff"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#fff"/></svg>
-      Entrar con Google</a>`;
+      ${t('entrarGoogle')}</a>`;
     const sa = document.getElementById('sidebar-auth-area');
     if (sa) sa.innerHTML = loginHtml;
     const ma = document.getElementById('mobile-auth-area');
@@ -971,13 +1021,13 @@ async function showVerificationReminder() {
     const needsCreoId = !p.identity_verified;
     if (!needsStripe && !needsCreoId) return;
     const msgs = [];
-    if (needsStripe) msgs.push('Conecta tu cuenta de Stripe para recibir pagos');
-    if (needsCreoId) msgs.push('Completa tu verificación CREO ID');
+    if (needsStripe) msgs.push(t('connectStripe'));
+    if (needsCreoId) msgs.push(t('completaCreoId'));
     const bar = document.createElement('div');
     bar.id = 'verify-reminder-bar';
     bar.className = 'bg-gradient-to-r from-creo-purple to-purple-700 text-white text-sm text-center py-2.5 px-4 relative z-50';
     const action = needsStripe ? 'startVerifyStripe' : 'startVerifyCreoId';
-    bar.innerHTML = `<a href="#" onclick="event.preventDefault();window.${action}(this)" class="hover:underline font-medium">${msgs.join(' y ')} →</a><button onclick="dismissVerifyBar()" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>`;
+    bar.innerHTML = `<a href="#" onclick="event.preventDefault();window.${action}(this)" class="hover:underline font-medium">${msgs.join(' ' + t('y') + ' ')} →</a><button onclick="dismissVerifyBar()" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>`;
     const existing = document.getElementById('announcement-bar');
     if (existing) existing.after(bar);
     else document.body.prepend(bar);
@@ -991,7 +1041,7 @@ function dismissVerifyBar() {
 
 window.startVerifyStripe = async function(el) {
   try {
-    if (el) el.textContent = 'Conectando...';
+    if (el) el.textContent = t('conectando');
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'index.html'; return; }
     const res = await fetch(SUPABASE_URL + '/functions/v1/stripe-onboard', {
@@ -1001,14 +1051,14 @@ window.startVerifyStripe = async function(el) {
     });
     const data = await res.json();
     if (data.url) { window.location.href = data.url; }
-    else if (data.already_connected) { showToast('Tu cuenta de Stripe ya está conectada.', 'success'); dismissVerifyBar(); }
-    else { showToast(data.error || 'Error al conectar Stripe.', 'error'); if (el) el.textContent = 'Conecta tu cuenta de Stripe →'; }
-  } catch(e) { showToast('Error al conectar con Stripe.', 'error'); if (el) el.textContent = 'Conecta tu cuenta de Stripe →'; }
+    else if (data.already_connected) { showToast(t('stripeYaConectado'), 'success'); dismissVerifyBar(); }
+    else { showToast(data.error || t('errorStripe'), 'error'); if (el) el.textContent = t('connectStripe') + ' →'; }
+  } catch(e) { showToast(t('errorStripe'), 'error'); if (el) el.textContent = t('connectStripe') + ' →'; }
 };
 
 window.startVerifyCreoId = async function(el) {
   try {
-    if (el) el.textContent = 'Iniciando verificación...';
+    if (el) el.textContent = t('iniciandoVerif');
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'index.html'; return; }
     const res = await fetch(SUPABASE_URL + '/functions/v1/create-identity-session', {
@@ -1018,8 +1068,8 @@ window.startVerifyCreoId = async function(el) {
     });
     const data = await res.json();
     if (data.url) { window.location.href = data.url; }
-    else { showToast(data.error || 'Error al iniciar verificación.', 'error'); if (el) el.textContent = 'Completa tu verificación CREO ID →'; }
-  } catch(e) { showToast('Error al iniciar verificación.', 'error'); if (el) el.textContent = 'Completa tu verificación CREO ID →'; }
+    else { showToast(data.error || t('errorVerif'), 'error'); if (el) el.textContent = t('completaCreoId') + ' →'; }
+  } catch(e) { showToast(t('errorVerif'), 'error'); if (el) el.textContent = t('completaCreoId') + ' →'; }
 };
 
 setTimeout(showVerificationReminder, 2000);
