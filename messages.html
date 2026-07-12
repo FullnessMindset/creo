@@ -296,6 +296,7 @@
     let isDesktop = window.innerWidth >= 768;
     let holdTimer = null;
     let isHoldRecording = false;
+    let reactionInProgress = false;
 
     function P(id) { return document.getElementById(id); }
 
@@ -506,7 +507,8 @@
       loadConversations();
     }
 
-    async function loadChatMessages() {
+    async function loadChatMessages(force) {
+      if (reactionInProgress && !force) return;
       if (!currentUser || !activeChatUser) return;
       const { data: msgs } = await sb.from('messages')
         .select('*')
@@ -542,7 +544,7 @@
       if (m.media_type === 'gif') {
         content = `<img src="${esc(m.media_url)}" class="max-w-[200px] rounded-xl" alt="GIF" loading="lazy">`;
       } else if (m.media_type === 'audio') {
-        content = `<audio controls src="${esc(m.media_url)}" class="max-w-[220px] h-8"></audio>`;
+        content = `<audio controls src="${esc(m.media_url)}" class="w-[220px] max-w-full" style="height:40px"></audio>`;
       } else if (m.media_type === 'image') {
         content = `<img src="${esc(m.media_url)}" class="max-w-[200px] rounded-xl cursor-pointer" alt="" loading="lazy" onclick="window.open(this.src,'_blank')">`;
       } else if (m.media_type === 'video') {
@@ -585,7 +587,7 @@
         if (!error && data) {
           const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
           msg.media_url = u.publicUrl; msg.media_type = 'image';
-        }
+        } else if (error) { showToast('Error subiendo imagen: ' + error.message, 'error'); }
         cancelImage();
       }
       if (pendingVideoBlob) {
@@ -594,7 +596,7 @@
         if (!error && data) {
           const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
           msg.media_url = u.publicUrl; msg.media_type = 'video';
-        }
+        } else if (error) { showToast('Error subiendo video: ' + error.message, 'error'); }
         cancelVideo();
       }
       if (audioBlob) {
@@ -603,7 +605,7 @@
         if (!error && data) {
           const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
           msg.media_url = u.publicUrl; msg.media_type = 'audio';
-        }
+        } else if (error) { showToast('Error subiendo audio: ' + error.message, 'error'); }
         cancelAudio();
       }
       if (input) input.value = '';
@@ -622,7 +624,7 @@
       if (!error && data) {
         const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
         msg.media_url = u.publicUrl; msg.media_type = 'audio';
-      }
+      } else if (error) { showToast('Error subiendo audio: ' + error.message, 'error'); cancelAudio(); return; }
       cancelAudio();
       const { error: insErr } = await sb.from('messages').insert(msg);
       if (insErr) { showToast('Error al enviar audio', 'error'); return; }
@@ -638,7 +640,7 @@
       if (!error && data) {
         const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
         msg.media_url = u.publicUrl; msg.media_type = 'video';
-      }
+      } else if (error) { showToast('Error subiendo video: ' + error.message, 'error'); cancelVideo(); return; }
       cancelVideo();
       const { error: insErr } = await sb.from('messages').insert(msg);
       if (insErr) { showToast('Error al enviar video', 'error'); return; }
@@ -859,6 +861,7 @@
       if (existing) existing.remove();
       const msgEl = P('msg-' + msgId);
       if (!msgEl) return;
+      reactionInProgress = true;
       const picker = document.createElement('div');
       picker.id = 'reaction-picker';
       picker.className = 'absolute z-50 bg-white rounded-full shadow-xl border border-gray-200 px-2 py-1.5 flex gap-0.5';
@@ -871,23 +874,47 @@
 
     function closeReactionPicker(e) {
       const p = P('reaction-picker');
-      if (p && !p.contains(e?.target)) { p.remove(); document.removeEventListener('click', closeReactionPicker); }
+      if (p && !p.contains(e?.target)) {
+        p.remove();
+        document.removeEventListener('click', closeReactionPicker);
+        reactionInProgress = false;
+      }
     }
 
     async function toggleReaction(msgId, emoji) {
       const existing = P('reaction-picker');
       if (existing) existing.remove();
-      const { data: msg } = await sb.from('messages').select('reactions, sender_id, receiver_id').eq('id', msgId).single();
-      if (!msg) return;
-      const reactions = msg.reactions || {};
-      if (!reactions[emoji]) reactions[emoji] = [];
-      const idx = reactions[emoji].indexOf(currentUser.id);
-      if (idx >= 0) { reactions[emoji].splice(idx, 1); if (!reactions[emoji].length) delete reactions[emoji]; }
-      else { reactions[emoji].push(currentUser.id); }
-      await sb.from('messages').update({ reactions }).eq('id', msgId);
-      const other = msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id;
-      if (idx < 0) createNotification(other, 'message', `Reacción ${emoji}`, null, 'messages.html#chat-' + currentUser.id);
-      loadChatMessages();
+      document.removeEventListener('click', closeReactionPicker);
+      reactionInProgress = true;
+      try {
+        const { data: msg } = await sb.from('messages').select('reactions, sender_id, receiver_id').eq('id', msgId).single();
+        if (!msg) return;
+        const reactions = msg.reactions || {};
+        if (!reactions[emoji]) reactions[emoji] = [];
+        const idx = reactions[emoji].indexOf(currentUser.id);
+        if (idx >= 0) { reactions[emoji].splice(idx, 1); if (!reactions[emoji].length) delete reactions[emoji]; }
+        else { reactions[emoji].push(currentUser.id); }
+        // Optimistic UI update
+        const msgEl = P('msg-' + msgId);
+        if (msgEl) {
+          const isMine = msg.sender_id === currentUser.id;
+          const oldReactions = msgEl.querySelector('.flex.flex-wrap');
+          const newHtml = Object.keys(reactions).length > 0
+            ? `<div class="flex flex-wrap gap-1 ${isMine ? 'justify-end' : 'justify-start'} mt-0.5">${Object.entries(reactions).map(([e, users]) => {
+                const my = users.includes(currentUser.id);
+                return `<button onclick="toggleReaction('${msgId}','${e}')" class="text-xs px-1.5 py-0.5 rounded-full border transition ${my ? 'bg-creo-purple/20 border-creo-purple' : 'bg-gray-50 border-gray-200 hover:border-creo-mint'}">${e}${users.length>1?' '+users.length:''}</button>`;
+              }).join('')}</div>` : '';
+          if (oldReactions) oldReactions.remove();
+          const bubble = msgEl.querySelector('.max-w-\\[75\\%\\]');
+          if (bubble && newHtml) bubble.insertAdjacentHTML('beforeend', newHtml);
+        }
+        await sb.from('messages').update({ reactions }).eq('id', msgId);
+        const other = msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id;
+        if (idx < 0) createNotification(other, 'message', `Reacción ${emoji}`, null, 'messages.html#chat-' + currentUser.id);
+      } finally {
+        reactionInProgress = false;
+        loadChatMessages(true);
+      }
     }
 
     // ===== UTILITIES =====

@@ -1169,7 +1169,7 @@
       if (mt === 'gif') {
         mediaHtml = `<img src="${esc(raw)}" class="max-w-[200px] rounded-xl" alt="GIF" loading="lazy">`;
       } else if (mt === 'audio') {
-        mediaHtml = `<audio controls src="${esc(raw)}" class="max-w-[200px] h-8"></audio>`;
+        mediaHtml = `<audio controls src="${esc(raw)}" class="w-[200px] max-w-full" style="height:40px"></audio>`;
       } else if (mt === 'image') {
         const parts = raw.split('\n');
         const url = parts[0];
@@ -1213,7 +1213,7 @@
         if (!error && data) {
           const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
           mediaUrl = u.publicUrl; mediaType = 'image';
-        }
+        } else if (error) { showToast('Error subiendo imagen: ' + error.message, 'error'); }
         cancelDealImage();
       }
       if (dcAudioBlob) {
@@ -1222,7 +1222,7 @@
         if (!error && data) {
           const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
           mediaUrl = u.publicUrl; mediaType = 'audio';
-        }
+        } else if (error) { showToast('Error subiendo audio: ' + error.message, 'error'); }
         cancelDealAudio();
       }
       if (dcPendingVideoBlob) {
@@ -1231,7 +1231,7 @@
         if (!error && data) {
           const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
           mediaUrl = u.publicUrl; mediaType = 'video';
-        }
+        } else if (error) { showToast('Error subiendo video: ' + error.message, 'error'); }
         cancelDealVideo();
       }
 
