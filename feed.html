@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CREO — Creadores</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="CREO — Descubre y apoya a tus creadores favoritos con tips, metas y suscripciones">
+  <meta property="og:title" content="CREO — Creadores">
+  <meta property="og:description" content="Descubre y apoya a tus creadores favoritos con tips, metas y suscripciones">
+  <meta property="og:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
+  <meta property="og:url" content="https://fullnessmindset.github.io/creo/feed.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="assets/logo-icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/logo-icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { creo: { purple: '#1a0a3e', light: '#2d1b69', mint: '#33f0b0', mintDark: '#28c48e' } } } }
+    }
+  </script>
+  <style>
+    body { overscroll-behavior: contain; }
+    input, select, textarea { font-size: max(16px, 1em) !important; }
+    .glass { background: rgba(255,255,255,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.4); }
+    .glass-dark { background: rgba(26,10,62,0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    @keyframes slide-up { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .float-anim { animation: float 3s ease-in-out infinite; }
+    .creo-btn { animation: pulse-creo 2s ease-in-out infinite; }
+    @keyframes pulse-creo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+
+    /* Portrait: vertical scroll, horizontal videos centered */
+    @media (orientation: portrait) {
+      #feed-scroll {
+        scroll-snap-type: y mandatory;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+      .feed-card {
+        scroll-snap-align: center;
+        margin-bottom: 1rem;
+      }
+    }
+
+    /* Landscape / Desktop: horizontal scroll */
+    @media (orientation: landscape) {
+      body { overflow: hidden; }
+      #feed-scroll {
+        scroll-snap-type: x mandatory;
+        overflow-x: auto;
+        overflow-y: hidden;
+        height: calc(100vh - 3.5rem);
+        max-width: none;
+        padding: 0 2rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        scrollbar-width: none;
+      }
+      #feed-scroll::-webkit-scrollbar { display: none; }
+      #feed-scroll #feed-content {
+        display: flex;
+        flex-direction: row;
+        gap: 1.5rem;
+        height: 100%;
+        align-items: center;
+      }
+      #feed-scroll #feed-content > * {
+        margin-top: 0 !important;
+      }
+      .feed-card {
+        scroll-snap-align: center;
+        min-width: 70vw;
+        max-width: 80vw;
+        flex-shrink: 0;
+      }
+      .feed-card .feed-video-wrap {
+        max-height: 75vh;
+      }
+      .feed-card video, .feed-card iframe {
+        max-height: 70vh !important;
+      }
+      .landscape-hide { display: none !important; }
+      #feed-loading, #feed-empty, #load-more { min-width: 70vw; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    }
+
+    .animate-slide-up { animation: slide-up 0.3s ease-out; }
+    .like-bounce { animation: like-pop 0.3s ease-out; }
+    @keyframes like-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
+  <script src="shared.js"></script>
+
+  <!-- Header -->
+  <div id="feed-header" class="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-sm border-b border-gray-200 dark-aware-header landscape-hide">
+    <div class="max-w-3xl mx-auto flex items-center justify-between px-4 py-3">
+      <a href="index.html" class="flex items-center gap-2 no-underline">
+        <div class="w-8 h-8 rounded-full bg-creo-purple flex items-center justify-center flex-shrink-0"><img src="assets/logo-icon.png" alt="CREO" class="w-6 h-6 rounded-full object-contain"></div>
+        <h1 class="text-lg font-bold tracking-[0.15em] text-creo-purple">CREADORES</h1>
+      </a>
+    </div>
+  </div>
+
+  <!-- Feed Container -->
+  <div id="feed-scroll" class="max-w-3xl mx-auto pt-14 pb-20 px-4">
+    <div id="feed-content" class="space-y-4"></div>
+
+    <!-- Loading -->
+    <div id="feed-loading" class="text-center py-12">
+      <div class="inline-block w-8 h-8 border-2 border-creo-mint border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-gray-400 text-sm mt-3">Cargando creadores...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="feed-empty" class="text-center py-20 hidden">
+      <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-10 h-10 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+      </div>
+      <h3 class="text-xl font-bold mb-2">No hay contenido aún</h3>
+      <p class="text-gray-400 text-sm">Sé el primero en publicar un video</p>
+    </div>
+
+    <!-- Load More -->
+    <div id="load-more" class="text-center py-4 hidden">
+      <button onclick="loadFeed()" class="px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-semibold transition">Cargar más</button>
+    </div>
+  </div>
+
+  <!-- Comments Drawer -->
+  <div id="comments-drawer" class="fixed inset-0 z-[55] hidden">
+    <div class="absolute inset-0 bg-black/60" onclick="closeComments()"></div>
+    <div class="absolute bottom-0 left-0 right-0 max-w-3xl mx-auto rounded-t-2xl max-h-[70vh] flex flex-col animate-slide-up shadow-2xl glass">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+        <h3 class="font-bold text-sm" id="comments-title">Comentarios</h3>
+        <button onclick="closeComments()" class="text-gray-400 hover:text-gray-700 p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+      <div id="comments-list" class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
+      <div id="comments-input-area" class="border-t border-gray-200 px-4 py-3">
+        <div id="reply-indicator" class="hidden flex items-center justify-between mb-2 px-1">
+          <span class="text-xs text-creo-mintDark font-semibold" id="reply-to-label">Respondiendo a...</span>
+          <button onclick="cancelReply()" class="text-gray-400 hover:text-gray-700 text-xs">Cancelar</button>
+        </div>
+        <div class="flex gap-2">
+          <input id="comment-input" type="text" maxlength="500" placeholder="Escribe un comentario..." class="flex-1 bg-gray-100 border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-creo-mint">
+          <button onclick="submitComment()" class="bg-creo-mint text-creo-purple font-bold px-4 py-2 rounded-full text-sm hover:bg-creo-mintDark transition">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let feedOffset = 0;
+    const FEED_LIMIT = 10;
+    let allLoaded = false;
+    let currentUser = null;
+    let userLikes = new Set();
+    let userCommentLikes = new Set();
+    let activeCommentsPostId = null;
+    let replyingToCommentId = null;
+    let replyingToName = null;
+
+    // Orientation handling
+    function handleOrientation() {
+      const isLandscape = window.matchMedia('(orientation: landscape)').matches;
+      const header = document.getElementById('feed-header');
+      const nav = document.getElementById('bottom-nav');
+      const themeBtn = document.getElementById('theme-toggle-btn');
+      const bell = document.getElementById('notif-bell');
+      if (isLandscape) {
+        if (header) header.classList.add('landscape-hide');
+        if (nav) nav.classList.add('landscape-hide');
+        if (themeBtn) themeBtn.classList.add('landscape-hide');
+        if (bell) bell.classList.add('landscape-hide');
+        document.body.style.paddingBottom = '0';
+      } else {
+        if (header) header.classList.remove('landscape-hide');
+        if (nav) nav.classList.remove('landscape-hide');
+        if (themeBtn) themeBtn.classList.remove('landscape-hide');
+        if (bell) bell.classList.remove('landscape-hide');
+        document.body.style.paddingBottom = '4rem';
+      }
+    }
+    window.matchMedia('(orientation: landscape)').addEventListener('change', handleOrientation);
+
+    async function initAuth() {
+      const { data: { user } } = await sb.auth.getUser();
+      currentUser = user;
+      if (user) {
+        const { data } = await sb.from('post_likes').select('post_id').eq('user_id', user.id);
+        if (data) data.forEach(l => userLikes.add(l.post_id));
+        const { data: cl } = await sb.from('comment_likes').select('comment_id').eq('user_id', user.id);
+        if (cl) cl.forEach(l => userCommentLikes.add(l.comment_id));
+      }
+    }
+
+    async function toggleLike(postId) {
+      if (!currentUser) { showToast('Inicia sesión para dar like', 'error'); return; }
+      const btn = document.getElementById('like-' + postId);
+      const countEl = document.getElementById('like-count-' + postId);
+      btn.classList.add('like-bounce');
+      setTimeout(() => btn.classList.remove('like-bounce'), 300);
+
+      const { data, error } = await sb.rpc('toggle_post_like', { p_post_id: postId });
+      if (error) { showToast('Error', 'error'); return; }
+
+      if (data.liked) {
+        userLikes.add(postId);
+        btn.querySelector('svg').setAttribute('fill', '#33f0b0');
+        btn.querySelector('svg').setAttribute('stroke', '#33f0b0');
+        const card = btn.closest('.feed-card');
+        const postCreatorId = card?.dataset?.creatorId;
+        if (postCreatorId) createNotification(postCreatorId, 'like', 'A alguien le gustó tu publicación', null, 'feed.html');
+      } else {
+        userLikes.delete(postId);
+        btn.querySelector('svg').setAttribute('fill', 'none');
+        btn.querySelector('svg').setAttribute('stroke', 'currentColor');
+      }
+      countEl.textContent = data.count > 0 ? data.count : '';
+    }
+
+    async function toggleCommentLike(commentId) {
+      if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
+      const { data, error } = await sb.rpc('toggle_comment_like', { p_comment_id: commentId });
+      if (error) { showToast('Error', 'error'); return; }
+      if (data.liked) userCommentLikes.add(commentId);
+      else userCommentLikes.delete(commentId);
+      openComments(activeCommentsPostId);
+    }
+
+    function startReply(commentId, displayName) {
+      replyingToCommentId = commentId;
+      replyingToName = displayName;
+      document.getElementById('reply-indicator').classList.remove('hidden');
+      document.getElementById('reply-to-label').textContent = 'Respondiendo a ' + displayName;
+      document.getElementById('comment-input').placeholder = 'Responder a ' + displayName + '...';
+      document.getElementById('comment-input').focus();
+    }
+
+    function cancelReply() {
+      replyingToCommentId = null;
+      replyingToName = null;
+      document.getElementById('reply-indicator').classList.add('hidden');
+      document.getElementById('comment-input').placeholder = 'Escribe un comentario...';
+    }
+
+    async function openComments(postId) {
+      activeCommentsPostId = postId;
+      const drawer = document.getElementById('comments-drawer');
+      drawer.classList.remove('hidden');
+      const nav = document.getElementById('bottom-nav');
+      if (nav) nav.style.display = 'none';
+      if (!currentUser) { const { data: { user } } = await sb.auth.getUser(); currentUser = user; }
+      cancelReply();
+      document.getElementById('comments-list').innerHTML = '<div class="text-center py-6"><div class="inline-block w-5 h-5 border-2 border-creo-mintDark border-t-transparent rounded-full animate-spin"></div></div>';
+
+      const { data } = await sb
+        .from('post_comments')
+        .select('*, profiles:user_id(username, display_name, avatar_url)')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true });
+
+      const list = document.getElementById('comments-list');
+      const topLevel = (data || []).filter(c => !c.parent_id);
+      const replies = (data || []).filter(c => c.parent_id);
+      const replyMap = {};
+      replies.forEach(r => { (replyMap[r.parent_id] = replyMap[r.parent_id] || []).push(r); });
+
+      document.getElementById('comments-title').textContent = `Comentarios (${data ? data.length : 0})`;
+
+      if (!data || data.length === 0) {
+        list.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">Sin comentarios aún. ¡Sé el primero!</p>';
+        return;
+      }
+
+      list.innerHTML = topLevel.map(c => renderComment(c, replyMap, postId)).join('');
+      list.scrollTop = list.scrollHeight;
+    }
+
+    function renderComment(c, replyMap, postId) {
+      const p = c.profiles || {};
+      const name = p.display_name || p.username || 'Usuario';
+      const profileLink = p.username ? `profile.html?u=${encodeURIComponent(p.username)}` : '#';
+      const avatar = p.avatar_url
+        ? `<a href="${profileLink}"><img src="${esc(p.avatar_url)}" class="w-8 h-8 rounded-full object-cover flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition"></a>`
+        : `<a href="${profileLink}" class="w-8 h-8 rounded-full bg-creo-mint/20 flex items-center justify-center flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition"><span class="text-creo-mint text-xs font-bold">${esc(name[0].toUpperCase())}</span></a>`;
+      const canDelete = currentUser && currentUser.id === c.user_id;
+      const isLiked = userCommentLikes.has(c.id);
+      const childReplies = replyMap[c.id] || [];
+
+      return `<div class="space-y-2">
+        <div class="flex gap-2 group">
+          ${avatar}
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <a href="${profileLink}" class="font-semibold text-xs text-creo-purple hover:underline">${esc(name)}</a>
+              <span class="text-gray-500 text-xs">${timeAgo(c.created_at)}</span>
+              ${canDelete ? `<button onclick="editFeedComment('${c.id}','${postId}', this)" class="ml-auto text-gray-300 hover:text-blue-400 text-xs opacity-0 group-hover:opacity-100 transition">✎</button><button onclick="deleteComment('${c.id}','${postId}')" class="text-gray-300 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition">✕</button>` : ''}
+            </div>
+            <p class="text-sm text-gray-900 leading-relaxed comment-body">${esc(c.body)}</p>
+            <div class="flex items-center gap-4 mt-1">
+              <button onclick="toggleCommentLike('${c.id}')" class="flex items-center gap-1 text-xs ${isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'} transition">
+                <svg class="w-3.5 h-3.5" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                ${c.like_count > 0 ? c.like_count : ''}
+              </button>
+              ${currentUser ? `<button onclick="startReply('${c.id}','${esc(name)}')" class="text-xs text-gray-400 hover:text-creo-mintDark transition">Responder</button>` : ''}
+            </div>
+          </div>
+        </div>
+        ${childReplies.length > 0 ? `<div class="ml-10 space-y-2 border-l border-gray-200 pl-3">${childReplies.map(r => renderReply(r, postId)).join('')}</div>` : ''}
+      </div>`;
+    }
+
+    function renderReply(c, postId) {
+      const p = c.profiles || {};
+      const name = p.display_name || p.username || 'Usuario';
+      const profileLink = p.username ? `profile.html?u=${encodeURIComponent(p.username)}` : '#';
+      const avatar = p.avatar_url
+        ? `<a href="${profileLink}"><img src="${esc(p.avatar_url)}" class="w-6 h-6 rounded-full object-cover flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition"></a>`
+        : `<a href="${profileLink}" class="w-6 h-6 rounded-full bg-creo-mint/20 flex items-center justify-center flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition"><span class="text-creo-mint text-[10px] font-bold">${esc(name[0].toUpperCase())}</span></a>`;
+      const canDelete = currentUser && currentUser.id === c.user_id;
+      const isLiked = userCommentLikes.has(c.id);
+
+      return `<div class="flex gap-2 group">
+        ${avatar}
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <a href="${profileLink}" class="font-semibold text-[11px] text-creo-purple hover:underline">${esc(name)}</a>
+            <span class="text-gray-400 text-[10px]">${timeAgo(c.created_at)}</span>
+            ${canDelete ? `<button onclick="editFeedComment('${c.id}','${postId}', this)" class="ml-auto text-gray-300 hover:text-blue-400 text-[10px] opacity-0 group-hover:opacity-100 transition">✎</button><button onclick="deleteComment('${c.id}','${postId}')" class="text-gray-300 hover:text-red-400 text-[10px] opacity-0 group-hover:opacity-100 transition">✕</button>` : ''}
+          </div>
+          <p class="text-xs text-gray-600 leading-relaxed comment-body">${esc(c.body)}</p>
+          <button onclick="toggleCommentLike('${c.id}')" class="flex items-center gap-1 mt-1 text-[10px] ${isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'} transition">
+            <svg class="w-3 h-3" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            ${c.like_count > 0 ? c.like_count : ''}
+          </button>
+        </div>
+      </div>`;
+    }
+
+    function closeComments() {
+      document.getElementById('comments-drawer').classList.add('hidden');
+      const nav = document.getElementById('bottom-nav');
+      if (nav) nav.style.display = '';
+      activeCommentsPostId = null;
+      cancelReply();
+    }
+
+    async function submitComment() {
+      if (!currentUser) {
+        const { data: { user } } = await sb.auth.getUser();
+        currentUser = user;
+      }
+      if (!currentUser) { showToast('Inicia sesión para comentar', 'error'); return; }
+      const input = document.getElementById('comment-input');
+      const body = input.value.trim();
+      if (!body) return;
+      input.value = '';
+
+      let result;
+      if (replyingToCommentId) {
+        result = await sb.rpc('add_comment_reply', { p_comment_id: replyingToCommentId, p_body: body });
+      } else {
+        result = await sb.rpc('add_post_comment', { p_post_id: activeCommentsPostId, p_body: body });
+      }
+
+      if (result.error) { showToast(result.error.message || 'Error al comentar', 'error'); return; }
+
+      const postCards = document.querySelectorAll('.feed-card');
+      for (const pc of postCards) {
+        const likeBtn = pc.querySelector(`#like-${activeCommentsPostId}`);
+        if (likeBtn && pc.dataset.creatorId) {
+          createNotification(pc.dataset.creatorId, 'comment', 'Nuevo comentario en tu publicación', body, 'feed.html');
+          break;
+        }
+      }
+
+      const countEl = document.getElementById('comment-count-' + activeCommentsPostId);
+      if (countEl && result.data) countEl.textContent = result.data.count > 0 ? result.data.count : '';
+
+      cancelReply();
+      openComments(activeCommentsPostId);
+    }
+
+    async function deleteComment(commentId, postId) {
+      if (!confirm('¿Eliminar comentario?')) return;
+      await sb.from('post_comments').delete().eq('id', commentId);
+      const { count } = await sb.from('post_comments').select('id', { count: 'exact', head: true }).eq('post_id', postId);
+      await sb.from('posts').update({ comment_count: count || 0 }).eq('id', postId);
+      const countEl = document.getElementById('comment-count-' + postId);
+      if (countEl) countEl.textContent = count > 0 ? count : '';
+      openComments(postId);
+    }
+
+    function editFeedComment(commentId, postId, btnEl) {
+      const commentDiv = btnEl.closest('.flex-1');
+      const bodyP = commentDiv.querySelector('.comment-body');
+      if (!bodyP) return;
+      const oldText = bodyP.textContent;
+      bodyP.innerHTML = `<textarea id="edit-fc-${commentId}" class="w-full border border-gray-300 bg-white p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" rows="2">${esc(oldText)}</textarea>
+        <div class="flex gap-2 mt-1">
+          <button onclick="saveFeedCommentEdit('${commentId}','${postId}')" class="text-xs px-3 py-1 bg-creo-purple text-white rounded-lg">Guardar</button>
+          <button onclick="openComments('${postId}')" class="text-xs px-3 py-1 bg-gray-200 text-gray-600 rounded-lg">Cancelar</button>
+        </div>`;
+    }
+
+    async function saveFeedCommentEdit(commentId, postId) {
+      const textarea = document.getElementById('edit-fc-' + commentId);
+      const body = textarea.value.trim();
+      if (!body) return showToast('El comentario no puede estar vacío', 'error');
+      const { error } = await sb.from('post_comments').update({ body }).eq('id', commentId);
+      if (error) return showToast('Error: ' + error.message, 'error');
+      showToast('Comentario actualizado', 'success');
+      openComments(postId);
+    }
+
+    document.getElementById('comment-input')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitComment();
+    });
+
+    // Autoplay: play/pause videos as they scroll into view, unmute the visible one
+    const videoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          video.muted = false;
+          video.play().catch(() => {
+            video.muted = true;
+            video.play().catch(() => {});
+          });
+        } else {
+          video.pause();
+          video.muted = true;
+        }
+      });
+    }, { threshold: 0.5 });
+
+    async function loadFeed() {
+      if (allLoaded) return;
+
+      const { data, error } = await sb
+        .from('posts')
+        .select('*, profiles(username, display_name, avatar_url, stripe_connect_id)')
+        .order('created_at', { ascending: false })
+        .range(feedOffset, feedOffset + FEED_LIMIT - 1);
+
+      document.getElementById('feed-loading').classList.add('hidden');
+
+      if (error) { showToast('Error cargando feed', 'error'); return; }
+
+      if (!data || data.length === 0) {
+        if (feedOffset === 0) document.getElementById('feed-empty').classList.remove('hidden');
+        allLoaded = true;
+        document.getElementById('load-more').classList.add('hidden');
+        return;
+      }
+
+      const container = document.getElementById('feed-content');
+
+      data.forEach(post => {
+        const profile = post.profiles;
+        const card = document.createElement('div');
+        card.className = 'feed-card rounded-2xl overflow-hidden shadow-xl glass';
+        card.dataset.creatorId = post.creator_id;
+
+        const avatarHTML = profile.avatar_url
+          ? `<img src="${esc(profile.avatar_url)}" class="w-10 h-10 rounded-full object-cover border-2 border-creo-mint" alt="">`
+          : `<div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold text-sm">${esc((profile.display_name || profile.username || '?')[0].toUpperCase())}</span></div>`;
+
+        const isLiked = userLikes.has(post.id);
+        const isDirectVideo = post.video_type === 'direct' && post.video_url && !post.video_url.includes('youtube');
+        const videoHTML = isDirectVideo
+          ? `<video src="${esc(post.video_url)}" class="w-full aspect-video object-contain bg-black feed-video" autoplay muted loop playsinline></video>`
+          : getAutoplayEmbedHTML(post.video_url, post.video_type);
+
+        card.innerHTML = `
+          <div class="relative feed-video-wrap">
+            <div class="w-full bg-black rounded-t-2xl overflow-hidden">${videoHTML}</div>
+            ${isDirectVideo ? `<div class="absolute bottom-4 left-3 z-10"><button class="mute-toggle w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white/70 hover:text-white transition" onclick="toggleMute(this)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg></button></div>` : ''}
+          </div>
+
+          <div class="p-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3 min-w-0">
+                <a href="profile.html?u=${esc(profile.username)}" class="flex-shrink-0">${avatarHTML}</a>
+                <div class="min-w-0">
+                  <a href="profile.html?u=${esc(profile.username)}" class="font-bold text-sm text-gray-900 hover:text-creo-mintDark transition block truncate">${esc(profile.display_name || profile.username)}</a>
+                  <span class="text-gray-600 text-xs">@${esc(profile.username)} · ${timeAgo(post.created_at)}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <button id="like-${post.id}" onclick="toggleLike('${post.id}')" class="flex items-center gap-1.5 transition group">
+                  <svg class="w-5 h-5" fill="${isLiked ? '#33f0b0' : 'none'}" stroke="${isLiked ? '#33f0b0' : 'currentColor'}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                  <span id="like-count-${post.id}" class="text-xs font-semibold text-gray-700">${post.like_count > 0 ? post.like_count : ''}</span>
+                </button>
+
+                <button onclick="openComments('${post.id}')" class="flex items-center gap-1.5 transition group">
+                  <svg class="w-5 h-5 text-gray-600 group-hover:text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                  <span id="comment-count-${post.id}" class="text-xs font-semibold text-gray-500">${post.comment_count > 0 ? post.comment_count : ''}</span>
+                </button>
+
+                <button onclick="shareCreator('${esc(profile.username)}')" class="transition group">
+                  <svg class="w-5 h-5 text-gray-600 group-hover:text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                </button>
+
+                <button onclick="openCreoChoice('${esc(profile.username)}')" class="creo-btn flex-shrink-0">
+                  <div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint hover:bg-creo-mint/30 transition">
+                    <img src="assets/logo-icon.png" class="w-6 h-6 rounded-full object-contain" alt="CREO">
+                  </div>
+                </button>
+              </div>
+            </div>
+            ${post.caption ? `<p class="text-sm text-gray-800 leading-relaxed mt-2">${esc(post.caption)}</p>` : ''}
+          </div>
+        `;
+
+        container.appendChild(card);
+
+        const video = card.querySelector('video.feed-video');
+        if (video) videoObserver.observe(video);
+      });
+
+      feedOffset += data.length;
+      if (data.length < FEED_LIMIT) {
+        allLoaded = true;
+        document.getElementById('load-more').classList.add('hidden');
+      } else {
+        document.getElementById('load-more').classList.remove('hidden');
+      }
+    }
+
+    function getAutoplayEmbedHTML(url, type) {
+      const cls = 'aspect-video';
+      if (type === 'youtube') {
+        const id = extractVideoId(url, 'youtube');
+        if (!id) return `<div class="w-full ${cls} bg-black flex items-center justify-center text-gray-400">Invalid YouTube URL</div>`;
+        return `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=0&loop=1&playlist=${id}&rel=0&playsinline=1" class="w-full ${cls}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+      }
+      if (type === 'tiktok') {
+        const id = extractVideoId(url, 'tiktok');
+        if (!id) return `<div class="w-full ${cls} bg-black flex items-center justify-center text-gray-400">Invalid TikTok URL</div>`;
+        return `<iframe src="https://www.tiktok.com/embed/v2/${id}" class="w-full ${cls}" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
+      }
+      if (type === 'instagram') {
+        return `<iframe src="${url.replace(/\/$/, '')}/embed" class="w-full ${cls}" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
+      }
+      return `<video src="${esc(url)}" class="w-full ${cls} object-contain bg-black feed-video" autoplay muted loop playsinline></video>`;
+    }
+
+    function toggleMute(btn) {
+      const card = btn.closest('.feed-card');
+      const video = card.querySelector('video');
+      if (!video) return;
+      video.muted = !video.muted;
+      btn.innerHTML = video.muted
+        ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>'
+        : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>';
+    }
+
+    async function shareCreator(username) {
+      const url = 'https://fullnessmindset.github.io/creo/profile.html?u=' + username;
+      if (navigator.share) {
+        navigator.share({ title: 'CREO — Apoya a este creador', url });
+      } else {
+        navigator.clipboard.writeText(url);
+        showToast('Enlace copiado', 'success');
+      }
+      const { data: prof } = await sb.from('profiles').select('id').eq('username', username).single();
+      if (prof) createNotification(prof.id, 'share', 'Alguien compartió tu perfil', null, 'profile.html?u=' + prof.username);
+    }
+
+    function timeAgo(dateStr) {
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'ahora';
+      if (mins < 60) return mins + 'm';
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return hrs + 'h';
+      const days = Math.floor(hrs / 24);
+      if (days < 30) return days + 'd';
+      return Math.floor(days / 30) + 'mes';
+    }
+
+    function setupInfiniteScroll() {
+      const feed = document.getElementById('feed-scroll');
+      const isLandscape = window.matchMedia('(orientation: landscape)').matches;
+
+      if (isLandscape) {
+        // Convert vertical wheel to horizontal scroll on desktop
+        feed.addEventListener('wheel', (e) => {
+          if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+            e.preventDefault();
+            feed.scrollBy({ left: e.deltaY, behavior: 'auto' });
+          }
+        }, { passive: false });
+
+        feed.addEventListener('scroll', () => {
+          if (allLoaded) return;
+          if (feed.scrollLeft + feed.clientWidth >= feed.scrollWidth - 500) loadFeed();
+        });
+      } else {
+        window.addEventListener('scroll', () => {
+          if (allLoaded) return;
+          if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) loadFeed();
+        });
+      }
+    }
+
+    function openCreoChoice(username) {
+      const overlay = document.getElementById('creo-loading');
+      overlay.querySelector('.creo-loading-text').textContent = 'Gracias por Creer';
+      overlay.querySelector('.creo-loading-sub').textContent = 'En unos segundos conocerás la Historia de este Creador...';
+      overlay.classList.remove('hidden');
+      setTimeout(() => { window.location.href = 'profile.html?u=' + username; }, 2500);
+    }
+
+    window.onload = async () => {
+      await initAuth();
+      loadFeed();
+      renderBottomNav('feed');
+      updateNavAuth();
+      loadNotificationBell();
+      handleOrientation();
+      setupInfiniteScroll();
+    };
+  </script>
+
+  <!-- "Yo Creo en Ti" loading overlay -->
+  <div id="creo-loading" class="fixed inset-0 z-[200] flex flex-col items-center justify-center hidden" style="background:rgba(26,10,62,0.85);backdrop-filter:blur(20px);">
+    <img src="assets/logo-icon.png" class="w-20 h-20 rounded-full shadow-2xl mb-6 float-anim" alt="CREO">
+    <p class="creo-loading-text text-white text-2xl font-bold tracking-wider">Yo Creo en Ti</p>
+    <p class="creo-loading-sub text-creo-mint text-sm mt-2">Cargando perfil del creador...</p>
+    <div class="mt-6 w-48 h-1.5 bg-white/20 rounded-full overflow-hidden">
+      <div class="h-full bg-creo-mint rounded-full animate-pulse" style="width:70%"></div>
+    </div>
+  </div>
+</body>
+</html>
