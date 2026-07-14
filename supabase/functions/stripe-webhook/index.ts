@@ -142,6 +142,21 @@ serve(async (req) => {
       }
     }
 
+    // STRIPE CONNECT ACCOUNT UPDATED — track real onboarding completion
+    if (event.type === "account.updated") {
+      const account = event.data.object as unknown as Record<string, unknown>;
+      const connectId = account.id as string;
+      if (connectId && account.details_submitted && account.charges_enabled) {
+        try {
+          await supabase
+            .from("profiles")
+            .update({ stripe_onboarded: true })
+            .eq("stripe_connect_id", connectId);
+          console.log(`Stripe onboarding complete for account: ${connectId}`);
+        } catch (_) {}
+      }
+    }
+
     // SUBSCRIPTION CANCELLED
     if (event.type === "customer.subscription.deleted") {
       const subscription = event.data.object as unknown as Record<string, unknown>;

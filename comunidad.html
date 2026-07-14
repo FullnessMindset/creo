@@ -57,28 +57,28 @@
 
     <!-- Category tabs -->
     <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-      <button onclick="setCategory('general')" id="cat-general" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-creo-purple text-white">Muro</button>
-      <button onclick="setCategory('cine_local')" id="cat-cine_local" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Cine Local</button>
-      <button onclick="setCategory('galeria')" id="cat-galeria" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Galería</button>
-      <button onclick="setCategory('biblioteca')" id="cat-biblioteca" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Biblioteca</button>
-      <button onclick="setCategory('musica')" id="cat-musica" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Música</button>
-      <button onclick="setCategory('eventos')" id="cat-eventos" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200">Eventos</button>
+      <button onclick="setCategory('general')" id="cat-general" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-creo-purple text-white" data-i18n="muro">Muro</button>
+      <button onclick="setCategory('cine_local')" id="cat-cine_local" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="cineLocal">Cine Local</button>
+      <button onclick="setCategory('galeria')" id="cat-galeria" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="galeria">Galería</button>
+      <button onclick="setCategory('biblioteca')" id="cat-biblioteca" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="biblioteca">Biblioteca</button>
+      <button onclick="setCategory('musica')" id="cat-musica" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="musica">Música</button>
+      <button onclick="setCategory('eventos')" id="cat-eventos" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="eventos">Eventos</button>
     </div>
 
     <!-- Compose box (auth only) -->
     <div id="compose-box" class="hidden bg-white rounded-2xl p-4 space-y-3 border border-gray-100 shadow-sm">
       <div class="flex items-center gap-3">
         <div id="compose-avatar" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0"></div>
-        <button onclick="openCompose()" class="flex-1 text-left text-gray-400 text-sm bg-gray-100 rounded-full px-4 py-2.5 hover:bg-gray-200 transition">¿Qué quieres compartir?</button>
+        <button onclick="openCompose()" class="flex-1 text-left text-gray-400 text-sm bg-gray-100 rounded-full px-4 py-2.5 hover:bg-gray-200 transition" data-i18n="queCompartir">¿Qué quieres compartir?</button>
       </div>
       <div class="flex justify-around border-t border-gray-100 pt-3">
         <button onclick="openCompose('video')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-creo-purple transition">
           <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg>
-          Video
+          <span data-i18n="video">Video</span>
         </button>
         <button onclick="openCompose('photo')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-creo-purple transition">
           <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-          Foto
+          <span data-i18n="foto">Foto</span>
         </button>
         <button onclick="openCompose('text')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-creo-purple transition">
           <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 18H6v-2h8v2zm2-4H6v-2h10v2zm-3-5V3.5L18.5 9H13z"/></svg>
@@ -133,7 +133,7 @@
               <p class="text-white/60 text-xs">Equipo CREO</p>
             </div>
           </div>
-          <h3 class="text-lg font-bold">¡Bienvenido a la Comunidad! 🎨</h3>
+          <h3 class="text-lg font-bold" data-i18n="bienvenidoComunidad">¡Bienvenido a la Comunidad! 🎨</h3>
           <p class="text-sm text-white/90 leading-relaxed">
             CREO es la plataforma donde los creadores como tú pueden recibir apoyo real de su comunidad y de empresas que creen en su talento.
           </p>
@@ -193,70 +193,70 @@
     <div class="compose-overlay" onclick="closeCompose()"></div>
     <div class="fixed inset-x-0 bottom-0 z-[91] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl max-h-[85vh] overflow-y-auto" id="compose-panel">
       <div class="p-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-        <button onclick="closeCompose()" class="text-gray-400 hover:text-gray-600 text-sm">Cancelar</button>
-        <span class="font-bold text-sm text-gray-900">Nueva publicación</span>
-        <button onclick="submitPost()" id="compose-submit" class="bg-creo-purple text-white font-bold px-5 py-2 rounded-full text-sm hover:bg-creo-light transition disabled:opacity-50" disabled>Publicar</button>
+        <button onclick="closeCompose()" class="text-gray-400 hover:text-gray-600 text-sm" data-i18n="cancelar">Cancelar</button>
+        <span class="font-bold text-sm text-gray-900" data-i18n="publicar">Nueva publicación</span>
+        <button onclick="submitPost()" id="compose-submit" class="bg-creo-purple text-white font-bold px-5 py-2 rounded-full text-sm hover:bg-creo-light transition disabled:opacity-50" disabled data-i18n="publicar">Publicar</button>
       </div>
       <div class="p-4 space-y-4">
         <div class="flex items-start gap-3">
           <div id="compose-modal-avatar" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0"></div>
           <div class="flex-1 space-y-3">
-            <input id="compose-title" type="text" placeholder="Título (opcional)" class="w-full text-base font-bold text-gray-900 outline-none placeholder-gray-300 bg-transparent">
-            <textarea id="compose-body" placeholder="¿Qué quieres compartir con la comunidad?" rows="4" class="w-full text-sm text-gray-700 outline-none placeholder-gray-400 bg-transparent resize-none" oninput="checkComposeValid()"></textarea>
+            <input id="compose-title" type="text" placeholder="Título (opcional)" data-i18n-placeholder="tituloOpcional" class="w-full text-base font-bold text-gray-900 outline-none placeholder-gray-300 bg-transparent">
+            <textarea id="compose-body" placeholder="¿Qué quieres compartir con la comunidad?" data-i18n-placeholder="queCompartir" rows="4" class="w-full text-sm text-gray-700 outline-none placeholder-gray-400 bg-transparent resize-none" oninput="checkComposeValid()"></textarea>
           </div>
         </div>
         <div id="compose-media-preview" class="hidden media-preview-scroll"></div>
         <div class="flex gap-2 flex-wrap">
           <span class="text-xs text-gray-400 self-center">Categoría:</span>
           <select id="compose-category" class="text-xs border border-gray-200 bg-gray-50 px-3 py-1.5 rounded-lg text-gray-700 outline-none">
-            <option value="general">Muro</option>
-            <option value="cine_local">Cine Local</option>
-            <option value="galeria">Galería</option>
-            <option value="biblioteca">Biblioteca</option>
-            <option value="musica">Música</option>
-            <option value="eventos">Eventos</option>
+            <option value="general" data-i18n="muro">Muro</option>
+            <option value="cine_local" data-i18n="cineLocal">Cine Local</option>
+            <option value="galeria" data-i18n="galeria">Galería</option>
+            <option value="biblioteca" data-i18n="biblioteca">Biblioteca</option>
+            <option value="musica" data-i18n="musica">Música</option>
+            <option value="eventos" data-i18n="eventos">Eventos</option>
           </select>
         </div>
         <div id="compose-type-pills" class="flex gap-2 flex-wrap">
-          <button onclick="setComposeType('normal')" class="compose-type-pill active px-3 py-1.5 rounded-full text-xs font-semibold transition bg-creo-purple text-white" data-type="normal">Normal</button>
-          <button onclick="setComposeType('evento')" class="compose-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="evento">📅 Evento</button>
-          <button onclick="setComposeType('en_vivo')" class="compose-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="en_vivo">📡 En Vivo</button>
+          <button onclick="setComposeType('normal')" class="compose-type-pill active px-3 py-1.5 rounded-full text-xs font-semibold transition bg-creo-purple text-white" data-type="normal" data-i18n="normal">Normal</button>
+          <button onclick="setComposeType('evento')" class="compose-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="evento" data-i18n="evento">📅 Evento</button>
+          <button onclick="setComposeType('en_vivo')" class="compose-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="en_vivo" data-i18n="enVivo">📡 En Vivo</button>
         </div>
         <div id="compose-evento-fields" class="hidden space-y-2">
           <div class="grid grid-cols-2 gap-2">
             <input id="compose-event-date" type="date" class="border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
             <input id="compose-event-time" type="time" class="border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
           </div>
-          <input id="compose-event-link" type="url" placeholder="Enlace (Zoom, Meet, URL)" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+          <input id="compose-event-link" type="url" placeholder="Enlace (Zoom, Meet, URL)" data-i18n-placeholder="enlaceEvento" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
         </div>
         <div id="compose-envivo-fields" class="hidden space-y-2">
           <select id="compose-live-platform" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
-            <option value="browser">Desde el navegador</option>
+            <option value="browser" data-i18n="desdeNavegador">Desde el navegador</option>
             <option value="youtube">YouTube Live</option>
             <option value="twitch">Twitch</option>
             <option value="instagram">Instagram Live</option>
             <option value="custom">Otro enlace</option>
           </select>
-          <input id="compose-live-url" type="url" placeholder="URL del stream" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
+          <input id="compose-live-url" type="url" placeholder="URL del stream" data-i18n-placeholder="urlStream" class="w-full border border-gray-200 bg-gray-50 p-2 rounded-lg text-xs text-gray-900 outline-none">
         </div>
         <div class="flex items-center gap-3 border-t border-gray-100 pt-3 flex-wrap">
           <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-green-600 transition">
             <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-            Foto
+            <span data-i18n="foto">Foto</span>
             <input type="file" accept="image/*" multiple class="hidden" onchange="handleComposeMedia(event, 'photo')">
           </label>
           <label class="cursor-pointer flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition">
             <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg>
-            Video
+            <span data-i18n="video">Video</span>
             <input type="file" accept="video/*" class="hidden" onchange="handleComposeMedia(event, 'video')">
           </label>
           <button onclick="startComposeRecording('video')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition">
             <svg class="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
-            Grabar Video
+            <span data-i18n="grabarVideo">Grabar Video</span>
           </button>
           <button onclick="startComposeRecording('audio')" class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-amber-500 transition">
             <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
-            Grabar Audio
+            <span data-i18n="grabarAudio">Grabar Audio</span>
           </button>
           <span id="compose-emoji-btn" class="cursor-pointer text-xl hover:scale-110 transition ml-auto">😊</span>
         </div>
@@ -269,7 +269,7 @@
     <div class="compose-overlay" onclick="closeComments()"></div>
     <div class="fixed inset-x-0 bottom-0 z-[96] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col">
       <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-        <span class="font-bold text-sm text-gray-900">Comentarios</span>
+        <span class="font-bold text-sm text-gray-900" data-i18n="comentar">Comentarios</span>
         <button onclick="closeComments()" class="text-gray-400 hover:text-gray-600">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -277,7 +277,7 @@
       <div id="comments-list" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
       <div class="p-3 border-t border-gray-100 flex items-center gap-2">
         <span id="comment-emoji-btn" class="cursor-pointer text-lg">😊</span>
-        <input id="comment-input" type="text" placeholder="Escribe un comentario..." class="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-creo-mint">
+        <input id="comment-input" type="text" placeholder="Escribe un comentario..." data-i18n-placeholder="escribirComentario" class="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-creo-mint">
         <button onclick="submitComment()" class="bg-creo-mint text-creo-purple font-bold px-4 py-2 rounded-full text-sm">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
         </button>
@@ -290,14 +290,14 @@
     <div class="compose-overlay" onclick="closeShareModal()"></div>
     <div class="fixed inset-x-0 bottom-0 z-[96] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl p-4 space-y-3">
       <div class="flex items-center justify-between">
-        <span class="font-bold text-sm text-gray-900">Compartir publicación</span>
+        <span class="font-bold text-sm text-gray-900" data-i18n="compartir">Compartir publicación</span>
         <button onclick="closeShareModal()" class="text-gray-400 hover:text-gray-600">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
       <textarea id="share-body" placeholder="Añade un comentario..." rows="2" class="w-full text-sm bg-gray-100 rounded-xl px-4 py-3 outline-none resize-none"></textarea>
       <div id="share-preview" class="border border-gray-200 rounded-xl p-3 bg-gray-50"></div>
-      <button onclick="submitShare()" class="w-full bg-creo-purple text-white font-bold py-3 rounded-xl hover:bg-creo-light transition">Compartir al muro</button>
+      <button onclick="submitShare()" class="w-full bg-creo-purple text-white font-bold py-3 rounded-xl hover:bg-creo-light transition" data-i18n="compartir">Compartir al muro</button>
     </div>
   </div>
 
@@ -346,6 +346,7 @@
       loadStories();
       renderSidebar('comunidad');
       loadNotificationBell();
+      translatePage();
       window.addEventListener('scroll', onScroll);
       document.getElementById('comment-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitComment(); });
       if (window.location.hash) {
@@ -386,7 +387,7 @@
     async function dismissWelcome() {
       await sb.from('profiles').update({ community_intro_dismissed_at: new Date().toISOString() }).eq('id', currentUser.id);
       document.getElementById('welcome-post').classList.add('hidden');
-      showToast('¡Sin problema! Disfruta la comunidad', 'info');
+      showToast(t('normasComunidad'), 'info');
     }
 
     async function loadStories() {
@@ -488,7 +489,7 @@
       }
       return `<div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition" id="post-${post.id}" data-author-id="${post.author_id}"><div class="p-4 space-y-3">
         <div class="flex items-center justify-between"><div class="flex items-center gap-3"><a href="profile.html?u=${esc(a.username || '')}" class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-creo-mint transition">${avatar}</a><div><div class="flex items-center gap-1"><a href="profile.html?u=${esc(a.username || '')}" class="font-bold text-sm text-gray-900 hover:text-creo-purple transition">${esc(name)}</a>${verified}</div><p class="text-[10px] text-gray-400">${timeAgo(post.created_at)}</p></div></div>
-        ${isOwner ? `<div class="flex items-center gap-1"><button onclick="editCommunityPost('${post.id}')" class="text-gray-300 hover:text-blue-400 transition p-1" title="Editar"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="deletePost('${post.id}')" class="text-gray-300 hover:text-red-400 transition p-1" title="Eliminar"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div>` : ''}</div>
+        ${isOwner ? `<div class="flex items-center gap-1"><button onclick="editCommunityPost('${post.id}')" class="text-gray-300 hover:text-blue-400 transition p-1" title="${t('editar')}"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="deletePost('${post.id}')" class="text-gray-300 hover:text-red-400 transition p-1" title="${t('eliminar')}"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div>` : ''}</div>
         ${post.post_type === 'evento' ? `<div class="flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-xl px-3 py-2"><span class="text-lg">📅</span><div class="flex-1"><p class="text-xs font-bold text-purple-700">Evento</p>${post.event_date ? `<p class="text-[10px] text-purple-600">${post.event_date}${post.event_time ? ' · ' + post.event_time : ''}</p>` : ''}</div>${post.event_link ? `<a href="${esc(post.event_link)}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-creo-purple hover:underline">Unirse</a>` : ''}</div>` : ''}
         ${post.post_type === 'en_vivo' ? `<div class="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-3 py-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span><div class="flex-1"><p class="text-xs font-bold text-red-600">En Vivo${post.live_platform ? ' · ' + esc(post.live_platform) : ''}</p></div>${post.live_url ? `<a href="${esc(post.live_url)}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-red-600 hover:underline">Ver</a>` : ''}</div>` : ''}
         ${post.title ? `<h3 class="text-base font-bold text-gray-900">${esc(post.title)}</h3>` : ''}
@@ -500,15 +501,15 @@
               <div class="reaction-picker" id="picker-${post.id}">${REACTIONS.map(r => `<button onclick="reactToPost('${post.id}','${r}',this)" title="${r}">${r}</button>`).join('')}</div>
               <button onclick="quickReact('${post.id}', this)" data-reacted="${liked || ''}" class="flex items-center gap-1 text-sm transition ${liked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}"><span class="current-reaction text-lg">${liked || '❤️'}</span><span class="like-count">${likeCount}</span></button>
             </div>
-            ${Object.keys(reactions || {}).length > 0 ? `<div class="relative group inline-flex"><button onclick="openReactions('${post.id}')" class="ml-1 hover:opacity-70 transition text-xs text-gray-400">Reacciones</button><div class="absolute bottom-full left-0 mb-1 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-20 shadow-lg"><p class="font-semibold mb-1">Reacciones</p>${(reactionUsersList || []).slice(0, 8).map(u => `<p>${u.type} ${esc(u.name)}</p>`).join('')}${(reactionUsersList || []).length > 8 ? `<p class="text-gray-400">+${reactionUsersList.length - 8} más</p>` : ''}</div></div>` : ''}
+            ${Object.keys(reactions || {}).length > 0 ? `<div class="relative group inline-flex"><button onclick="openReactions('${post.id}')" class="ml-1 hover:opacity-70 transition text-xs text-gray-400">${t('reaccion')}</button><div class="absolute bottom-full left-0 mb-1 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-20 shadow-lg"><p class="font-semibold mb-1">${t('reaccion')}</p>${(reactionUsersList || []).slice(0, 8).map(u => `<p>${u.type} ${esc(u.name)}</p>`).join('')}${(reactionUsersList || []).length > 8 ? `<p class="text-gray-400">+${reactionUsersList.length - 8} más</p>` : ''}</div></div>` : ''}
           </div>
           <button onclick="openComments('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-purple transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span>${commentCount}</span></button>
-          <button onclick="openShareModal('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-mint transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>Compartir</button>
+          <button onclick="openShareModal('${post.id}')" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-creo-mint transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>${t('compartir')}</button>
         </div></div></div>`;
     }
 
     function linkify(text) { return text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-creo-mint hover:underline">$1</a>'); }
-    function timeAgo(date) { const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000); if (s < 60) return 'ahora'; if (s < 3600) return Math.floor(s / 60) + 'm'; if (s < 86400) return Math.floor(s / 3600) + 'h'; if (s < 604800) return Math.floor(s / 86400) + 'd'; return new Date(date).toLocaleDateString('es'); }
+    function timeAgo(date) { const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000); if (s < 60) return t('ahora'); if (s < 3600) return Math.floor(s / 60) + 'm'; if (s < 86400) return Math.floor(s / 3600) + 'h'; if (s < 604800) return Math.floor(s / 86400) + 'd'; return new Date(date).toLocaleDateString('es'); }
 
     let composePostType = 'normal';
     function setComposeType(type) {
@@ -519,7 +520,7 @@
     }
 
     async function openCompose(type) {
-      if (!currentUser) { showToast('Inicia sesión para publicar', 'info'); return; }
+      if (!currentUser) { showToast(t('iniciarSesionParaComentar'), 'info'); return; }
       composeType = type || 'text'; composeMediaFiles = []; composePostType = 'normal';
       document.getElementById('compose-media-preview').innerHTML = '';
       document.getElementById('compose-media-preview').classList.add('hidden');
@@ -542,23 +543,23 @@
       const isVideo = type === 'video';
       navigator.mediaDevices.getUserMedia(isVideo ? { video: { facingMode: 'user' }, audio: true } : { audio: true }).then(stream => {
         const modal = document.createElement('div'); modal.id = 'compose-rec-modal'; modal.className = 'fixed inset-0 z-[200] flex items-center justify-center';
-        modal.innerHTML = `<div class="absolute inset-0 bg-black/70" onclick="cancelComposeRec()"></div><div class="relative bg-white rounded-2xl shadow-2xl p-5 w-80 space-y-4 z-10"><h3 class="font-bold text-center text-gray-900">${isVideo ? 'Grabando Video' : 'Grabando Audio'}</h3>${isVideo ? '<video id="compose-rec-preview" autoplay playsinline muted class="w-full rounded-xl bg-black aspect-video"></video>' : '<div class="flex items-center justify-center py-6"><div class="w-16 h-16 rounded-full bg-red-500 animate-pulse flex items-center justify-center"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg></div></div>'}<p id="compose-rec-timer" class="text-center text-sm font-mono text-gray-500">00:00</p><div class="flex gap-2"><button onclick="cancelComposeRec()" class="flex-1 py-2 rounded-xl border text-sm font-semibold text-gray-600 hover:bg-gray-50">Cancelar</button><button onclick="saveComposeRec('${type}')" class="flex-1 py-2 rounded-xl bg-creo-mint text-creo-purple text-sm font-bold hover:opacity-90">Guardar</button></div></div>`;
+        modal.innerHTML = `<div class="absolute inset-0 bg-black/70" onclick="cancelComposeRec()"></div><div class="relative bg-white rounded-2xl shadow-2xl p-5 w-80 space-y-4 z-10"><h3 class="font-bold text-center text-gray-900">${isVideo ? t('grabandoVideo') : t('grabandoAudio')}</h3>${isVideo ? '<video id="compose-rec-preview" autoplay playsinline muted class="w-full rounded-xl bg-black aspect-video"></video>' : '<div class="flex items-center justify-center py-6"><div class="w-16 h-16 rounded-full bg-red-500 animate-pulse flex items-center justify-center"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg></div></div>'}<p id="compose-rec-timer" class="text-center text-sm font-mono text-gray-500">00:00</p><div class="flex gap-2"><button onclick="cancelComposeRec()" class="flex-1 py-2 rounded-xl border text-sm font-semibold text-gray-600 hover:bg-gray-50">${t('cancelar')}</button><button onclick="saveComposeRec('${type}')" class="flex-1 py-2 rounded-xl bg-creo-mint text-creo-purple text-sm font-bold hover:opacity-90">${t('guardar')}</button></div></div>`;
         document.body.appendChild(modal);
         if (isVideo) document.getElementById('compose-rec-preview').srcObject = stream;
         const mimeType = isVideo ? (MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm') : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg');
         window._compRecChunks = []; window._compRecorder = new MediaRecorder(stream, { mimeType }); window._compRecorder.ondataavailable = e => { if (e.data.size > 0) window._compRecChunks.push(e.data); }; window._compRecorder.start(100); window._compRecStream = stream;
         let secs = 0; window._compRecTimer = setInterval(() => { secs++; const el = document.getElementById('compose-rec-timer'); if (el) el.textContent = String(Math.floor(secs/60)).padStart(2,'0') + ':' + String(secs%60).padStart(2,'0'); }, 1000);
-      }).catch(err => showToast('No se pudo acceder: ' + err.message, 'error'));
+      }).catch(err => showToast(t('errorSubiendo') + ': ' + err.message, 'error'));
     }
     function cancelComposeRec() { if (window._compRecorder && window._compRecorder.state !== 'inactive') window._compRecorder.stop(); clearInterval(window._compRecTimer); if (window._compRecStream) window._compRecStream.getTracks().forEach(t => t.stop()); window._compRecChunks = []; const m = document.getElementById('compose-rec-modal'); if (m) m.remove(); }
-    async function saveComposeRec(type) { if (!window._compRecorder) return; clearInterval(window._compRecTimer); const done = new Promise(r => { window._compRecorder.onstop = r; window._compRecorder.stop(); }); await done; window._compRecStream.getTracks().forEach(t => t.stop()); const isVid = type === 'video'; const blob = new Blob(window._compRecChunks, { type: isVid ? 'video/webm' : 'audio/webm' }); const file = new File([blob], (isVid ? 'video-' : 'audio-') + Date.now() + '.webm', { type: blob.type }); composeMediaFiles.push(file); renderMediaPreviews(); checkComposeValid(); window._compRecChunks = []; const m = document.getElementById('compose-rec-modal'); if (m) m.remove(); showToast('Grabación lista', 'success'); }
+    async function saveComposeRec(type) { if (!window._compRecorder) return; clearInterval(window._compRecTimer); const done = new Promise(r => { window._compRecorder.onstop = r; window._compRecorder.stop(); }); await done; window._compRecStream.getTracks().forEach(t => t.stop()); const isVid = type === 'video'; const blob = new Blob(window._compRecChunks, { type: isVid ? 'video/webm' : 'audio/webm' }); const file = new File([blob], (isVid ? 'video-' : 'audio-') + Date.now() + '.webm', { type: blob.type }); composeMediaFiles.push(file); renderMediaPreviews(); checkComposeValid(); window._compRecChunks = []; const m = document.getElementById('compose-rec-modal'); if (m) m.remove(); showToast(t('grabacionLista'), 'success'); }
 
     async function submitPost() {
-      if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
+      if (!currentUser) { showToast(t('iniciarSesionParaComentar'), 'error'); return; }
       const title = document.getElementById('compose-title').value.trim();
       const body = document.getElementById('compose-body').value.trim();
       if (!body && composeMediaFiles.length === 0) return;
-      const btn = document.getElementById('compose-submit'); btn.disabled = true; btn.textContent = 'Publicando...';
+      const btn = document.getElementById('compose-submit'); btn.disabled = true; btn.textContent = t('publicando');
       try {
         let mediaUrls = [];
         for (const file of composeMediaFiles) { const url = await uploadToStorage(file, 'community-media', 10); if (url) mediaUrls.push(url); }
@@ -568,14 +569,14 @@
         else if (composePostType === 'en_vivo') { insertData.live_platform = document.getElementById('compose-live-platform').value || null; insertData.live_url = document.getElementById('compose-live-url').value || null; }
         const { error } = await sb.from('community_posts').insert(insertData);
         if (error) throw error;
-        closeCompose(); showToast('¡Publicado!', 'success');
+        closeCompose(); showToast(t('publicadoEnComunidad'), 'success');
         document.getElementById('community-feed').innerHTML = ''; feedPage = 0; feedDone = false; loadFeed();
-      } catch(e) { showToast('Error al publicar: ' + (e.message || e), 'error'); }
-      btn.disabled = false; btn.textContent = 'Publicar';
+      } catch(e) { showToast(t('errorSubiendo') + ': ' + (e.message || e), 'error'); }
+      btn.disabled = false; btn.textContent = t('publicar');
     }
 
     function quickReact(postId, btn) {
-      if (!currentUser) { showToast('Inicia sesión para reaccionar', 'info'); return; }
+      if (!currentUser) { showToast(t('iniciarSesionParaLike'), 'info'); return; }
       const current = btn.dataset.reacted;
       if (current) {
         btn.dataset.reacted = '';
@@ -590,7 +591,7 @@
     }
 
     async function reactToPost(postId, emoji, pickerBtn, mainBtn) {
-      if (!currentUser) { showToast('Inicia sesión para reaccionar', 'info'); return; }
+      if (!currentUser) { showToast(t('iniciarSesionParaLike'), 'info'); return; }
       const wrap = document.querySelector(`#post-${postId} .reaction-wrap`);
       const btn = mainBtn || wrap?.querySelector('button[data-reacted]');
       if (!btn) return;
@@ -610,7 +611,7 @@
 
     async function openReactions(postId) {
       const { data } = await sb.from('community_likes').select('reaction_type, user:user_id(id, username, display_name, avatar_url)').eq('post_id', postId).order('created_at', { ascending: false });
-      if (!data || !data.length) { showToast('Sin reacciones aún', 'info'); return; }
+      if (!data || !data.length) { showToast(t('reaccion'), 'info'); return; }
       const grouped = {};
       data.forEach(r => { const t = r.reaction_type || '❤️'; if (!grouped[t]) grouped[t] = []; grouped[t].push(r.user); });
       const allTypes = Object.keys(grouped);
@@ -619,7 +620,7 @@
       modal.innerHTML = `<div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('reactions-modal').remove()"></div>
         <div class="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md max-h-[70vh] flex flex-col overflow-hidden">
           <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
-            <h3 class="font-bold text-gray-900">Reacciones</h3>
+            <h3 class="font-bold text-gray-900">${t('reaccion')}</h3>
             <button onclick="document.getElementById('reactions-modal').remove()" class="text-gray-400 hover:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
           </div>
           <div class="flex gap-1 px-5 py-2 border-b border-gray-100 overflow-x-auto no-scrollbar">
@@ -674,49 +675,49 @@
     async function loadComments(postId) {
       const list = document.getElementById('comments-list'); list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Cargando...</p>';
       const { data } = await sb.from('community_comments').select('*, author:author_id(id, username, display_name, avatar_url)').eq('post_id', postId).order('created_at', { ascending: true }).limit(100);
-      if (!data || data.length === 0) { list.innerHTML = '<p class="text-center text-gray-400 text-xs py-8">Sin comentarios aún</p>'; return; }
+      if (!data || data.length === 0) { list.innerHTML = `<p class="text-center text-gray-400 text-xs py-8">${t('sinComentarios')}</p>`; return; }
       list.innerHTML = data.map(c => { const ca = c.author; const cName = ca?.display_name || ca?.username || '?'; const cAvatar = ca?.avatar_url ? `<img src="${esc(ca.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-xs">${esc(cName[0])}</span>`; const isOwner = currentUser && currentUser.id === c.author_id;
         return `<div class="flex gap-2"><a href="profile.html?u=${esc(ca?.username || '')}" class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0">${cAvatar}</a><div class="flex-1 bg-gray-100 rounded-2xl rounded-tl-sm px-3 py-2"><div class="flex items-center justify-between"><a href="profile.html?u=${esc(ca?.username || '')}" class="text-xs font-bold text-gray-900 hover:text-creo-purple">${esc(cName)}</a><div class="flex items-center gap-2"><span class="text-[10px] text-gray-400">${timeAgo(c.created_at)}</span>${isOwner ? `<button onclick="editComment('${c.id}', this)" class="text-gray-300 hover:text-blue-400 text-[10px]">✎</button><button onclick="deleteComment('${c.id}')" class="text-gray-300 hover:text-red-400 text-[10px]">✕</button>` : ''}</div></div><p class="text-sm text-gray-700 mt-0.5">${linkify(esc(c.body))}</p></div></div>`; }).join('');
       list.scrollTop = list.scrollHeight;
     }
     async function submitComment() {
-      if (!currentUser || !activeCommentPostId) { showToast('Inicia sesión', 'info'); return; }
+      if (!currentUser || !activeCommentPostId) { showToast(t('iniciarSesionParaComentar'), 'info'); return; }
       const input = document.getElementById('comment-input'); const body = input.value.trim(); if (!body) return; input.value = '';
       const { error } = await sb.from('community_comments').insert({ post_id: activeCommentPostId, author_id: currentUser.id, body });
-      if (error) { showToast('Error', 'error'); return; }
+      if (error) { showToast(t('errorSubiendo'), 'error'); return; }
       const authorId = document.getElementById('post-' + activeCommentPostId)?.dataset?.authorId;
       if (authorId) createNotification(authorId, 'comment', 'Nuevo comentario en tu publicación', body.slice(0, 80), 'comunidad.html#post-' + activeCommentPostId);
       loadComments(activeCommentPostId);
     }
-    async function deleteComment(id) { if (!confirm('¿Eliminar comentario?')) return; await sb.from('community_comments').delete().eq('id', id); if (activeCommentPostId) loadComments(activeCommentPostId); }
-    function editComment(id, btnEl) { const commentDiv = btnEl.closest('.flex.gap-2'); const bodyP = commentDiv.querySelector('p'); const oldText = bodyP.textContent; bodyP.innerHTML = `<textarea id="edit-comment-${id}" class="w-full border border-gray-300 bg-white p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" rows="2">${esc(oldText)}</textarea><div class="flex gap-2 mt-1"><button onclick="saveCommentEdit('${id}')" class="text-xs px-3 py-1 bg-creo-purple text-white rounded-lg">Guardar</button><button onclick="loadComments(activeCommentPostId)" class="text-xs px-3 py-1 bg-gray-200 text-gray-600 rounded-lg">Cancelar</button></div>`; }
-    async function saveCommentEdit(id) { const textarea = document.getElementById('edit-comment-' + id); const body = textarea.value.trim(); if (!body) return showToast('El comentario no puede estar vacío', 'error'); const { error } = await sb.from('community_comments').update({ body }).eq('id', id); if (error) return showToast('Error: ' + error.message, 'error'); showToast('Comentario actualizado', 'success'); loadComments(activeCommentPostId); }
+    async function deleteComment(id) { if (!confirm(t('confirmarEliminar'))) return; await sb.from('community_comments').delete().eq('id', id); if (activeCommentPostId) loadComments(activeCommentPostId); }
+    function editComment(id, btnEl) { const commentDiv = btnEl.closest('.flex.gap-2'); const bodyP = commentDiv.querySelector('p'); const oldText = bodyP.textContent; bodyP.innerHTML = `<textarea id="edit-comment-${id}" class="w-full border border-gray-300 bg-white p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" rows="2">${esc(oldText)}</textarea><div class="flex gap-2 mt-1"><button onclick="saveCommentEdit('${id}')" class="text-xs px-3 py-1 bg-creo-purple text-white rounded-lg">${t('guardar')}</button><button onclick="loadComments(activeCommentPostId)" class="text-xs px-3 py-1 bg-gray-200 text-gray-600 rounded-lg">${t('cancelar')}</button></div>`; }
+    async function saveCommentEdit(id) { const textarea = document.getElementById('edit-comment-' + id); const body = textarea.value.trim(); if (!body) return showToast(t('escribeAlgoOMedia'), 'error'); const { error } = await sb.from('community_comments').update({ body }).eq('id', id); if (error) return showToast('Error: ' + error.message, 'error'); showToast(t('postActualizado'), 'success'); loadComments(activeCommentPostId); }
 
-    async function openShareModal(postId) { if (!currentUser) { showToast('Inicia sesión', 'info'); return; } sharePostId = postId; const postEl = document.getElementById('post-' + postId); const preview = document.getElementById('share-preview'); const titleEl = postEl?.querySelector('h3'); const bodyEl = postEl?.querySelector('.whitespace-pre-line'); preview.innerHTML = `<p class="text-xs text-gray-500"><span class="font-semibold">${titleEl ? esc(titleEl.textContent) : 'Publicación compartida'}</span></p>${bodyEl ? `<p class="text-xs text-gray-400 truncate mt-1">${esc(bodyEl.textContent.slice(0, 80))}</p>` : ''}`; document.getElementById('share-body').value = ''; document.getElementById('share-modal').classList.remove('hidden'); }
+    async function openShareModal(postId) { if (!currentUser) { showToast(t('iniciarSesionParaComentar'), 'info'); return; } sharePostId = postId; const postEl = document.getElementById('post-' + postId); const preview = document.getElementById('share-preview'); const titleEl = postEl?.querySelector('h3'); const bodyEl = postEl?.querySelector('.whitespace-pre-line'); preview.innerHTML = `<p class="text-xs text-gray-500"><span class="font-semibold">${titleEl ? esc(titleEl.textContent) : 'Publicación compartida'}</span></p>${bodyEl ? `<p class="text-xs text-gray-400 truncate mt-1">${esc(bodyEl.textContent.slice(0, 80))}</p>` : ''}`; document.getElementById('share-body').value = ''; document.getElementById('share-modal').classList.remove('hidden'); }
     function closeShareModal() { document.getElementById('share-modal').classList.add('hidden'); sharePostId = null; }
     async function submitShare() {
       if (!currentUser || !sharePostId) return;
       const body = document.getElementById('share-body').value.trim();
       const authorId = document.getElementById('post-' + sharePostId)?.dataset?.authorId;
       const { error } = await sb.from('community_posts').insert({ author_id: currentUser.id, post_type: 'share_post', body: body || null, shared_post_id: sharePostId });
-      if (error) { showToast('Error al compartir', 'error'); return; }
+      if (error) { showToast(t('errorSubiendo'), 'error'); return; }
       if (authorId) createNotification(authorId, 'share', 'Alguien compartió tu publicación', null, 'comunidad.html#post-' + sharePostId);
-      closeShareModal(); showToast('¡Compartido!', 'success'); document.getElementById('community-feed').innerHTML = ''; feedPage = 0; feedDone = false; loadFeed();
+      closeShareModal(); showToast(t('enlaceCopiado'), 'success'); document.getElementById('community-feed').innerHTML = ''; feedPage = 0; feedDone = false; loadFeed();
     }
-    async function deletePost(id) { if (!confirm('¿Eliminar esta publicación?')) return; await sb.from('community_posts').delete().eq('id', id); const el = document.getElementById('post-' + id); if (el) el.remove(); showToast('Publicación eliminada', 'success'); }
+    async function deletePost(id) { if (!confirm(t('confirmarEliminar'))) return; await sb.from('community_posts').delete().eq('id', id); const el = document.getElementById('post-' + id); if (el) el.remove(); showToast(t('postEliminado'), 'success'); }
 
     async function editCommunityPost(id) {
       const { data: post } = await sb.from('community_posts').select('*').eq('id', id).single();
-      if (!post) return showToast('No se encontró la publicación', 'error');
+      if (!post) return showToast(t('errorSubiendo'), 'error');
       let existing = document.getElementById('edit-community-modal'); if (existing) existing.remove();
       const media = post.media_urls || [];
-      const mediaPreview = media.length > 0 ? `<div><label class="block text-xs font-medium text-gray-500 mb-1">Media actual</label><div class="flex gap-2 overflow-x-auto py-1">${media.map((m, i) => { const isVid = /\.(mp4|webm|mov)$/i.test(m); return isVid ? `<div class="relative flex-shrink-0"><video src="${esc(m)}" class="w-16 h-16 rounded-lg object-cover"></video><button onclick="removeCommunityMedia('${id}', ${i})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button></div>` : `<div class="relative flex-shrink-0"><img src="${esc(m)}" class="w-16 h-16 rounded-lg object-cover"><button onclick="removeCommunityMedia('${id}', ${i})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button></div>`; }).join('')}</div></div>` : '';
+      const mediaPreview = media.length > 0 ? `<div><label class="block text-xs font-medium text-gray-500 mb-1">${t('media')}</label><div class="flex gap-2 overflow-x-auto py-1">${media.map((m, i) => { const isVid = /\.(mp4|webm|mov)$/i.test(m); return isVid ? `<div class="relative flex-shrink-0"><video src="${esc(m)}" class="w-16 h-16 rounded-lg object-cover"></video><button onclick="removeCommunityMedia('${id}', ${i})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button></div>` : `<div class="relative flex-shrink-0"><img src="${esc(m)}" class="w-16 h-16 rounded-lg object-cover"><button onclick="removeCommunityMedia('${id}', ${i})" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button></div>`; }).join('')}</div></div>` : '';
       const modal = document.createElement('div'); modal.id = 'edit-community-modal'; modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4';
-      modal.innerHTML = `<div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('edit-community-modal').remove()"></div><div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto"><div class="flex items-center justify-between"><h3 class="font-bold text-lg text-gray-900">Editar Publicación</h3><button onclick="document.getElementById('edit-community-modal').remove()" class="text-gray-400 hover:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div><div><label class="block text-xs font-medium text-gray-500 mb-1">Titulo (opcional)</label><input id="edit-cp-title" type="text" value="${esc(post.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></div><div><label class="block text-xs font-medium text-gray-500 mb-1">Contenido</label><textarea id="edit-cp-body" rows="4" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(post.body || '')}</textarea></div>${mediaPreview}<input type="hidden" id="edit-cp-media" value='${JSON.stringify(media)}'><div class="flex gap-3"><button onclick="saveCommunityPostEdit('${post.id}')" id="save-cp-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Cambios</button><button onclick="document.getElementById('edit-community-modal').remove()" class="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition">Cancelar</button></div></div>`;
+      modal.innerHTML = `<div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('edit-community-modal').remove()"></div><div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto"><div class="flex items-center justify-between"><h3 class="font-bold text-lg text-gray-900">${t('editarPost')}</h3><button onclick="document.getElementById('edit-community-modal').remove()" class="text-gray-400 hover:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div><div><label class="block text-xs font-medium text-gray-500 mb-1">${t('tituloOpcional')}</label><input id="edit-cp-title" type="text" value="${esc(post.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></div><div><label class="block text-xs font-medium text-gray-500 mb-1">${t('contenido')}</label><textarea id="edit-cp-body" rows="4" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(post.body || '')}</textarea></div>${mediaPreview}<input type="hidden" id="edit-cp-media" value='${JSON.stringify(media)}'><div class="flex gap-3"><button onclick="saveCommunityPostEdit('${post.id}')" id="save-cp-btn" class="flex-1 bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">${t('guardarCambios')}</button><button onclick="document.getElementById('edit-community-modal').remove()" class="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition">${t('cancelar')}</button></div></div>`;
       document.body.appendChild(modal);
     }
     function removeCommunityMedia(postId, idx) { const input = document.getElementById('edit-cp-media'); const media = JSON.parse(input.value); media.splice(idx, 1); input.value = JSON.stringify(media); editCommunityPost(postId); }
-    async function saveCommunityPostEdit(id) { const btn = document.getElementById('save-cp-btn'); btn.textContent = 'Guardando...'; btn.disabled = true; const title = document.getElementById('edit-cp-title').value.trim(); const body = document.getElementById('edit-cp-body').value.trim(); const media_urls = JSON.parse(document.getElementById('edit-cp-media').value || '[]'); const { error } = await sb.from('community_posts').update({ title: title || null, body: body || null, media_urls, updated_at: new Date().toISOString() }).eq('id', id); btn.textContent = 'Guardar Cambios'; btn.disabled = false; if (error) { showToast('Error: ' + error.message, 'error'); return; } document.getElementById('edit-community-modal').remove(); showToast('Publicación actualizada', 'success'); document.getElementById('community-feed').innerHTML = ''; feedPage = 0; feedDone = false; loadFeed(); }
+    async function saveCommunityPostEdit(id) { const btn = document.getElementById('save-cp-btn'); btn.textContent = t('procesando'); btn.disabled = true; const title = document.getElementById('edit-cp-title').value.trim(); const body = document.getElementById('edit-cp-body').value.trim(); const media_urls = JSON.parse(document.getElementById('edit-cp-media').value || '[]'); const { error } = await sb.from('community_posts').update({ title: title || null, body: body || null, media_urls, updated_at: new Date().toISOString() }).eq('id', id); btn.textContent = t('guardarCambios'); btn.disabled = false; if (error) { showToast('Error: ' + error.message, 'error'); return; } document.getElementById('edit-community-modal').remove(); showToast(t('postActualizado'), 'success'); document.getElementById('community-feed').innerHTML = ''; feedPage = 0; feedDone = false; loadFeed(); }
 
     function openLightbox(url, isVideo) { const lb = document.getElementById('media-lightbox'); const content = document.getElementById('lightbox-content'); content.innerHTML = isVideo ? `<video src="${esc(url)}" controls autoplay class="max-w-full max-h-[90vh] rounded-xl"></video>` : `<img src="${esc(url)}" class="max-w-full max-h-[90vh] rounded-xl object-contain">`; lb.classList.remove('hidden'); }
     function closeLightbox() { document.getElementById('media-lightbox').classList.add('hidden'); document.getElementById('lightbox-content').innerHTML = ''; }

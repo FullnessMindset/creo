@@ -123,7 +123,7 @@
       </div>
 
       <div>
-        <h1 id="profile-name" class="text-2xl font-bold text-gray-900">Cargando...</h1>
+        <h1 id="profile-name" class="text-2xl font-bold text-gray-900" data-i18n="cargando">Cargando...</h1>
         <p id="profile-username" class="text-sm text-creo-purple font-medium"></p>
       </div>
 
@@ -131,11 +131,11 @@
       <div id="follow-stats" class="hidden flex justify-center gap-6">
         <div class="text-center">
           <p id="follower-count" class="text-lg font-bold text-gray-900">0</p>
-          <p class="text-[10px] text-gray-400 uppercase tracking-wider">Seguidores</p>
+          <p class="text-[10px] text-gray-400 uppercase tracking-wider" data-i18n="seguidores">Seguidores</p>
         </div>
         <div class="text-center">
           <p id="following-count" class="text-lg font-bold text-gray-900">0</p>
-          <p class="text-[10px] text-gray-400 uppercase tracking-wider">Siguiendo</p>
+          <p class="text-[10px] text-gray-400 uppercase tracking-wider" data-i18n="siguiendo">Siguiendo</p>
         </div>
       </div>
 
@@ -166,16 +166,16 @@
       <div id="profile-actions" class="hidden flex justify-center gap-2">
         <button onclick="toggleFollow()" id="follow-btn" class="hidden flex items-center gap-1.5 px-4 py-2 rounded-full glass text-xs font-semibold text-creo-purple hover:bg-creo-mint/20 transition-all border border-creo-mint/40">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-          <span id="follow-btn-text">Seguir</span>
+          <span id="follow-btn-text" data-i18n="seguir">Seguir</span>
         </button>
         <button onclick="openDM()" id="dm-btn" class="hidden flex items-center gap-1.5 px-4 py-2 rounded-full bg-creo-purple text-white text-xs font-semibold hover:bg-creo-light transition-all">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-          Mensaje
+          <span data-i18n="mensaje">Mensaje</span>
         </button>
         <button onclick="shareProfile()" id="share-btn" class="hidden flex items-center gap-1.5 px-3 py-2 rounded-full glass text-xs text-gray-500 hover:text-creo-purple hover:shadow-md transition-all">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
         </button>
-        <button onclick="openReport()" id="report-btn" class="hidden flex items-center gap-1.5 px-3 py-2 rounded-full glass text-xs text-gray-400 hover:text-red-500 transition-all" title="Reportar">
+        <button onclick="openReport()" id="report-btn" class="hidden flex items-center gap-1.5 px-3 py-2 rounded-full glass text-xs text-gray-400 hover:text-red-500 transition-all" data-i18n-title="reportar" title="Reportar">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
         </button>
       </div>
@@ -183,15 +183,15 @@
 
     <!-- Not Verified Banner -->
     <div id="not-verified-banner" class="hidden glass-mint p-4 rounded-xl text-center">
-      <p class="text-sm text-amber-800 font-semibold">Este creador aún no ha sido verificado</p>
-      <p class="text-xs text-amber-700 mt-1">Los pagos estarán disponibles una vez sea aprobado.</p>
+      <p class="text-sm text-amber-800 font-semibold" data-i18n="noVerificadoTitulo">Este creador aún no ha sido verificado</p>
+      <p class="text-xs text-amber-700 mt-1" data-i18n="noVerificadoSubtext">Los pagos estarán disponibles una vez sea aprobado.</p>
     </div>
 
     <!-- MI HISTORIA -->
     <div id="story-section" class="hidden space-y-4">
       <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
         <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-        Mi Historia
+        <span data-i18n="miHistoria">Mi Historia</span>
       </h2>
       <div id="stories-list" class="space-y-6"></div>
     </div>
@@ -200,7 +200,7 @@
     <div id="creo-en-ellos-section" class="hidden space-y-2">
       <h2 class="section-title text-sm font-bold text-gray-900 flex items-center gap-2">
         <img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="CREO">
-        Yo Creo en Ellos
+        <span data-i18n="yoCreoEnEllos">Yo Creo en Ellos</span>
       </h2>
       <div id="creo-en-ellos-scroll" class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
     </div>
@@ -215,7 +215,7 @@
     <div id="completed-metas-inline" class="hidden space-y-4">
       <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
         <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Metas Alcanzadas
+        <span data-i18n="metasAlcanzadas">Metas Alcanzadas</span>
       </h2>
       <div id="completed-metas-inline-list" class="space-y-3"></div>
     </div>
@@ -225,10 +225,10 @@
       <div class="flex items-center justify-between">
         <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
           <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-          Publicaciones
+          <span data-i18n="publicaciones">Publicaciones</span>
         </h2>
         <button onclick="toggleFullPosts()" id="full-posts-btn" class="text-xs font-semibold text-creo-purple hover:text-creo-light transition flex items-center gap-1">
-          Ver todo <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <span data-i18n="verTodo">Ver todo</span> <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
       </div>
       <div id="creator-posts-scroll"></div>
@@ -239,7 +239,7 @@
     <div id="business-section" class="hidden space-y-4">
       <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
         <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-        Mis Creaciones
+        <span data-i18n="misCreaciones">Mis Creaciones</span>
       </h2>
       <div id="business-links-list" class="grid gap-3"></div>
     </div>
@@ -257,7 +257,7 @@
           <p id="creo-popup-username" class="text-[10px] text-gray-400"></p>
           <p id="creo-popup-bio" class="text-[11px] text-gray-600 mt-1 line-clamp-3"></p>
           <div id="creo-popup-story" class="hidden mt-2 text-[11px] text-gray-500 italic line-clamp-2 border-t border-gray-100 pt-2"></div>
-          <a id="creo-popup-link" href="#" class="mt-2 inline-block text-[10px] font-semibold text-creo-purple hover:text-creo-light transition">Ver perfil →</a>
+          <a id="creo-popup-link" href="#" class="mt-2 inline-block text-[10px] font-semibold text-creo-purple hover:text-creo-light transition" data-i18n="verPerfilFlecha">Ver perfil →</a>
         </div>
       </div>
     </div>
@@ -267,21 +267,21 @@
       <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeReport()"></div>
       <div class="absolute inset-0 flex items-end sm:items-center justify-center p-4">
         <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl p-6 space-y-4 animate-slide-up">
-          <h3 class="text-lg font-bold text-gray-900 text-center">Reportar Creador</h3>
-          <p class="text-xs text-gray-500 text-center">Ayúdanos a mantener la comunidad segura. Tu reporte es confidencial.</p>
+          <h3 class="text-lg font-bold text-gray-900 text-center" data-i18n="reportarCreador">Reportar Creador</h3>
+          <p class="text-xs text-gray-500 text-center" data-i18n="reportarSubtext">Ayúdanos a mantener la comunidad segura. Tu reporte es confidencial.</p>
           <select id="report-reason" class="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900">
-            <option value="">Selecciona un motivo</option>
-            <option value="sexual">Contenido con insinuación sexual</option>
-            <option value="drugs">Uso o promoción de drogas</option>
-            <option value="violence">Incitación a la violencia</option>
-            <option value="language">Palabras soeces / lenguaje ofensivo</option>
-            <option value="discrimination">Discriminación</option>
-            <option value="spam">Spam o estafa</option>
-            <option value="other">Otro</option>
+            <option value="" data-i18n="seleccionaMotivo">Selecciona un motivo</option>
+            <option value="sexual" data-i18n="motivoSexual">Contenido con insinuación sexual</option>
+            <option value="drugs" data-i18n="motivoDrogas">Uso o promoción de drogas</option>
+            <option value="violence" data-i18n="motivoViolencia">Incitación a la violencia</option>
+            <option value="language" data-i18n="motivoLenguaje">Palabras soeces / lenguaje ofensivo</option>
+            <option value="discrimination" data-i18n="motivoDiscriminacion">Discriminación</option>
+            <option value="spam" data-i18n="motivoSpam">Spam o estafa</option>
+            <option value="other" data-i18n="motivoOtro">Otro</option>
           </select>
-          <textarea id="report-details" rows="3" placeholder="Describe el problema (opcional)" class="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 resize-none"></textarea>
-          <button onclick="submitReport()" id="report-submit-btn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-xl transition">Enviar Reporte</button>
-          <button onclick="closeReport()" class="w-full text-gray-400 text-sm hover:text-gray-600 transition py-2">Cancelar</button>
+          <textarea id="report-details" rows="3" data-i18n-placeholder="detallesPlaceholder" placeholder="Describe el problema (opcional)" class="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 resize-none"></textarea>
+          <button onclick="submitReport()" id="report-submit-btn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-xl transition" data-i18n="enviarReporte">Enviar Reporte</button>
+          <button onclick="closeReport()" class="w-full text-gray-400 text-sm hover:text-gray-600 transition py-2" data-i18n="cancelar">Cancelar</button>
         </div>
       </div>
     </div>
@@ -303,7 +303,7 @@
               <a id="dm-profile-link-name" href="#" class="font-bold text-sm text-gray-900 hover:text-creo-purple transition block truncate"><span id="dm-name"></span></a>
               <p id="dm-username" class="text-[10px] text-gray-400"></p>
             </div>
-            <a id="dm-view-profile-btn" href="#" class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-creo-mint/20 transition" title="Ver perfil">
+            <a id="dm-view-profile-btn" href="#" class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-creo-mint/20 transition" data-i18n-title="verPerfilTitle" title="Ver perfil">
               <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
             </a>
           </div>
@@ -328,44 +328,44 @@
               <div class="relative inline-block">
                 <div class="video-circle w-[100px] h-[100px]"><video id="dm-video-thumb" class="w-full h-full object-cover" playsinline muted loop></video><div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div></div>
                 <div class="flex gap-2 mt-2 justify-center">
-                  <button onclick="sendDMVideoNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold">Enviar</button>
+                  <button onclick="sendDMVideoNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold" data-i18n="enviarVideo">Enviar</button>
                   <button onclick="cancelVideoDM()" class="text-red-400 text-xs font-semibold">✕</button>
                 </div>
               </div>
             </div>
             <!-- Main input row -->
             <div class="flex items-center gap-1.5 px-3 py-2.5">
-              <button onclick="startDMVideoRecord()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Grabar video">
+              <button onclick="startDMVideoRecord()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" data-i18n-title="grabarVideoMsg" title="Grabar video">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
               </button>
-              <button onclick="document.getElementById('dm-image-input').click()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Enviar imagen">
+              <button onclick="document.getElementById('dm-image-input').click()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" data-i18n-title="enviarImagen" title="Enviar imagen">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               </button>
               <input type="file" id="dm-image-input" accept="image/*" class="hidden" onchange="handleDMImage(this)">
-              <button onclick="toggleAudioRecordDM()" id="dm-audio-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-red-500 transition" title="Grabar audio">
+              <button onclick="toggleAudioRecordDM()" id="dm-audio-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-red-500 transition" data-i18n-title="grabarAudioMsg" title="Grabar audio">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
               </button>
               <div class="flex-1 relative flex items-center bg-gray-100 rounded-full border border-gray-200 focus-within:border-creo-mint/50 transition">
                 <input id="dm-input" type="text" placeholder="Aa" class="flex-1 bg-transparent rounded-full px-4 py-2 text-sm outline-none border-none !border-0">
                 <span id="dm-emoji-btn" class="cursor-pointer text-lg hover:scale-110 transition pr-3">😊</span>
               </div>
-              <button onclick="toggleGifPicker()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition" title="Enviar GIF">
+              <button onclick="toggleGifPicker()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition" data-i18n-title="enviarGif" title="Enviar GIF">
                 <span class="text-xs font-black">GIF</span>
               </button>
-              <button onclick="sendDM()" class="w-9 h-9 rounded-full bg-creo-purple flex items-center justify-center hover:bg-creo-light transition flex-shrink-0" title="Enviar">
+              <button onclick="sendDM()" class="w-9 h-9 rounded-full bg-creo-purple flex items-center justify-center hover:bg-creo-light transition flex-shrink-0" data-i18n-title="enviar" title="Enviar">
                 <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
               </button>
             </div>
             <!-- GIF Picker -->
             <div id="gif-picker" class="hidden mx-3 mb-2 bg-white border border-gray-200 rounded-xl p-2 max-h-52 overflow-y-auto shadow-lg">
-              <input id="gif-search" type="text" placeholder="Buscar GIF..." class="w-full bg-gray-100 rounded-lg px-3 py-2 text-xs mb-2 outline-none" oninput="searchGifs(this.value)">
+              <input id="gif-search" type="text" data-i18n-placeholder="buscarGif" placeholder="Buscar GIF..." class="w-full bg-gray-100 rounded-lg px-3 py-2 text-xs mb-2 outline-none" oninput="searchGifs(this.value)">
               <div id="gif-results" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1"></div>
               <p class="text-[9px] text-gray-300 text-center mt-1">Powered by GIPHY</p>
             </div>
             <!-- Recording indicator -->
             <div id="dm-recording-indicator" class="hidden mx-3 mb-2 flex items-center gap-2 text-red-500 text-xs bg-red-50 rounded-xl px-3 py-2">
-              <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Grabando audio...
-              <button onclick="stopAudioRecordDM()" class="ml-auto bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-semibold hover:bg-red-200 transition">Detener</button>
+              <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> <span data-i18n="grabandoAudio">Grabando audio...</span>
+              <button onclick="stopAudioRecordDM()" class="ml-auto bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-semibold hover:bg-red-200 transition" data-i18n="detener">Detener</button>
             </div>
           </div>
         </div>
@@ -374,21 +374,21 @@
 
     <!-- Payment Type Selector — Glassmorphism -->
     <div id="payment-tabs" class="flex glass rounded-xl overflow-hidden">
-      <button onclick="showPayment('tip')" id="pay-tab-tip" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400">Yo Creo en Ti</button>
-      <button onclick="showPayment('metas')" id="pay-tab-metas" class="flex-1 py-3 text-xs font-semibold text-center transition pay-tab-active">Mi Meta</button>
-      <button onclick="showPayment('sub')" id="pay-tab-sub" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400">Apoyo Full</button>
-      <button onclick="showPayment('meta-support')" id="pay-tab-meta-support" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400 hidden">🎯 Desde Meta</button>
+      <button onclick="showPayment('tip')" id="pay-tab-tip" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400" data-i18n="yoCreoEnTi">Yo Creo en Ti</button>
+      <button onclick="showPayment('metas')" id="pay-tab-metas" class="flex-1 py-3 text-xs font-semibold text-center transition pay-tab-active" data-i18n="miMeta">Mi Meta</button>
+      <button onclick="showPayment('sub')" id="pay-tab-sub" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400" data-i18n="apoyoFull">Apoyo Full</button>
+      <button onclick="showPayment('meta-support')" id="pay-tab-meta-support" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400 hidden" data-i18n="desdeMeta">🎯 Desde Meta</button>
     </div>
 
     <!-- PAYMENT: Yo Creo en Ti -->
     <div id="pay-tip" class="pay-panel hidden glass p-6 rounded-2xl shadow-xl space-y-4">
       <div id="mec-tip-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
       <div class="text-center">
-        <h3 id="mec-tip-heading" class="text-lg font-bold text-gray-900">Yo Creo en Ti</h3>
-        <p id="mec-tip-subtext" class="text-xs text-gray-500 mt-1">Envía un apoyo único al creador</p>
+        <h3 id="mec-tip-heading" class="text-lg font-bold text-gray-900" data-i18n="yoCreoEnTi">Yo Creo en Ti</h3>
+        <p id="mec-tip-subtext" class="text-xs text-gray-500 mt-1" data-i18n="enviaApoyoUnico">Envía un apoyo único al creador</p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad (USD)</label>
+        <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="cantidadUsd">Cantidad (USD)</label>
         <div class="relative">
           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</span>
           <input type="number" id="tip-amount" min="1" value="5.00" step="0.50" class="w-full pl-8 pr-4 py-3 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-lg font-bold outline-none focus:ring-2 focus:ring-creo-purple">
@@ -402,7 +402,7 @@
       </div>
       <button onclick="processTip()" id="tip-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
         <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-        <span>Apoyar Creador</span>
+        <span data-i18n="apoyarCreador">Apoyar Creador</span>
       </button>
     </div>
 
@@ -412,14 +412,14 @@
         <div id="pay-metas-list" class="space-y-4"></div>
         <div id="pay-metas-empty-visitor" class="hidden glass p-6 rounded-2xl shadow-xl text-center space-y-2">
           <svg class="w-12 h-12 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          <p class="text-sm font-semibold text-gray-500">No hay metas publicadas aún</p>
+          <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasPublicadas">No hay metas publicadas aún</p>
           <p id="pay-metas-encourage" class="text-xs text-gray-400"></p>
         </div>
         <div id="pay-metas-empty-owner" class="hidden glass p-6 rounded-2xl shadow-xl text-center space-y-3">
           <svg class="w-12 h-12 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          <p class="text-sm font-semibold text-gray-500">Aún no has publicado ninguna meta</p>
-          <p class="text-xs text-gray-400">Comparte tu meta con la comunidad de CREO y recibe apoyo</p>
-          <a href="index.html?panel=1" onclick="localStorage.setItem('creo-open-tab','metas')" class="inline-block mt-2 px-6 py-2.5 bg-creo-purple hover:bg-creo-light text-white text-sm font-bold rounded-xl transition">Crear mi primera Meta</a>
+          <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasOwner">Aún no has publicado ninguna meta</p>
+          <p class="text-xs text-gray-400" data-i18n="noMetasOwnerSub">Comparte tu meta con la comunidad de CREO y recibe apoyo</p>
+          <a href="index.html?panel=1" onclick="localStorage.setItem('creo-open-tab','metas')" class="inline-block mt-2 px-6 py-2.5 bg-creo-purple hover:bg-creo-light text-white text-sm font-bold rounded-xl transition" data-i18n="crearPrimeraMeta">Crear mi primera Meta</a>
         </div>
       </div>
     </div>
@@ -428,15 +428,15 @@
     <div id="pay-meta-support" class="pay-panel hidden">
       <div class="glass p-6 rounded-2xl shadow-xl space-y-4">
         <div class="text-center">
-          <h3 class="text-lg font-bold text-gray-900">🎯 Apoyar desde mi Meta</h3>
-          <p class="text-xs text-gray-500 mt-1">Comparte fondos de tu meta activa con este creador</p>
+          <h3 class="text-lg font-bold text-gray-900" data-i18n="apoyarDesdeMeta">🎯 Apoyar desde mi Meta</h3>
+          <p class="text-xs text-gray-500 mt-1" data-i18n="apoyarDesdeMetaSub">Comparte fondos de tu meta activa con este creador</p>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Selecciona tu Meta</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="seleccionaTuMeta">Selecciona tu Meta</label>
           <select id="meta-support-select" class="w-full border border-gray-200 bg-white/50 p-3 rounded-xl text-gray-900 text-sm outline-none focus:ring-2 focus:ring-creo-purple"></select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad a enviar (USD)</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="cantidadEnviar">Cantidad a enviar (USD)</label>
           <div class="relative">
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</span>
             <input type="number" id="meta-support-amount" min="1" value="5" step="1" class="w-full pl-8 pr-4 py-3 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-lg font-bold outline-none focus:ring-2 focus:ring-creo-purple">
@@ -444,9 +444,9 @@
         </div>
         <button onclick="processMetaSupport()" id="meta-support-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
           <span>🎯</span>
-          <span>Enviar desde mi Meta</span>
+          <span data-i18n="enviarDesdeMeta">Enviar desde mi Meta</span>
         </button>
-        <p class="text-xs text-gray-400 text-center">Los fondos se transfieren directamente de tu meta al creador</p>
+        <p class="text-xs text-gray-400 text-center" data-i18n="fondosTransferencia">Los fondos se transfieren directamente de tu meta al creador</p>
       </div>
     </div>
 
@@ -455,26 +455,26 @@
       <div class="glass p-6 rounded-2xl shadow-xl space-y-4">
         <div id="mec-sub-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
         <div class="text-center">
-          <h3 id="mec-sub-heading" class="text-lg font-bold text-gray-900">Apoyo Full</h3>
-          <p id="mec-sub-subtext" class="text-xs text-gray-500 mt-1">Apoya mensualmente con una cantidad que tú elijas</p>
+          <h3 id="mec-sub-heading" class="text-lg font-bold text-gray-900" data-i18n="apoyoFullHeading">Apoyo Full</h3>
+          <p id="mec-sub-subtext" class="text-xs text-gray-500 mt-1" data-i18n="apoyoFullSub">Apoya mensualmente con una cantidad que tú elijas</p>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad Mensual (USD)</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="cantidadMensual">Cantidad Mensual (USD)</label>
           <div class="relative">
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</span>
             <input type="number" id="sub-amount" min="3" value="10.00" step="1" class="w-full pl-8 pr-4 py-3 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-lg font-bold outline-none focus:ring-2 focus:ring-creo-purple">
           </div>
           <div class="flex gap-2 mt-3">
-            <button onclick="document.getElementById('sub-amount').value='5'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$5/mes</button>
-            <button onclick="document.getElementById('sub-amount').value='10'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$10/mes</button>
-            <button onclick="document.getElementById('sub-amount').value='25'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$25/mes</button>
+            <button onclick="document.getElementById('sub-amount').value='5'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$5/<span data-i18n="porMes">mes</span></button>
+            <button onclick="document.getElementById('sub-amount').value='10'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$10/<span data-i18n="porMes">mes</span></button>
+            <button onclick="document.getElementById('sub-amount').value='25'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$25/<span data-i18n="porMes">mes</span></button>
           </div>
         </div>
         <button onclick="processSubscription()" id="sub-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
           <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-          <span>Suscribirme Mensualmente</span>
+          <span data-i18n="suscribirme">Suscribirme Mensualmente</span>
         </button>
-        <p class="text-xs text-gray-400 text-center">Puedes cancelar en cualquier momento</p>
+        <p class="text-xs text-gray-400 text-center" data-i18n="cancelarEnCualquier">Puedes cancelar en cualquier momento</p>
       </div>
     </div>
   </div>
@@ -482,8 +482,8 @@
   <!-- "Yo Creo en Ti" loading overlay -->
   <div id="creo-loading" class="fixed inset-0 z-[200] flex flex-col items-center justify-center hidden" style="background:rgba(26,10,62,0.85);backdrop-filter:blur(20px);">
     <img src="assets/logo-icon.png" class="w-20 h-20 rounded-full shadow-2xl mb-6 float-anim" alt="CREO">
-    <p class="text-white text-2xl font-bold tracking-wider">Yo Creo en Ti</p>
-    <p class="text-creo-mint text-sm mt-2">Preparando tu apoyo...</p>
+    <p class="text-white text-2xl font-bold tracking-wider" data-i18n="yoCreoEnTiLoading">Yo Creo en Ti</p>
+    <p class="text-creo-mint text-sm mt-2" data-i18n="preparandoApoyo">Preparando tu apoyo...</p>
     <div class="mt-6 w-48 h-1.5 bg-white/20 rounded-full overflow-hidden">
       <div class="h-full bg-creo-mint rounded-full animate-pulse" style="width:70%"></div>
     </div>
@@ -524,8 +524,8 @@
           <div id="meta-comments-list" class="space-y-3 max-h-48 overflow-y-auto"></div>
           <!-- Comment input -->
           <div class="flex gap-2">
-            <input id="meta-comment-input" type="text" maxlength="500" placeholder="Escribe un comentario..." class="flex-1 bg-gray-100 border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-creo-mint">
-            <button onclick="submitMetaComment()" class="bg-creo-mint text-creo-purple font-bold px-4 py-2 rounded-full text-sm hover:bg-creo-mintDark transition">Enviar</button>
+            <input id="meta-comment-input" type="text" maxlength="500" data-i18n-placeholder="escribirComentario" placeholder="Escribe un comentario..." class="flex-1 bg-gray-100 border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-creo-mint">
+            <button onclick="submitMetaComment()" class="bg-creo-mint text-creo-purple font-bold px-4 py-2 rounded-full text-sm hover:bg-creo-mintDark transition" data-i18n="enviar">Enviar</button>
           </div>
         </div>
       </div>
@@ -541,15 +541,15 @@
           <div class="w-14 h-14 rounded-full bg-creo-mint/20 flex items-center justify-center mx-auto mb-3">
             <img src="assets/logo-icon.png" class="w-8 h-8 rounded-full" alt="">
           </div>
-          <h3 class="text-lg font-bold text-gray-900">Creamos</h3>
-          <p class="text-xs text-gray-500 mt-1">Invita a otro creador a unirse a esta meta</p>
+          <h3 class="text-lg font-bold text-gray-900" data-i18n="creamos">Creamos</h3>
+          <p class="text-xs text-gray-500 mt-1" data-i18n="creamosSubtext">Invita a otro creador a unirse a esta meta</p>
         </div>
-        <input id="creamos-username" type="text" placeholder="Username del creador (ej: mi_amigo)" class="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-creo-mint">
+        <input id="creamos-username" type="text" data-i18n-placeholder="creamosPlaceholder" placeholder="Username del creador (ej: mi_amigo)" class="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-creo-mint">
         <button onclick="sendCreamosInvite()" id="creamos-send-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-          <span>Enviar Invitación</span>
+          <span data-i18n="enviarInvitacion">Enviar Invitación</span>
         </button>
-        <button onclick="closeCreamos()" class="w-full text-gray-400 text-sm hover:text-gray-600 transition py-2">Cancelar</button>
+        <button onclick="closeCreamos()" class="w-full text-gray-400 text-sm hover:text-gray-600 transition py-2" data-i18n="cancelar">Cancelar</button>
       </div>
     </div>
   </div>
@@ -561,11 +561,11 @@
 
   <!-- Completed Metas History -->
   <footer class="max-w-2xl mx-auto px-4 pb-24 text-center text-xs text-gray-400 leading-relaxed space-y-2">
-    <p><span class="font-semibold text-creo-purple tracking-wider">CREO</span> — Los pagos son voluntarios, no reembolsables y no deducibles de impuestos. Los creadores son responsables de sus propios impuestos.</p>
+    <p><span class="font-semibold text-creo-purple tracking-wider">CREO</span> — <span data-i18n="footerDisclaimer">Los pagos son voluntarios, no reembolsables y no deducibles de impuestos. Los creadores son responsables de sus propios impuestos.</span></p>
     <p class="space-x-3">
-      <a href="terminos.html" class="hover:text-creo-purple underline">Términos</a>
-      <a href="privacidad.html" class="hover:text-creo-purple underline">Privacidad</a>
-      <a href="mailto:osvaldo@fullnessmindset.com" class="hover:text-creo-purple underline">Contacto</a>
+      <a href="terminos.html" class="hover:text-creo-purple underline" data-i18n="terminos">Términos</a>
+      <a href="privacidad.html" class="hover:text-creo-purple underline" data-i18n="privacidad">Privacidad</a>
+      <a href="mailto:osvaldo@fullnessmindset.com" class="hover:text-creo-purple underline" data-i18n="contacto">Contacto</a>
     </p>
     <p class="text-[10px]">© 2026 Fullness Mindset LLC — Florida, US</p>
   </footer>
@@ -598,19 +598,19 @@
             return;
           }
         }
-        document.getElementById('profile-name').innerText = "No se seleccionó perfil";
+        document.getElementById('profile-name').innerText = t('noPerfilSeleccionado');
         return;
       }
       const { data, error } = await sb.from('profiles').select('*').eq('username', username).single();
       if (error || !data) {
-        document.getElementById('profile-name').innerText = "Perfil No Encontrado";
-        document.getElementById('profile-bio').innerText = "Este creador no existe o no ha configurado su página.";
+        document.getElementById('profile-name').innerText = t('perfilNoEncontrado');
+        document.getElementById('profile-bio').innerText = t('perfilNoEncontradoDesc');
         return;
       }
       creatorProfile = data;
       document.getElementById('profile-name').innerText = data.display_name || data.username;
       document.getElementById('profile-username').innerText = '@' + data.username;
-      document.getElementById('profile-bio').innerText = data.bio || 'Bienvenido a mi página de apoyo.';
+      document.getElementById('profile-bio').innerText = data.bio || t('bienvenidoPagina');
 
       if (data.avatar_url) {
         document.getElementById('avatar-img').src = data.avatar_url;
@@ -638,8 +638,7 @@
         document.body.prepend(bgContainer);
       }
 
-      // Verified badge: creators with Stripe Connect OR admin (identity verification bypassed for now — see supabase/STRIPE_IDENTITY_VERIFICATION.md)
-      if (data.stripe_connect_id || isAdmin(data.email || '')) {
+      if ((data.stripe_onboarded && data.identity_verified) || isAdmin(data.email || '')) {
         document.getElementById('verified-badge').classList.remove('hidden');
         document.getElementById('avatar-container').classList.add('verified-ring');
       }
@@ -656,10 +655,8 @@
       });
       if (hasSocials) document.getElementById('social-links').classList.remove('hidden');
 
-      // Platform creator (owner) doesn't need Connect — payments go to main Stripe
-      // Other creators need stripe_connect_id for payouts
       const isPlatformOwner = data.id === '67133679-4e5f-49aa-8a22-43af41b917ee';
-      if (!data.stripe_connect_id && !isPlatformOwner) {
+      if (!data.stripe_onboarded && !isPlatformOwner) {
         disablePayments();
       }
 
@@ -758,7 +755,7 @@
 
       const today = new Date().toISOString().split('T')[0];
       const isPlatformOwner = creatorProfile?.id === '67133679-4e5f-49aa-8a22-43af41b917ee';
-      const canPay = !!creatorProfile?.stripe_connect_id || isPlatformOwner;
+      const canPay = !!creatorProfile?.stripe_onboarded || isPlatformOwner;
 
       container.innerHTML = data.map(m => {
         const pct = m.goal_amount_cents > 0 ? Math.min(100, Math.round(m.raised_cents / m.goal_amount_cents * 100)) : 0;
@@ -3065,6 +3062,7 @@
         applyBranding(creatorProfile.profile_colors);
         setupAdminImpersonation();
       }
+      translatePage();
       renderBottomNav('profile');
       updateNavAuth();
       loadNotificationBell();

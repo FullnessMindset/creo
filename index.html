@@ -40,26 +40,26 @@
     <div class="text-center space-y-2">
       <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto"><img src="assets/logo-icon.png" alt="CREO" class="w-12 h-12 rounded-full object-contain"></div>
       <h2 class="text-2xl font-bold tracking-[0.2em] text-creo-purple">CREO</h2>
-      <p class="text-xs text-gray-500">Panel de Creador</p>
+      <p class="text-xs text-gray-500" data-i18n="panelCreador">Panel de Creador</p>
     </div>
 
     <!-- AUTH SECTION (Google-only) -->
     <div id="auth-section" class="glass p-6 rounded-xl shadow-xl space-y-4 transition-colors">
-      <h3 class="text-lg font-bold text-center text-gray-900">Inicia sesión para gestionar tu panel</h3>
-      <p class="text-sm text-gray-500 text-center">Usa tu cuenta de Google para acceder de forma segura</p>
+      <h3 class="text-lg font-bold text-center text-gray-900" data-i18n="authHeading">Inicia sesión para gestionar tu panel</h3>
+      <p class="text-sm text-gray-500 text-center" data-i18n="authSubtext">Usa tu cuenta de Google para acceder de forma segura</p>
       <button onclick="signInWithGoogle()" class="w-full flex items-center justify-center space-x-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-3 rounded-lg font-semibold transition shadow-sm">
         <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-        <span>Continuar con Google</span>
+        <span data-i18n="continuarConGoogle">Continuar con Google</span>
       </button>
       <div class="bg-green-50 border border-green-200 rounded-lg p-3 flex gap-2 items-start">
         <span class="text-lg">🛡️</span>
-        <p class="text-xs text-green-700">CREO usa exclusivamente Google para inicio de sesión. Tu cuenta está protegida por la autenticación de Google.</p>
+        <p class="text-xs text-green-700" data-i18n="authSecurityNote">CREO usa exclusivamente Google para inicio de sesión. Tu cuenta está protegida por la autenticación de Google.</p>
       </div>
       <div class="text-center pt-2 border-t border-gray-200">
-        <p class="text-xs text-gray-500 mb-2">¿Eres una empresa o marca?</p>
+        <p class="text-xs text-gray-500 mb-2" data-i18n="eresEmpresa">¿Eres una empresa o marca?</p>
         <a href="registro-empresa.html" class="inline-flex items-center gap-2 bg-creo-purple/10 hover:bg-creo-purple/20 text-creo-purple px-4 py-2.5 rounded-lg font-semibold text-sm transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-          Registrar como Empresa
+          <span data-i18n="registrarEmpresa">Registrar como Empresa</span>
         </a>
       </div>
     </div>
@@ -73,68 +73,68 @@
     <div id="dashboard-section" class="hidden space-y-6">
       <div class="glass p-4 rounded-xl shadow-xl flex items-center justify-between">
         <p id="user-welcome" class="font-medium text-gray-900 text-sm"></p>
-        <button onclick="signOut()" class="text-xs text-gray-400 hover:text-red-500 transition">Salir</button>
+        <button onclick="signOut()" class="text-xs text-gray-400 hover:text-red-500 transition" data-i18n="salir">Salir</button>
       </div>
 
       <!-- STATS -->
       <div id="creator-stats" class="hidden grid grid-cols-4 gap-2">
         <div class="glass rounded-xl p-3 text-center">
           <p id="stat-posts" class="text-lg font-black text-creo-purple">0</p>
-          <p class="text-[10px] text-gray-400">Posts</p>
+          <p class="text-[10px] text-gray-400" data-i18n="posts">Posts</p>
         </div>
         <div class="glass rounded-xl p-3 text-center">
           <p id="stat-likes" class="text-lg font-black text-creo-purple">0</p>
-          <p class="text-[10px] text-gray-400">Likes</p>
+          <p class="text-[10px] text-gray-400" data-i18n="likes">Likes</p>
         </div>
         <div class="glass rounded-xl p-3 text-center">
           <p id="stat-metas" class="text-lg font-black text-creo-purple">0</p>
-          <p class="text-[10px] text-gray-400">Metas</p>
+          <p class="text-[10px] text-gray-400" data-i18n="metas">Metas</p>
         </div>
         <div class="glass rounded-xl p-3 text-center">
           <p id="stat-comments" class="text-lg font-black text-creo-purple">0</p>
-          <p class="text-[10px] text-gray-400">Comments</p>
+          <p class="text-[10px] text-gray-400" data-i18n="comments">Comments</p>
         </div>
       </div>
 
       <!-- TABS — main row (matches public profile section order) -->
       <div class="flex glass rounded-xl overflow-x-auto text-[11px] no-scrollbar md:flex-wrap">
-        <button onclick="showTab('profile')" id="tab-profile" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition tab-active">👤 Perfil</button>
-        <button onclick="showTab('story')" id="tab-story" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">📖 Historia</button>
-        <button onclick="showTab('posts')" id="tab-posts" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">📸 Posts</button>
+        <button onclick="showTab('profile')" id="tab-profile" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition tab-active">👤 <span data-i18n="tabPerfil">Perfil</span></button>
+        <button onclick="showTab('story')" id="tab-story" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">📖 <span data-i18n="tabHistoria">Historia</span></button>
+        <button onclick="showTab('posts')" id="tab-posts" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">📸 <span data-i18n="tabPosts">Posts</span></button>
         <button onclick="toggleMetasDropdown()" id="tab-metas-group" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1">
-          🎯 Metas <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          🎯 <span data-i18n="tabMetas">Metas</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
-        <button onclick="showTab('business')" id="tab-business" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">💼 Creaciones</button>
-        <button onclick="showTab('creoellos')" id="tab-creoellos" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1"><img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="CREO"> Creo en Ellos</button>
+        <button onclick="showTab('business')" id="tab-business" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">💼 <span data-i18n="tabCreaciones">Creaciones</span></button>
+        <button onclick="showTab('creoellos')" id="tab-creoellos" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1"><img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="CREO"> <span data-i18n="tabCreoEnEllos">Creo en Ellos</span></button>
 
         <button onclick="toggleHerramientas()" id="tab-herramientas" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1">
-          🛠️ Herramientas <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          🛠️ <span data-i18n="tabHerramientas">Herramientas</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
       </div>
       <!-- Metas dropdown -->
       <div id="metas-dropdown" class="hidden bg-white rounded-xl shadow-xl border border-gray-200 z-50 py-1 text-[12px]">
-        <button onclick="showTab('metas');closeMetasDropdown()" id="tab-metas" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎯 Mis Metas</button>
+        <button onclick="showTab('metas');closeMetasDropdown()" id="tab-metas" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎯 <span data-i18n="tabMisMetas">Mis Metas</span></button>
         <div class="border-t border-gray-100 my-1"></div>
-        <p class="px-4 py-1 text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Mecenas</p>
-        <button onclick="showTab('mecenas-tip');closeMetasDropdown()" id="tab-mecenas-tip" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💚 Yo Creo en Ti</button>
-        <button onclick="showTab('mecenas-sub');closeMetasDropdown()" id="tab-mecenas-sub" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">⭐ Apoyo Full</button>
+        <p class="px-4 py-1 text-[10px] text-gray-400 font-semibold uppercase tracking-wider" data-i18n="tabMecenas">Mecenas</p>
+        <button onclick="showTab('mecenas-tip');closeMetasDropdown()" id="tab-mecenas-tip" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💚 <span data-i18n="tabYoCreoEnTi">Yo Creo en Ti</span></button>
+        <button onclick="showTab('mecenas-sub');closeMetasDropdown()" id="tab-mecenas-sub" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">⭐ <span data-i18n="tabApoyoFull">Apoyo Full</span></button>
       </div>
       <!-- Herramientas dropdown — outside the overflow container -->
       <div id="herramientas-menu" class="hidden bg-white rounded-xl shadow-xl border border-gray-200 z-50 py-1 text-[12px]">
-        <button onclick="showTab('verify');closeHerramientas()" id="tab-verify" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">✅ Verificación</button>
-        <button onclick="showTab('stripe');closeHerramientas()" id="tab-stripe" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💳 Stripe</button>
-        <button onclick="showTab('branding');closeHerramientas()" id="tab-branding" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎨 Mi Branding</button>
-        <button onclick="showTab('sounds');closeHerramientas()" id="tab-sounds" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🔔 Sonidos</button>
+        <button onclick="showTab('verify');closeHerramientas()" id="tab-verify" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">✅ <span data-i18n="tabVerificacion">Verificación</span></button>
+        <button onclick="showTab('stripe');closeHerramientas()" id="tab-stripe" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💳 <span data-i18n="tabStripe">Stripe</span></button>
+        <button onclick="showTab('branding');closeHerramientas()" id="tab-branding" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎨 <span data-i18n="tabBranding">Mi Branding</span></button>
+        <button onclick="showTab('sounds');closeHerramientas()" id="tab-sounds" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🔔 <span data-i18n="tabSonidos">Sonidos</span></button>
       </div>
 
       <!-- TAB: Profile -->
       <div id="panel-profile" class="tab-panel space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
-          <h3 class="font-bold text-gray-900">Información del Perfil</h3>
+          <h3 class="font-bold text-gray-900" data-i18n="infoPerfilHeading">Información del Perfil</h3>
 
           <!-- Avatar Upload -->
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-2">Foto de Perfil</label>
+            <label class="block text-xs font-medium text-gray-500 mb-2" data-i18n="fotoPerfilLabel">Foto de Perfil</label>
             <div class="flex items-center gap-4">
               <div id="avatar-preview" class="w-20 h-20 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden border-2 border-gray-200">
                 <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
@@ -148,61 +148,61 @@
 
           <!-- Cover Upload -->
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-2">Imagen de Portada</label>
+            <label class="block text-xs font-medium text-gray-500 mb-2" data-i18n="imagenPortada">Imagen de Portada</label>
             <div id="cover-preview" class="w-full h-24 rounded-lg bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
-              <span class="text-xs text-gray-400">Sin portada</span>
+              <span class="text-xs text-gray-400" data-i18n="sinPortada">Sin portada</span>
             </div>
             <input type="file" id="cover-file" accept="image/*" onchange="uploadFile('cover-file','covers','cover_url','cover-preview')" class="mt-2 block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
-            <p class="text-[10px] text-gray-400 mt-1">JPG, PNG. Max 5MB. Recomendado: 1200×400px</p>
+            <p class="text-[10px] text-gray-400 mt-1" data-i18n="portadaRecomendacion">JPG, PNG. Max 5MB. Recomendado: 1200×400px</p>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">Nombre <span class="text-red-500">*</span></label>
-              <input id="first_name" type="text" placeholder="Tu nombre" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+              <label class="block text-xs font-medium text-gray-500 mb-1"><span data-i18n="nombre">Nombre</span> <span class="text-red-500">*</span></label>
+              <input id="first_name" type="text" placeholder="Tu nombre" data-i18n-placeholder="tuNombre" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">Apellido <span class="text-red-500">*</span></label>
-              <input id="last_name" type="text" placeholder="Tu apellido" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+              <label class="block text-xs font-medium text-gray-500 mb-1"><span data-i18n="apellido">Apellido</span> <span class="text-red-500">*</span></label>
+              <input id="last_name" type="text" placeholder="Tu apellido" data-i18n-placeholder="tuApellido" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">Nombre de Usuario</label>
-              <input id="username" type="text" placeholder="mi_nombre" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+              <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="nombreUsuario">Nombre de Usuario</label>
+              <input id="username" type="text" placeholder="mi_nombre" data-i18n-placeholder="nombreUsuarioPlaceholder" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">Nombre para Mostrar</label>
-              <input id="display_name" type="text" placeholder="Se genera automáticamente" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-400 outline-none text-sm" readonly>
+              <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="nombreMostrar">Nombre para Mostrar</label>
+              <input id="display_name" type="text" placeholder="Se genera automáticamente" data-i18n-placeholder="nombreMostrarPlaceholder" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-400 outline-none text-sm" readonly>
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Bio</label>
-            <textarea id="bio" placeholder="Cuéntale al mundo quién eres..." rows="2" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+            <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="bio">Bio</label>
+            <textarea id="bio" placeholder="Cuéntale al mundo quién eres..." data-i18n-placeholder="bioPlaceholder" rows="2" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
           </div>
 
-          <h4 class="font-semibold text-sm text-gray-700 pt-2">Información de Contacto</h4>
-          <p class="text-[10px] text-gray-400 -mt-3">Visible en tu perfil público (opcional)</p>
+          <h4 class="font-semibold text-sm text-gray-700 pt-2" data-i18n="infoContacto">Información de Contacto</h4>
+          <p class="text-[10px] text-gray-400 -mt-3" data-i18n="infoContactoSub">Visible en tu perfil público (opcional)</p>
           <div class="space-y-3">
-            <input id="contact-email" type="email" placeholder="Email de contacto" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <input id="contact-email" type="email" placeholder="Email de contacto" data-i18n-placeholder="emailContacto" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             <div class="flex gap-2">
-              <input id="contact-phone" type="tel" placeholder="Teléfono o WhatsApp" class="flex-1 border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              <input id="contact-phone" type="tel" placeholder="Teléfono o WhatsApp" data-i18n-placeholder="telefonoWhatsapp" class="flex-1 border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
               <select id="contact-type" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
-                <option value="phone">📞 Teléfono</option>
-                <option value="whatsapp">💬 WhatsApp</option>
+                <option value="phone" data-i18n="telefono">📞 Teléfono</option>
+                <option value="whatsapp" data-i18n="whatsapp">💬 WhatsApp</option>
               </select>
             </div>
-            <input id="contact-website" type="url" placeholder="Sitio web (https://...)" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+            <input id="contact-website" type="url" placeholder="Sitio web (https://...)" data-i18n-placeholder="sitioWeb" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             <div class="grid grid-cols-2 gap-2">
-              <input id="contact-city" type="text" placeholder="Ciudad" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
-              <input id="contact-country" type="text" placeholder="País" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              <input id="contact-city" type="text" placeholder="Ciudad" data-i18n-placeholder="ciudad" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              <input id="contact-country" type="text" placeholder="País" data-i18n-placeholder="pais" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             </div>
           </div>
 
-          <h4 class="font-semibold text-sm text-gray-700 pt-2">Redes Sociales <span class="text-red-500">*</span></h4>
-          <p class="text-[10px] text-gray-400 -mt-3">Al menos 1 red social es requerida</p>
+          <h4 class="font-semibold text-sm text-gray-700 pt-2"><span data-i18n="redesSociales">Redes Sociales</span> <span class="text-red-500">*</span></h4>
+          <p class="text-[10px] text-gray-400 -mt-3" data-i18n="alMenos1Red">Al menos 1 red social es requerida</p>
           <div class="grid grid-cols-2 gap-3">
             <input id="social-instagram" type="url" placeholder="Instagram URL" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             <input id="social-tiktok" type="url" placeholder="TikTok URL" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
@@ -212,11 +212,11 @@
             <input id="social-linkedin" type="url" placeholder="LinkedIn URL" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
           </div>
 
-          <button onclick="saveProfile()" id="save-profile-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Guardar Perfil</button>
+          <button onclick="saveProfile()" id="save-profile-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition" data-i18n="guardarPerfil">Guardar Perfil</button>
         </div>
 
         <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
-          <p class="text-sm text-blue-800 mb-1 font-semibold">Tu Enlace Público:</p>
+          <p class="text-sm text-blue-800 mb-1 font-semibold" data-i18n="tuEnlacePublico">Tu Enlace Público:</p>
           <p id="profile-link" class="text-xs text-creo-purple break-all font-mono"></p>
         </div>
       </div>
@@ -230,33 +230,33 @@
 
         <!-- Verification Form -->
         <div id="verify-form" class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
-          <h3 class="font-bold text-gray-900">Solicitud de Verificación</h3>
-          <p class="text-xs text-gray-500 leading-relaxed">Para proteger a los Supporters y mantener la integridad de CREO, todos los creadores deben ser verificados antes de recibir pagos. Completa la información y envía tu solicitud.</p>
+          <h3 class="font-bold text-gray-900" data-i18n="verificacionHeading">Solicitud de Verificación</h3>
+          <p class="text-xs text-gray-500 leading-relaxed" data-i18n="verificacionDesc">Para proteger a los Supporters y mantener la integridad de CREO, todos los creadores deben ser verificados antes de recibir pagos. Completa la información y envía tu solicitud.</p>
 
           <div class="p-3 bg-amber-50 rounded-lg border border-amber-200">
-            <p class="text-xs text-amber-800 font-semibold mb-1">Política de Contenido</p>
+            <p class="text-xs text-amber-800 font-semibold mb-1" data-i18n="politicaContenido">Política de Contenido</p>
             <ul class="text-[10px] text-amber-700 space-y-0.5">
-              <li>• No se permite contenido sexual o para adultos</li>
-              <li>• No se permiten metas para drogas o sustancias ilegales</li>
-              <li>• No se aceptan solicitudes de donaciones — todo es apoyo voluntario</li>
-              <li>• Las metas deben ser para herramientas, equipos o necesidades legítimas del creador</li>
-              <li>• Empresas deben presentar documentos legales (LLC, licencia comercial)</li>
+              <li data-i18n="noContenidoSexual">• No se permite contenido sexual o para adultos</li>
+              <li data-i18n="noContenidoDrogas">• No se permiten metas para drogas o sustancias ilegales</li>
+              <li data-i18n="noContenidoDonaciones">• No se aceptan solicitudes de donaciones — todo es apoyo voluntario</li>
+              <li data-i18n="metasLegitimas">• Las metas deben ser para herramientas, equipos o necesidades legítimas del creador</li>
+              <li data-i18n="empresasDocumentos">• Empresas deben presentar documentos legales (LLC, licencia comercial)</li>
             </ul>
           </div>
 
-          <h4 class="font-semibold text-sm text-gray-700">Información Personal <span class="text-red-500">*</span></h4>
+          <h4 class="font-semibold text-sm text-gray-700"><span data-i18n="infoPersonal">Información Personal</span> <span class="text-red-500">*</span></h4>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-[10px] text-gray-500 mb-1">Nombre Completo</label>
-              <input id="v-fullname" type="text" placeholder="Nombre Apellido" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              <label class="block text-[10px] text-gray-500 mb-1" data-i18n="nombreCompleto">Nombre Completo</label>
+              <input id="v-fullname" type="text" placeholder="Nombre Apellido" data-i18n-placeholder="nombreApellidoPlaceholder" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             </div>
             <div>
-              <label class="block text-[10px] text-gray-500 mb-1">Teléfono</label>
+              <label class="block text-[10px] text-gray-500 mb-1" data-i18n="telefono">Teléfono</label>
               <input id="v-phone" type="tel" placeholder="+1 (555) 000-0000" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             </div>
           </div>
           <div>
-            <label class="block text-[10px] text-gray-500 mb-1">Email de Contacto</label>
+            <label class="block text-[10px] text-gray-500 mb-1" data-i18n="emailContacto">Email de Contacto</label>
             <input id="v-email" type="email" placeholder="tu@email.com" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
           </div>
 
@@ -1388,10 +1388,13 @@
 
           if (user.email === ADMIN_EMAIL) {
             document.getElementById('stripe-connect-regular').innerHTML = '<div class="bg-green-50 p-6 rounded-xl border border-green-200 space-y-2"><h3 class="font-bold text-green-800 flex items-center gap-2">✅ Cuenta de Plataforma</h3><p class="text-sm text-green-700">Esta es la cuenta principal de CREO. Las comisiones del 5% se depositan directamente aquí.</p></div>';
-          } else if (data.stripe_connect_id) {
+          } else if (data.stripe_onboarded) {
             document.getElementById('stripe-btn').innerText = "Stripe Conectado ✓";
             document.getElementById('stripe-btn').disabled = true;
             document.getElementById('stripe-btn').className = "w-full bg-green-600 text-white py-3 rounded-xl font-bold cursor-default";
+          } else if (data.stripe_connect_id) {
+            document.getElementById('stripe-btn').innerText = "Completar configuración de Stripe";
+            document.getElementById('stripe-btn').className = "w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 rounded-xl font-bold transition";
           }
 
           updateVerificationUI(data);
@@ -2875,7 +2878,7 @@
     if (_urlParams.get('verification') === 'complete') {
       window.addEventListener('load', async () => {
         showTab('verify');
-        showToast('Verificación completada. Confirmando resultado...', 'info');
+        showToast('Confirmando resultado de verificación...', 'info');
         let verified = false;
         for (let i = 0; i < 10; i++) {
           const { data: { user } } = await sb.auth.getUser();
@@ -2888,12 +2891,32 @@
           showToast('¡Identidad verificada exitosamente!', 'success');
           checkUser();
         } else {
-          showToast('Verificación en proceso. Tu estado se actualizará en unos minutos.', 'info');
+          showToast('La verificación no se completó. Si no terminaste el proceso, inténtalo de nuevo.', 'warning');
         }
       });
     }
     if (_urlParams.get('stripe') === 'success') {
-      window.addEventListener('load', () => { showToast('¡Stripe conectado exitosamente! Ya puedes recibir pagos.', 'success'); });
+      window.addEventListener('load', async () => {
+        showTab('stripe');
+        showToast('Verificando estado de Stripe...', 'info');
+        try {
+          const { data: { session } } = await sb.auth.getSession();
+          if (!session) return;
+          const res = await fetch(SUPABASE_URL + '/functions/v1/check-stripe-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token }
+          });
+          const result = await res.json();
+          if (result.status === 'complete') {
+            showToast('¡Stripe conectado exitosamente! Ya puedes recibir pagos.', 'success');
+            checkUser();
+          } else {
+            showToast('La configuración de Stripe no se completó. Por favor, intenta de nuevo para terminar el proceso.', 'warning');
+          }
+        } catch (e) {
+          showToast('No se pudo verificar el estado de Stripe. Recarga la página.', 'error');
+        }
+      });
     }
     if (_urlParams.get('stripe') === 'refresh') {
       window.addEventListener('load', () => { showToast('Configuración de Stripe incompleta. Intenta de nuevo.', 'error'); });
@@ -3169,6 +3192,7 @@
       checkUser().then(() => { showOnboarding(); });
       renderBottomNav('dashboard');
       loadNotificationBell();
+      translatePage();
     };
 
   </script>

@@ -29,42 +29,1335 @@ function isPlatformCreator(email) { return email === ADMIN_EMAIL; }
 // ========== INTERNATIONALIZATION (i18n) ==========
 const CREO_TRANSLATIONS = {
   es: {
+    // Nav & sidebar
     comunidad: 'Comunidad', explorar: 'Explorar', mensajes: 'Mensajes', perfil: 'Perfil',
     brandDeals: 'Brand Deals', panel: 'Panel', admin: 'Admin', tema: 'Tema', salir: 'Salir',
     entrarGoogle: 'Entrar con Google', idioma: 'Idioma',
+    entrarCreoId: 'Iniciar sesión con CREO ID',
+
+    // Auth
+    sesionCerrada: 'Sesión cerrada', errorGoogle: 'Error al conectar con Google',
+    ingresaEmail: 'Ingresa tu email', emailPlaceholder: 'tu@email.com',
+    continuar: 'Continuar', cancelar: 'Cancelar',
+    linkEnviado: 'Link de acceso enviado a tu email',
+    iniciaSesion: 'Inicia sesión', iniciaSesionPrimero: 'Inicia sesión primero',
+    authHeading: 'Inicia sesión para gestionar tu panel',
+    authSubtext: 'Usa tu cuenta de Google para acceder de forma segura',
+    continuarConGoogle: 'Continuar con Google',
+    authSecurityNote: 'CREO usa exclusivamente Google para inicio de sesión. Tu cuenta está protegida por la autenticación de Google.',
+    eresEmpresa: '¿Eres una empresa o marca?',
+    registrarEmpresa: 'Registrar como Empresa',
+    aceptaTerminos: 'Acepta los términos para continuar',
+    debesAceptarTerminos: 'Debes aceptar los Términos y Política de Privacidad',
+    debesAceptarConducta: 'Debes aceptar las normas de conducta',
+    cuentaCreada: 'Cuenta creada. Revisa tu email para confirmar.',
+    ingresaEmailPassword: 'Ingresa email y contraseña',
+
+    // Verification bar
     connectStripe: 'Conecta tu cuenta de Stripe para recibir pagos',
     completaCreoId: 'Completa tu verificación CREO ID',
     conectando: 'Conectando...', iniciandoVerif: 'Iniciando verificación...',
     stripeYaConectado: 'Tu cuenta de Stripe ya está conectada.',
     errorStripe: 'Error al conectar con Stripe.', errorVerif: 'Error al iniciar verificación.',
     errorSubiendo: 'Error subiendo archivo',
-    reporteEnviado: 'Reporte enviado. Gracias por ayudar a la comunidad.',
+
+    // Notifications
     notifVerifIniciada: 'Verificación Iniciada', notifVerifEnviada: 'Verificación Enviada',
     notifVerificada: '¡Identidad Verificada!', notifVerifRechazada: 'Verificación Rechazada',
     y: 'y', noNotifs: 'No hay notificaciones', marcarLeidas: 'Leer todas',
-    entrarCreoId: 'Iniciar sesión con CREO ID', sesionCerrada: 'Sesión cerrada',
-    errorGoogle: 'Error al conectar con Google', ingresaEmail: 'Ingresa tu email',
-    emailPlaceholder: 'tu@email.com', continuar: 'Continuar', cancelar: 'Cancelar',
-    linkEnviado: 'Link de acceso enviado a tu email',
+    notificaciones: 'Notificaciones', marcarLeidasFull: 'Marcar leídas',
+    sinNotificaciones: 'Sin notificaciones',
+    notifsMarcadasLeidas: 'Notificaciones marcadas como leídas',
+
+    // Reports
+    reporteEnviado: 'Reporte enviado. Gracias por ayudar a la comunidad.',
+    reportarCreador: 'Reportar Creador',
+    reportarSubtext: 'Ayúdanos a mantener la comunidad segura. Tu reporte es confidencial.',
+    seleccionaMotivo: 'Selecciona un motivo',
+    motivoSexual: 'Contenido con insinuación sexual',
+    motivoDrogas: 'Uso o promoción de drogas',
+    motivoViolencia: 'Incitación a la violencia',
+    motivoLenguaje: 'Palabras soeces / lenguaje ofensivo',
+    motivoDiscriminacion: 'Discriminación',
+    motivoSpam: 'Spam o estafa',
+    motivoOtro: 'Otro',
+    detallesPlaceholder: 'Describe el problema (opcional)',
+    enviarReporte: 'Enviar Reporte',
+
+    // Cookie consent
+    cookiesTitle: 'Cookies y Privacidad',
+    cookiesText: 'CREO utiliza cookies esenciales para autenticación y almacenamiento local para tus preferencias. No usamos cookies de seguimiento ni publicidad.',
+    aceptar: 'Aceptar', masInfo: 'Más info',
+
+    // CREO ID modal
+    verificaCreoId: 'Verifica tu Creo ID',
+    creoIdSubtext: 'Para publicar deals y recibir pagos necesitas verificar tu identidad',
+    personasReales: 'Personas reales',
+    personasRealesDesc: 'Cada usuario de CREO es una persona real verificada. Tu seguridad es nuestra prioridad.',
+    sinMenores: 'Sin menores',
+    sinMenoresDesc: 'Los niños deben estar jugando, aprendiendo y en la escuela. Solo aceptamos mayores de 18 con identificación.',
+    tuIdSeguridad: 'Tu ID, tu seguridad',
+    tuIdSeguridadDesc: 'Verificamos tu identidad una sola vez. Tu información está protegida y nunca se comparte.',
+    verificarCreoId: 'Verificar mi Creo ID',
+    ahoraNo: 'Ahora no',
+    verificacionRapida: 'La verificación es rápida, segura y solo se hace una vez.',
+    preparando: 'Preparando...',
+    noSePudoVerif: 'No se pudo iniciar la verificación',
+    errorConexion: 'Error de conexión',
+
+    // Upload helper
+    archivoMax: 'Archivo max',
+    subiendo: 'Subiendo...',
+
+    // ===== COMUNIDAD PAGE =====
+    muro: 'Muro', cineLocal: 'Cine Local', galeria: 'Galería', biblioteca: 'Biblioteca',
+    musica: 'Música', eventos: 'Eventos', general: 'General',
+    queCompartir: '¿Qué quieres compartir con la comunidad?',
+    tituloOpcional: 'Título (opcional)',
+    normal: 'Normal', evento: 'Evento', enVivo: 'En Vivo',
+    enlaceEvento: 'Enlace (Zoom, Meet, URL)',
+    desdeNavegador: 'Desde el navegador',
+    urlStream: 'URL del stream',
+    foto: 'Foto', video: 'Video', grabarVideo: 'Grabar Video', grabarAudio: 'Grabar Audio',
+    publicar: 'Publicar', publicando: 'Publicando...',
+    escribeAlgoOMedia: 'Escribe algo o agrega media',
+    publicadoEnComunidad: '¡Publicado en Comunidad!',
+    editarPost: 'Editar Post', titulo: 'Título', contenido: 'Contenido', media: 'Media',
+    guardarCambios: 'Guardar Cambios',
+    eliminar: 'Eliminar', confirmarEliminar: '¿Eliminar?',
+    postEliminado: 'Post eliminado', postActualizado: 'Post actualizado',
+    comentar: 'Comentar', comentaPlaceholder: 'Comenta...',
+    enviar: 'Enviar', sinComentarios: 'Sin comentarios aún',
+    compartir: 'Compartir', enlaceCopiado: 'Enlace copiado',
+    editar: 'Editar',
+    ahora: 'ahora', mes: 'mes',
+    reaccion: 'Reacción',
+    iniciarSesionParaLike: 'Inicia sesión para dar like',
+    iniciarSesionParaComentar: 'Inicia sesión para comentar',
+    iniciarSesionParaSeguir: 'Inicia sesión para seguir',
+    iniciarSesionParaMensajes: 'Inicia sesión para enviar mensajes',
+    iniciarSesionParaReportar: 'Inicia sesión para reportar',
+    bienvenidoComunidad: 'Bienvenido a la Comunidad',
+    normasComunidad: 'Normas de la Comunidad',
+    grabandoVideo: 'Grabando Video', grabandoAudio: 'Grabando Audio',
+    grabando: 'Grabando...', procesando: 'Procesando...',
+    listoParaGrabar: 'Listo para grabar',
+    guardar: 'Guardar', grabacionLista: 'Grabación lista',
+    subiendoGrabacion: 'Subiendo grabación...',
+
+    // ===== MESSAGES PAGE =====
+    conversaciones: 'Conversaciones', buscarConversacion: 'Buscar conversación...',
+    nuevaConversacion: 'Nueva conversación',
+    escribeMensaje: 'Escribe un mensaje...',
+    iniciaConversacion: 'Inicia la conversación',
+    sinConversaciones: 'No tienes conversaciones aún',
+    enviando: 'Enviando...',
+    buscarGif: 'Buscar GIF...',
+    enviarGif: 'Enviar GIF',
+    enviarImagen: 'Enviar imagen',
+    grabarAudioMsg: 'Grabar audio',
+    grabarVideoMsg: 'Grabar video',
+    verPerfil: 'Ver perfil',
+    detener: 'Detener',
+    imagenMax10mb: 'Imagen máx 10MB',
+    errorMicrofono: 'No se pudo acceder al micrófono',
+    errorCamara: 'No se pudo acceder a la cámara',
+    errorSubiendoImagen: 'Error subiendo imagen: ',
+    errorSubiendoVideo: 'Error subiendo video: ',
+    errorSubiendoAudio: 'Error subiendo audio: ',
+    errorEnviandoMensaje: 'Error al enviar mensaje',
+    errorEnviandoVideo: 'Error al enviar video',
+    videoSubido: 'Video subido',
+    enviarVideo: 'Enviar',
+    seleccionaConversacion: 'Selecciona una conversación',
+    buscaCreadorParaIniciar: 'o busca un creador para iniciar',
+    noSeEncontraronCreadores: 'No se encontraron creadores',
+    escribeAlMenos2: 'Escribe al menos 2 caracteres',
+    buscarPorNombre: 'Buscar por nombre o @username...',
+    buscarCreadores: 'Buscar creadores...',
+    sinMensajes: 'Sin mensajes',
+    noTienesMensajes: 'No tienes mensajes aún',
+    buscaCreadorIniciar: 'Busca un creador para iniciar',
+    nuevoMensaje: 'Nuevo Mensaje',
+    iniciarSesionVerMensajes: 'Inicia sesión para ver tus mensajes',
+    suelteParaEnviar: 'Suelta para enviar',
+    mantenParaGrabar: 'Mantén para grabar',
+    enviaUnMensaje: 'Envía un mensaje para iniciar',
+    errorAlEnviar: 'Error al enviar',
+    errorAlEnviarAudio: 'Error al enviar audio',
+
+    // ===== BRAND DEALS PAGE =====
+    crearDeal: 'Crear Deal',
+    misDeals: 'Mis Deals', todosDeals: 'Todos los Deals',
+    tituloDeal: 'Título del Deal',
+    descripcionDeal: 'Descripción',
+    presupuesto: 'Presupuesto ($)',
+    categoria: 'Categoría',
+    requisitos: 'Requisitos',
+    terminosCondiciones: 'Términos y Condiciones',
+    fechaEntrega: 'Fecha de entrega',
+    vibeVideo: 'Vibe del video',
+    descripcionPago: 'Descripción del pago',
+    portada: 'Portada',
+    publicarDeal: 'Publicar Deal',
+    verDetalle: 'Ver Detalle',
+    aplicar: 'Aplicar',
+    chat: 'Chat',
+    tratoHecho: 'Trato Hecho',
+    pagarCreador: 'Pagar al Creador',
+    dealPublicado: 'Deal publicado',
+    errorCreandoDeal: 'Error al crear deal',
+    completaCampos: 'Completa todos los campos requeridos',
+
+    // ===== PROFILE PAGE =====
+    cargando: 'Cargando...',
+    seguidores: 'Seguidores', siguiendo: 'Siguiendo',
+    bienvenidoPagina: 'Bienvenido a mi página de apoyo.',
+    seguir: 'Seguir', siguiendoBtn: 'Siguiendo',
+    mensaje: 'Mensaje', reportar: 'Reportar',
+    noVerificadoTitulo: 'Este creador aún no ha sido verificado',
+    noVerificadoSubtext: 'Los pagos estarán disponibles una vez sea aprobado.',
+    miHistoria: 'Mi Historia',
+    yoCreoEnEllos: 'Yo Creo en Ellos',
+    metasAlcanzadas: 'Metas Alcanzadas',
+    publicaciones: 'Publicaciones',
+    misCreaciones: 'Mis Creaciones',
+    verTodo: 'Ver todo', slider: 'Slider',
+    yoCreoEnTi: 'Yo Creo en Ti',
+    miMeta: 'Mi Meta',
+    apoyoFull: 'Apoyo Full',
+    desdeMeta: 'Desde Meta',
+    enviaApoyoUnico: 'Envía un apoyo único al creador',
+    cantidadUsd: 'Cantidad (USD)',
+    apoyarCreador: 'Apoyar Creador',
+    noMetasPublicadas: 'No hay metas publicadas aún',
+    noMetasOwner: 'Aún no has publicado ninguna meta',
+    noMetasOwnerSub: 'Comparte tu meta con la comunidad de CREO y recibe apoyo',
+    crearPrimeraMeta: 'Crear mi primera Meta',
+    animaPrefix: 'Anima a @',
+    animaSuffix: ' que comparta su meta con la comunidad de CREO.',
+    contribuir: 'Contribuir',
+    apoyarDesdeMeta: 'Apoyar desde mi Meta',
+    apoyarDesdeMetaSub: 'Comparte fondos de tu meta activa con este creador',
+    seleccionaTuMeta: 'Selecciona tu Meta',
+    cantidadEnviar: 'Cantidad a enviar (USD)',
+    enviarDesdeMeta: 'Enviar desde mi Meta',
+    fondosTransferencia: 'Los fondos se transfieren directamente de tu meta al creador',
+    disponible: 'disponible',
+    apoyoFullHeading: 'Apoyo Full',
+    apoyoFullSub: 'Apoya mensualmente con una cantidad que tú elijas',
+    cantidadMensual: 'Cantidad Mensual (USD)',
+    porMes: '/mes',
+    suscribirme: 'Suscribirme Mensualmente',
+    cancelarEnCualquier: 'Puedes cancelar en cualquier momento',
+    metaCompletadaLegit: 'Meta Completada Legítimamente',
+    completadaAntes: 'Completada Antes de lo Esperado',
+    cancelada: 'Cancelada', enReview: 'En Review',
+    completada: 'Completada', expirada: 'Expirada', finalizada: 'Finalizada',
+    alcanzado: '% alcanzado', de: 'de',
+    verProductoPrecio: 'Ver producto / precio',
+    verMas: 'Ver más', verMenos: 'Ver menos',
+    colaborador: 'colaborador', colaboradores: 'colaboradores',
+    escribirComentario: 'Escribe un comentario...',
+    creamos: 'Creamos',
+    creamosSubtext: 'Invita a otro creador a unirse a esta meta',
+    creamosPlaceholder: 'Username del creador (ej: mi_amigo)',
+    enviarInvitacion: 'Enviar Invitación',
+    noPerfilSeleccionado: 'No se seleccionó perfil',
+    perfilNoEncontrado: 'Perfil No Encontrado',
+    perfilNoEncontradoDesc: 'Este creador no existe o no ha configurado su página.',
+    pagosNoDisponibles: 'Pagos no disponibles',
+    montoMinimo1: 'Monto mínimo: $1.00',
+    montoMinimoMensual3: 'Monto mínimo mensual: $3.00',
+    seleccionaUnaMeta: 'Selecciona una meta',
+    montoMinimo1d: 'Monto mínimo: $1',
+    ingresaUsername: 'Ingresa un username',
+    errorInvitando: 'Error al invitar',
+    errorEnviandoReporte: 'Error al enviar reporte',
+    seguimientoNoDisponible: 'Seguimiento no disponible aún',
+    funcionSeguimientoNo: 'Función de seguimiento no disponible aún',
+    invitacionEnviada: 'Invitación enviada a @',
+    graciasApoyo: '¡Gracias por tu apoyo!',
+    graciasMeta: '¡Gracias por contribuir a la meta!',
+    suscripcionActivada: '¡Suscripción activada! Gracias por tu apoyo mensual.',
+    publicadoAmbosPerfil: '¡Publicado en tu perfil y Comunidad!',
+    publicadoSoloPerfil: '¡Publicado solo en tu perfil!',
+    archivosSubidos: ' archivo(s) subido(s)',
+    creadorVerificado: 'Creador Verificado',
+
+    // Profile — Edit Story Modal
+    editarHistoria: 'Editar Historia',
+    tituloLabel: 'Titulo',
+    resumenYoCreo: 'Resumen para "Yo Creo en Ti"',
+    resumenHint: 'Este texto aparece cuando alguien te destaca en su sección "Yo Creo en Ellos". Escribe algo breve que inspire a otros a apoyarte.',
+    resumenPlaceholder: 'Ej: Soy músico independiente creando mi primer álbum...',
+    tuHistoriaCompleta: 'Tu Historia Completa',
+    historiaCompletaHint: 'El contenido completo de tu historia. Aquí cuentas tu camino, tu visión y por qué haces lo que haces.',
+    historiaCompletaPlaceholder: 'Cuéntale al mundo tu historia...',
+    videoPrincipal: 'Video Principal',
+    sinVideoPrincipal: 'Sin video principal',
+    videoUrlPlaceholder: 'URL de YouTube o video directo...',
+    oSubeArchivo: 'o sube un archivo:',
+    subirVideo: 'Subir Video',
+    eliminarVideo: 'Eliminar Video',
+    mediaAdjunta: 'Media Adjunta (imagenes, videos, audio)',
+    sinArchivosAdjuntos: 'Sin archivos adjuntos',
+    agregarImagenes: 'Agregar Imagenes',
+    grabarVideoOp: 'Grabar Video', subirVideoOp: 'Subir Video',
+    grabarAudioOp: 'Grabar Audio', subirAudioOp: 'Subir Audio',
+    guardando: 'Guardando...',
+    subiendoVideoPrincipal: 'Subiendo video principal...',
+    archivosAdjuntos: 'Archivos adjuntos',
+    audio: 'Audio', archivo: 'Archivo',
+    max5min: 'Max 5 min',
+    historiaActualizada: 'Historia actualizada',
+    historiaEliminada: 'Historia eliminada',
+    grabacionGuardada: 'Grabación guardada',
+    historiaPublicada: 'Historia publicada',
+
+    // Profile — DM modal
+    verPerfilTitle: 'Ver perfil',
+
+    // Profile — Footer
+    footerDisclaimer: 'Los pagos son voluntarios, no reembolsables y no deducibles de impuestos. Los creadores son responsables de sus propios impuestos.',
+    terminos: 'Términos', privacidad: 'Privacidad', contacto: 'Contacto',
+
+    // Profile — Loading
+    yoCreoEnTiLoading: 'Yo Creo en Ti',
+    preparandoApoyo: 'Preparando tu apoyo...',
+    verPerfilFlecha: 'Ver perfil →',
+
+    // Profile — Time
+    teApoyoCon: 'te apoyó con $',
+    aAlguienLeGusto: 'A alguien le gustó tu meta',
+    alguienCompartio: 'Alguien compartió tu meta',
+    nuevoComentarioMeta: 'Nuevo comentario en tu meta',
+    nuevoComentarioHistoria: 'Nuevo comentario en tu historia',
+    nuevoSeguidor: 'Tienes un nuevo seguidor',
+    unCreador: 'Un creador',
+    eliminarHistoriaConfirm: '¿Eliminar esta historia? Esta acción no se puede deshacer.',
+
+    // Profile — Admin impersonation
+    actuarComo: 'Actuar como ',
+    modoImpersonacion: 'Modo impersonación: ',
+
+    // ===== INDEX (DASHBOARD) PAGE =====
+    panelCreador: 'Panel de Creador',
+    posts: 'Posts', likes: 'Likes', metas: 'Metas', comments: 'Comments',
+    tabPerfil: 'Perfil', tabHistoria: 'Historia', tabPosts: 'Posts',
+    tabMetas: 'Metas', tabCreaciones: 'Creaciones', tabCreoEnEllos: 'Creo en Ellos',
+    tabHerramientas: 'Herramientas', tabMisMetas: 'Mis Metas', tabMecenas: 'Mecenas',
+    tabYoCreoEnTi: 'Yo Creo en Ti', tabApoyoFull: 'Apoyo Full',
+    tabVerificacion: 'Verificación', tabStripe: 'Stripe',
+    tabBranding: 'Mi Branding', tabSonidos: 'Sonidos',
+
+    // Dashboard — Profile tab
+    infoPerfilHeading: 'Información del Perfil',
+    fotoPerfilLabel: 'Foto de Perfil',
+    imagenPortada: 'Imagen de Portada',
+    sinPortada: 'Sin portada',
+    portadaRecomendacion: 'JPG, PNG. Max 5MB. Recomendado: 1200×400px',
+    nombre: 'Nombre', apellido: 'Apellido',
+    tuNombre: 'Tu nombre', tuApellido: 'Tu apellido',
+    nombreUsuario: 'Nombre de Usuario',
+    nombreUsuarioPlaceholder: 'mi_nombre',
+    nombreMostrar: 'Nombre para Mostrar',
+    nombreMostrarPlaceholder: 'Se genera automáticamente',
+    bio: 'Bio', bioPlaceholder: 'Cuéntale al mundo quién eres...',
+    infoContacto: 'Información de Contacto',
+    infoContactoSub: 'Visible en tu perfil público (opcional)',
+    emailContacto: 'Email de contacto',
+    telefonoWhatsapp: 'Teléfono o WhatsApp',
+    telefono: 'Teléfono', whatsapp: 'WhatsApp',
+    sitioWeb: 'Sitio web (https://...)',
+    ciudad: 'Ciudad', pais: 'País',
+    redesSociales: 'Redes Sociales',
+    alMenos1Red: 'Al menos 1 red social es requerida',
+    guardarPerfil: 'Guardar Perfil',
+    tuEnlacePublico: 'Tu Enlace Público:',
+    nombreApellidoRequeridos: 'Nombre y apellido son requeridos',
+    usernameMin3: 'Username mínimo 3 caracteres',
+    agregaRedSocial: 'Agrega al menos 1 red social',
+    perfilGuardado: 'Perfil guardado',
+
+    // Dashboard — Verification tab
+    verificacionHeading: 'Solicitud de Verificación',
+    verificacionDesc: 'Para proteger a los Supporters y mantener la integridad de CREO, todos los creadores deben ser verificados antes de recibir pagos. Completa la información y envía tu solicitud.',
+    politicaContenido: 'Política de Contenido',
+    noContenidoSexual: 'No se permite contenido sexual o para adultos',
+    noContenidoDrogas: 'No se permiten metas para drogas o sustancias ilegales',
+    noContenidoDonaciones: 'No se aceptan solicitudes de donaciones — todo es apoyo voluntario',
+    metasLegitimas: 'Las metas deben ser para herramientas, equipos o necesidades legítimas del creador',
+    empresasDocumentos: 'Empresas deben presentar documentos legales (LLC, licencia comercial)',
+    infoPersonal: 'Información Personal',
+    nombreCompleto: 'Nombre Completo',
+    nombreApellidoPlaceholder: 'Nombre Apellido',
+    tipoDeCliente: 'Tipo de Cuenta',
+    personal: 'Personal', personalDesc: 'Creador individual',
+    empresa: 'Empresa', empresaDesc: 'LLC / Negocio',
+    nombreEmpresa: 'Nombre de la Empresa',
+    nombreEmpresaPlaceholder: 'Mi Empresa LLC',
+    documentosLegales: 'Documentos Legales (LLC, Licencia Comercial)',
+    documentosLegalesHint: 'PDF, JPG o PNG. Sube tus documentos de incorporación.',
+    socialVerifRequerido: 'Requerido: al menos 2 perfiles de redes sociales activos',
+    socialVerifNota: 'Las redes se toman de tu perfil. Guarda tu perfil primero si aún no las has agregado.',
+    identidadVerifHeading: 'Verificación de Identidad (Stripe Identity)',
+    identidadVerifDesc: 'Stripe verificará tu identidad con foto de documento + selfie. Esto garantiza que eres una persona real. Costo: $1.50 USD (cargo único al creador).',
+    noVerificado: 'No verificado',
+    iniciarVerifIdentidad: 'Iniciar Verificación de Identidad — $1.50',
+    enviarSolicitud: 'Enviar Solicitud para Revisión',
+    enviarSolicitudHint: 'Tu perfil será revisado por nuestro equipo. Te notificaremos cuando seas aprobado.',
+    cuentaVerificada: 'Cuenta Verificada',
+    cuentaVerificadaDesc: 'Tu cuenta está aprobada y activa',
+    enRevision: 'En Revisión',
+    enRevisionDesc: 'Tu solicitud está siendo revisada por nuestro equipo',
+    enRevisionBanner: 'Tu solicitud de verificación está en revisión',
+    solicitudRechazada: 'Solicitud Rechazada',
+    sinRazon: 'No se proporcionó razón',
+    solicitudRechazadaHint: 'Puedes corregir y enviar de nuevo.',
+    noVerificadoLabel: 'No Verificado',
+    noVerificadoDesc: 'Completa el formulario abajo para solicitar verificación',
+    identidadVerificada: 'Identidad verificada',
+    identidadVerificadaBtn: 'Verificado ✓',
+    completaNombreTelEmail: 'Completa nombre, teléfono y email',
+    agregaSocial: 'Agrega al menos 1 red social en tu perfil primero',
+    ingresaNombreEmpresa: 'Ingresa el nombre de tu empresa',
+    solicitudEnviada: 'Solicitud enviada. Te notificaremos pronto.',
+    identidadVerificadaExito: '¡Identidad verificada exitosamente!',
+    verificacionEnProceso: 'Verificación en proceso. Tu estado se actualizará en unos minutos.',
+    stripeConectadoExito: '¡Stripe conectado exitosamente! Ya puedes recibir pagos.',
+    stripeIncompleto: 'Configuración de Stripe incompleta. Intenta de nuevo.',
+    verificacionCompletada: 'Verificación completada. Confirmando resultado...',
+
+    // Dashboard — Metas tab
+    metaBloqueadaTitulo: 'Debes ser verificado para crear metas',
+    metaBloqueadaHint: 'Ve a la pestaña "Verificación" para iniciar el proceso.',
+    crearMeta: 'Crear Nueva Meta',
+    metaRecomendacion: 'Recomendación: Sube screenshots de los precios del producto/herramienta que necesitas con el link directo de compra. Esto genera credibilidad y transparencia para tus Supporters.',
+    metaTituloPlaceholder: 'Título de la meta (ej: Nueva cámara para contenido)',
+    metaDescPlaceholder: '¿Qué necesitas y para qué? Describe brevemente tu meta y cómo ayudará a tu trabajo como creador...',
+    metaImagenesLabel: 'Imágenes / Screenshots de precio',
+    metaImagenesHint: 'Sube imágenes del producto, screenshots de precios, o evidencia visual',
+    metaVideoLabel: 'Video de la meta (opcional)',
+    metaVideoHint: 'Sube un video explicando tu meta (Máx 50MB)',
+    metaLinkLabel: 'Link de compra del producto (opcional pero recomendado)',
+    metaGoalLabel: 'Meta ($)',
+    metaInicioLabel: 'Inicio',
+    metaFinLabel: 'Fin',
+    crearMetaBtn: 'Crear Meta',
+    invitacionesMetas: 'Invitaciones a Metas',
+    metaAlcanzada: 'Meta Alcanzada',
+    debesSerVerificado: 'Debes ser verificado para crear metas',
+    creando: 'Creando...',
+    completaMetaFields: 'Completa título, descripción, meta ($10 min), y fechas',
+    subeMetaMedia: 'Sube al menos una imagen o video de tu meta',
+    metaCreada: 'Meta creada',
+    confirmarEliminarMeta: '¿Eliminar esta meta?',
+    metaEliminada: 'Meta eliminada',
+    metaTituloRequerido: 'El titulo es requerido',
+    metaMinGoal: 'La meta debe ser al menos $1',
+    metaActualizada: 'Meta actualizada',
+    editarMeta: 'Editar Meta',
+    metaDescLabel: 'Descripcion',
+    estado: 'Estado',
+    fechaInicio: 'Fecha Inicio', fechaFin: 'Fecha Fin',
+    imagenesVideos: 'Imágenes / Videos',
+    activa: 'Activa', inactiva: 'Inactiva',
+
+    // Dashboard — 3-stage fund release
+    liberacionFondos: 'Sistema de Liberación de Fondos en 3 Etapas',
+    liberacionFondosDesc: 'Para proteger a los supporters y garantizar transparencia, los fondos de cada meta se liberan en 3 etapas verificadas.',
+    etapa1Titulo: 'Retención en Stripe (7-14 días)',
+    etapa1Desc: 'Los fondos se retienen para verificar que no sean pagos fraudulentos o tarjetas robadas.',
+    etapa2Titulo: 'Primera liberación (50%)',
+    etapa2Desc: 'Recibes la mitad. Debes subir recibo de compra + actualización a la comunidad (foto/video con descripción).',
+    etapa3Titulo: 'Liberación final (50% restante)',
+    etapa3Desc: 'Sube recibos finales, fotos y videos de la adquisición. El admin revisa y aprueba.',
+    retencionStripe: 'Retención Stripe',
+    confirmarProcederEtapa2: 'Confirmar y Proceder a Etapa 2',
+    enviado: 'Enviado',
+    esperandoAprobacion: 'Esperando aprobación...',
+    reciboScreenshot: 'Recibo / Screenshot de compra *',
+    actualizacionComunidad: 'Actualización para la comunidad * (qué hiciste con los fondos)',
+    actualizacionPlaceholder: 'Ej: Compré el micrófono Blue Yeti en Amazon. ¡Llega en 3 días!',
+    evidenciaFotoVideo: 'Foto o video de evidencia *',
+    enviarEtapa2: 'Enviar Etapa 2 para Revisión',
+    recibosFinales: 'Recibos finales y comprobantes *',
+    descripcionAdquisicion: 'Descripción de la adquisición *',
+    descripcionAdquisicionPlaceholder: 'Ej: Ya tengo el micrófono instalado. Aquí fotos del unboxing y setup completo.',
+    enviarPruebaFinal: 'Enviar Prueba Final para Revisión',
+    cancelarMeta: 'Cancelar esta meta',
+    cancelarMetaWarning: 'Cancelar una meta requiere una explicación pública:',
+    cancelarRazonPlaceholder: 'Explica por qué cancelas esta meta...',
+    confirmarCancelacion: 'Confirmar Cancelación',
+    noMantener: 'No, Mantener',
+    etapa1Completa: 'Etapa 1 completada. Sube tus recibos para la Etapa 2.',
+    subeRecibo: 'Sube al menos un recibo',
+    escribeActualizacion: 'Escribe una actualización para tu comunidad',
+    subeEvidencia: 'Sube al menos una foto o video de evidencia',
+    subiendoDocumentos: 'Subiendo documentos...',
+    etapa2Enviada: 'Etapa 2 enviada para revisión del admin',
+    subePruebas: 'Sube recibos y pruebas de la adquisición',
+    escribeDescAdquisicion: 'Escribe una descripción de la adquisición',
+    subiendoPruebasFinales: 'Subiendo pruebas finales...',
+    etapa3Enviada: 'Prueba final enviada para revisión del admin',
+    debesEscribirRazon: 'Debes escribir una razón para cancelar',
+    metaCancelada: 'Meta cancelada. El admin revisará tu explicación.',
+
+    // Dashboard — Meta status badges
+    creadorBaneado: 'Creador Baneado',
+    fraudeCancelada: 'Meta Cancelada — Fraude',
+    completadaAntesGracias: 'Meta Completada Antes de lo Esperado — Gracias al apoyo de todos',
+    metaCanceladaBadge: 'Meta Cancelada',
+    metaCompletadaLegitBadge: 'Meta Completada Legítimamente',
+    adminReview: 'Meta en Review por Admin',
+    adminRechazada: 'Rechazada por Admin',
+
+    // Dashboard — Meta invites
+    teInvitoColaborar: 'te invitó a colaborar',
+    metaLabel: 'Meta:',
+    sinTitulo: 'Sin título',
+    unirseCreamos: 'Creamos',
+    declinar: 'Declinar',
+    alguienInvito: 'Alguien',
+    teUnisteAMeta: '¡Te uniste a la meta! Ahora es una meta conjunta.',
+    invitacionDeclinada: 'Invitación declinada',
+
+    // Dashboard — Posts tab
+    nuevaPublicacion: 'Nueva Publicación',
+    nuevaPublicacionSub: 'Tu publicación aparecerá en la Comunidad para que todos la vean.',
+    noPostsAun: 'Aún no tienes publicaciones',
+
+    // Dashboard — Story tab
+    miHistoriaTab: 'Mi Historia',
+    miHistoriaSub: 'Deja que la gente te conozca más. Comparte cómo has llegado hasta aquí.',
+    tituloHistoriaPlaceholder: 'Ej: Mi camino como creador',
+    descripcionHistoria: 'Descripción',
+    descripcionHistoriaPlaceholder: 'Cuéntale al mundo tu historia...',
+    videoPrincipalHint: 'Explícale al mundo tu historia en no más de 5 minutos. Comparte cómo has llegado hasta aquí y luego di tu meta. (Máx 50MB)',
+    mediaAdicional: 'Imágenes y Audios Adicionales',
+    mediaAdicionalHint: 'Sube fotos de cartas escritas a mano, fotos de equipos antiguos, o graba un audio con tu historia. (Máx 10MB c/u)',
+    compartirMuroComunidad: 'Compartir en el Muro de Comunidad',
+    compartirMuroComunidadHint: 'Tu historia aparecerá en el feed de la comunidad',
+    publicarHistoria: 'Publicar Historia',
+    historiasPublicadas: 'Historias Publicadas',
+    sinHistorias: 'Aún no has publicado historias',
+    videoActual: 'Video actual',
+    agregaDescVideoMedia: 'Agrega al menos una descripción, video o media',
+    historiaPublicadaCompartida: 'Historia publicada y compartida en la comunidad',
+    eliminarError: 'Error al eliminar',
+
+    // Dashboard — Creaciones tab
+    misCreacionesHeading: 'Mis Creaciones',
+    misCreacionesSub: 'Agrega enlaces a tus productos, sitios web o servicios (máximo 10).',
+    tituloEnlace: 'Título del enlace',
+    urlEnlace: 'https://tu-sitio.com',
+    descripcionCorta: 'Descripción corta (opcional)',
+    imagenOpcional: 'Imagen (opcional)',
+    agregarEnlace: 'Agregar Enlace',
+    sinEnlaces: 'No tienes enlaces de negocio aún.',
+    editarEnlace: 'Editar Enlace',
+    tituloUrlRequeridos: 'Título y URL son requeridos',
+    maxEnlaces: 'Máximo 10 enlaces permitidos',
+    agregando: 'Agregando...',
+    enlaceAgregado: 'Enlace agregado',
+    confirmarEliminarEnlace: '¿Eliminar este enlace?',
+    enlaceEliminado: 'Enlace eliminado',
+    enlaceActualizado: 'Enlace actualizado',
+
+    // Dashboard — Stripe tab
+    stripeHeading: 'Conexión con Stripe',
+    stripeSub: 'Conecta tu cuenta de Stripe para recibir pagos.',
+    stripeConectarBtn: 'Conectar Stripe',
+    stripeComision: 'CREO retiene un 5% de comisión por transacción. Stripe maneja todo el procesamiento de pagos de forma segura.',
+    stripePlataforma: 'Cuenta de Plataforma',
+    stripePlataformaDesc: 'Esta es la cuenta principal de CREO. Las comisiones del 5% se depositan directamente aquí.',
+
+    // Dashboard — Branding tab
+    brandingHeading: 'Mi Branding',
+    brandingSub: 'Personaliza cómo los visitantes ven tu perfil.',
+    imagenesPerfilHeading: 'Imágenes de perfil',
+    cambiarFoto: 'Cambiar foto',
+    cambiarPortada: 'Cambiar portada',
+    temaPerfil: 'Tema del perfil',
+    temaClaro: 'Claro', temaOscuro: 'Oscuro',
+    textoPrincipal: 'Texto principal',
+    titulosColor: 'Títulos',
+    textoBoton: 'Texto de botones',
+    fondoSecciones: 'Fondo de secciones',
+    fondoBotones: 'Fondo de botones',
+    fondoPagina: 'Fondo de página',
+    tipografia: 'Tipografía',
+    vistaPrevia: 'Vista previa de la tipografía seleccionada',
+    bgMedia: 'Imagen o video de fondo',
+    bgMediaPasteHint: 'O pega un enlace directo:',
+    preview: 'Vista previa',
+    previewPerfil: 'Así se verá tu perfil',
+    previewSub: 'Los textos y secciones reflejan tus colores',
+    previewCreoEnTi: 'Creo en Ti',
+    previewApoyoFull: 'Apoyo Full',
+    textoInvisible: 'Texto invisible.',
+    botonPocoVisible: 'Texto de botón poco visible sobre el fondo',
+    guardarBranding: 'Guardar Branding General',
+    seccionMetasHeading: 'Sección de Metas',
+    seccionMetasSub: 'Personaliza cómo se ven las metas en tu perfil',
+    tituloSeccion: 'Título de la sección',
+    colorBoton: 'Color del botón',
+    colorTarjeta: 'Color de la tarjeta',
+    guardarMetasBranding: 'Guardar Metas Branding',
+    brandingGuardado: 'Branding guardado. Visita tu perfil para verlo.',
+    textoInvisibleBloqueo: 'El texto no es visible sobre el fondo de secciones. Ajusta los colores.',
+    errorGuardando: 'Error al guardar',
+    avatarError: 'Error al guardar avatar',
+    avatarActualizado: 'Foto de perfil actualizada',
+    portadaError: 'Error al guardar portada',
+    portadaActualizada: 'Portada actualizada',
+    imagenMaxSize: 'Cada imagen max 5MB',
+    errorSubiendoImagenToast: 'Error subiendo imagen',
+    imagenesSubidas: ' imagen(es) subida(s)',
+    docMaxSize: 'Documento max 10MB',
+    docsSubidos: 'Documentos subidos',
+    redirigiendo: 'Redirigiendo...',
+    bgMediaSubida: 'Imagen de fondo cargada',
+    mecenasGuardado: 'Mecenas guardado',
+    imagenActualizada: 'Imagen actualizada',
+
+    // Dashboard — Sounds tab
+    sonidoNotifHeading: 'Sonido de Notificación',
+    sonidoNotifSub: 'Elige el sonido que se reproducirá cuando recibas una nueva notificación.',
+    activarSonidos: 'Activar sonidos',
+    sonido: 'Sonido',
+    volumen: 'Volumen:',
+    previsualizar: 'Previsualizar',
+    sonidosActivados: 'Sonidos activados',
+    sonidosDesactivados: 'Sonidos desactivados',
+
+    // Dashboard — Creo en Ellos tab
+    creoEnEllosHeading: 'Yo Creo en Ellos',
+    creoEnEllosSub: 'Selecciona los creadores que quieres destacar en tu perfil. Aparecerán en la sección "Yo Creo en Ellos" de tu página pública.',
+    buscarCreador: 'Buscar creador por nombre o @usuario...',
+    creadoresDestacados: 'Creadores destacados',
+    sinCreadores: 'No has seleccionado ningún creador aún.',
+    buscaArriba: 'Busca arriba para agregar creadores a tu sección.',
+    buscando: 'Buscando...',
+    sinResultados: 'No se encontraron creadores.',
+    agregar: 'Agregar', quitar: 'Quitar',
+    maxCreadores: 'Máximo 10 creadores destacados',
+
+    // Dashboard — Mecenas tabs
+    mecTipHeading: 'Yo Creo en Ti',
+    mecTipSub: 'Personaliza cómo se ve la sección de tips en tu perfil',
+    mecSubHeading: 'Apoyo Full',
+    mecSubSub: 'Personaliza la sección de suscripciones mensuales',
+    mecMetaDefaultTitle: 'Mi Meta',
+    mecMetaDefaultDesc: 'Apoya mis metas como creador',
+
+    // Dashboard — Onboarding
+    onboardingBienvenido: '¡Bienvenido a CREO!',
+    onboardingBienvenidoMsg: 'Tu cuenta ha sido confirmada. Te guiaremos paso a paso para configurar tu perfil de creador.',
+    onboardingPerfil: 'Completa tu Perfil',
+    onboardingPerfilMsg: 'Agrega tu nombre, foto de perfil y biografía. Esto es lo primero que verán las personas que te apoyan.',
+    onboardingHistoria: 'Comparte tu Historia',
+    onboardingHistoriaMsg: 'Cuéntale al mundo quién eres. Sube un video de hasta 5 minutos y fotos que cuenten tu historia. No es obligatorio, pero los creadores con historia reciben hasta 3x más apoyo.',
+    onboardingHistoriaHighlight: 'Los creadores que comparten su historia reciben significativamente más apoyo. ¡Te lo recomendamos!',
+    onboardingMeta: 'Crea tu Primera Meta',
+    onboardingMetaMsg: 'Las metas son objetivos financieros. Publica qué necesitas, cuánto cuesta y deja que la comunidad te ayude a lograrlo.',
+    onboardingStripe: 'Conecta Stripe',
+    onboardingStripeMsg: 'Para recibir pagos necesitas conectar tu cuenta de Stripe. Es gratis y toma solo 5 minutos.',
+    onboardingListo: '¡Listo para empezar!',
+    onboardingListoMsg: 'Tu perfil público estará disponible en tu enlace personal. Compártelo en redes sociales para que te descubran.',
+    saltarGuia: 'Saltar guía',
+    atras: 'Atrás', siguiente: 'Siguiente', empezar: '¡Empezar!',
+
+    // Dashboard — Misc
+    hola: 'Hola, ',
+    miHistoriaPost: 'Mi Historia',
+    historia: 'historia', historias: 'historias',
+    errorCamara2: 'No se pudo acceder: ',
+    noAccesoDispositivo: 'No se pudo acceder a ',
+    laCamara: 'la cámara', elMicrofono: 'el micrófono',
+
+    // Emojis panel
+    emojis: 'Emojis',
+
+    // ===== EXPLORE PAGE =====
+    explorarHeader: 'EXPLORAR',
+    buscarCreadoresHistorias: 'Buscar creadores, historias...',
+    sinHistoriasPublicadas: 'Aún no hay historias publicadas',
+    resultados: 'Resultados',
+    sinResultadosBusqueda: 'No se encontraron resultados',
+    comentarios: 'Comentarios',
+    escribirComentarioPlaceholder: 'Escribe un comentario...',
+    linkCopiado: 'Link copiado al portapapeles',
+    creador: 'Creador',
+    historiaDe: 'Historia de ',
+    iniciarSesionParaCreo: 'Inicia sesión para dar Creo',
   },
+
   en: {
+    // Nav & sidebar
     comunidad: 'Community', explorar: 'Explore', mensajes: 'Messages', perfil: 'Profile',
     brandDeals: 'Brand Deals', panel: 'Dashboard', admin: 'Admin', tema: 'Theme', salir: 'Sign Out',
     entrarGoogle: 'Sign in with Google', idioma: 'Language',
+    entrarCreoId: 'Sign in with CREO ID',
+
+    // Auth
+    sesionCerrada: 'Session closed', errorGoogle: 'Error connecting to Google',
+    ingresaEmail: 'Enter your email', emailPlaceholder: 'you@email.com',
+    continuar: 'Continue', cancelar: 'Cancel',
+    linkEnviado: 'Access link sent to your email',
+    iniciaSesion: 'Sign in', iniciaSesionPrimero: 'Sign in first',
+    authHeading: 'Sign in to manage your dashboard',
+    authSubtext: 'Use your Google account for secure access',
+    continuarConGoogle: 'Continue with Google',
+    authSecurityNote: 'CREO exclusively uses Google for sign-in. Your account is protected by Google authentication.',
+    eresEmpresa: 'Are you a business or brand?',
+    registrarEmpresa: 'Register as Business',
+    aceptaTerminos: 'Accept the terms to continue',
+    debesAceptarTerminos: 'You must accept the Terms and Privacy Policy',
+    debesAceptarConducta: 'You must accept the community guidelines',
+    cuentaCreada: 'Account created. Check your email to confirm.',
+    ingresaEmailPassword: 'Enter email and password',
+
+    // Verification bar
     connectStripe: 'Connect your Stripe account to receive payments',
     completaCreoId: 'Complete your CREO ID verification',
     conectando: 'Connecting...', iniciandoVerif: 'Starting verification...',
     stripeYaConectado: 'Your Stripe account is already connected.',
     errorStripe: 'Error connecting to Stripe.', errorVerif: 'Error starting verification.',
     errorSubiendo: 'Error uploading file',
-    reporteEnviado: 'Report sent. Thank you for helping the community.',
+
+    // Notifications
     notifVerifIniciada: 'Verification Started', notifVerifEnviada: 'Verification Submitted',
     notifVerificada: 'Identity Verified!', notifVerifRechazada: 'Verification Rejected',
     y: 'and', noNotifs: 'No notifications', marcarLeidas: 'Mark all read',
-    entrarCreoId: 'Sign in with CREO ID', sesionCerrada: 'Session closed',
-    errorGoogle: 'Error connecting to Google', ingresaEmail: 'Enter your email',
-    emailPlaceholder: 'you@email.com', continuar: 'Continue', cancelar: 'Cancel',
-    linkEnviado: 'Access link sent to your email',
+    notificaciones: 'Notifications', marcarLeidasFull: 'Mark read',
+    sinNotificaciones: 'No notifications',
+    notifsMarcadasLeidas: 'Notifications marked as read',
+
+    // Reports
+    reporteEnviado: 'Report sent. Thank you for helping the community.',
+    reportarCreador: 'Report Creator',
+    reportarSubtext: 'Help us keep the community safe. Your report is confidential.',
+    seleccionaMotivo: 'Select a reason',
+    motivoSexual: 'Sexually suggestive content',
+    motivoDrogas: 'Drug use or promotion',
+    motivoViolencia: 'Incitement to violence',
+    motivoLenguaje: 'Profanity / offensive language',
+    motivoDiscriminacion: 'Discrimination',
+    motivoSpam: 'Spam or scam',
+    motivoOtro: 'Other',
+    detallesPlaceholder: 'Describe the issue (optional)',
+    enviarReporte: 'Submit Report',
+
+    // Cookie consent
+    cookiesTitle: 'Cookies & Privacy',
+    cookiesText: 'CREO uses essential cookies for authentication and local storage for your preferences. We do not use tracking or advertising cookies.',
+    aceptar: 'Accept', masInfo: 'Learn more',
+
+    // CREO ID modal
+    verificaCreoId: 'Verify your CREO ID',
+    creoIdSubtext: 'To publish deals and receive payments you need to verify your identity',
+    personasReales: 'Real people',
+    personasRealesDesc: 'Every CREO user is a verified real person. Your safety is our priority.',
+    sinMenores: 'No minors',
+    sinMenoresDesc: 'Children should be playing, learning, and in school. We only accept adults 18+ with ID.',
+    tuIdSeguridad: 'Your ID, your safety',
+    tuIdSeguridadDesc: 'We verify your identity only once. Your information is protected and never shared.',
+    verificarCreoId: 'Verify my CREO ID',
+    ahoraNo: 'Not now',
+    verificacionRapida: 'Verification is fast, secure, and done only once.',
+    preparando: 'Preparing...',
+    noSePudoVerif: 'Could not start verification',
+    errorConexion: 'Connection error',
+
+    // Upload helper
+    archivoMax: 'File max',
+    subiendo: 'Uploading...',
+
+    // ===== COMUNIDAD PAGE =====
+    muro: 'Wall', cineLocal: 'Local Cinema', galeria: 'Gallery', biblioteca: 'Library',
+    musica: 'Music', eventos: 'Events', general: 'General',
+    queCompartir: 'What do you want to share with the community?',
+    tituloOpcional: 'Title (optional)',
+    normal: 'Normal', evento: 'Event', enVivo: 'Live',
+    enlaceEvento: 'Link (Zoom, Meet, URL)',
+    desdeNavegador: 'From the browser',
+    urlStream: 'Stream URL',
+    foto: 'Photo', video: 'Video', grabarVideo: 'Record Video', grabarAudio: 'Record Audio',
+    publicar: 'Publish', publicando: 'Publishing...',
+    escribeAlgoOMedia: 'Write something or add media',
+    publicadoEnComunidad: 'Published to Community!',
+    editarPost: 'Edit Post', titulo: 'Title', contenido: 'Content', media: 'Media',
+    guardarCambios: 'Save Changes',
+    eliminar: 'Delete', confirmarEliminar: 'Delete?',
+    postEliminado: 'Post deleted', postActualizado: 'Post updated',
+    comentar: 'Comment', comentaPlaceholder: 'Comment...',
+    enviar: 'Send', sinComentarios: 'No comments yet',
+    compartir: 'Share', enlaceCopiado: 'Link copied',
+    editar: 'Edit',
+    ahora: 'now', mes: 'month',
+    reaccion: 'Reaction',
+    iniciarSesionParaLike: 'Sign in to like',
+    iniciarSesionParaComentar: 'Sign in to comment',
+    iniciarSesionParaSeguir: 'Sign in to follow',
+    iniciarSesionParaMensajes: 'Sign in to send messages',
+    iniciarSesionParaReportar: 'Sign in to report',
+    bienvenidoComunidad: 'Welcome to the Community',
+    normasComunidad: 'Community Guidelines',
+    grabandoVideo: 'Recording Video', grabandoAudio: 'Recording Audio',
+    grabando: 'Recording...', procesando: 'Processing...',
+    listoParaGrabar: 'Ready to record',
+    guardar: 'Save', grabacionLista: 'Recording ready',
+    subiendoGrabacion: 'Uploading recording...',
+
+    // ===== MESSAGES PAGE =====
+    conversaciones: 'Conversations', buscarConversacion: 'Search conversation...',
+    nuevaConversacion: 'New conversation',
+    escribeMensaje: 'Write a message...',
+    iniciaConversacion: 'Start the conversation',
+    sinConversaciones: 'You have no conversations yet',
+    enviando: 'Sending...',
+    buscarGif: 'Search GIF...',
+    enviarGif: 'Send GIF',
+    enviarImagen: 'Send image',
+    grabarAudioMsg: 'Record audio',
+    grabarVideoMsg: 'Record video',
+    verPerfil: 'View profile',
+    detener: 'Stop',
+    imagenMax10mb: 'Image max 10MB',
+    errorMicrofono: 'Could not access microphone',
+    errorCamara: 'Could not access camera',
+    errorSubiendoImagen: 'Error uploading image: ',
+    errorSubiendoVideo: 'Error uploading video: ',
+    errorSubiendoAudio: 'Error uploading audio: ',
+    errorEnviandoMensaje: 'Error sending message',
+    errorEnviandoVideo: 'Error sending video',
+    videoSubido: 'Video uploaded',
+    enviarVideo: 'Send',
+    seleccionaConversacion: 'Select a conversation',
+    buscaCreadorParaIniciar: 'or search a creator to start',
+    noSeEncontraronCreadores: 'No creators found',
+    escribeAlMenos2: 'Type at least 2 characters',
+    buscarPorNombre: 'Search by name or @username...',
+    buscarCreadores: 'Search creators...',
+    sinMensajes: 'No messages',
+    noTienesMensajes: 'You have no messages yet',
+    buscaCreadorIniciar: 'Search a creator to start',
+    nuevoMensaje: 'New Message',
+    iniciarSesionVerMensajes: 'Sign in to see your messages',
+    suelteParaEnviar: 'Release to send',
+    mantenParaGrabar: 'Hold to record',
+    enviaUnMensaje: 'Send a message to start',
+    errorAlEnviar: 'Error sending',
+    errorAlEnviarAudio: 'Error sending audio',
+
+    // ===== BRAND DEALS PAGE =====
+    crearDeal: 'Create Deal',
+    misDeals: 'My Deals', todosDeals: 'All Deals',
+    tituloDeal: 'Deal Title',
+    descripcionDeal: 'Description',
+    presupuesto: 'Budget ($)',
+    categoria: 'Category',
+    requisitos: 'Requirements',
+    terminosCondiciones: 'Terms & Conditions',
+    fechaEntrega: 'Delivery date',
+    vibeVideo: 'Video vibe',
+    descripcionPago: 'Payment description',
+    portada: 'Cover',
+    publicarDeal: 'Publish Deal',
+    verDetalle: 'View Details',
+    aplicar: 'Apply',
+    chat: 'Chat',
+    tratoHecho: 'Deal Done',
+    pagarCreador: 'Pay Creator',
+    dealPublicado: 'Deal published',
+    errorCreandoDeal: 'Error creating deal',
+    completaCampos: 'Complete all required fields',
+
+    // ===== PROFILE PAGE =====
+    cargando: 'Loading...',
+    seguidores: 'Followers', siguiendo: 'Following',
+    bienvenidoPagina: 'Welcome to my support page.',
+    seguir: 'Follow', siguiendoBtn: 'Following',
+    mensaje: 'Message', reportar: 'Report',
+    noVerificadoTitulo: 'This creator has not been verified yet',
+    noVerificadoSubtext: 'Payments will be available once approved.',
+    miHistoria: 'My Story',
+    yoCreoEnEllos: 'I Believe in Them',
+    metasAlcanzadas: 'Goals Reached',
+    publicaciones: 'Publications',
+    misCreaciones: 'My Creations',
+    verTodo: 'See all', slider: 'Slider',
+    yoCreoEnTi: 'I Believe in You',
+    miMeta: 'My Goal',
+    apoyoFull: 'Full Support',
+    desdeMeta: 'From Goal',
+    enviaApoyoUnico: 'Send a one-time support to the creator',
+    cantidadUsd: 'Amount (USD)',
+    apoyarCreador: 'Support Creator',
+    noMetasPublicadas: 'No goals published yet',
+    noMetasOwner: 'You haven\'t published any goals yet',
+    noMetasOwnerSub: 'Share your goal with the CREO community and receive support',
+    crearPrimeraMeta: 'Create my first Goal',
+    animaPrefix: 'Encourage @',
+    animaSuffix: ' to share their goal with the CREO community.',
+    contribuir: 'Contribute',
+    apoyarDesdeMeta: 'Support from my Goal',
+    apoyarDesdeMetaSub: 'Share funds from your active goal with this creator',
+    seleccionaTuMeta: 'Select your Goal',
+    cantidadEnviar: 'Amount to send (USD)',
+    enviarDesdeMeta: 'Send from my Goal',
+    fondosTransferencia: 'Funds are transferred directly from your goal to the creator',
+    disponible: 'available',
+    apoyoFullHeading: 'Full Support',
+    apoyoFullSub: 'Support monthly with an amount you choose',
+    cantidadMensual: 'Monthly Amount (USD)',
+    porMes: '/month',
+    suscribirme: 'Subscribe Monthly',
+    cancelarEnCualquier: 'You can cancel at any time',
+    metaCompletadaLegit: 'Goal Legitimately Completed',
+    completadaAntes: 'Completed Ahead of Schedule',
+    cancelada: 'Cancelled', enReview: 'In Review',
+    completada: 'Completed', expirada: 'Expired', finalizada: 'Finalized',
+    alcanzado: '% reached', de: 'of',
+    verProductoPrecio: 'View product / price',
+    verMas: 'See more', verMenos: 'See less',
+    colaborador: 'contributor', colaboradores: 'contributors',
+    escribirComentario: 'Write a comment...',
+    creamos: 'Let\'s Create',
+    creamosSubtext: 'Invite another creator to join this goal',
+    creamosPlaceholder: 'Creator username (e.g.: my_friend)',
+    enviarInvitacion: 'Send Invitation',
+    noPerfilSeleccionado: 'No profile selected',
+    perfilNoEncontrado: 'Profile Not Found',
+    perfilNoEncontradoDesc: 'This creator does not exist or has not set up their page.',
+    pagosNoDisponibles: 'Payments not available',
+    montoMinimo1: 'Minimum amount: $1.00',
+    montoMinimoMensual3: 'Minimum monthly amount: $3.00',
+    seleccionaUnaMeta: 'Select a goal',
+    montoMinimo1d: 'Minimum amount: $1',
+    ingresaUsername: 'Enter a username',
+    errorInvitando: 'Error inviting',
+    errorEnviandoReporte: 'Error sending report',
+    seguimientoNoDisponible: 'Follow feature not available yet',
+    funcionSeguimientoNo: 'Follow feature not available yet',
+    invitacionEnviada: 'Invitation sent to @',
+    graciasApoyo: 'Thank you for your support!',
+    graciasMeta: 'Thank you for contributing to the goal!',
+    suscripcionActivada: 'Subscription activated! Thank you for your monthly support.',
+    publicadoAmbosPerfil: 'Published to your profile and Community!',
+    publicadoSoloPerfil: 'Published to your profile only!',
+    archivosSubidos: ' file(s) uploaded',
+    creadorVerificado: 'Verified Creator',
+
+    // Profile — Edit Story Modal
+    editarHistoria: 'Edit Story',
+    tituloLabel: 'Title',
+    resumenYoCreo: 'Summary for "I Believe in You"',
+    resumenHint: 'This text appears when someone features you in their "I Believe in Them" section. Write something brief that inspires others to support you.',
+    resumenPlaceholder: 'E.g.: I\'m an independent musician creating my first album...',
+    tuHistoriaCompleta: 'Your Full Story',
+    historiaCompletaHint: 'The full content of your story. Here you tell your journey, your vision, and why you do what you do.',
+    historiaCompletaPlaceholder: 'Tell the world your story...',
+    videoPrincipal: 'Main Video',
+    sinVideoPrincipal: 'No main video',
+    videoUrlPlaceholder: 'YouTube URL or direct video...',
+    oSubeArchivo: 'or upload a file:',
+    subirVideo: 'Upload Video',
+    eliminarVideo: 'Remove Video',
+    mediaAdjunta: 'Attached Media (images, videos, audio)',
+    sinArchivosAdjuntos: 'No attachments',
+    agregarImagenes: 'Add Images',
+    grabarVideoOp: 'Record Video', subirVideoOp: 'Upload Video',
+    grabarAudioOp: 'Record Audio', subirAudioOp: 'Upload Audio',
+    guardando: 'Saving...',
+    subiendoVideoPrincipal: 'Uploading main video...',
+    archivosAdjuntos: 'Attachments',
+    audio: 'Audio', archivo: 'File',
+    max5min: 'Max 5 min',
+    historiaActualizada: 'Story updated',
+    historiaEliminada: 'Story deleted',
+    grabacionGuardada: 'Recording saved',
+    historiaPublicada: 'Story published',
+
+    // Profile — DM modal
+    verPerfilTitle: 'View profile',
+
+    // Profile — Footer
+    footerDisclaimer: 'Payments are voluntary, non-refundable, and not tax-deductible. Creators are responsible for their own taxes.',
+    terminos: 'Terms', privacidad: 'Privacy', contacto: 'Contact',
+
+    // Profile — Loading
+    yoCreoEnTiLoading: 'I Believe in You',
+    preparandoApoyo: 'Preparing your support...',
+    verPerfilFlecha: 'View profile →',
+
+    // Profile — Notifications text
+    teApoyoCon: 'supported you with $',
+    aAlguienLeGusto: 'Someone liked your goal',
+    alguienCompartio: 'Someone shared your goal',
+    nuevoComentarioMeta: 'New comment on your goal',
+    nuevoComentarioHistoria: 'New comment on your story',
+    nuevoSeguidor: 'You have a new follower',
+    unCreador: 'A creator',
+    eliminarHistoriaConfirm: 'Delete this story? This action cannot be undone.',
+
+    // Profile — Admin impersonation
+    actuarComo: 'Act as ',
+    modoImpersonacion: 'Impersonation mode: ',
+
+    // ===== INDEX (DASHBOARD) PAGE =====
+    panelCreador: 'Creator Dashboard',
+    posts: 'Posts', likes: 'Likes', metas: 'Goals', comments: 'Comments',
+    tabPerfil: 'Profile', tabHistoria: 'Story', tabPosts: 'Posts',
+    tabMetas: 'Goals', tabCreaciones: 'Creations', tabCreoEnEllos: 'I Believe in Them',
+    tabHerramientas: 'Tools', tabMisMetas: 'My Goals', tabMecenas: 'Patrons',
+    tabYoCreoEnTi: 'I Believe in You', tabApoyoFull: 'Full Support',
+    tabVerificacion: 'Verification', tabStripe: 'Stripe',
+    tabBranding: 'My Branding', tabSonidos: 'Sounds',
+
+    // Dashboard — Profile tab
+    infoPerfilHeading: 'Profile Information',
+    fotoPerfilLabel: 'Profile Photo',
+    imagenPortada: 'Cover Image',
+    sinPortada: 'No cover',
+    portadaRecomendacion: 'JPG, PNG. Max 5MB. Recommended: 1200×400px',
+    nombre: 'First Name', apellido: 'Last Name',
+    tuNombre: 'Your first name', tuApellido: 'Your last name',
+    nombreUsuario: 'Username',
+    nombreUsuarioPlaceholder: 'my_name',
+    nombreMostrar: 'Display Name',
+    nombreMostrarPlaceholder: 'Auto-generated',
+    bio: 'Bio', bioPlaceholder: 'Tell the world who you are...',
+    infoContacto: 'Contact Information',
+    infoContactoSub: 'Visible on your public profile (optional)',
+    emailContacto: 'Contact email',
+    telefonoWhatsapp: 'Phone or WhatsApp',
+    telefono: 'Phone', whatsapp: 'WhatsApp',
+    sitioWeb: 'Website (https://...)',
+    ciudad: 'City', pais: 'Country',
+    redesSociales: 'Social Media',
+    alMenos1Red: 'At least 1 social network is required',
+    guardarPerfil: 'Save Profile',
+    tuEnlacePublico: 'Your Public Link:',
+    nombreApellidoRequeridos: 'First and last name are required',
+    usernameMin3: 'Username minimum 3 characters',
+    agregaRedSocial: 'Add at least 1 social network',
+    perfilGuardado: 'Profile saved',
+
+    // Dashboard — Verification tab
+    verificacionHeading: 'Verification Request',
+    verificacionDesc: 'To protect Supporters and maintain CREO\'s integrity, all creators must be verified before receiving payments. Complete the information and submit your request.',
+    politicaContenido: 'Content Policy',
+    noContenidoSexual: 'Sexual or adult content is not allowed',
+    noContenidoDrogas: 'Goals for drugs or illegal substances are not allowed',
+    noContenidoDonaciones: 'Donation requests are not accepted — everything is voluntary support',
+    metasLegitimas: 'Goals must be for tools, equipment, or legitimate creator needs',
+    empresasDocumentos: 'Businesses must submit legal documents (LLC, business license)',
+    infoPersonal: 'Personal Information',
+    nombreCompleto: 'Full Name',
+    nombreApellidoPlaceholder: 'First Last',
+    tipoDeCliente: 'Account Type',
+    personal: 'Personal', personalDesc: 'Individual creator',
+    empresa: 'Business', empresaDesc: 'LLC / Business',
+    nombreEmpresa: 'Business Name',
+    nombreEmpresaPlaceholder: 'My Business LLC',
+    documentosLegales: 'Legal Documents (LLC, Business License)',
+    documentosLegalesHint: 'PDF, JPG or PNG. Upload your incorporation documents.',
+    socialVerifRequerido: 'Required: at least 2 active social media profiles',
+    socialVerifNota: 'Social networks are taken from your profile. Save your profile first if you haven\'t added them yet.',
+    identidadVerifHeading: 'Identity Verification (Stripe Identity)',
+    identidadVerifDesc: 'Stripe will verify your identity with a document photo + selfie. This ensures you are a real person. Cost: $1.50 USD (one-time charge to creator).',
+    noVerificado: 'Not verified',
+    iniciarVerifIdentidad: 'Start Identity Verification — $1.50',
+    enviarSolicitud: 'Submit Application for Review',
+    enviarSolicitudHint: 'Your profile will be reviewed by our team. We\'ll notify you when approved.',
+    cuentaVerificada: 'Verified Account',
+    cuentaVerificadaDesc: 'Your account is approved and active',
+    enRevision: 'Under Review',
+    enRevisionDesc: 'Your application is being reviewed by our team',
+    enRevisionBanner: 'Your verification request is under review',
+    solicitudRechazada: 'Application Rejected',
+    sinRazon: 'No reason provided',
+    solicitudRechazadaHint: 'You can correct and resubmit.',
+    noVerificadoLabel: 'Not Verified',
+    noVerificadoDesc: 'Complete the form below to request verification',
+    identidadVerificada: 'Identity verified',
+    identidadVerificadaBtn: 'Verified ✓',
+    completaNombreTelEmail: 'Complete name, phone, and email',
+    agregaSocial: 'Add at least 1 social network in your profile first',
+    ingresaNombreEmpresa: 'Enter your business name',
+    solicitudEnviada: 'Application submitted. We\'ll notify you soon.',
+    identidadVerificadaExito: 'Identity verified successfully!',
+    verificacionEnProceso: 'Verification in progress. Your status will update in a few minutes.',
+    stripeConectadoExito: 'Stripe connected successfully! You can now receive payments.',
+    stripeIncompleto: 'Stripe setup incomplete. Try again.',
+    verificacionCompletada: 'Verification completed. Confirming result...',
+
+    // Dashboard — Metas tab
+    metaBloqueadaTitulo: 'You must be verified to create goals',
+    metaBloqueadaHint: 'Go to the "Verification" tab to start the process.',
+    crearMeta: 'Create New Goal',
+    metaRecomendacion: 'Recommendation: Upload screenshots of the product/tool prices you need with a direct purchase link. This builds credibility and transparency for your Supporters.',
+    metaTituloPlaceholder: 'Goal title (e.g.: New camera for content)',
+    metaDescPlaceholder: 'What do you need and why? Briefly describe your goal and how it will help your work as a creator...',
+    metaImagenesLabel: 'Images / Price screenshots',
+    metaImagenesHint: 'Upload product images, price screenshots, or visual evidence',
+    metaVideoLabel: 'Goal video (optional)',
+    metaVideoHint: 'Upload a video explaining your goal (Max 50MB)',
+    metaLinkLabel: 'Product purchase link (optional but recommended)',
+    metaGoalLabel: 'Goal ($)',
+    metaInicioLabel: 'Start',
+    metaFinLabel: 'End',
+    crearMetaBtn: 'Create Goal',
+    invitacionesMetas: 'Goal Invitations',
+    metaAlcanzada: 'Goal Reached',
+    debesSerVerificado: 'You must be verified to create goals',
+    creando: 'Creating...',
+    completaMetaFields: 'Complete title, description, goal ($10 min), and dates',
+    subeMetaMedia: 'Upload at least one image or video of your goal',
+    metaCreada: 'Goal created',
+    confirmarEliminarMeta: 'Delete this goal?',
+    metaEliminada: 'Goal deleted',
+    metaTituloRequerido: 'Title is required',
+    metaMinGoal: 'Goal must be at least $1',
+    metaActualizada: 'Goal updated',
+    editarMeta: 'Edit Goal',
+    metaDescLabel: 'Description',
+    estado: 'Status',
+    fechaInicio: 'Start Date', fechaFin: 'End Date',
+    imagenesVideos: 'Images / Videos',
+    activa: 'Active', inactiva: 'Inactive',
+
+    // Dashboard — 3-stage fund release
+    liberacionFondos: '3-Stage Fund Release System',
+    liberacionFondosDesc: 'To protect supporters and ensure transparency, funds for each goal are released in 3 verified stages.',
+    etapa1Titulo: 'Stripe Hold (7-14 days)',
+    etapa1Desc: 'Funds are held to verify they are not fraudulent payments or stolen cards.',
+    etapa2Titulo: 'First Release (50%)',
+    etapa2Desc: 'You receive half. You must upload a purchase receipt + community update (photo/video with description).',
+    etapa3Titulo: 'Final Release (remaining 50%)',
+    etapa3Desc: 'Upload final receipts, photos, and videos of the acquisition. Admin reviews and approves.',
+    retencionStripe: 'Stripe Hold',
+    confirmarProcederEtapa2: 'Confirm and Proceed to Stage 2',
+    enviado: 'Sent',
+    esperandoAprobacion: 'Waiting for approval...',
+    reciboScreenshot: 'Receipt / Purchase screenshot *',
+    actualizacionComunidad: 'Community update * (what you did with the funds)',
+    actualizacionPlaceholder: 'E.g.: I bought the Blue Yeti microphone on Amazon. Arriving in 3 days!',
+    evidenciaFotoVideo: 'Photo or video evidence *',
+    enviarEtapa2: 'Submit Stage 2 for Review',
+    recibosFinales: 'Final receipts and proof *',
+    descripcionAdquisicion: 'Acquisition description *',
+    descripcionAdquisicionPlaceholder: 'E.g.: I now have the microphone installed. Here are photos of the unboxing and complete setup.',
+    enviarPruebaFinal: 'Submit Final Proof for Review',
+    cancelarMeta: 'Cancel this goal',
+    cancelarMetaWarning: 'Cancelling a goal requires a public explanation:',
+    cancelarRazonPlaceholder: 'Explain why you are cancelling this goal...',
+    confirmarCancelacion: 'Confirm Cancellation',
+    noMantener: 'No, Keep It',
+    etapa1Completa: 'Stage 1 completed. Upload your receipts for Stage 2.',
+    subeRecibo: 'Upload at least one receipt',
+    escribeActualizacion: 'Write an update for your community',
+    subeEvidencia: 'Upload at least one photo or video evidence',
+    subiendoDocumentos: 'Uploading documents...',
+    etapa2Enviada: 'Stage 2 submitted for admin review',
+    subePruebas: 'Upload receipts and proof of acquisition',
+    escribeDescAdquisicion: 'Write an acquisition description',
+    subiendoPruebasFinales: 'Uploading final proof...',
+    etapa3Enviada: 'Final proof submitted for admin review',
+    debesEscribirRazon: 'You must write a reason for cancellation',
+    metaCancelada: 'Goal cancelled. Admin will review your explanation.',
+
+    // Dashboard — Meta status badges
+    creadorBaneado: 'Creator Banned',
+    fraudeCancelada: 'Goal Cancelled — Fraud',
+    completadaAntesGracias: 'Goal Completed Ahead of Schedule — Thanks to everyone\'s support',
+    metaCanceladaBadge: 'Goal Cancelled',
+    metaCompletadaLegitBadge: 'Goal Legitimately Completed',
+    adminReview: 'Goal Under Admin Review',
+    adminRechazada: 'Rejected by Admin',
+
+    // Dashboard — Meta invites
+    teInvitoColaborar: 'invited you to collaborate',
+    metaLabel: 'Goal:',
+    sinTitulo: 'No title',
+    unirseCreamos: 'Let\'s Create',
+    declinar: 'Decline',
+    alguienInvito: 'Someone',
+    teUnisteAMeta: 'You joined the goal! It\'s now a joint goal.',
+    invitacionDeclinada: 'Invitation declined',
+
+    // Dashboard — Posts tab
+    nuevaPublicacion: 'New Post',
+    nuevaPublicacionSub: 'Your post will appear in the Community for everyone to see.',
+    noPostsAun: 'You don\'t have any posts yet',
+
+    // Dashboard — Story tab
+    miHistoriaTab: 'My Story',
+    miHistoriaSub: 'Let people get to know you better. Share how you got here.',
+    tituloHistoriaPlaceholder: 'E.g.: My journey as a creator',
+    descripcionHistoria: 'Description',
+    descripcionHistoriaPlaceholder: 'Tell the world your story...',
+    videoPrincipalHint: 'Tell the world your story in no more than 5 minutes. Share how you got here and then state your goal. (Max 50MB)',
+    mediaAdicional: 'Additional Images and Audio',
+    mediaAdicionalHint: 'Upload photos of handwritten letters, old equipment photos, or record an audio with your story. (Max 10MB each)',
+    compartirMuroComunidad: 'Share on Community Wall',
+    compartirMuroComunidadHint: 'Your story will appear in the community feed',
+    publicarHistoria: 'Publish Story',
+    historiasPublicadas: 'Published Stories',
+    sinHistorias: 'You haven\'t published any stories yet',
+    videoActual: 'Current video',
+    agregaDescVideoMedia: 'Add at least a description, video, or media',
+    historiaPublicadaCompartida: 'Story published and shared in the community',
+    eliminarError: 'Error deleting',
+
+    // Dashboard — Creaciones tab
+    misCreacionesHeading: 'My Creations',
+    misCreacionesSub: 'Add links to your products, websites, or services (max 10).',
+    tituloEnlace: 'Link title',
+    urlEnlace: 'https://your-site.com',
+    descripcionCorta: 'Short description (optional)',
+    imagenOpcional: 'Image (optional)',
+    agregarEnlace: 'Add Link',
+    sinEnlaces: 'You don\'t have any business links yet.',
+    editarEnlace: 'Edit Link',
+    tituloUrlRequeridos: 'Title and URL are required',
+    maxEnlaces: 'Maximum 10 links allowed',
+    agregando: 'Adding...',
+    enlaceAgregado: 'Link added',
+    confirmarEliminarEnlace: 'Delete this link?',
+    enlaceEliminado: 'Link deleted',
+    enlaceActualizado: 'Link updated',
+
+    // Dashboard — Stripe tab
+    stripeHeading: 'Stripe Connection',
+    stripeSub: 'Connect your Stripe account to receive payments.',
+    stripeConectarBtn: 'Connect Stripe',
+    stripeComision: 'CREO retains a 5% commission per transaction. Stripe handles all payment processing securely.',
+    stripePlataforma: 'Platform Account',
+    stripePlataformaDesc: 'This is CREO\'s main account. The 5% commissions are deposited directly here.',
+
+    // Dashboard — Branding tab
+    brandingHeading: 'My Branding',
+    brandingSub: 'Customize how visitors see your profile.',
+    imagenesPerfilHeading: 'Profile images',
+    cambiarFoto: 'Change photo',
+    cambiarPortada: 'Change cover',
+    temaPerfil: 'Profile theme',
+    temaClaro: 'Light', temaOscuro: 'Dark',
+    textoPrincipal: 'Main text',
+    titulosColor: 'Titles',
+    textoBoton: 'Button text',
+    fondoSecciones: 'Section background',
+    fondoBotones: 'Button background',
+    fondoPagina: 'Page background',
+    tipografia: 'Typography',
+    vistaPrevia: 'Selected typography preview',
+    bgMedia: 'Background image or video',
+    bgMediaPasteHint: 'Or paste a direct link:',
+    preview: 'Preview',
+    previewPerfil: 'This is how your profile will look',
+    previewSub: 'Text and sections reflect your colors',
+    previewCreoEnTi: 'I Believe',
+    previewApoyoFull: 'Full Support',
+    textoInvisible: 'Invisible text.',
+    botonPocoVisible: 'Button text barely visible on background',
+    guardarBranding: 'Save General Branding',
+    seccionMetasHeading: 'Goals Section',
+    seccionMetasSub: 'Customize how goals look on your profile',
+    tituloSeccion: 'Section title',
+    colorBoton: 'Button color',
+    colorTarjeta: 'Card color',
+    guardarMetasBranding: 'Save Goals Branding',
+    brandingGuardado: 'Branding saved. Visit your profile to see it.',
+    textoInvisibleBloqueo: 'Text is not visible on the section background. Adjust the colors.',
+    errorGuardando: 'Error saving',
+    avatarError: 'Error saving avatar',
+    avatarActualizado: 'Profile photo updated',
+    portadaError: 'Error saving cover',
+    portadaActualizada: 'Cover updated',
+    imagenMaxSize: 'Each image max 5MB',
+    errorSubiendoImagenToast: 'Error uploading image',
+    imagenesSubidas: ' image(s) uploaded',
+    docMaxSize: 'Document max 10MB',
+    docsSubidos: 'Documents uploaded',
+    redirigiendo: 'Redirecting...',
+    bgMediaSubida: 'Background image loaded',
+    mecenasGuardado: 'Patron settings saved',
+    imagenActualizada: 'Image updated',
+
+    // Dashboard — Sounds tab
+    sonidoNotifHeading: 'Notification Sound',
+    sonidoNotifSub: 'Choose the sound that will play when you receive a new notification.',
+    activarSonidos: 'Enable sounds',
+    sonido: 'Sound',
+    volumen: 'Volume:',
+    previsualizar: 'Preview',
+    sonidosActivados: 'Sounds enabled',
+    sonidosDesactivados: 'Sounds disabled',
+
+    // Dashboard — Creo en Ellos tab
+    creoEnEllosHeading: 'I Believe in Them',
+    creoEnEllosSub: 'Select the creators you want to feature on your profile. They will appear in the "I Believe in Them" section of your public page.',
+    buscarCreador: 'Search creator by name or @username...',
+    creadoresDestacados: 'Featured creators',
+    sinCreadores: 'You haven\'t selected any creators yet.',
+    buscaArriba: 'Search above to add creators to your section.',
+    buscando: 'Searching...',
+    sinResultados: 'No creators found.',
+    agregar: 'Add', quitar: 'Remove',
+    maxCreadores: 'Maximum 10 featured creators',
+
+    // Dashboard — Mecenas tabs
+    mecTipHeading: 'I Believe in You',
+    mecTipSub: 'Customize how the tips section looks on your profile',
+    mecSubHeading: 'Full Support',
+    mecSubSub: 'Customize the monthly subscriptions section',
+    mecMetaDefaultTitle: 'My Goal',
+    mecMetaDefaultDesc: 'Support my goals as a creator',
+
+    // Dashboard — Onboarding
+    onboardingBienvenido: 'Welcome to CREO!',
+    onboardingBienvenidoMsg: 'Your account has been confirmed. We\'ll guide you step by step to set up your creator profile.',
+    onboardingPerfil: 'Complete your Profile',
+    onboardingPerfilMsg: 'Add your name, profile photo, and bio. This is the first thing people who support you will see.',
+    onboardingHistoria: 'Share your Story',
+    onboardingHistoriaMsg: 'Tell the world who you are. Upload a video up to 5 minutes and photos that tell your story. It\'s not mandatory, but creators with stories receive up to 3x more support.',
+    onboardingHistoriaHighlight: 'Creators who share their story receive significantly more support. We highly recommend it!',
+    onboardingMeta: 'Create your First Goal',
+    onboardingMetaMsg: 'Goals are financial objectives. Post what you need, how much it costs, and let the community help you achieve it.',
+    onboardingStripe: 'Connect Stripe',
+    onboardingStripeMsg: 'To receive payments you need to connect your Stripe account. It\'s free and takes only 5 minutes.',
+    onboardingListo: 'Ready to go!',
+    onboardingListoMsg: 'Your public profile will be available at your personal link. Share it on social media so people can discover you.',
+    saltarGuia: 'Skip guide',
+    atras: 'Back', siguiente: 'Next', empezar: 'Let\'s go!',
+
+    // Dashboard — Misc
+    hola: 'Hello, ',
+    miHistoriaPost: 'My Story',
+    historia: 'story', historias: 'stories',
+    errorCamara2: 'Could not access: ',
+    noAccesoDispositivo: 'Could not access ',
+    laCamara: 'the camera', elMicrofono: 'the microphone',
+
+    // Emojis panel
+    emojis: 'Emojis',
+
+    // ===== EXPLORE PAGE =====
+    explorarHeader: 'EXPLORE',
+    buscarCreadoresHistorias: 'Search creators, stories...',
+    sinHistoriasPublicadas: 'No stories published yet',
+    resultados: 'Results',
+    sinResultadosBusqueda: 'No results found',
+    comentarios: 'Comments',
+    escribirComentarioPlaceholder: 'Write a comment...',
+    linkCopiado: 'Link copied to clipboard',
+    creador: 'Creator',
+    historiaDe: 'Story by ',
+    iniciarSesionParaCreo: 'Sign in to give Creo',
   }
 };
 
@@ -75,6 +1368,29 @@ function setCreoLang(lang) {
 }
 function t(key) { return (CREO_TRANSLATIONS[getCreoLang()] || CREO_TRANSLATIONS.es)[key] || (CREO_TRANSLATIONS.es)[key] || key; }
 function toggleCreoLang() { setCreoLang(getCreoLang() === 'es' ? 'en' : 'es'); }
+
+function translatePage() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if (val && val !== key) el.textContent = val;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    const val = t(key);
+    if (val && val !== key) el.placeholder = val;
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    const val = t(key);
+    if (val && val !== key) el.title = val;
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    const val = t(key);
+    if (val && val !== key) el.innerHTML = val;
+  });
+}
 
 // ========== AUTHENTICATION (Google-only) ==========
 
@@ -171,7 +1487,7 @@ async function isCreoIdVerified() {
 
 async function requireCreoId(action) {
   const { data: { user } } = await sb.auth.getUser();
-  if (!user) { showToast('Inicia sesión para ' + (action || 'continuar'), 'error'); return false; }
+  if (!user) { showToast(t('iniciaSesion'), 'error'); return false; }
   const verified = await isCreoIdVerified();
   if (!verified) { showCreoIdModal(); return false; }
   return true;
@@ -190,45 +1506,45 @@ function showCreoIdModal() {
         <div class="w-16 h-16 rounded-full bg-creo-purple/10 flex items-center justify-center mx-auto">
           <img src="assets/logo-icon.png" class="w-10 h-10 rounded-full" alt="CREO">
         </div>
-        <h3 class="text-xl font-bold text-gray-900">Verifica tu Creo ID</h3>
-        <p class="text-sm text-gray-500">Para publicar deals y recibir pagos necesitas verificar tu identidad</p>
+        <h3 class="text-xl font-bold text-gray-900">${t('verificaCreoId')}</h3>
+        <p class="text-sm text-gray-500">${t('creoIdSubtext')}</p>
       </div>
 
       <div class="space-y-3">
         <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex gap-3">
           <span class="text-2xl flex-shrink-0">🛡️</span>
           <div>
-            <p class="text-sm font-bold text-green-800">Personas reales</p>
-            <p class="text-xs text-green-700">Cada usuario de CREO es una persona real verificada. Tu seguridad es nuestra prioridad.</p>
+            <p class="text-sm font-bold text-green-800">${t('personasReales')}</p>
+            <p class="text-xs text-green-700">${t('personasRealesDesc')}</p>
           </div>
         </div>
 
         <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
           <span class="text-2xl flex-shrink-0">🎓</span>
           <div>
-            <p class="text-sm font-bold text-blue-800">Sin menores</p>
-            <p class="text-xs text-blue-700">Los niños deben estar jugando, aprendiendo y en la escuela. Solo aceptamos mayores de 18 con identificación.</p>
+            <p class="text-sm font-bold text-blue-800">${t('sinMenores')}</p>
+            <p class="text-xs text-blue-700">${t('sinMenoresDesc')}</p>
           </div>
         </div>
 
         <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 flex gap-3">
           <span class="text-2xl flex-shrink-0">🔒</span>
           <div>
-            <p class="text-sm font-bold text-purple-800">Tu ID, tu seguridad</p>
-            <p class="text-xs text-purple-700">Verificamos tu identidad una sola vez. Tu información está protegida y nunca se comparte.</p>
+            <p class="text-sm font-bold text-purple-800">${t('tuIdSeguridad')}</p>
+            <p class="text-xs text-purple-700">${t('tuIdSeguridadDesc')}</p>
           </div>
         </div>
       </div>
 
       <button onclick="startCreoIdVerification()" id="creo-id-verify-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3.5 rounded-xl transition flex items-center justify-center gap-2">
         <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-        <span>Verificar mi Creo ID</span>
+        <span>${t('verificarCreoId')}</span>
       </button>
 
-      <button onclick="closeCreoIdModal()" class="w-full text-gray-400 text-sm hover:text-gray-600 transition py-1">Ahora no</button>
+      <button onclick="closeCreoIdModal()" class="w-full text-gray-400 text-sm hover:text-gray-600 transition py-1">${t('ahoraNo')}</button>
 
       <div class="text-center">
-        <p class="text-[10px] text-gray-400">La verificación es rápida, segura y solo se hace una vez.</p>
+        <p class="text-[10px] text-gray-400">${t('verificacionRapida')}</p>
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -241,10 +1557,10 @@ function closeCreoIdModal() {
 
 async function startCreoIdVerification() {
   const btn = document.getElementById('creo-id-verify-btn');
-  if (btn) { btn.textContent = 'Preparando...'; btn.disabled = true; }
+  if (btn) { btn.textContent = t('preparando'); btn.disabled = true; }
   try {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { showToast('Inicia sesión primero', 'error'); return; }
+    if (!session) { showToast(t('iniciaSesionPrimero'), 'error'); return; }
     const returnUrl = window.location.href.split('?')[0] + '?verification=complete';
     const res = await fetch(SUPABASE_URL + '/functions/v1/create-identity-session', {
       method: 'POST',
@@ -256,13 +1572,13 @@ async function startCreoIdVerification() {
     if (result.url) {
       window.location.href = result.url;
     } else {
-      showToast('No se pudo iniciar la verificación', 'error');
+      showToast(t('noSePudoVerif'), 'error');
     }
   } catch (e) {
-    showToast('Error de conexión', 'error');
+    showToast(t('errorConexion'), 'error');
     console.error(e);
   } finally {
-    if (btn) { btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Verificar mi Creo ID</span>'; btn.disabled = false; }
+    if (btn) { btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>' + t('verificarCreoId') + '</span>'; btn.disabled = false; }
   }
 }
 
@@ -334,12 +1650,12 @@ function applyThemeToFixedElements(dark) {
 // Generic file upload helper
 async function uploadToStorage(file, bucket, maxMB) {
   if (!file) return null;
-  if (file.size > (maxMB || 10) * 1024 * 1024) { showToast('Archivo max ' + (maxMB || 10) + 'MB', 'error'); return null; }
+  if (file.size > (maxMB || 10) * 1024 * 1024) { showToast(t('archivoMax') + ' ' + (maxMB || 10) + 'MB', 'error'); return null; }
   const { data: { user } } = await sb.auth.getUser();
-  if (!user) { showToast('Inicia sesión', 'error'); return null; }
+  if (!user) { showToast(t('iniciaSesion'), 'error'); return null; }
   const ext = file.name.split('.').pop();
   const path = user.id + '/' + Date.now() + '.' + ext;
-  showToast('Subiendo...', 'info');
+  showToast(t('subiendo'), 'info');
   const { error } = await sb.storage.from(bucket).upload(path, file, { upsert: true });
   if (error) { showToast('Error: ' + error.message, 'error'); return null; }
   const { data: urlData } = sb.storage.from(bucket).getPublicUrl(path);
@@ -602,12 +1918,12 @@ async function toggleNotifPanel() {
   panel.id = 'notif-panel';
   panel.className = 'fixed top-12 right-4 z-[60] w-80 max-h-96 overflow-y-auto rounded-xl shadow-2xl bg-white border border-gray-200';
   if (!data || data.length === 0) {
-    panel.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">Sin notificaciones</p>';
+    panel.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">' + t('sinNotificaciones') + '</p>';
   } else {
     const defaultIcons = { like: '❤️', comment: '💬', payment: '💰', approval: '✅', rejection: '❌', invite: '🤝', share: '🔗', meta_like: '❤️', meta_comment: '💬', follow: '👤', message: '✉️' };
     const categoryColors = { verification: 'border-l-purple-500', payment: 'border-l-creo-mint', admin: 'border-l-blue-500', warning: 'border-l-red-500', general: 'border-l-gray-300' };
     const priorityBg = { urgent: 'bg-red-50', high: 'bg-yellow-50', normal: '', low: '' };
-    panel.innerHTML = `<div class="p-3 border-b border-gray-200 flex justify-between items-center"><span class="font-bold text-sm text-gray-900">Notificaciones</span><button onclick="markAllRead()" class="text-xs text-creo-mint hover:underline">Marcar leídas</button></div>` +
+    panel.innerHTML = `<div class="p-3 border-b border-gray-200 flex justify-between items-center"><span class="font-bold text-sm text-gray-900">${t('notificaciones')}</span><button onclick="markAllRead()" class="text-xs text-creo-mint hover:underline">${t('marcarLeidasFull')}</button></div>` +
       data.map(n => {
         const link = n.action_url || n.link || getNotifDefaultLink(n);
         const icon = n.icon || defaultIcons[n.type] || '🔔';
@@ -647,7 +1963,7 @@ async function markAllRead() {
   loadNotificationBell();
   const panel = document.getElementById('notif-panel');
   if (panel) panel.remove();
-  showToast('Notificaciones marcadas como leídas', 'success');
+  showToast(t('notifsMarcadasLeidas'), 'success');
 }
 
 async function createNotification(targetUserId, type, title, body, link, opts = {}) {
@@ -747,7 +2063,7 @@ function createEmojiPicker(inputId, btnId) {
 }
 
 function emojiButton(btnId) {
-  return `<button type="button" id="${btnId}" class="p-1.5 text-gray-400 hover:text-yellow-500 transition rounded-lg hover:bg-gray-100" title="Emojis">😊</button>`;
+  return `<button type="button" id="${btnId}" class="p-1.5 text-gray-400 hover:text-yellow-500 transition rounded-lg hover:bg-gray-100" title="${t('emojis')}">😊</button>`;
 }
 
 // Cookie Consent Banner
@@ -761,13 +2077,13 @@ function initCookieConsent() {
       <div class="flex items-start gap-3">
         <span class="text-2xl flex-shrink-0">🍪</span>
         <div>
-          <p class="text-sm font-semibold text-gray-900">Cookies y Privacidad</p>
-          <p class="text-xs text-gray-500 mt-1">CREO utiliza cookies esenciales para autenticación y almacenamiento local para tus preferencias. No usamos cookies de seguimiento ni publicidad.</p>
+          <p class="text-sm font-semibold text-gray-900">${t('cookiesTitle')}</p>
+          <p class="text-xs text-gray-500 mt-1">${t('cookiesText')}</p>
         </div>
       </div>
       <div class="flex gap-2">
-        <button onclick="acceptCookies()" class="flex-1 bg-creo-purple text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-creo-light transition">Aceptar</button>
-        <a href="privacidad.html" class="flex-1 text-center border border-gray-300 text-gray-600 text-sm font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition">Más info</a>
+        <button onclick="acceptCookies()" class="flex-1 bg-creo-purple text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-creo-light transition">${t('aceptar')}</button>
+        <a href="privacidad.html" class="flex-1 text-center border border-gray-300 text-gray-600 text-sm font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition">${t('masInfo')}</a>
       </div>
     </div>`;
   document.body.appendChild(banner);
@@ -1243,16 +2559,16 @@ function showOnboardingModal(user, profile) {
     const cb3 = document.getElementById('ob-community-check');
     const cb4 = document.getElementById('ob-stripe-check');
     if (!cb1?.checked || !cb2?.checked || !cb3?.checked || !cb4?.checked) {
-      showToast('Debes aceptar todos los términos para continuar', 'error');
+      showToast(t('aceptaTerminos'), 'error');
       return;
     }
     const btn = document.getElementById('ob-accept-btn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+    if (btn) { btn.disabled = true; btn.textContent = t('guardando'); }
     try {
       await sb.rpc('accept_platform_terms', { p_policy_version: ONBOARDING_VERSION, p_app_version: ONBOARDING_VERSION });
       saveOnboardingState({ completed: true });
       modal.remove();
-      showToast('¡Bienvenido a CREO! Tu cuenta está lista.', 'success');
+      showToast(t('onboardingBienvenido'), 'success');
       _creoIdVerified = null;
     } catch(e) {
       console.error('Terms acceptance error:', e);
@@ -1262,7 +2578,7 @@ function showOnboardingModal(user, profile) {
       }
       saveOnboardingState({ completed: true });
       modal.remove();
-      showToast('¡Bienvenido a CREO!', 'success');
+      showToast(t('onboardingBienvenido'), 'success');
     }
   };
 
@@ -1276,16 +2592,16 @@ function renderWelcomeStep(container) {
       <div class="w-20 h-20 rounded-full bg-gradient-to-br from-creo-purple to-creo-light flex items-center justify-center mx-auto shadow-lg">
         <img src="assets/logo-icon.png" class="w-12 h-12 rounded-full" alt="CREO">
       </div>
-      <h2 class="text-2xl font-bold text-gray-900">Bienvenido a CREO</h2>
+      <h2 class="text-2xl font-bold text-gray-900">${t('onboardingBienvenido')}</h2>
       <div class="space-y-3 text-left">
-        <p class="text-sm text-gray-600 leading-relaxed">CREO es una comunidad construida para <strong>creadores reales</strong> y <strong>apoyadores reales</strong>.</p>
-        <p class="text-sm text-gray-600 leading-relaxed">Cada creador que encuentras aquí está verificado como una persona real.</p>
-        <p class="text-sm text-gray-600 leading-relaxed">Los pagos son procesados de forma segura por <strong>Stripe</strong>, uno de los proveedores de pagos más confiables del mundo.</p>
-        <p class="text-sm text-gray-600 leading-relaxed">Nuestro proceso de verificación protege a creadores, apoyadores y marcas contra el fraude, construyendo una <strong>economía de creadores confiable</strong>.</p>
+        <p class="text-sm text-gray-600 leading-relaxed">${t('obWelcome1')}</p>
+        <p class="text-sm text-gray-600 leading-relaxed">${t('obWelcome2')}</p>
+        <p class="text-sm text-gray-600 leading-relaxed">${t('obWelcome3')}</p>
+        <p class="text-sm text-gray-600 leading-relaxed">${t('obWelcome4')}</p>
       </div>
       <div class="flex gap-3 pt-2">
-        <button onclick="_onboardDismiss()" class="flex-1 text-gray-400 text-sm hover:text-gray-600 transition py-2.5">Ahora no</button>
-        <button onclick="_onboardNext()" class="flex-1 bg-creo-purple hover:bg-creo-light text-white font-bold py-2.5 rounded-xl transition">Continuar</button>
+        <button onclick="_onboardDismiss()" class="flex-1 text-gray-400 text-sm hover:text-gray-600 transition py-2.5">${t('ahoraNo')}</button>
+        <button onclick="_onboardNext()" class="flex-1 bg-creo-purple hover:bg-creo-light text-white font-bold py-2.5 rounded-xl transition">${t('continuar')}</button>
       </div>
     </div>`;
 }

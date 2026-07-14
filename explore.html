@@ -40,12 +40,12 @@
   <div class="fixed top-[60px] lg:top-0 left-0 lg:left-[220px] right-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-200 dark-aware-header">
     <div class="max-w-2xl mx-auto px-4 py-3 space-y-3">
       <div class="flex items-center justify-between">
-        <h1 class="text-lg font-bold tracking-[0.15em] text-creo-purple">EXPLORAR</h1>
+        <h1 class="text-lg font-bold tracking-[0.15em] text-creo-purple" data-i18n="explorarHeader">EXPLORAR</h1>
       </div>
       <!-- Search -->
       <div class="relative">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input id="search-input" type="text" placeholder="Buscar creadores, historias..." class="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-creo-mint text-gray-900 placeholder-gray-400 dark-aware-input" oninput="handleSearch(this.value)">
+        <input id="search-input" type="text" data-i18n-placeholder="buscarCreadoresHistorias" placeholder="Buscar creadores, historias..." class="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-creo-mint text-gray-900 placeholder-gray-400 dark-aware-input" oninput="handleSearch(this.value)">
       </div>
     </div>
   </div>
@@ -57,13 +57,13 @@
     <div id="stories-loading" class="text-center py-8">
       <div class="inline-block w-6 h-6 border-2 border-creo-mint border-t-transparent rounded-full animate-spin"></div>
     </div>
-    <p id="no-stories" class="hidden text-center text-gray-400 text-xs py-8">Aún no hay historias publicadas</p>
+    <p id="no-stories" class="hidden text-center text-gray-400 text-xs py-8" data-i18n="sinHistoriasPublicadas">Aún no hay historias publicadas</p>
 
     <!-- Search results -->
     <div id="search-results" class="hidden px-4 space-y-3">
-      <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Resultados</h2>
+      <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3" data-i18n="resultados">Resultados</h2>
       <div id="search-results-list" class="space-y-3"></div>
-      <p id="no-search" class="hidden text-center text-gray-400 text-xs py-8">No se encontraron resultados</p>
+      <p id="no-search" class="hidden text-center text-gray-400 text-xs py-8" data-i18n="sinResultadosBusqueda">No se encontraron resultados</p>
     </div>
   </div>
 
@@ -77,14 +77,14 @@
     <div id="story-comments-panel" class="fixed bottom-0 left-0 right-0 z-[110] hidden transform translate-y-full transition-transform duration-300" style="max-height:60vh">
       <div class="bg-gray-900 rounded-t-2xl border-t border-gray-700 flex flex-col" style="max-height:60vh">
         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-          <h3 class="text-white font-bold text-sm">Comentarios</h3>
+          <h3 class="text-white font-bold text-sm" data-i18n="comentarios">Comentarios</h3>
           <button onclick="closeStoryComments()" class="text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
         <div id="story-comments-list" class="flex-1 overflow-y-auto px-4 py-3 space-y-3" style="max-height:40vh"></div>
         <div class="px-4 py-3 border-t border-gray-700">
           <div class="flex gap-2">
-            <input id="story-comment-input" type="text" placeholder="Escribe un comentario..." class="flex-1 bg-gray-800 text-white text-sm rounded-full px-4 py-2 focus:outline-none focus:ring-1 focus:ring-creo-mint placeholder-gray-500">
-            <button onclick="submitStoryComment()" class="bg-creo-mint text-creo-purple px-4 py-2 rounded-full text-sm font-bold hover:opacity-90 transition">Enviar</button>
+            <input id="story-comment-input" type="text" data-i18n-placeholder="escribirComentarioPlaceholder" placeholder="Escribe un comentario..." class="flex-1 bg-gray-800 text-white text-sm rounded-full px-4 py-2 focus:outline-none focus:ring-1 focus:ring-creo-mint placeholder-gray-500">
+            <button onclick="submitStoryComment()" class="bg-creo-mint text-creo-purple px-4 py-2 rounded-full text-sm font-bold hover:opacity-90 transition" data-i18n="enviar">Enviar</button>
           </div>
         </div>
       </div>
@@ -221,7 +221,7 @@
           : `<img src="${esc(first)}" class="w-full h-full object-contain">`;
       } else {
         media = `<div class="w-full h-full flex items-center justify-center"><div class="max-w-md p-8 text-center text-white space-y-4">
-          <h3 class="text-xl font-bold">${esc(s.title || 'Mi Historia')}</h3>
+          <h3 class="text-xl font-bold">${esc(s.title || t('miHistoria'))}</h3>
           <p class="text-sm text-white/80 leading-relaxed">${esc(s.description || s.content || '')}</p>
         </div></div>`;
       }
@@ -242,7 +242,7 @@
           </button>
           <button onclick="shareStory()" class="flex flex-col items-center gap-1 text-white/80 hover:text-creo-mint transition">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-            <span class="text-[10px] font-bold">Compartir</span>
+            <span class="text-[10px] font-bold">${t('compartir')}</span>
           </button>
         </div>
         <div class="absolute bottom-0 left-0 right-16 p-4 bg-gradient-to-t from-black/80 to-transparent">
@@ -348,7 +348,7 @@
     }
 
     async function toggleStoryLike(idx) {
-      if (!exploreUser) { showToast('Inicia sesión para dar Creo', 'error'); return; }
+      if (!exploreUser) { showToast(t('iniciarSesionParaCreo'), 'error'); return; }
       const s = allStories[idx != null ? idx : currentStoryIdx];
       if (!s) return;
       const container = document.getElementById('story-scroll-container');
@@ -393,7 +393,7 @@
         .order('created_at', { ascending: true });
 
       if (!data || data.length === 0) {
-        list.innerHTML = '<p class="text-gray-500 text-xs text-center py-4">Sé el primero en comentar</p>';
+        list.innerHTML = '<p class="text-gray-500 text-xs text-center py-4">' + t('sinComentarios') + '</p>';
         return;
       }
 
@@ -416,7 +416,7 @@
     }
 
     async function submitStoryComment() {
-      if (!exploreUser) { showToast('Inicia sesión para comentar', 'error'); return; }
+      if (!exploreUser) { showToast(t('iniciarSesionParaComentar'), 'error'); return; }
       const s = allStories[currentStoryIdx];
       if (!s) return;
       const input = document.getElementById('story-comment-input');
@@ -431,7 +431,7 @@
     }
 
     async function deleteStoryComment(commentId) {
-      if (!confirm('¿Eliminar comentario?')) return;
+      if (!confirm(t('confirmarEliminar'))) return;
       await sb.from('story_comments').delete().eq('id', commentId);
       loadStoryCommentsList();
       const el = document.getElementById('sv-comment-count');
@@ -442,12 +442,12 @@
       const s = allStories[currentStoryIdx];
       if (!s) return;
       const url = window.location.origin + window.location.pathname;
-      const name = s.profile?.display_name || s.profile?.username || 'Creador';
+      const name = s.profile?.display_name || s.profile?.username || t('creador');
       if (navigator.share) {
-        try { await navigator.share({ title: s.title || 'Historia de ' + name, url }); } catch(e) {}
+        try { await navigator.share({ title: s.title || t('historiaDe') + name, url }); } catch(e) {}
       } else {
         await navigator.clipboard.writeText(url);
-        showToast('Link copiado al portapapeles', 'success');
+        showToast(t('linkCopiado'), 'success');
       }
     }
 
@@ -512,6 +512,7 @@
       renderBottomNav('explore');
       updateNavAuth();
       loadNotificationBell();
+      translatePage();
     }
 
     init();
