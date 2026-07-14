@@ -2858,3 +2858,139 @@ function renderTermsStep(container) {
 
 // Update last_activity_at debounced (max once per 30s)
 trackActivityDebounced();
+
+// ========== SERVICE WORKER REGISTRATION ==========
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/creo/sw.js').catch(() => {});
+  });
+}
+
+// ========== APPLE PWA META TAGS (injected once) ==========
+(function injectAppleMeta() {
+  const tags = [
+    { name: 'apple-mobile-web-app-capable', content: 'yes' },
+    { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+    { name: 'apple-mobile-web-app-title', content: 'CREO' },
+  ];
+  tags.forEach(({ name, content }) => {
+    if (document.querySelector(`meta[name="${name}"]`)) return;
+    const meta = document.createElement('meta');
+    meta.name = name;
+    meta.content = content;
+    document.head.appendChild(meta);
+  });
+})();
+
+// ========== GLOBAL ERROR HANDLER ==========
+window.onerror = function(msg, src, line) {
+  console.error('CREO Error:', msg, src, line);
+  if (typeof showToast === 'function') showToast('Algo salió mal. Intenta recargar.', 'error');
+  return false;
+};
+window.addEventListener('unhandledrejection', function(e) {
+  console.error('CREO Unhandled Promise:', e.reason);
+});
+
+// ========== PWA INSTALL PROMPT ==========
+let _deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _deferredInstallPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner() {
+  if (localStorage.getItem('creo_install_dismissed')) return;
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  const banner = document.createElement('div');
+  banner.id = 'creo-install-banner';
+  banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;background:#1a0a3e;color:#fff;padding:12px 20px;border-radius:16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.3);font-size:14px;max-width:360px;width:calc(100% - 32px);';
+  banner.innerHTML = `
+    <img src="assets/logo-icon.png" style="width:40px;height:40px;border-radius:10px;" alt="CREO">
+    <div style="flex:1">
+      <div style="font-weight:700;">Instalar CREO</div>
+      <div style="font-size:12px;opacity:0.7;">Acceso rápido desde tu pantalla</div>
+    </div>
+    <button id="creo-install-btn" style="background:#33f0b0;color:#1a0a3e;border:none;padding:8px 16px;border-radius:999px;font-weight:700;font-size:13px;cursor:pointer;">Instalar</button>
+    <button id="creo-install-dismiss" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:18px;cursor:pointer;padding:4px;">✕</button>
+  `;
+  document.body.appendChild(banner);
+  document.getElementById('creo-install-btn').addEventListener('click', async () => {
+    if (_deferredInstallPrompt) {
+      _deferredInstallPrompt.prompt();
+      const { outcome } = await _deferredInstallPrompt.userChoice;
+      if (outcome === 'accepted') showToast('CREO instalado', 'success');
+      _deferredInstallPrompt = null;
+    }
+    banner.remove();
+  });
+  document.getElementById('creo-install-dismiss').addEventListener('click', () => {
+    localStorage.setItem('creo_install_dismissed', '1');
+    banner.remove();
+  });
+}
+
+// ========== ACCOUNT DELETION ==========
+async function requestAccountDeletion() {
+  const user = await getCachedUser();
+  if (!user) { showToast(t('iniciaSesion'), 'error'); return; }
+  const confirmed = confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible. Todos tus datos serán eliminados permanentemente en 7 días.');
+  if (!confirmed) return;
+  const confirmText = prompt('Escribe ELIMINAR para confirmar:');
+  if (confirmText !== 'ELIMINAR') { showToast('Cancelado', 'info'); return; }
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch(SUPABASE_URL + '/functions/v1/delete-account', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + session.access_token,
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({ user_id: user.id }),
+    });
+    const result = await res.json();
+    if (res.ok) {
+      showToast('Cuenta programada para eliminación en 7 días. Revisa tu email.', 'success');
+      await sb.auth.signOut();
+      setTimeout(() => { window.location.href = 'explore.html'; }, 2000);
+    } else {
+      showToast(result.error || 'Error al eliminar cuenta', 'error');
+    }
+  } catch (err) {
+    showToast('Error de conexión', 'error');
+  }
+}
+
+// ========== DATA EXPORT ==========
+async function requestDataExport() {
+  const user = await getCachedUser();
+  if (!user) { showToast(t('iniciaSesion'), 'error'); return; }
+  showToast('Preparando tu descarga de datos...', 'info');
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch(SUPABASE_URL + '/functions/v1/export-data', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + session.access_token,
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({ user_id: user.id }),
+    });
+    if (!res.ok) { showToast('Error al exportar datos', 'error'); return; }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'creo-mis-datos.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('Datos descargados', 'success');
+  } catch (err) {
+    showToast('Error de conexión', 'error');
+  }
+}

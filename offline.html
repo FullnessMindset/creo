@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CREO — Sin conexión</title>
+  <meta name="theme-color" content="#1a0a3e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CREO">
+  <link rel="icon" href="assets/logo-icon.png" type="image/png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    .container { max-width: 400px; }
+    .logo { width: 100px; height: 100px; border-radius: 24px; margin: 0 auto 2rem; }
+    h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.75rem; }
+    p { font-size: 0.95rem; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 2rem; }
+    .retry-btn {
+      display: inline-block;
+      background: #33f0b0;
+      color: #1a0a3e;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.75rem 2rem;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .retry-btn:active { transform: scale(0.96); }
+    .wifi-icon {
+      width: 64px; height: 64px; margin: 0 auto 1.5rem;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <svg class="wifi-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+        d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.858 15.355-5.858 21.213 0"/>
+    </svg>
+    <h1>Sin conexión</h1>
+    <p>No pudimos conectar con CREO. Verifica tu conexión a internet e inténtalo de nuevo.</p>
+    <button class="retry-btn" onclick="location.reload()">Reintentar</button>
+  </div>
+</body>
+</html>
