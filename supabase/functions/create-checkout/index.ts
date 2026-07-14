@@ -4,6 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2023-10-16" });
 const PLATFORM_FEE_PERCENT = 5;
+const ALLOWED_ORIGINS = ["https://fullnessmindset.github.io"];
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -16,39 +17,63 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+function json(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status, headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+function isValidReturnUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.origin === "https://fullnessmindset.github.io";
+  } catch { return false; }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(
+      req.headers.get("Authorization")?.replace("Bearer ", "") || ""
+    );
+
+    const rateLimitKey = user ? `checkout:${user.id}` : `checkout:anon:${req.headers.get("x-forwarded-for")?.split(",").pop()?.trim() || "unknown"}`;
     const { data: allowed } = await supabase.rpc("check_rate_limit", {
-      p_key: `checkout:${clientIP}`,
+      p_key: rateLimitKey,
       p_max_requests: 10,
       p_window_seconds: 60,
     });
-    if (allowed === false) {
-      return new Response(JSON.stringify({ error: "Too many requests. Please wait a moment." }), {
-        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (allowed === false) return json({ error: "Too many requests. Please wait a moment." }, 429);
+
+    const { creator_id, creator_username, amount_usd, success_url, cancel_url } = await req.json();
+
+    if (!creator_id || !amount_usd || amount_usd < 1 || amount_usd > 10000) {
+      return json({ error: "Missing or invalid parameters (amount: $1–$10,000)" }, 400);
     }
 
-    const { creator_connect_id, creator_id, creator_username, amount_usd, success_url, cancel_url } = await req.json();
+    // Server-side resolution of stripe_connect_id — never trust client
+    const { data: profile, error: profileErr } = await supabase
+      .from("profiles")
+      .select("stripe_connect_id, username")
+      .eq("id", creator_id)
+      .single();
 
-    if (!creator_connect_id || !amount_usd || amount_usd < 1 || amount_usd > 10000) {
-      return new Response(JSON.stringify({ error: "Missing or invalid parameters (amount: $1–$10,000)" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    if (profileErr || !profile) return json({ error: "Creator not found" }, 404);
 
+    const connectId = profile.stripe_connect_id;
     const amountCents = Math.round(amount_usd * 100);
-    const isPlatform = creator_connect_id === "platform";
+    const isPlatform = !connectId;
     const feeCents = Math.round(amountCents * PLATFORM_FEE_PERCENT / 100);
 
-    const paymentIntentData: any = {};
+    const paymentIntentData: Record<string, unknown> = {};
     if (!isPlatform) {
       paymentIntentData.application_fee_amount = feeCents;
-      paymentIntentData.transfer_data = { destination: creator_connect_id };
+      paymentIntentData.transfer_data = { destination: connectId };
     }
+
+    const validSuccessUrl = success_url && isValidReturnUrl(success_url) ? success_url : "https://fullnessmindset.github.io/creo/redirect.html?status=success";
+    const validCancelUrl = cancel_url && isValidReturnUrl(cancel_url) ? cancel_url : "https://fullnessmindset.github.io/creo/";
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -61,17 +86,19 @@ serve(async (req) => {
         quantity: 1,
       }],
       payment_intent_data: paymentIntentData,
-      metadata: { type: "tip", creator_connect_id, creator_id: creator_id || "", creator_username: creator_username || "" },
-      success_url: success_url || "https://fullnessmindset.github.io/creo/redirect.html?status=success",
-      cancel_url: cancel_url || "https://fullnessmindset.github.io/creo/",
+      metadata: {
+        type: "tip",
+        creator_id,
+        creator_username: profile.username || creator_username || "",
+        creator_connect_id: connectId || "platform",
+      },
+      success_url: validSuccessUrl,
+      cancel_url: validCancelUrl,
     });
 
-    return new Response(JSON.stringify({ url: session.url }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return json({ url: session.url });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    console.error("create-checkout error:", err);
+    return json({ error: (err as Error).message }, 500);
   }
 });

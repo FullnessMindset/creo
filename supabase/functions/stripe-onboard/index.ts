@@ -42,8 +42,14 @@ serve(async (req) => {
     if (authError || !user) return json({ error: "Unauthorized" }, 403);
 
     const { redirect_url } = await req.json();
-    const returnUrl =
-      redirect_url || "https://fullnessmindset.github.io/creo/redirect.html";
+    let returnUrl = "https://fullnessmindset.github.io/creo/redirect.html";
+    if (redirect_url) {
+      try {
+        if (new URL(redirect_url).origin === "https://fullnessmindset.github.io") {
+          returnUrl = redirect_url;
+        }
+      } catch { /* invalid URL, use default */ }
+    }
 
     const { data: profile } = await sbAdmin
       .from("profiles")

@@ -35,53 +35,129 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabaseUser.auth.getUser();
     if (authError || !user) return json({ error: "Unauthorized" }, 401);
 
-    const { user_id } = await req.json();
+    const { user_id, confirm_immediate } = await req.json();
     if (user_id !== user.id) return json({ error: "Unauthorized" }, 403);
 
-    // Mark profile for deletion (7-day grace period)
+    // Rate limit: max 2 deletion requests per hour
+    const { data: allowed } = await supabaseAdmin.rpc("check_rate_limit", {
+      p_key: `delete-account:${user.id}`,
+      p_max_requests: 2,
+      p_window_seconds: 3600,
+    });
+    if (allowed === false) return json({ error: "Too many requests" }, 429);
+
+    if (confirm_immediate) {
+      // Immediate deletion — user confirmed after grace period or chose immediate
+      await performDeletion(supabaseAdmin, user.id);
+      return json({ success: true, message: "Account deleted immediately" });
+    }
+
+    // Schedule deletion for 7 days from now (real grace period)
     const deletionDate = new Date();
     deletionDate.setDate(deletionDate.getDate() + 7);
 
-    await supabaseAdmin.from("profiles").update({
+    const { error: updateErr } = await supabaseAdmin.from("profiles").update({
       deletion_requested_at: new Date().toISOString(),
       deletion_scheduled_for: deletionDate.toISOString(),
     }).eq("id", user.id);
 
-    // Delete storage files
-    const buckets = ["avatars", "post-media", "story-media", "meta-media"];
-    for (const bucket of buckets) {
-      const { data: files } = await supabaseAdmin.storage.from(bucket).list(user.id);
-      if (files && files.length > 0) {
-        const paths = files.map((f) => `${user.id}/${f.name}`);
-        await supabaseAdmin.storage.from(bucket).remove(paths);
-      }
+    if (updateErr) {
+      console.error("Failed to schedule deletion:", updateErr);
+      return json({ error: "Failed to schedule deletion" }, 500);
     }
 
-    // Anonymize messages (keep conversation structure but remove content)
-    await supabaseAdmin.from("messages")
-      .update({ content: "[mensaje eliminado]", media_url: null })
-      .eq("sender_id", user.id);
-
-    // Delete user content
-    await supabaseAdmin.from("posts").delete().eq("creator_id", user.id);
-    await supabaseAdmin.from("creator_stories").delete().eq("creator_id", user.id);
-    await supabaseAdmin.from("community_posts").delete().eq("author_id", user.id);
-    await supabaseAdmin.from("notifications").delete().eq("user_id", user.id);
-    await supabaseAdmin.from("follows").delete().or(`follower_id.eq.${user.id},following_id.eq.${user.id}`);
-
-    // Delete profile
-    await supabaseAdmin.from("profiles").delete().eq("id", user.id);
-
-    // Delete auth user
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
-    if (deleteError) {
-      console.error("Auth delete error:", deleteError);
-      return json({ error: "Error deleting auth user" }, 500);
-    }
-
-    return json({ success: true, message: "Account deleted" });
+    return json({
+      success: true,
+      message: "Account scheduled for deletion",
+      deletion_scheduled_for: deletionDate.toISOString(),
+    });
   } catch (err) {
     console.error("Delete account error:", err);
     return json({ error: "Internal server error" }, 500);
   }
 });
+
+async function performDeletion(supabaseAdmin: ReturnType<typeof createClient>, userId: string) {
+  // Delete storage files across all buckets
+  const buckets = ["avatars", "post-media", "story-media", "meta-media", "deal-media", "message-media"];
+  for (const bucket of buckets) {
+    try {
+      const { data: files } = await supabaseAdmin.storage.from(bucket).list(userId);
+      if (files && files.length > 0) {
+        const paths = files.map((f) => `${userId}/${f.name}`);
+        await supabaseAdmin.storage.from(bucket).remove(paths);
+      }
+    } catch { /* bucket may not exist */ }
+  }
+
+  // Anonymize messages (keep conversation structure but remove content)
+  await supabaseAdmin.from("messages")
+    .update({ content: "[mensaje eliminado]", media_url: null })
+    .eq("sender_id", userId);
+
+  await supabaseAdmin.from("deal_messages")
+    .update({ content: "[mensaje eliminado]" })
+    .eq("sender_id", userId);
+
+  // Delete user content
+  const contentTables = [
+    { table: "posts", col: "creator_id" },
+    { table: "creator_stories", col: "creator_id" },
+    { table: "community_posts", col: "author_id" },
+    { table: "notifications", col: "user_id" },
+    { table: "follows", col: "follower_id" },
+    { table: "follows", col: "following_id" },
+    { table: "meta_likes", col: "user_id" },
+    { table: "meta_comments", col: "user_id" },
+    { table: "post_likes", col: "user_id" },
+    { table: "post_comments", col: "user_id" },
+    { table: "story_likes", col: "user_id" },
+    { table: "story_comments", col: "user_id" },
+    { table: "community_likes", col: "user_id" },
+    { table: "community_comments", col: "user_id" },
+    { table: "comment_likes", col: "user_id" },
+    { table: "reports", col: "reporter_id" },
+    { table: "verification_documents", col: "user_id" },
+    { table: "terms_acceptance", col: "user_id" },
+    { table: "business_links", col: "creator_id" },
+  ];
+
+  for (const { table, col } of contentTables) {
+    try {
+      await supabaseAdmin.from(table).delete().eq(col, userId);
+    } catch { /* table may not exist */ }
+  }
+
+  // Anonymize financial records (keep for accounting/tax, remove PII)
+  try {
+    await supabaseAdmin.from("tips")
+      .update({ tipper_name: "[eliminado]", tipper_email: null })
+      .eq("creator_id", userId);
+  } catch {}
+
+  try {
+    await supabaseAdmin.from("subscriptions")
+      .update({ subscriber_name: "[eliminado]", subscriber_email: null, status: "cancelled" })
+      .eq("creator_id", userId);
+  } catch {}
+
+  // Delete metas owned by this creator (cascades to contributions)
+  try {
+    await supabaseAdmin.from("metas").delete().eq("creator_id", userId);
+  } catch {}
+
+  // Delete brand deal requests by this creator
+  try {
+    await supabaseAdmin.from("brand_deal_requests").delete().eq("creator_id", userId);
+  } catch {}
+
+  // Delete profile
+  await supabaseAdmin.from("profiles").delete().eq("id", userId);
+
+  // Delete auth user
+  const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+  if (deleteError) {
+    console.error("Auth delete error:", deleteError);
+    throw new Error("Error deleting auth user");
+  }
+}

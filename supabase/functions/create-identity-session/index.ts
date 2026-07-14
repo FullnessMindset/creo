@@ -37,12 +37,28 @@ serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const returnUrl = body.return_url || "https://fullnessmindset.github.io/creo/index.html?verification=complete";
+    let returnUrl = "https://fullnessmindset.github.io/creo/index.html?verification=complete";
+    if (body.return_url) {
+      try {
+        if (new URL(body.return_url).origin === "https://fullnessmindset.github.io") {
+          returnUrl = body.return_url;
+        }
+      } catch { /* invalid URL, use default */ }
+    }
 
+    // Rate limit: $1.50 per session — prevent abuse
     const sbAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+    const { data: allowed } = await sbAdmin.rpc("check_rate_limit", {
+      p_key: `identity:${user.id}`, p_max_requests: 3, p_window_seconds: 3600,
+    });
+    if (allowed === false) {
+      return new Response(JSON.stringify({ error: "Too many verification attempts. Please try again later." }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
       apiVersion: "2023-10-16",

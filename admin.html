@@ -2112,10 +2112,11 @@
 
       list.innerHTML = filtered.map(m => {
         const creator = m.creator || {};
-        const name = creator.display_name || creator.username || 'Desconocido';
+        const name = esc(creator.display_name || creator.username || 'Desconocido');
+        const avatarUrl = esc(creator.avatar_url || '');
         const avatar = creator.avatar_url
-          ? `<img src="${creator.avatar_url}" class="w-10 h-10 rounded-full object-cover border-2 border-creo-mint">`
-          : `<div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold">${name[0].toUpperCase()}</span></div>`;
+          ? `<img src="${avatarUrl}" class="w-10 h-10 rounded-full object-cover border-2 border-creo-mint">`
+          : `<div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold">${name[0] ? name[0].toUpperCase() : '?'}</span></div>`;
         const raised = (m.raised_cents / 100).toFixed(2);
         const goal = (m.goal_amount_cents / 100).toFixed(2);
         const stage = m.fund_stage || 1;
@@ -2130,13 +2131,13 @@
           'rejected': 'Rechazada',
           'fraud_banned': 'Fraude — Baneado',
           'early_complete': 'Completada Anticipada'
-        }[m.fund_status] || m.fund_status;
+        }[m.fund_status] || esc(m.fund_status || '');
 
-        return `<div class="p-4 flex items-center gap-4 hover:bg-gray-50 transition cursor-pointer" onclick="openMetaReview('${m.id}')">
+        return `<div class="p-4 flex items-center gap-4 hover:bg-gray-50 transition cursor-pointer" onclick="openMetaReview('${esc(m.id)}')">
           ${avatar}
           <div class="flex-1 min-w-0">
-            <p class="font-semibold text-sm truncate">${m.title}</p>
-            <p class="text-xs text-gray-500">por @${creator.username || '?'} · $${raised}/$${goal} · Etapa ${stage}</p>
+            <p class="font-semibold text-sm truncate">${esc(m.title || '')}</p>
+            <p class="text-xs text-gray-500">por @${esc(creator.username || '?')} · $${raised}/$${goal} · Etapa ${stage}</p>
           </div>
           <span class="text-[10px] bg-${statusColor}-100 text-${statusColor}-700 px-3 py-1 rounded-full font-semibold whitespace-nowrap">${statusLabel}</span>
         </div>`;
@@ -2155,18 +2156,25 @@
       const isCancellation = meta.fund_status === 'cancelled_review';
       document.getElementById('mr-fraud-btn').classList.toggle('hidden', !isCancellation);
 
+      const cName = esc(creator.display_name || creator.username || '?');
+      const cUser = esc(creator.username || '');
+      const cEmail = esc(creator.email || '');
+      const cAvatar = esc(creator.avatar_url || '');
+      const mTitle = esc(meta.title || '');
+      const mDesc = esc(meta.description || '');
+
       let html = `<div class="space-y-4">
         <div class="flex items-center gap-3">
-          ${creator.avatar_url ? `<img src="${creator.avatar_url}" class="w-14 h-14 rounded-full object-cover border-2 border-creo-mint">` : `<div class="w-14 h-14 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold text-xl">${(creator.display_name || creator.username || '?')[0].toUpperCase()}</span></div>`}
+          ${creator.avatar_url ? `<img src="${cAvatar}" class="w-14 h-14 rounded-full object-cover border-2 border-creo-mint">` : `<div class="w-14 h-14 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold text-xl">${cName[0] ? cName[0].toUpperCase() : '?'}</span></div>`}
           <div>
-            <p class="font-bold text-lg">${creator.display_name || creator.username}</p>
-            <p class="text-sm text-gray-500">@${creator.username} · ${creator.email || ''}</p>
+            <p class="font-bold text-lg">${cName}</p>
+            <p class="text-sm text-gray-500">@${cUser} · ${cEmail}</p>
           </div>
         </div>
 
         <div class="bg-gray-50 rounded-xl p-4 space-y-2">
-          <p class="font-semibold">${meta.title}</p>
-          <p class="text-sm text-gray-600">${meta.description || ''}</p>
+          <p class="font-semibold">${mTitle}</p>
+          <p class="text-sm text-gray-600">${mDesc}</p>
           <div class="flex gap-4 text-xs text-gray-500">
             <span>Meta: $${(meta.goal_amount_cents/100).toFixed(2)}</span>
             <span>Recaudado: $${(meta.raised_cents/100).toFixed(2)}</span>
@@ -2180,15 +2188,15 @@
           <p class="text-xs font-medium text-gray-700">Monto a liberar: $${(meta.raised_cents/200).toFixed(2)}</p>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Recibos de compra:</p>
-            <div class="flex flex-wrap gap-2">${(meta.stage2_receipt_urls||[]).map(u => `<a href="${u}" target="_blank"><img src="${u}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin recibos</p>'}</div>
+            <div class="flex flex-wrap gap-2">${(meta.stage2_receipt_urls||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin recibos</p>'}</div>
           </div>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Actualización para la comunidad:</p>
-            <p class="text-sm bg-white p-3 rounded-lg border">${meta.stage2_update_text || 'Sin actualización'}</p>
+            <p class="text-sm bg-white p-3 rounded-lg border">${esc(meta.stage2_update_text || 'Sin actualización')}</p>
           </div>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Evidencia (fotos/videos):</p>
-            <div class="flex flex-wrap gap-2">${(meta.stage2_update_media||[]).map(u => `<a href="${u}" target="_blank"><img src="${u}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin evidencia</p>'}</div>
+            <div class="flex flex-wrap gap-2">${(meta.stage2_update_media||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin evidencia</p>'}</div>
           </div>
         </div>`;
       }
@@ -2199,11 +2207,11 @@
           <p class="text-xs font-medium text-gray-700">Monto a liberar: $${(meta.raised_cents/200).toFixed(2)}</p>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Recibos y comprobantes finales:</p>
-            <div class="flex flex-wrap gap-2">${(meta.stage3_proof_urls||[]).map(u => `<a href="${u}" target="_blank"><img src="${u}" class="w-24 h-24 rounded-lg object-cover border hover:border-emerald-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin pruebas</p>'}</div>
+            <div class="flex flex-wrap gap-2">${(meta.stage3_proof_urls||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-emerald-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin pruebas</p>'}</div>
           </div>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Descripción de la adquisición:</p>
-            <p class="text-sm bg-white p-3 rounded-lg border">${meta.stage3_proof_text || 'Sin descripción'}</p>
+            <p class="text-sm bg-white p-3 rounded-lg border">${esc(meta.stage3_proof_text || 'Sin descripción')}</p>
           </div>
         </div>`;
       }
@@ -2213,7 +2221,7 @@
           <h4 class="font-semibold text-red-800 text-sm">⚠️ Cancelación de Meta</h4>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Razón del creador:</p>
-            <p class="text-sm bg-white p-3 rounded-lg border">${meta.cancellation_reason || 'Sin razón proporcionada'}</p>
+            <p class="text-sm bg-white p-3 rounded-lg border">${esc(meta.cancellation_reason || 'Sin razón proporcionada')}</p>
           </div>
           <p class="text-[10px] text-red-600">Si es fraude verificado, haz clic en "Fraude — Banear" para bloquear al creador permanentemente.</p>
         </div>`;

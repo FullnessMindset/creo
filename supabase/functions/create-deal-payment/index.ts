@@ -18,16 +18,19 @@ const corsHeaders = {
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    status, headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+function isValidReturnUrl(url: string): boolean {
+  try { return new URL(url).origin === "https://fullnessmindset.github.io"; }
+  catch { return false; }
 }
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    // Verify JWT auth — the caller must be the brand who owns the conversation
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) return json({ error: "No authorization header" }, 401);
 
@@ -35,27 +38,19 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) return json({ error: "Unauthorized" }, 401);
 
-    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     const { data: allowed } = await supabase.rpc("check_rate_limit", {
-      p_key: `deal-payment:${user.id}`,
-      p_max_requests: 5,
-      p_window_seconds: 60,
+      p_key: `deal-payment:${user.id}`, p_max_requests: 5, p_window_seconds: 60,
     });
-    if (allowed === false) {
-      return json({ error: "Too many requests. Please wait a moment." }, 429);
-    }
+    if (allowed === false) return json({ error: "Too many requests. Please wait a moment." }, 429);
 
-    const { conversation_id, creator_connect_id, amount_usd, description, success_url, cancel_url } = await req.json();
+    const { conversation_id, amount_usd, description, success_url, cancel_url } = await req.json();
 
-    if (!conversation_id || !creator_connect_id || !amount_usd || amount_usd < 1) {
+    if (!conversation_id || !amount_usd || amount_usd < 1) {
       return json({ error: "Missing or invalid parameters" }, 400);
     }
-
     if (amount_usd > 50000) {
       return json({ error: "Amount exceeds maximum" }, 400);
     }
-
-    const sender_id = user.id;
 
     // Verify the authenticated user is the brand in this conversation
     const { data: conv, error: convErr } = await supabase
@@ -64,12 +59,27 @@ serve(async (req) => {
       .eq("id", conversation_id)
       .single();
 
-    if (convErr || !conv || conv.brand_id !== sender_id) {
+    if (convErr || !conv || conv.brand_id !== user.id) {
       return json({ error: "Only the brand can send payments" }, 403);
     }
 
+    // Server-side resolution of creator's connect_id — never trust client
+    const { data: creatorProfile, error: profileErr } = await supabase
+      .from("profiles")
+      .select("stripe_connect_id")
+      .eq("id", conv.creator_id)
+      .single();
+
+    if (profileErr || !creatorProfile || !creatorProfile.stripe_connect_id) {
+      return json({ error: "Creator has not connected their Stripe account" }, 400);
+    }
+
+    const connectId = creatorProfile.stripe_connect_id;
     const amountCents = Math.round(amount_usd * 100);
     const feeCents = Math.round(amountCents * PLATFORM_FEE_PERCENT / 100);
+
+    const validSuccessUrl = success_url && isValidReturnUrl(success_url) ? success_url : "https://fullnessmindset.github.io/creo/brand-deals.html?status=payment_sent";
+    const validCancelUrl = cancel_url && isValidReturnUrl(cancel_url) ? cancel_url : "https://fullnessmindset.github.io/creo/brand-deals.html";
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -83,29 +93,29 @@ serve(async (req) => {
       }],
       payment_intent_data: {
         application_fee_amount: feeCents,
-        transfer_data: { destination: creator_connect_id },
+        transfer_data: { destination: connectId },
       },
       metadata: {
         type: "brand_deal",
         conversation_id,
-        sender_id,
-        creator_connect_id,
+        sender_id: user.id,
+        creator_id: conv.creator_id,
+        creator_connect_id: connectId,
       },
-      success_url: success_url || "https://fullnessmindset.github.io/creo/brand-deals.html?status=payment_sent",
-      cancel_url: cancel_url || "https://fullnessmindset.github.io/creo/brand-deals.html",
+      success_url: validSuccessUrl,
+      cancel_url: validCancelUrl,
     });
 
-    // Record payment message in encrypted chat
+    // Record payment message in deal chat
     await supabase.rpc("send_deal_message", {
       p_conversation_id: conversation_id,
-      p_sender_id: sender_id,
+      p_sender_id: user.id,
       p_content: `Pago de $${amount_usd.toFixed(2)} — ${description || "Colaboración"}`,
       p_message_type: "payment",
       p_payment_amount_cents: amountCents,
       p_payment_status: "pending",
     });
 
-    // Store stripe session ID on the latest payment message
     const { data: msgs } = await supabase
       .from("deal_messages")
       .select("id")
@@ -115,18 +125,14 @@ serve(async (req) => {
       .limit(1);
 
     if (msgs && msgs[0]) {
-      await supabase
-        .from("deal_messages")
+      await supabase.from("deal_messages")
         .update({ stripe_session_id: session.id })
         .eq("id", msgs[0].id);
     }
 
-    return new Response(JSON.stringify({ url: session.url }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return json({ url: session.url });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    console.error("create-deal-payment error:", err);
+    return json({ error: (err as Error).message }, 500);
   }
 });

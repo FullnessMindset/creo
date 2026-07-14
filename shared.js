@@ -7,9 +7,9 @@
   csp.httpEquiv = 'Content-Security-Policy';
   csp.content = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net",
+    "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://js.stripe.com",
     "style-src 'self' 'unsafe-inline'",
-    "connect-src 'self' https://qddxoyjtoxtdcezwuvcq.supabase.co wss://qddxoyjtoxtdcezwuvcq.supabase.co https://api.giphy.com",
+    "connect-src 'self' https://qddxoyjtoxtdcezwuvcq.supabase.co wss://qddxoyjtoxtdcezwuvcq.supabase.co https://api.giphy.com https://api.stripe.com https://js.stripe.com",
     "img-src 'self' data: blob: https: http:",
     "media-src 'self' blob: https://qddxoyjtoxtdcezwuvcq.supabase.co",
     "frame-src https://checkout.stripe.com https://connect.stripe.com https://js.stripe.com",
@@ -779,6 +779,25 @@ const CREO_TRANSLATIONS = {
     creador: 'Creador',
     historiaDe: 'Historia de ',
     iniciarSesionParaCreo: 'Inicia sesión para dar Creo',
+
+    // Onboarding
+    obWelcome1: 'CREO es una plataforma donde los creadores reciben apoyo directo de su comunidad.',
+    obWelcome2: 'Puedes recibir tips, suscripciones mensuales y crear metas de fondeo.',
+    obWelcome3: 'Tu perfil es tu escaparate — personalízalo con tu historia, redes y contenido.',
+    obWelcome4: 'Estamos aquí para ayudarte a crecer. ¡Bienvenido/a!',
+    obCreoIdTitle: 'Verificación CREO ID',
+    obCreoIdDesc: 'Verifica tu identidad para recibir pagos y obtener la insignia de verificado.',
+    obCreoIdBtn: 'Verificar mi identidad',
+    obCreoIdSkip: 'Ahora no',
+    obStripeTitle: 'Conectar Stripe',
+    obStripeDesc: 'Conecta tu cuenta de Stripe para recibir pagos directamente.',
+    obStripeBtn: 'Conectar Stripe',
+    obStripeSkip: 'Configurar después',
+    obTermsTitle: 'Términos y Condiciones',
+    obTermsDesc: 'Para continuar, acepta nuestros términos de servicio y normas de comunidad.',
+    obTermsAccept: 'Acepto los términos y condiciones',
+    obTermsAcceptConduct: 'Acepto las normas de comunidad',
+    obTermsBtn: 'Continuar',
   },
 
   en: {
@@ -1445,6 +1464,25 @@ const CREO_TRANSLATIONS = {
     creador: 'Creator',
     historiaDe: 'Story by ',
     iniciarSesionParaCreo: 'Sign in to give Creo',
+
+    // Onboarding
+    obWelcome1: 'CREO is a platform where creators receive direct support from their community.',
+    obWelcome2: 'You can receive tips, monthly subscriptions, and create funding goals.',
+    obWelcome3: 'Your profile is your showcase — customize it with your story, social links, and content.',
+    obWelcome4: 'We\'re here to help you grow. Welcome!',
+    obCreoIdTitle: 'CREO ID Verification',
+    obCreoIdDesc: 'Verify your identity to receive payments and earn your verified badge.',
+    obCreoIdBtn: 'Verify my identity',
+    obCreoIdSkip: 'Not now',
+    obStripeTitle: 'Connect Stripe',
+    obStripeDesc: 'Connect your Stripe account to receive payments directly.',
+    obStripeBtn: 'Connect Stripe',
+    obStripeSkip: 'Set up later',
+    obTermsTitle: 'Terms & Conditions',
+    obTermsDesc: 'To continue, accept our terms of service and community guidelines.',
+    obTermsAccept: 'I accept the terms and conditions',
+    obTermsAcceptConduct: 'I accept the community guidelines',
+    obTermsBtn: 'Continue',
   }
 };
 
@@ -1675,8 +1713,8 @@ function initTheme() {
   applyTheme(saved);
 }
 function isDark() { return document.documentElement.classList.contains('dark'); }
-function applyTheme(t) {
-  const dark = t === 'dark';
+function applyTheme(theme) {
+  const dark = theme === 'dark';
   if (dark) {
     document.documentElement.classList.add('dark');
     document.body.classList.add('bg-gray-900', 'text-white');
@@ -1686,7 +1724,7 @@ function applyTheme(t) {
     document.body.classList.add('bg-white', 'text-gray-900');
     document.body.classList.remove('bg-gray-900', 'text-white');
   }
-  localStorage.setItem('creo-theme', t);
+  localStorage.setItem('creo-theme', theme);
   updateThemeIcons();
   applyThemeToFixedElements(dark);
 }
@@ -2016,7 +2054,8 @@ async function toggleNotifPanel() {
         const icon = n.icon || defaultIcons[n.type] || '🔔';
         const catClass = categoryColors[n.category] || 'border-l-gray-300';
         const priBg = priorityBg[n.priority] || '';
-        return `<div class="px-3 py-2.5 border-b border-gray-100 border-l-3 ${catClass} ${priBg} ${n.is_read ? 'opacity-60' : ''} hover:bg-gray-50 transition cursor-pointer" style="border-left-width:3px" onclick="${link ? `window.location.href='${link}'` : ''}">
+        const safeLink = link ? esc(link) : '';
+        return `<div class="px-3 py-2.5 border-b border-gray-100 border-l-3 ${catClass} ${priBg} ${n.is_read ? 'opacity-60' : ''} hover:bg-gray-50 transition cursor-pointer" style="border-left-width:3px" onclick="${safeLink ? `window.location.href='${safeLink}'` : ''}">
           <div class="flex gap-2">
             <span>${icon}</span>
             <div class="flex-1 min-w-0">
@@ -2701,7 +2740,7 @@ function renderCreoIdStep(container) {
         <button onclick="_onboardPrev()" class="p-1.5 rounded-lg hover:bg-gray-100 transition">
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </button>
-        <h2 class="text-xl font-bold text-gray-900 flex-1">Creo ID — Verificación de Identidad</h2>
+        <h2 class="text-xl font-bold text-gray-900 flex-1">${t('obCreoIdTitle')}</h2>
       </div>
       <div class="space-y-3">
         <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex gap-3">
@@ -2737,7 +2776,7 @@ function renderStripeStep(container) {
         <button onclick="_onboardPrev()" class="p-1.5 rounded-lg hover:bg-gray-100 transition">
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </button>
-        <h2 class="text-xl font-bold text-gray-900 flex-1">Pagos Seguros con Stripe</h2>
+        <h2 class="text-xl font-bold text-gray-900 flex-1">${t('obStripeTitle')}</h2>
       </div>
       <div class="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-5 space-y-3">
         <div class="flex items-center gap-2">
@@ -2772,7 +2811,7 @@ function renderTermsStep(container) {
         <button onclick="_onboardPrev()" class="p-1.5 rounded-lg hover:bg-gray-100 transition">
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </button>
-        <h2 class="text-xl font-bold text-gray-900 flex-1">Acepta los Términos</h2>
+        <h2 class="text-xl font-bold text-gray-900 flex-1">${t('obTermsTitle')}</h2>
       </div>
       <p class="text-sm text-gray-500">Para usar CREO, acepta los siguientes términos:</p>
       <div class="space-y-3">

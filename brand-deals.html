@@ -1570,7 +1570,7 @@
       list.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Cargando...</div>';
 
       const isPlatform = isPlatformCreator(currentProfile?.email || '');
-      const isBrandAccount = currentProfile?.account_type === 'empresa' || currentProfile?.account_type === 'business';
+      const isBrandAccount = currentProfile?.account_type === 'empresa' || currentProfile?.account_type === 'business' || currentProfile?.account_type === 'brand';
 
       let convos = [];
       if (isPlatform || isBrandAccount) {

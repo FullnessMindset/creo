@@ -42,6 +42,12 @@ serve(async (req) => {
     if (authError || !user || user.email !== ADMIN_EMAIL)
       return json({ error: "Unauthorized" }, 403);
 
+    // Rate limit admin API (prevent abuse even with compromised admin session)
+    const { data: allowed } = await sbAdmin.rpc("check_rate_limit", {
+      p_key: `admin-api:${user.id}`, p_max_requests: 60, p_window_seconds: 60,
+    });
+    if (allowed === false) return json({ error: "Rate limit exceeded" }, 429);
+
     const url = new URL(req.url);
     const action = url.searchParams.get("action");
 
@@ -168,9 +174,23 @@ serve(async (req) => {
       const updates = body.updates as Record<string, unknown>;
       if (!profileId || !updates)
         return json({ error: "Missing profile_id or updates" }, 400);
+
+      const ALLOWED_FIELDS = new Set([
+        "username", "display_name", "bio", "avatar_url", "cover_url",
+        "account_type", "creo_id_verified", "stripe_onboarded",
+        "is_banned", "ban_reason", "fund_status", "fund_stage",
+        "admin_review_notes", "admin_reviewed_at",
+      ]);
+      const sanitized: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(updates)) {
+        if (ALLOWED_FIELDS.has(key)) sanitized[key] = value;
+      }
+      if (Object.keys(sanitized).length === 0)
+        return json({ error: "No valid fields to update" }, 400);
+
       const { error } = await sbAdmin
         .from("profiles")
-        .update(updates)
+        .update(sanitized)
         .eq("id", profileId);
       if (error) return json({ error: error.message }, 500);
       return json({ success: true });
