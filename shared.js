@@ -26,6 +26,93 @@ const ADMIN_EMAIL = 'fullnessmindset@gmail.com';
 function isAdmin(email) { return email === ADMIN_EMAIL; }
 function isPlatformCreator(email) { return email === ADMIN_EMAIL; }
 
+// ========== CACHE LAYER ==========
+const _cache = new Map();
+const CACHE_TTL = {
+  profile: 60000,
+  notifications_count: 15000,
+  notifications_list: 30000,
+  announcements: 120000,
+  auth_user: 30000,
+  creo_id: 60000,
+};
+
+function cacheGet(key) {
+  const entry = _cache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > (CACHE_TTL[entry.type] || 30000)) {
+    _cache.delete(key);
+    return null;
+  }
+  return entry.data;
+}
+
+function cacheSet(key, data, type) {
+  _cache.set(key, { data, ts: Date.now(), type });
+}
+
+function cacheInvalidate(prefix) {
+  for (const k of _cache.keys()) {
+    if (k.startsWith(prefix)) _cache.delete(k);
+  }
+}
+
+function cacheClear() { _cache.clear(); }
+
+let _cachedUser = null;
+let _cachedUserTs = 0;
+async function getCachedUser() {
+  if (_cachedUser && Date.now() - _cachedUserTs < CACHE_TTL.auth_user) return _cachedUser;
+  const { data: { user } } = await sb.auth.getUser();
+  _cachedUser = user;
+  _cachedUserTs = Date.now();
+  return user;
+}
+
+async function getCachedProfile(userId) {
+  const key = 'profile:' + userId;
+  const cached = cacheGet(key);
+  if (cached) return cached;
+  const { data } = await sb.from('profiles').select('*').eq('id', userId).single();
+  if (data) cacheSet(key, data, 'profile');
+  return data;
+}
+
+// ========== ASYNC BATCH HELPERS ==========
+const _pendingActivity = { timer: null, dirty: false };
+
+function trackActivityDebounced() {
+  _pendingActivity.dirty = true;
+  if (_pendingActivity.timer) return;
+  _pendingActivity.timer = setTimeout(async () => {
+    _pendingActivity.timer = null;
+    if (!_pendingActivity.dirty) return;
+    _pendingActivity.dirty = false;
+    const user = await getCachedUser();
+    if (user) {
+      sb.from('profiles').update({ last_activity_at: new Date().toISOString() }).eq('id', user.id).then(() => {});
+    }
+  }, 30000);
+}
+
+let _notifCountPending = null;
+async function getNotifCountCached() {
+  const user = await getCachedUser();
+  if (!user) return 0;
+  const key = 'notif_count:' + user.id;
+  const cached = cacheGet(key);
+  if (cached !== null) return cached;
+  if (_notifCountPending) return _notifCountPending;
+  _notifCountPending = (async () => {
+    const { count } = await sb.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false);
+    const val = count || 0;
+    cacheSet(key, val, 'notifications_count');
+    _notifCountPending = null;
+    return val;
+  })();
+  return _notifCountPending;
+}
+
 // ========== INTERNATIONALIZATION (i18n) ==========
 const CREO_TRANSLATIONS = {
   es: {
@@ -1477,16 +1564,16 @@ let _creoIdVerified = null;
 
 async function isCreoIdVerified() {
   if (_creoIdVerified !== null) return _creoIdVerified;
-  const { data: { user } } = await sb.auth.getUser();
+  const user = await getCachedUser();
   if (!user) return false;
   if (isAdmin(user.email)) { _creoIdVerified = true; return true; }
-  const { data } = await sb.from('profiles').select('identity_verified').eq('id', user.id).single();
-  _creoIdVerified = data?.identity_verified === true;
+  const profile = await getCachedProfile(user.id);
+  _creoIdVerified = profile?.identity_verified === true;
   return _creoIdVerified;
 }
 
 async function requireCreoId(action) {
-  const { data: { user } } = await sb.auth.getUser();
+  const user = await getCachedUser();
   if (!user) { showToast(t('iniciaSesion'), 'error'); return false; }
   const verified = await isCreoIdVerified();
   if (!verified) { showCreoIdModal(); return false; }
@@ -1651,7 +1738,7 @@ function applyThemeToFixedElements(dark) {
 async function uploadToStorage(file, bucket, maxMB) {
   if (!file) return null;
   if (file.size > (maxMB || 10) * 1024 * 1024) { showToast(t('archivoMax') + ' ' + (maxMB || 10) + 'MB', 'error'); return null; }
-  const { data: { user } } = await sb.auth.getUser();
+  const user = await getCachedUser();
   if (!user) { showToast(t('iniciaSesion'), 'error'); return null; }
   const ext = file.name.split('.').pop();
   const path = user.id + '/' + Date.now() + '.' + ext;
@@ -1850,12 +1937,12 @@ function closeMobileMenu() {
 }
 
 async function updateSidebarAuth() {
-  const { data: { user } } = await sb.auth.getUser();
+  const user = await getCachedUser();
   document.querySelectorAll('[data-auth-only]').forEach(el => {
     el.style.display = user ? '' : 'none';
   });
   if (user) {
-    const { data } = await sb.from('profiles').select('username').eq('id', user.id).single();
+    const data = await getCachedProfile(user.id);
     if (data && data.username) {
       document.querySelectorAll('a[href="profile.html"]').forEach(a => {
         a.href = 'profile.html?u=' + encodeURIComponent(data.username);
@@ -1891,9 +1978,9 @@ async function updateSidebarAuth() {
 
 // Notifications
 async function loadNotificationBell() {
-  const { data: { user } } = await sb.auth.getUser();
+  const user = await getCachedUser();
   if (!user) return;
-  const { count } = await sb.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false);
+  const count = await getNotifCountCached();
   const bellHTML = `<div class="relative p-2"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>${count > 0 ? `<span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">${count > 9 ? '9+' : count}</span>` : ''}</div>`;
   document.querySelectorAll('.notif-bell-instance').forEach(el => el.remove());
   const targets = [document.getElementById('mobile-header-right'), document.getElementById('sidebar-bell-area')];
@@ -1911,7 +1998,7 @@ async function loadNotificationBell() {
 async function toggleNotifPanel() {
   let panel = document.getElementById('notif-panel');
   if (panel) { panel.remove(); return; }
-  const { data: { user } } = await sb.auth.getUser();
+  const user = await getCachedUser();
   if (!user) return;
   const { data } = await sb.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20);
   panel = document.createElement('div');
@@ -1943,7 +2030,8 @@ async function toggleNotifPanel() {
   }
   document.body.appendChild(panel);
   document.addEventListener('click', closeNotifOnClickOutside);
-  await sb.from('notifications').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false);
+  sb.from('notifications').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false).then(() => {});
+  cacheInvalidate('notif_count');
   loadNotificationBell();
 }
 
@@ -1957,9 +2045,10 @@ function closeNotifOnClickOutside(e) {
 }
 
 async function markAllRead() {
-  const { data: { user } } = await sb.auth.getUser();
+  const user = await getCachedUser();
   if (!user) return;
   await sb.from('notifications').update({ is_read: true }).eq('user_id', user.id);
+  cacheInvalidate('notif_count');
   loadNotificationBell();
   const panel = document.getElementById('notif-panel');
   if (panel) panel.remove();
@@ -1968,7 +2057,7 @@ async function markAllRead() {
 
 async function createNotification(targetUserId, type, title, body, link, opts = {}) {
   if (!targetUserId) return;
-  const { data: { user } } = await sb.auth.getUser();
+  const user = await getCachedUser();
   if (user && user.id === targetUserId) return;
   await sb.from('notifications').insert([{
     user_id: targetUserId, type, title, body, link: link || null,
@@ -2259,7 +2348,7 @@ let _lastNotifCount = -1;
 let _notifPollTimer = null;
 
 async function initRealtimeNotifications() {
-  const { data: { user } } = await sb.auth.getUser();
+  const user = await getCachedUser();
   if (!user) return;
   if (_realtimeNotifChannel) sb.removeChannel(_realtimeNotifChannel);
   _realtimeNotifChannel = sb.channel('notif-' + user.id)
@@ -2282,8 +2371,9 @@ async function initRealtimeNotifications() {
 
 async function pollNotifications() {
   try {
-    const { data: { user } } = await sb.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return;
+    cacheInvalidate('notif_count');
     const { data, count } = await sb.from('notifications').select('*', { count: 'exact' }).eq('user_id', user.id).eq('is_read', false).order('created_at', { ascending: false }).limit(1);
     if (_lastNotifCount >= 0 && count > _lastNotifCount && data && data[0]) {
       const notif = data[0];
@@ -2304,10 +2394,10 @@ function startNotifPolling() {
 (function startNotifSystem() {
   setTimeout(async () => {
     try {
-      const { data: { user } } = await sb.auth.getUser();
+      const user = await getCachedUser();
       if (!user) return;
       _lastNotifCount = -1;
-      const { count } = await sb.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false);
+      const count = await getNotifCountCached();
       _lastNotifCount = count || 0;
       await initRealtimeNotifications();
       startNotifPolling();
@@ -2319,6 +2409,7 @@ function startNotifPolling() {
       setTimeout(() => { initRealtimeNotifications(); startNotifPolling(); }, 1000);
     }
     if (event === 'SIGNED_OUT') {
+      cacheClear(); _cachedUser = null; _cachedUserTs = 0; _creoIdVerified = null;
       if (_realtimeNotifChannel) { sb.removeChannel(_realtimeNotifChannel); _realtimeNotifChannel = null; }
       if (_notifPollTimer) { clearInterval(_notifPollTimer); _notifPollTimer = null; }
     }
@@ -2332,13 +2423,12 @@ function updateNavAuth() { updateSidebarAuth(); }
 // ========== ANNOUNCEMENT BAR ==========
 async function loadAnnouncementBar() {
   try {
-    const { data: { user } } = await sb.auth.getUser();
+    const user = await getCachedUser();
     const { data: anns } = await sb.from('announcements').select('*').eq('is_active', true).order('created_at', { ascending: false });
     if (!anns || !anns.length) return;
     let profile = null;
     if (user) {
-      const { data: p } = await sb.from('profiles').select('account_type').eq('id', user.id).single();
-      profile = p;
+      profile = await getCachedProfile(user.id);
     }
     const dismissed = JSON.parse(localStorage.getItem('creo_dismissed_anns') || '[]');
     const matching = anns.filter(a => {
@@ -2375,11 +2465,11 @@ setTimeout(loadAnnouncementBar, 1500);
 async function showVerificationReminder() {
   try {
     if (localStorage.getItem('creo_dismiss_verify_bar')) return;
-    const { data: { user } } = await sb.auth.getUser();
+    const user = await getCachedUser();
     if (!user || user.email === ADMIN_EMAIL) return;
-    const { data: p } = await sb.from('profiles').select('stripe_connect_id, identity_verified, account_type').eq('id', user.id).single();
+    const p = await getCachedProfile(user.id);
     if (!p) return;
-    const needsStripe = !p.stripe_connect_id;
+    const needsStripe = !p.stripe_onboarded;
     const needsCreoId = !p.identity_verified;
     if (!needsStripe && !needsCreoId) return;
     const msgs = [];
@@ -2478,13 +2568,11 @@ function trackEngagement(signal) {
 
 async function checkAndTriggerOnboarding() {
   if (_onboardingTriggered) return;
-  const { data: { user } } = await sb.auth.getUser();
+  const user = await getCachedUser();
   if (!user) return;
   if (isAdmin(user.email)) return;
 
-  const { data: profile } = await sb.from('profiles')
-    .select('onboarding_completed, terms_accepted_at, identity_verified')
-    .eq('id', user.id).single();
+  const profile = await getCachedProfile(user.id);
 
   if (profile?.onboarding_completed || profile?.terms_accepted_at) {
     saveOnboardingState({ completed: true });
@@ -2768,9 +2856,5 @@ function renderTermsStep(container) {
   document.head.appendChild(style);
 })();
 
-// Update last_activity_at periodically
-(async function trackActivity() {
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user || isAdmin(user.email)) return;
-  await sb.from('profiles').update({ last_activity_at: new Date().toISOString() }).eq('id', user.id);
-})();
+// Update last_activity_at debounced (max once per 30s)
+trackActivityDebounced();
