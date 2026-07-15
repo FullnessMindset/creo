@@ -52,28 +52,18 @@ serve(async (req) => {
       });
     }
 
-    // Record this event as processed (before handling, for idempotency)
-    const { error: recordErr } = await supabase.from("processed_webhook_events").insert({
-      stripe_event_id: event.id,
-      event_type: event.type,
-      stripe_session_id: (event.data.object as Record<string, unknown>).id as string || null,
-      metadata: event.data.object,
-    });
-    if (recordErr) {
-      console.error("Failed to record webhook event:", recordErr);
-      return new Response("Failed to record event", { status: 500 });
-    }
-
     // === CHECKOUT SESSION COMPLETED ===
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata || {};
       const type = metadata.type;
+      const baseCents = metadata.base_amount_cents ? parseInt(metadata.base_amount_cents) : (session.amount_total || 0);
+      const platformFeeCents = metadata.platform_fee_cents ? parseInt(metadata.platform_fee_cents) : Math.round(baseCents * 5 / 100);
+      const stripeSurchargeCents = metadata.stripe_surcharge_cents ? parseInt(metadata.stripe_surcharge_cents) : 0;
 
       if (type === "meta" && metadata.meta_id) {
-        const amountCents = session.amount_total || 0;
         const { error } = await supabase.rpc("increment_meta_raised", {
-          p_meta_id: metadata.meta_id, p_amount: amountCents,
+          p_meta_id: metadata.meta_id, p_amount: baseCents,
         });
         if (error) {
           console.error("Failed to increment meta raised:", error);
@@ -83,7 +73,9 @@ serve(async (req) => {
         const { error: insertErr } = await supabase.from("meta_contributions").insert({
           meta_id: metadata.meta_id,
           stripe_session_id: session.id,
-          amount_cents: amountCents,
+          amount_cents: baseCents,
+          platform_fee_cents: platformFeeCents,
+          stripe_surcharge_cents: stripeSurchargeCents,
           contributor_name: session.customer_details?.name || "Anónimo",
         });
         if (insertErr) {
@@ -98,15 +90,28 @@ serve(async (req) => {
           .update({ payment_status: "completed" })
           .eq("stripe_session_id", session.id);
         if (error) console.error("Failed to update deal payment status:", error);
+
+        // Notify the creator
+        if (metadata.creator_id) {
+          await supabase.from("notifications").insert({
+            user_id: metadata.creator_id,
+            type: "payment",
+            title: `💰 Pago de marca recibido: $${(baseCents / 100).toFixed(2)}`,
+            body: "Se ha completado un pago de colaboración",
+            category: "payment",
+            priority: "high",
+          });
+        }
       }
 
       if (type === "tip") {
-        const amountCents = session.amount_total || 0;
         const { error } = await supabase.from("tips").insert({
           stripe_session_id: session.id,
           creator_id: metadata.creator_id || null,
           creator_username: metadata.creator_username || null,
-          amount_cents: amountCents,
+          amount_cents: baseCents,
+          platform_fee_cents: platformFeeCents,
+          stripe_surcharge_cents: stripeSurchargeCents,
           tipper_name: session.customer_details?.name || "Anónimo",
           tipper_email: session.customer_details?.email || null,
         });
@@ -115,12 +120,11 @@ serve(async (req) => {
           return new Response("DB error: tip insert", { status: 500 });
         }
 
-        // Notify the creator
         if (metadata.creator_id) {
           await supabase.from("notifications").insert({
             user_id: metadata.creator_id,
             type: "payment",
-            title: `💰 Nuevo apoyo: $${(amountCents / 100).toFixed(2)}`,
+            title: `💰 Nuevo apoyo: $${(baseCents / 100).toFixed(2)}`,
             body: `${session.customer_details?.name || "Alguien"} te envió un apoyo`,
             category: "payment",
             priority: "high",
@@ -134,9 +138,12 @@ serve(async (req) => {
           stripe_session_id: session.id,
           stripe_subscription_id: subscriptionId || null,
           creator_id: metadata.creator_id || null,
+          subscriber_id: metadata.subscriber_id || null,
           subscriber_email: session.customer_details?.email || null,
           subscriber_name: session.customer_details?.name || "Anónimo",
-          amount_cents: session.amount_total || 0,
+          amount_cents: baseCents,
+          platform_fee_cents: platformFeeCents,
+          stripe_surcharge_cents: stripeSurchargeCents,
           status: "active",
         });
         if (error) {
@@ -148,7 +155,7 @@ serve(async (req) => {
           await supabase.from("notifications").insert({
             user_id: metadata.creator_id,
             type: "payment",
-            title: `🎉 Nuevo suscriptor: $${((session.amount_total || 0) / 100).toFixed(2)}/mes`,
+            title: `🎉 Nuevo suscriptor: $${(baseCents / 100).toFixed(2)}/mes`,
             body: `${session.customer_details?.name || "Alguien"} se suscribió a tu Apoyo Full`,
             category: "payment",
             priority: "high",
@@ -192,7 +199,6 @@ serve(async (req) => {
       const piId = charge.payment_intent as string;
       console.log(`Charge refunded: ${charge.id}, payment_intent: ${piId}`);
 
-      // Notify admin
       await supabase.from("admin_notifications").insert({
         type: "refund",
         title: `Reembolso procesado: $${((charge.amount_refunded as number || 0) / 100).toFixed(2)}`,
@@ -239,7 +245,7 @@ serve(async (req) => {
       }
     }
 
-    // === SUBSCRIPTION UPDATED (plan change, cancellation scheduled) ===
+    // === SUBSCRIPTION UPDATED ===
     if (event.type === "customer.subscription.updated") {
       const subscription = event.data.object as unknown as Record<string, unknown>;
       const subId = subscription.id as string;
@@ -293,6 +299,14 @@ serve(async (req) => {
         else console.log(`Connect account deauthorized: ${connectId}`);
       }
     }
+
+    // Idempotency: record AFTER successful processing so retries work on failure
+    await supabase.from("processed_webhook_events").insert({
+      stripe_event_id: event.id,
+      event_type: event.type,
+      stripe_session_id: (event.data.object as Record<string, unknown>).id as string || null,
+      metadata: event.data.object,
+    });
 
     return new Response(JSON.stringify({ received: true }), {
       status: 200, headers: { "Content-Type": "application/json" },

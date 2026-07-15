@@ -4,6 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2023-10-16" });
 const PLATFORM_FEE_PERCENT = 5;
+const STRIPE_SURCHARGE_PERCENT = 3;
 const ALLOWED_ORIGINS = ["https://fullnessmindset.github.io"];
 
 const supabase = createClient(
@@ -62,13 +63,16 @@ serve(async (req) => {
     if (profileErr || !profile) return json({ error: "Creator not found" }, 404);
 
     const connectId = profile.stripe_connect_id;
-    const amountCents = Math.round(amount_usd * 100);
+    const baseCents = Math.round(amount_usd * 100);
     const isPlatform = !connectId;
-    const feeCents = Math.round(amountCents * PLATFORM_FEE_PERCENT / 100);
+    const platformFeeCents = Math.round(baseCents * PLATFORM_FEE_PERCENT / 100);
+    const stripeSurchargeCents = Math.round(baseCents * STRIPE_SURCHARGE_PERCENT / 100);
+    const totalChargeCents = baseCents + stripeSurchargeCents;
+    const applicationFeeCents = platformFeeCents + stripeSurchargeCents;
 
     const paymentIntentData: Record<string, unknown> = {};
     if (!isPlatform) {
-      paymentIntentData.application_fee_amount = feeCents;
+      paymentIntentData.application_fee_amount = applicationFeeCents;
       paymentIntentData.transfer_data = { destination: connectId };
     }
 
@@ -81,7 +85,7 @@ serve(async (req) => {
         price_data: {
           currency: "usd",
           product_data: { name: "Yo Creo en Ti — Apoyo único" },
-          unit_amount: amountCents,
+          unit_amount: totalChargeCents,
         },
         quantity: 1,
       }],
@@ -91,6 +95,9 @@ serve(async (req) => {
         creator_id,
         creator_username: profile.username || creator_username || "",
         creator_connect_id: connectId || "platform",
+        base_amount_cents: String(baseCents),
+        platform_fee_cents: String(platformFeeCents),
+        stripe_surcharge_cents: String(stripeSurchargeCents),
       },
       success_url: validSuccessUrl,
       cancel_url: validCancelUrl,

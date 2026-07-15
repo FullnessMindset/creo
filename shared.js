@@ -2440,13 +2440,12 @@ function startNotifPolling() {
       const count = await getNotifCountCached();
       _lastNotifCount = count || 0;
       await initRealtimeNotifications();
-      startNotifPolling();
     } catch(e) { console.log('[CREO] Notif init error:', e); startNotifPolling(); }
   }, 2000);
   sb.auth.onAuthStateChange((event) => {
     if (event === 'SIGNED_IN') {
       _lastNotifCount = -1;
-      setTimeout(() => { initRealtimeNotifications(); startNotifPolling(); }, 1000);
+      setTimeout(() => { initRealtimeNotifications(); }, 1000);
     }
     if (event === 'SIGNED_OUT') {
       cacheClear(); _cachedUser = null; _cachedUserTs = 0; _creoIdVerified = null;

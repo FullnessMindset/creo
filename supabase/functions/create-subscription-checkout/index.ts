@@ -4,6 +4,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2023-10-16" });
 const PLATFORM_FEE_PERCENT = 5;
+const STRIPE_SURCHARGE_PERCENT = 3;
+const COMBINED_FEE_PERCENT = 7.77; // (5% + 3%) / 1.03 — ensures creator gets 95% of base after surcharge
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -61,7 +63,9 @@ serve(async (req) => {
     if (profileErr || !profile) return json({ error: "Creator not found" }, 404);
 
     const connectId = profile.stripe_connect_id;
-    const amountCents = Math.round(amount_usd * 100);
+    const baseCents = Math.round(amount_usd * 100);
+    const stripeSurchargeCents = Math.round(baseCents * STRIPE_SURCHARGE_PERCENT / 100);
+    const totalChargeCents = baseCents + stripeSurchargeCents;
 
     let productId = profile.stripe_product_id;
 
@@ -79,11 +83,11 @@ serve(async (req) => {
       product: productId, currency: "usd", type: "recurring", active: true, limit: 100,
     });
     price = existingPrices.data.find(
-      (p) => p.unit_amount === amountCents && p.recurring?.interval === "month"
+      (p) => p.unit_amount === totalChargeCents && p.recurring?.interval === "month"
     );
     if (!price) {
       price = await stripe.prices.create({
-        product: productId, unit_amount: amountCents, currency: "usd",
+        product: productId, unit_amount: totalChargeCents, currency: "usd",
         recurring: { interval: "month" },
       });
     }
@@ -91,7 +95,7 @@ serve(async (req) => {
     const isPlatform = !connectId;
     const subscriptionData: Record<string, unknown> = {};
     if (!isPlatform) {
-      subscriptionData.application_fee_percent = PLATFORM_FEE_PERCENT;
+      subscriptionData.application_fee_percent = COMBINED_FEE_PERCENT;
       subscriptionData.transfer_data = { destination: connectId };
     }
 
@@ -102,7 +106,15 @@ serve(async (req) => {
       mode: "subscription",
       line_items: [{ price: price.id, quantity: 1 }],
       subscription_data: subscriptionData,
-      metadata: { type: "subscription", creator_id, creator_connect_id: connectId || "platform", subscriber_id: user.id },
+      metadata: {
+        type: "subscription",
+        creator_id,
+        creator_connect_id: connectId || "platform",
+        subscriber_id: user.id,
+        base_amount_cents: String(baseCents),
+        platform_fee_cents: String(Math.round(baseCents * PLATFORM_FEE_PERCENT / 100)),
+        stripe_surcharge_cents: String(stripeSurchargeCents),
+      },
       success_url: validSuccessUrl,
       cancel_url: validCancelUrl,
     });

@@ -4,6 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2023-10-16" });
 const PLATFORM_FEE_PERCENT = 5;
+const STRIPE_SURCHARGE_PERCENT = 3;
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -75,8 +76,11 @@ serve(async (req) => {
     }
 
     const connectId = creatorProfile.stripe_connect_id;
-    const amountCents = Math.round(amount_usd * 100);
-    const feeCents = Math.round(amountCents * PLATFORM_FEE_PERCENT / 100);
+    const baseCents = Math.round(amount_usd * 100);
+    const platformFeeCents = Math.round(baseCents * PLATFORM_FEE_PERCENT / 100);
+    const stripeSurchargeCents = Math.round(baseCents * STRIPE_SURCHARGE_PERCENT / 100);
+    const totalChargeCents = baseCents + stripeSurchargeCents;
+    const applicationFeeCents = platformFeeCents + stripeSurchargeCents;
 
     const validSuccessUrl = success_url && isValidReturnUrl(success_url) ? success_url : "https://fullnessmindset.github.io/creo/brand-deals.html?status=payment_sent";
     const validCancelUrl = cancel_url && isValidReturnUrl(cancel_url) ? cancel_url : "https://fullnessmindset.github.io/creo/brand-deals.html";
@@ -87,12 +91,12 @@ serve(async (req) => {
         price_data: {
           currency: "usd",
           product_data: { name: `Brand Deal — ${description || "Pago por colaboración"}` },
-          unit_amount: amountCents,
+          unit_amount: totalChargeCents,
         },
         quantity: 1,
       }],
       payment_intent_data: {
-        application_fee_amount: feeCents,
+        application_fee_amount: applicationFeeCents,
         transfer_data: { destination: connectId },
       },
       metadata: {
@@ -101,34 +105,28 @@ serve(async (req) => {
         sender_id: user.id,
         creator_id: conv.creator_id,
         creator_connect_id: connectId,
+        base_amount_cents: String(baseCents),
+        platform_fee_cents: String(platformFeeCents),
+        stripe_surcharge_cents: String(stripeSurchargeCents),
       },
       success_url: validSuccessUrl,
       cancel_url: validCancelUrl,
     });
 
-    // Record payment message in deal chat
-    await supabase.rpc("send_deal_message", {
-      p_conversation_id: conversation_id,
-      p_sender_id: user.id,
-      p_content: `Pago de $${amount_usd.toFixed(2)} — ${description || "Colaboración"}`,
-      p_message_type: "payment",
-      p_payment_amount_cents: amountCents,
-      p_payment_status: "pending",
+    // Record payment message in deal chat (direct insert — service_role has no auth.uid() for the RPC)
+    await supabase.from("deal_messages").insert({
+      conversation_id,
+      sender_id: user.id,
+      content: `Pago de $${amount_usd.toFixed(2)} — ${description || "Colaboración"}`,
+      message_type: "payment",
+      payment_amount_cents: baseCents,
+      payment_status: "pending",
+      stripe_session_id: session.id,
     });
 
-    const { data: msgs } = await supabase
-      .from("deal_messages")
-      .select("id")
-      .eq("conversation_id", conversation_id)
-      .eq("message_type", "payment")
-      .order("created_at", { ascending: false })
-      .limit(1);
-
-    if (msgs && msgs[0]) {
-      await supabase.from("deal_messages")
-        .update({ stripe_session_id: session.id })
-        .eq("id", msgs[0].id);
-    }
+    await supabase.from("deal_conversations")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("id", conversation_id);
 
     return json({ url: session.url });
   } catch (err) {
