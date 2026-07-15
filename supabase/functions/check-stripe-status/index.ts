@@ -41,6 +41,11 @@ serve(async (req) => {
     } = await sbAdmin.auth.getUser(token);
     if (authError || !user) return json({ error: "Unauthorized" }, 403);
 
+    const { data: allowed } = await sbAdmin.rpc("check_rate_limit", {
+      p_key: `check-stripe:${user.id}`, p_max_requests: 10, p_window_seconds: 60,
+    });
+    if (allowed === false) return json({ error: "Too many requests. Please wait." }, 429);
+
     const { data: profile } = await sbAdmin
       .from("profiles")
       .select("stripe_connect_id, stripe_onboarded")

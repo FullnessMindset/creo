@@ -41,6 +41,11 @@ serve(async (req) => {
     } = await sbAdmin.auth.getUser(token);
     if (authError || !user) return json({ error: "Unauthorized" }, 403);
 
+    const { data: allowed } = await sbAdmin.rpc("check_rate_limit", {
+      p_key: `stripe-onboard:${user.id}`, p_max_requests: 5, p_window_seconds: 300,
+    });
+    if (allowed === false) return json({ error: "Too many requests. Please wait." }, 429);
+
     const { redirect_url } = await req.json();
     let returnUrl = "https://fullnessmindset.github.io/creo/redirect.html";
     if (redirect_url) {

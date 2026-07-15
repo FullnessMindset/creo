@@ -38,6 +38,16 @@ serve(async (req) => {
       });
     }
 
+    const { data: allowed } = await supabase.rpc("check_rate_limit", {
+      p_key: `export-data:${user.id}`, p_max_requests: 3, p_window_seconds: 600,
+    });
+    if (allowed === false) {
+      return new Response(JSON.stringify({ error: "Too many requests. Please wait." }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { user_id } = await req.json();
     if (user_id !== user.id) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {

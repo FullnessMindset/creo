@@ -588,7 +588,10 @@
         const { data: p } = await sb.from('profiles').select('*').eq('id', user.id).single();
         currentProfile = p;
         document.getElementById('my-convos-btn').classList.remove('hidden');
-        document.getElementById('post-deal-bar').classList.remove('hidden');
+        const isBrandOrAdmin = p && (p.account_type === 'empresa' || p.account_type === 'business' || p.account_type === 'brand' || p.account_type === 'admin' || user.email === 'fullnessmindset@gmail.com');
+        if (isBrandOrAdmin) {
+          document.getElementById('post-deal-bar').classList.remove('hidden');
+        }
       }
       updateNavAuth();
       loadNotificationBell();

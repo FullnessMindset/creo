@@ -364,9 +364,12 @@ serve(async (req) => {
       if (!gmailPassword)
         return json({ error: "GMAIL_APP_PASSWORD not configured. Generate one at myaccount.google.com/apppasswords" }, 500);
 
-      const buttonText = (body.button_text as string) || "";
-      const buttonUrl = (body.button_url as string) || "";
-      const imageUrl = (body.image_url as string) || "";
+      const escHtml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      const buttonText = escHtml((body.button_text as string) || "");
+      const rawButtonUrl = (body.button_url as string) || "";
+      const rawImageUrl = (body.image_url as string) || "";
+      const buttonUrl = rawButtonUrl.match(/^https?:\/\//) ? escHtml(rawButtonUrl) : "";
+      const imageUrl = rawImageUrl.match(/^https?:\/\//) ? escHtml(rawImageUrl) : "";
       const imagePosition = (body.image_position as string) || "cover";
 
       const sanitizedMsg = (message as string)
