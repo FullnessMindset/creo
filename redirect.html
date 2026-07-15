@@ -85,11 +85,17 @@
       if (status === 'success') {
         setUI('Verificando conexión con Stripe...', 'Confirmando tu cuenta...');
         try {
-          const { data: { user } } = await sb.auth.getUser();
-          if (user) {
-            const { data: prof } = await sb.from('profiles').select('stripe_connect_id').eq('id', user.id).single();
-            if (prof?.stripe_connect_id) {
+          const { data: { session } } = await sb.auth.getSession();
+          if (session) {
+            const res = await fetch(SUPABASE_URL + '/functions/v1/check-stripe-status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token }
+            });
+            const result = await res.json();
+            if (result.status === 'complete') {
               setUI('¡Stripe Conectado!', 'Tu cuenta está lista para recibir pagos.');
+            } else if (result.status === 'incomplete') {
+              setUI('Stripe Conectado', 'Configuración casi lista. Completa los datos pendientes desde tu panel.');
             } else {
               setUI('Stripe Conectado', 'Redirigiendo al panel...');
             }
@@ -100,7 +106,7 @@
           setUI('¡Stripe Conectado!', 'Redirigiendo al panel...');
         }
         document.getElementById('spinner').classList.add('hidden');
-        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+        setTimeout(() => { window.location.href = 'index.html?stripe=success'; }, 1500);
         return;
       }
 

@@ -1418,9 +1418,26 @@
           if (user.email === ADMIN_EMAIL) {
             document.getElementById('stripe-connect-regular').innerHTML = '<div class="bg-green-50 p-6 rounded-xl border border-green-200 space-y-2"><h3 class="font-bold text-green-800 flex items-center gap-2">✅ Cuenta de Plataforma</h3><p class="text-sm text-green-700">Esta es la cuenta principal de CREO. Las comisiones del 5% se depositan directamente aquí.</p></div>';
           } else if (data.stripe_onboarded) {
-            document.getElementById('stripe-btn').innerText = "Stripe Conectado ✓";
-            document.getElementById('stripe-btn').disabled = true;
-            document.getElementById('stripe-btn').className = "w-full bg-green-600 text-white py-3 rounded-xl font-bold cursor-default";
+            document.getElementById('stripe-connect-regular').innerHTML = `
+              <div class="bg-green-50 p-6 rounded-xl border border-green-200 space-y-3">
+                <h3 class="font-bold text-green-800 flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  Stripe Conectado
+                </h3>
+                <p class="text-sm text-green-700">Tu cuenta está lista para recibir pagos. Los fondos se depositan directamente en tu cuenta bancaria.</p>
+                <div class="flex flex-col sm:flex-row gap-2 pt-1">
+                  <a href="https://connect.stripe.com/express_login" target="_blank" rel="noopener" class="flex-1 text-center bg-creo-purple text-white py-3 rounded-xl font-bold transition hover:opacity-90 text-sm">
+                    <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    Ir a mi Stripe Dashboard
+                  </a>
+                  <button onclick="refreshStripeStatus()" class="flex-1 bg-white text-green-700 py-3 rounded-xl font-bold border border-green-300 transition hover:bg-green-50 text-sm">
+                    Verificar Estado
+                  </button>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded-xl border border-gray-200 mt-4">
+                <p class="text-xs text-gray-500">CREO retiene un 5% de comisión por transacción. Stripe cobra un 3% adicional al que paga. Tú recibes el 95% de cada pago.</p>
+              </div>`;
           } else if (data.stripe_connect_id) {
             document.getElementById('stripe-btn').innerText = "Completar configuración de Stripe";
             document.getElementById('stripe-btn').className = "w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 rounded-xl font-bold transition";
@@ -2609,6 +2626,32 @@
       const data = await response.json();
       if (data.url) window.location.href = data.url;
       else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); document.getElementById('stripe-btn').innerText = "Conectar Stripe"; }
+    }
+
+    async function refreshStripeStatus() {
+      showToast('Verificando estado de Stripe...', 'info');
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) return showToast('Inicia sesión primero', 'error');
+        const res = await fetch(SUPABASE_URL + '/functions/v1/check-stripe-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token }
+        });
+        const result = await res.json();
+        if (result.status === 'complete') {
+          showToast('Stripe verificado: cargos y pagos habilitados', 'success');
+        } else if (result.status === 'incomplete') {
+          let missing = [];
+          if (!result.details_submitted) missing.push('datos pendientes');
+          if (!result.charges_enabled) missing.push('cargos no habilitados');
+          if (!result.payouts_enabled) missing.push('pagos no habilitados');
+          showToast('Stripe incompleto: ' + missing.join(', '), 'warning');
+        } else {
+          showToast('Stripe no conectado aún', 'warning');
+        }
+      } catch (e) {
+        showToast('Error al verificar Stripe', 'error');
+      }
     }
 
     // ===== STORIES MANAGEMENT =====
