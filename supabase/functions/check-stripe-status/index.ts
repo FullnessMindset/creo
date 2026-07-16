@@ -75,6 +75,6 @@ serve(async (req) => {
     });
   } catch (err) {
     console.error("check-stripe-status error:", err);
-    return json({ error: (err as Error).message }, 500);
+    return json({ error: "Failed to check Stripe status. Please try again." }, 500);
   }
 });

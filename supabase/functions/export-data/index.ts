@@ -74,7 +74,7 @@ serve(async (req) => {
       supabase.from("posts").select("*").eq("creator_id", user.id),
       supabase.from("creator_stories").select("*").eq("creator_id", user.id),
       supabase.from("community_posts").select("*").eq("author_id", user.id),
-      supabase.from("follows").select("*").or(`follower_id.eq.${user.id},following_id.eq.${user.id}`),
+      supabase.from("follows").select("*").or("follower_id.eq." + user.id + ",following_id.eq." + user.id),
       supabase.from("tips").select("*").eq("creator_id", user.id),
       supabase.from("subscriptions").select("*").eq("creator_id", user.id),
       supabase.from("messages").select("*").eq("sender_id", user.id).order("created_at", { ascending: false }).limit(1000),

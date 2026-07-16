@@ -204,7 +204,8 @@ serve(async (req) => {
         .from("profiles")
         .delete()
         .eq("id", profileId);
-      if (error) return json({ error: error.message }, 500);
+      if (error) return json({ error: "Failed to delete profile" }, 500);
+      try { await sbAdmin.auth.admin.deleteUser(profileId); } catch (e) { console.error("Failed to delete auth user:", profileId, e); }
       return json({ success: true });
     }
 
@@ -568,12 +569,14 @@ serve(async (req) => {
 
         return json({ success: true, transfer_id: transfer.id });
       } catch (e) {
-        return json({ error: (e as Error).message }, 500);
+        console.error("admin-api payout error:", e);
+        return json({ error: "Payout failed. Please try again." }, 500);
       }
     }
 
     return json({ error: "Unknown action: " + action }, 400);
   } catch (err) {
-    return json({ error: (err as Error).message }, 500);
+    console.error("admin-api error:", err);
+    return json({ error: "Internal server error" }, 500);
   }
 });

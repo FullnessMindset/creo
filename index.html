@@ -1231,16 +1231,26 @@
       const card = document.getElementById('brand-preview-card');
       card.style.backgroundColor = bgColor;
 
-      // Background media in preview
+      // Background media in preview — safe DOM construction
       const mediaCont = document.getElementById('brand-preview-bg-media');
-      if (bgMedia) {
+      mediaCont.innerHTML = '';
+      if (bgMedia && /^https?:\/\//i.test(bgMedia)) {
         const isVideo = /\.(mp4|webm|ogg)(\?|$)/i.test(bgMedia);
         if (isVideo) {
-          mediaCont.innerHTML = '<video src="' + bgMedia + '" autoplay muted loop playsinline class="w-full h-full object-cover absolute inset-0" style="opacity:0.3"></video>';
+          const vid = document.createElement('video');
+          vid.src = bgMedia;
+          vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true;
+          vid.className = 'w-full h-full object-cover absolute inset-0';
+          vid.style.opacity = '0.3';
+          mediaCont.appendChild(vid);
         } else {
-          mediaCont.innerHTML = '<img src="' + bgMedia + '" class="w-full h-full object-cover absolute inset-0" style="opacity:0.3">';
+          const img = document.createElement('img');
+          img.src = bgMedia;
+          img.className = 'w-full h-full object-cover absolute inset-0';
+          img.style.opacity = '0.3';
+          mediaCont.appendChild(img);
         }
-      } else { mediaCont.innerHTML = ''; }
+      }
 
       const previewText = document.getElementById('brand-preview-text');
       const previewSub = document.getElementById('brand-preview-subtext');

@@ -122,6 +122,6 @@ serve(async (req) => {
     return json({ url: session.url });
   } catch (err) {
     console.error("create-subscription-checkout error:", err);
-    return json({ error: (err as Error).message }, 500);
+    return json({ error: "Subscription setup failed. Please try again." }, 500);
   }
 });

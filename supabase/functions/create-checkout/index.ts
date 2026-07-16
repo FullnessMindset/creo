@@ -5,8 +5,6 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2023-10-16" });
 const PLATFORM_FEE_PERCENT = 5;
 const STRIPE_SURCHARGE_PERCENT = 3;
-const ALLOWED_ORIGINS = ["https://fullnessmindset.github.io"];
-
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -106,6 +104,6 @@ serve(async (req) => {
     return json({ url: session.url });
   } catch (err) {
     console.error("create-checkout error:", err);
-    return json({ error: (err as Error).message }, 500);
+    return json({ error: "Payment processing failed. Please try again." }, 500);
   }
 });

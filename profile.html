@@ -626,17 +626,7 @@
 
       // Branding colors are applied after all sections load via applyBranding()
 
-      // Apply background media
-      if (data.bg_media_url) {
-        const bgContainer = document.createElement('div');
-        bgContainer.className = 'fixed inset-0 -z-10 overflow-hidden';
-        if (/\.(mp4|webm|mov)$/i.test(data.bg_media_url)) {
-          bgContainer.innerHTML = `<video src="${data.bg_media_url}" class="w-full h-full object-cover opacity-20" autoplay muted loop playsinline></video>`;
-        } else {
-          bgContainer.innerHTML = `<img src="${data.bg_media_url}" class="w-full h-full object-cover opacity-20">`;
-        }
-        document.body.prepend(bgContainer);
-      }
+      // Background media is handled by applyBranding() via profile_colors.bgMedia
 
       if ((data.stripe_onboarded && data.identity_verified) || isAdmin(data.email || '')) {
         document.getElementById('verified-badge').classList.remove('hidden');
@@ -2816,18 +2806,26 @@
 
       // Background media (image/video behind content)
       let bgContainer = document.getElementById('brand-bg-media-container');
-      if (bgMedia) {
+      if (bgMedia && /^https?:\/\//i.test(bgMedia)) {
         if (!bgContainer) {
           bgContainer = document.createElement('div');
           bgContainer.id = 'brand-bg-media-container';
           bgContainer.style.cssText = 'position:fixed;inset:0;z-index:-1;overflow:hidden;';
           document.body.prepend(bgContainer);
         }
+        bgContainer.innerHTML = '';
         const isVideo = /\.(mp4|webm|ogg)(\?|$)/i.test(bgMedia);
         if (isVideo) {
-          bgContainer.innerHTML = '<video src="' + bgMedia + '" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;opacity:0.2"></video>';
+          const vid = document.createElement('video');
+          vid.src = bgMedia;
+          vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true;
+          vid.style.cssText = 'width:100%;height:100%;object-fit:cover;opacity:0.2';
+          bgContainer.appendChild(vid);
         } else {
-          bgContainer.innerHTML = '<img src="' + bgMedia + '" style="width:100%;height:100%;object-fit:cover;opacity:0.2">';
+          const img = document.createElement('img');
+          img.src = bgMedia;
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;opacity:0.2';
+          bgContainer.appendChild(img);
         }
       } else if (bgContainer) {
         bgContainer.remove();

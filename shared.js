@@ -8,12 +8,12 @@
   csp.content = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://js.stripe.com",
-    "style-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "connect-src 'self' https://qddxoyjtoxtdcezwuvcq.supabase.co wss://qddxoyjtoxtdcezwuvcq.supabase.co https://api.giphy.com https://api.stripe.com https://js.stripe.com",
     "img-src 'self' data: blob: https: http:",
     "media-src 'self' blob: https://qddxoyjtoxtdcezwuvcq.supabase.co",
     "frame-src https://checkout.stripe.com https://connect.stripe.com https://js.stripe.com",
-    "font-src 'self' data:",
+    "font-src 'self' data: https://fonts.gstatic.com",
   ].join('; ');
   document.head.prepend(csp);
 })();

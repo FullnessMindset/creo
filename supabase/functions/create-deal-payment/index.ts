@@ -131,6 +131,6 @@ serve(async (req) => {
     return json({ url: session.url });
   } catch (err) {
     console.error("create-deal-payment error:", err);
-    return json({ error: (err as Error).message }, 500);
+    return json({ error: "Payment processing failed. Please try again." }, 500);
   }
 });

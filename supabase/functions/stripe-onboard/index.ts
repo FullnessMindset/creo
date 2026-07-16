@@ -71,6 +71,7 @@ serve(async (req) => {
           return json({ error: "Stripe account already connected", already_connected: true });
         }
       } catch (e) {
+        console.error("stripe-onboard: failed to retrieve existing account:", connectId, e);
         connectId = null;
       }
     }
@@ -99,6 +100,6 @@ serve(async (req) => {
     return json({ url: accountLink.url });
   } catch (err) {
     console.error("stripe-onboard error:", err);
-    return json({ error: (err as Error).message }, 500);
+    return json({ error: "Failed to connect Stripe account. Please try again." }, 500);
   }
 });
