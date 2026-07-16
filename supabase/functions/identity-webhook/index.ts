@@ -29,14 +29,31 @@ serve(async (req) => {
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
     } catch (err) {
-      console.error("Webhook signature verification failed:", err.message);
-      return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+      console.error("Webhook signature verification failed:", (err as Error).message);
+      return new Response("Webhook signature verification failed", { status: 400 });
     }
+
+    console.log(`Processing identity event: ${event.type} (${event.id})`);
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    // Idempotency: check if this event was already processed
+    const { data: existing } = await supabaseAdmin
+      .from("processed_webhook_events")
+      .select("id")
+      .eq("stripe_event_id", event.id)
+      .maybeSingle();
+
+    if (existing) {
+      console.log(`Identity event ${event.id} already processed, skipping`);
+      return new Response(
+        JSON.stringify({ received: true, duplicate: true }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
     const eventTypeMap: Record<string, string> = {
       "identity.verification_session.verified": "verified",
@@ -89,6 +106,15 @@ serve(async (req) => {
       console.log(`Unhandled identity event type: ${event.type}`);
     }
 
+    // Idempotency: record AFTER successful processing so retries work on failure
+    await supabaseAdmin.from("processed_webhook_events").insert({
+      stripe_event_id: event.id,
+      event_type: event.type,
+      stripe_session_id:
+        (event.data.object as Record<string, unknown>).id as string || null,
+      metadata: event.data.object,
+    });
+
     return new Response(JSON.stringify({ received: true }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
@@ -96,7 +122,7 @@ serve(async (req) => {
   } catch (err) {
     console.error("Identity webhook error:", err);
     return new Response(
-      JSON.stringify({ error: err.message || "Internal error" }),
+      JSON.stringify({ error: "Internal webhook processing error" }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }

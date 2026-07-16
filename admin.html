@@ -857,7 +857,7 @@
           document.getElementById('account-name').textContent = res.account.name || res.account.id;
         }
       } catch (e) {
-        console.log('Stripe API check skipped:', e.message);
+        // Stripe account info not available — non-critical
       }
 
       document.getElementById('auth-gate').classList.add('hidden');

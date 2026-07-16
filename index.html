@@ -1300,8 +1300,8 @@
       if (s.image_url) {
         const isVid = /\.(mp4|webm|mov)$/i.test(s.image_url);
         previewEl.innerHTML = isVid
-          ? `<video src="${s.image_url}" class="w-full h-32 object-cover rounded-lg border border-gray-200" controls></video>`
-          : `<img src="${s.image_url}" class="w-full h-32 object-cover rounded-lg border border-gray-200" alt="">`;
+          ? `<video src="${esc(s.image_url)}" class="w-full h-32 object-cover rounded-lg border border-gray-200" controls></video>`
+          : `<img src="${esc(s.image_url)}" class="w-full h-32 object-cover rounded-lg border border-gray-200" alt="">`;
         previewEl.classList.remove('hidden');
       } else {
         previewEl.classList.add('hidden');
@@ -1368,8 +1368,8 @@
         const previewEl = document.getElementById('mec-' + key + '-media-preview');
         const isVid = /\.(mp4|webm|mov)$/i.test(settings.image_url);
         previewEl.innerHTML = isVid
-          ? `<video src="${settings.image_url}" class="w-full h-32 object-cover rounded-lg border border-gray-200" controls></video>`
-          : `<img src="${settings.image_url}" class="w-full h-32 object-cover rounded-lg border border-gray-200" alt="">`;
+          ? `<video src="${esc(settings.image_url)}" class="w-full h-32 object-cover rounded-lg border border-gray-200" controls></video>`
+          : `<img src="${esc(settings.image_url)}" class="w-full h-32 object-cover rounded-lg border border-gray-200" alt="">`;
         previewEl.classList.remove('hidden');
       }
     }
@@ -1382,7 +1382,7 @@
       const { error } = await sb.from('profiles').update({ avatar_url: url }).eq('id', currentProfile.id);
       if (error) { showToast('Error al guardar avatar', 'error'); return; }
       currentProfile.avatar_url = url;
-      document.getElementById('brand-avatar-preview').innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+      document.getElementById('brand-avatar-preview').innerHTML = `<img src="${esc(url)}" class="w-full h-full object-cover">`;
       showToast('Foto de perfil actualizada');
     }
 
@@ -1394,17 +1394,17 @@
       const { error } = await sb.from('profiles').update({ cover_url: url }).eq('id', currentProfile.id);
       if (error) { showToast('Error al guardar portada', 'error'); return; }
       currentProfile.cover_url = url;
-      document.getElementById('brand-cover-preview').innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+      document.getElementById('brand-cover-preview').innerHTML = `<img src="${esc(url)}" class="w-full h-full object-cover">`;
       showToast('Portada actualizada');
     }
 
     function loadBrandImagePreviews() {
       if (!currentProfile) return;
       if (currentProfile.avatar_url) {
-        document.getElementById('brand-avatar-preview').innerHTML = `<img src="${currentProfile.avatar_url}" class="w-full h-full object-cover">`;
+        document.getElementById('brand-avatar-preview').innerHTML = `<img src="${esc(currentProfile.avatar_url)}" class="w-full h-full object-cover">`;
       }
       if (currentProfile.cover_url) {
-        document.getElementById('brand-cover-preview').innerHTML = `<img src="${currentProfile.cover_url}" class="w-full h-full object-cover">`;
+        document.getElementById('brand-cover-preview').innerHTML = `<img src="${esc(currentProfile.cover_url)}" class="w-full h-full object-cover">`;
       }
     }
 
@@ -1475,10 +1475,10 @@
           }
 
           if (data.avatar_url) {
-            document.getElementById('avatar-preview').innerHTML = `<img src="${data.avatar_url}" class="w-full h-full object-cover">`;
+            document.getElementById('avatar-preview').innerHTML = `<img src="${esc(data.avatar_url)}" class="w-full h-full object-cover">`;
           }
           if (data.cover_url) {
-            document.getElementById('cover-preview').innerHTML = `<img src="${data.cover_url}" class="w-full h-full object-cover">`;
+            document.getElementById('cover-preview').innerHTML = `<img src="${esc(data.cover_url)}" class="w-full h-full object-cover">`;
           }
 
           if (user.email === ADMIN_EMAIL) {
@@ -1581,7 +1581,7 @@
       await sb.from('profiles').update({ [profileField]: publicUrl }).eq('id', currentUser.id);
 
       const preview = document.getElementById(previewId);
-      preview.innerHTML = `<img src="${publicUrl}" class="w-full h-full object-cover">`;
+      preview.innerHTML = `<img src="${esc(publicUrl)}" class="w-full h-full object-cover">`;
       showToast('Imagen actualizada', 'success');
     }
 
@@ -1606,7 +1606,7 @@
 
         const thumb = document.createElement('div');
         thumb.className = 'w-16 h-16 rounded-lg overflow-hidden border border-gray-200';
-        thumb.innerHTML = `<img src="${urlData.publicUrl}" class="w-full h-full object-cover">`;
+        thumb.innerHTML = `<img src="${esc(urlData.publicUrl)}" class="w-full h-full object-cover">`;
         preview.appendChild(thumb);
       }
       showToast(`${files.length} imagen(es) subida(s)`, 'success');
@@ -1967,7 +1967,7 @@
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Imágenes / Videos</label>
-            <div id="edit-meta-media-preview" class="flex flex-wrap gap-2 mb-2">${(m.images || []).map((url, i) => '<div class="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 group"><img src="' + url + '" class="w-full h-full object-cover"><button onclick="removeEditMetaMedia(' + i + ')" class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-xs rounded-bl opacity-0 group-hover:opacity-100 transition">&times;</button></div>').join('')}</div>
+            <div id="edit-meta-media-preview" class="flex flex-wrap gap-2 mb-2">${(m.images || []).map((url, i) => '<div class="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 group"><img src="' + esc(url) + '" class="w-full h-full object-cover"><button onclick="removeEditMetaMedia(' + i + ')" class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-xs rounded-bl opacity-0 group-hover:opacity-100 transition">&times;</button></div>').join('')}</div>
             <input type="file" id="edit-meta-media-file" accept="image/*,video/*" multiple class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
           </div>
           <div class="flex gap-3">
@@ -1984,7 +1984,7 @@
     function removeEditMetaMedia(index) {
       editMetaMediaUrls.splice(index, 1);
       const preview = document.getElementById('edit-meta-media-preview');
-      preview.innerHTML = editMetaMediaUrls.map((url, i) => '<div class="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 group"><img src="' + url + '" class="w-full h-full object-cover"><button onclick="removeEditMetaMedia(' + i + ')" class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-xs rounded-bl opacity-0 group-hover:opacity-100 transition">&times;</button></div>').join('');
+      preview.innerHTML = editMetaMediaUrls.map((url, i) => '<div class="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 group"><img src="' + esc(url) + '" class="w-full h-full object-cover"><button onclick="removeEditMetaMedia(' + i + ')" class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-xs rounded-bl opacity-0 group-hover:opacity-100 transition">&times;</button></div>').join('');
     }
 
     async function saveMetaEdit(id) {

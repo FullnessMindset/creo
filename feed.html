@@ -546,7 +546,8 @@
         return `<iframe src="https://www.tiktok.com/embed/v2/${id}" class="w-full ${cls}" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
       }
       if (type === 'instagram') {
-        return `<iframe src="${url.replace(/\/$/, '')}/embed" class="w-full ${cls}" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
+        if (!/^https:\/\/(www\.)?instagram\.com\//i.test(url)) return `<div class="w-full ${cls} bg-black flex items-center justify-center text-gray-400">Invalid Instagram URL</div>`;
+        return `<iframe src="${esc(url.replace(/\/$/, ''))}/embed" class="w-full ${cls}" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
       }
       return `<video src="${esc(url)}" class="w-full ${cls} object-contain bg-black feed-video" autoplay muted loop playsinline></video>`;
     }

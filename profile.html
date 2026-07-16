@@ -667,8 +667,8 @@
         const hero = document.getElementById('mec-tip-hero');
         const isVid = /\.(mp4|webm|mov)$/i.test(tip.image_url);
         hero.innerHTML = isVid
-          ? `<video src="${tip.image_url}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
-          : `<img src="${tip.image_url}" class="w-full h-40 object-cover rounded-xl" alt="">`;
+          ? `<video src="${esc(tip.image_url)}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
+          : `<img src="${esc(tip.image_url)}" class="w-full h-40 object-cover rounded-xl" alt="">`;
         hero.classList.remove('hidden');
       }
       // Update tab label
@@ -687,8 +687,8 @@
         const hero = document.getElementById('mec-sub-hero');
         const isVid = /\.(mp4|webm|mov)$/i.test(sub.image_url);
         hero.innerHTML = isVid
-          ? `<video src="${sub.image_url}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
-          : `<img src="${sub.image_url}" class="w-full h-40 object-cover rounded-xl" alt="">`;
+          ? `<video src="${esc(sub.image_url)}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
+          : `<img src="${esc(sub.image_url)}" class="w-full h-40 object-cover rounded-xl" alt="">`;
         hero.classList.remove('hidden');
       }
       if (sub.title) document.getElementById('pay-tab-sub').textContent = sub.title;
@@ -1439,7 +1439,7 @@
       const profileUrl = creatorProfile.username ? `profile.html?u=${encodeURIComponent(creatorProfile.username)}` : '#';
       const avatar = document.getElementById('dm-avatar');
       if (creatorProfile.avatar_url) {
-        avatar.innerHTML = `<img src="${creatorProfile.avatar_url}" class="w-full h-full object-cover" alt="">`;
+        avatar.innerHTML = `<img src="${esc(creatorProfile.avatar_url)}" class="w-full h-full object-cover" alt="">`;
       } else {
         avatar.innerHTML = `<span class="text-creo-purple font-bold text-lg">${esc((creatorProfile.display_name || creatorProfile.username)[0].toUpperCase())}</span>`;
       }
@@ -3071,7 +3071,8 @@
       if (status === 'subscribed') showToast('¡Suscripción activada! Gracias por tu apoyo mensual.', 'success');
       if (window.location.hash) {
         setTimeout(() => {
-          const target = document.querySelector(window.location.hash);
+          const hash = window.location.hash.slice(1);
+          const target = /^[a-zA-Z0-9_-]+$/.test(hash) ? document.getElementById(hash) : null;
           if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); target.style.outline = '3px solid #7c3aed'; setTimeout(() => target.style.outline = '', 3000); }
         }, 500);
       }

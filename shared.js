@@ -1993,7 +1993,7 @@ async function toggleNotifPanel() {
         const icon = n.icon || defaultIcons[n.type] || '🔔';
         const catClass = categoryColors[n.category] || 'border-l-gray-300';
         const priBg = priorityBg[n.priority] || '';
-        const safeLink = link ? esc(link) : '';
+        const safeLink = link ? link.replace(/['"<>&]/g, c => ({'\'':'&#39;','"':'&quot;','<':'&lt;','>':'&gt;','&':'&amp;'}[c])) : '';
         return `<div class="px-3 py-2.5 border-b border-gray-100 border-l-3 ${catClass} ${priBg} ${n.is_read ? 'opacity-60' : ''} hover:bg-gray-50 transition cursor-pointer" style="border-left-width:3px" onclick="${safeLink ? `window.location.href='${safeLink}'` : ''}">
           <div class="flex gap-2">
             <span>${icon}</span>
@@ -2394,7 +2394,7 @@ async function loadAnnouncementBar() {
     const bar = document.createElement('div');
     bar.id = 'announcement-bar';
     bar.className = `${colors[a.style] || colors.info} text-white text-sm text-center py-2 px-4 relative z-50 font-medium`;
-    bar.innerHTML = `<span>${a.message.replace(/</g,'&lt;')}</span><button onclick="dismissAnnouncement('${a.id}')" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>`;
+    bar.innerHTML = `<span>${esc(a.message)}</span><button onclick="dismissAnnouncement('${esc(a.id)}')" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>`;
     document.body.prepend(bar);
   } catch(e) { console.log('Announcement bar:', e); }
 }

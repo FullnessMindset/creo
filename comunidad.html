@@ -350,7 +350,8 @@
       window.addEventListener('scroll', onScroll);
       document.getElementById('comment-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitComment(); });
       if (window.location.hash) {
-        const target = document.querySelector(window.location.hash);
+        const hash = window.location.hash.slice(1);
+        const target = /^[a-zA-Z0-9_-]+$/.test(hash) ? document.getElementById(hash) : null;
         if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); target.style.outline = '3px solid #7c3aed'; setTimeout(() => target.style.outline = '', 3000); }
       }
     }
