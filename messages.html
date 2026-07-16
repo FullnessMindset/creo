@@ -332,7 +332,8 @@
       const container = P(pfx + 'search-results');
       if (!q || q.trim().length < 2) { container?.classList.add('hidden'); return; }
       searchTimer = setTimeout(async () => {
-        const term = q.trim().toLowerCase();
+        const term = q.trim().toLowerCase().replace(/[%_,()]/g, '');
+        if (!term) return;
         const { data: profiles } = await sb.from('profiles')
           .select('id, username, display_name, avatar_url, verification_status')
           .or(`username.ilike.%${term}%,display_name.ilike.%${term}%`)
@@ -369,7 +370,8 @@
       const container = P('new-msg-results');
       if (!q || q.trim().length < 2) { container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Escribe al menos 2 caracteres</p>'; return; }
       searchTimer = setTimeout(async () => {
-        const term = q.trim().toLowerCase();
+        const term = q.trim().toLowerCase().replace(/[%_,()]/g, '');
+        if (!term) return;
         const { data: profiles } = await sb.from('profiles')
           .select('id, username, display_name, avatar_url, verification_status')
           .or(`username.ilike.%${term}%,display_name.ilike.%${term}%`)
@@ -408,7 +410,8 @@
       const { data: msgs } = await sb.from('messages')
         .select('*, sender:sender_id(id, username, display_name, avatar_url), receiver:receiver_id(id, username, display_name, avatar_url)')
         .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(500);
 
       const noMsgD = P('no-messages-desktop');
       const noMsgM = P('no-messages-mobile');
@@ -610,6 +613,7 @@
         cancelAudio();
       }
       if (input) input.value = '';
+      if (!msg.body && !msg.media_url) return;
       const { error } = await sb.from('messages').insert(msg);
       if (error) { showToast('Error al enviar', 'error'); console.error(error); return; }
       const label = msg.media_type === 'video' ? '🎥 Video' : msg.media_type === 'image' ? '📷 Imagen' : msg.media_type === 'audio' ? '🎤 Audio' : body;
@@ -890,19 +894,15 @@
       document.removeEventListener('click', closeReactionPicker);
       reactionInProgress = true;
       try {
-        const { data: msg } = await sb.from('messages').select('reactions, sender_id, receiver_id').eq('id', msgId).single();
+        const { data: msg } = await sb.from('messages').select('sender_id, receiver_id').eq('id', msgId).single();
         if (!msg) return;
-        const reactions = msg.reactions || {};
-        if (!reactions[emoji]) reactions[emoji] = [];
-        const idx = reactions[emoji].indexOf(currentUser.id);
-        if (idx >= 0) { reactions[emoji].splice(idx, 1); if (!reactions[emoji].length) delete reactions[emoji]; }
-        else { reactions[emoji].push(currentUser.id); }
-        // Optimistic UI update
+        const { data: reactions, error: rpcErr } = await sb.rpc('toggle_message_reaction', { p_message_id: msgId, p_emoji: emoji });
+        if (rpcErr) { showToast('Error al reaccionar', 'error'); console.error(rpcErr); return; }
         const msgEl = P('msg-' + msgId);
         if (msgEl) {
           const isMine = msg.sender_id === currentUser.id;
           const oldReactions = msgEl.querySelector('.flex.flex-wrap');
-          const newHtml = Object.keys(reactions).length > 0
+          const newHtml = reactions && Object.keys(reactions).length > 0
             ? `<div class="flex flex-wrap gap-1 ${isMine ? 'justify-end' : 'justify-start'} mt-0.5">${Object.entries(reactions).map(([e, users]) => {
                 const my = users.includes(currentUser.id);
                 return `<button onclick="toggleReaction('${msgId}','${e}')" class="text-xs px-1.5 py-0.5 rounded-full border transition ${my ? 'bg-creo-purple/20 border-creo-purple' : 'bg-gray-50 border-gray-200 hover:border-creo-mint'}">${e}${users.length>1?' '+users.length:''}</button>`;
@@ -911,9 +911,9 @@
           const bubble = msgEl.querySelector('.max-w-\\[75\\%\\]');
           if (bubble && newHtml) bubble.insertAdjacentHTML('beforeend', newHtml);
         }
-        await sb.from('messages').update({ reactions }).eq('id', msgId);
+        const wasAdded = reactions && reactions[emoji] && reactions[emoji].includes(currentUser.id);
         const other = msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id;
-        if (idx < 0) createNotification(other, 'message', `Reacción ${emoji}`, null, 'messages.html#chat-' + currentUser.id);
+        if (wasAdded) createNotification(other, 'message', `Reacción ${emoji}`, null, 'messages.html#chat-' + currentUser.id);
       } finally {
         reactionInProgress = false;
         loadChatMessages(true);
