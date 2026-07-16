@@ -126,18 +126,22 @@
     <div class="max-w-7xl mx-auto px-6 py-8 space-y-8">
 
       <!-- Stats Row -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('creators')">
           <p class="text-gray-500 text-xs uppercase tracking-wider">Total Creators</p>
           <p id="stat-total" class="text-3xl font-bold text-gray-900 mt-1">-</p>
         </div>
-        <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
+        <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('verification')">
           <p class="text-gray-500 text-xs uppercase tracking-wider">Pending Review</p>
           <p id="stat-pending-review" class="text-3xl font-bold text-yellow-600 mt-1">-</p>
         </div>
-        <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
+        <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('verification')">
           <p class="text-gray-500 text-xs uppercase tracking-wider">Verified</p>
           <p id="stat-verified" class="text-3xl font-bold text-green-600 mt-1">-</p>
+        </div>
+        <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('reports')">
+          <p class="text-gray-500 text-xs uppercase tracking-wider">Open Reports</p>
+          <p id="stat-reports" class="text-3xl font-bold text-red-500 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
           <p class="text-gray-500 text-xs uppercase tracking-wider">Platform Revenue</p>
@@ -151,15 +155,15 @@
 
       <!-- Tabs -->
       <div class="flex space-x-1 bg-gray-100 p-1 rounded-xl w-fit border border-gray-200 transition-colors">
-        <button onclick="showTab('verification')" id="tab-verification" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium bg-creo-purple text-white transition">Verification</button>
+        <button onclick="showTab('verification')" id="tab-verification" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium bg-creo-purple text-white transition relative">Verification<span id="badge-verification" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
         <button onclick="showTab('creators')" id="tab-creators" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Creators</button>
         <button onclick="showTab('transactions')" id="tab-transactions" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Transactions</button>
         <button onclick="showTab('accounts')" id="tab-accounts" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Stripe Accounts</button>
         <button onclick="showTab('links')" id="tab-links" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Quick Links</button>
         <button onclick="showTab('allusers')" id="tab-allusers" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">All Users</button>
-        <button onclick="showTab('metareviews')" id="tab-metareviews" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Meta Reviews</button>
-        <button onclick="showTab('dealpayouts')" id="tab-dealpayouts" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Deal Payouts</button>
-        <button onclick="showTab('reports')" id="tab-reports" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Reports</button>
+        <button onclick="showTab('metareviews')" id="tab-metareviews" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition relative">Meta Reviews<span id="badge-metareviews" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('dealpayouts')" id="tab-dealpayouts" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition relative">Deal Payouts<span id="badge-dealpayouts" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('reports')" id="tab-reports" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition relative">Reports<span id="badge-reports" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
         <button onclick="showTab('announcements')" id="tab-announcements" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Announcements</button>
         <button onclick="showTab('stripe')" id="tab-stripe" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
@@ -381,6 +385,88 @@
           <div id="reports-list" class="divide-y divide-gray-100"></div>
           <div id="no-reports" class="hidden px-5 py-12 text-center text-gray-400">No reports found.</div>
           <div id="reports-loading" class="px-5 py-12 text-center text-gray-400">Loading reports...</div>
+        </div>
+      </div>
+
+      <!-- Report Review Modal -->
+      <div id="report-review-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onclick="if(event.target===this)closeReportReview()">
+        <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col">
+          <div class="p-5 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center"><svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg></div>
+              <h3 class="text-lg font-bold text-gray-900">Report Review</h3>
+              <span id="rr-status-badge" class="text-xs px-2 py-0.5 rounded-full font-medium"></span>
+            </div>
+            <button onclick="closeReportReview()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+          </div>
+
+          <div class="flex-1 overflow-y-auto">
+            <!-- Report Details -->
+            <div class="p-5 space-y-4">
+              <div class="flex items-start gap-4">
+                <div id="rr-reported-avatar" class="w-12 h-12 rounded-full flex-shrink-0 overflow-hidden"></div>
+                <div class="flex-1">
+                  <p class="font-bold text-gray-900" id="rr-reported-name"></p>
+                  <p class="text-sm text-gray-500" id="rr-reported-email"></p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span id="rr-warning-count" class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium"></span>
+                    <span id="rr-sanction-status" class="text-xs px-2 py-0.5 rounded-full font-medium"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p class="text-xs text-red-500 font-semibold uppercase mb-1">Reason</p>
+                <p class="text-sm font-medium text-red-800" id="rr-reason"></p>
+                <p class="text-xs text-gray-600 mt-1" id="rr-details"></p>
+                <p class="text-xs text-gray-400 mt-2">Reported by <span id="rr-reporter-name" class="font-medium text-gray-600"></span> · <span id="rr-report-date"></span></p>
+              </div>
+
+              <!-- Past Reports History -->
+              <div id="rr-history-section" class="hidden">
+                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Past Reports & Sanctions</h4>
+                <div id="rr-history-list" class="space-y-2 max-h-40 overflow-y-auto"></div>
+              </div>
+            </div>
+
+            <!-- Message Thread -->
+            <div class="border-t border-gray-200">
+              <div class="px-5 py-3 bg-gray-50 flex items-center justify-between">
+                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Admin Messages</h4>
+                <span id="rr-msg-count" class="text-xs text-gray-400"></span>
+              </div>
+              <div id="rr-messages" class="px-5 py-3 space-y-2 max-h-48 overflow-y-auto bg-gray-50/50"></div>
+              <div class="px-5 py-3 border-t border-gray-100 flex gap-2">
+                <input id="rr-msg-input" type="text" placeholder="Send message to user..." class="flex-1 bg-gray-50 border border-gray-300 px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" onkeydown="if(event.key==='Enter')sendReportMessage()">
+                <button onclick="sendReportMessage()" class="bg-creo-purple text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-creo-light transition flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions Footer -->
+          <div class="p-5 border-t border-gray-200 space-y-3 flex-shrink-0 bg-white">
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="sendReportNotification()" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                Warn &amp; Notify
+              </button>
+              <button onclick="resolveReport()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Resolve
+              </button>
+            </div>
+            <div id="rr-escalation" class="hidden">
+              <p class="text-xs text-gray-500 mb-2 font-semibold uppercase">Escalation Actions</p>
+              <div class="flex items-center gap-2 flex-wrap">
+                <button onclick="applySanction('partial_lock')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">Partial Lock</button>
+                <button onclick="applySanction('temporary_lock')" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">Temporary Lock</button>
+                <button onclick="applySanction('life_ban')" class="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">Life Ban</button>
+              </div>
+              <p class="text-[10px] text-gray-400 mt-1.5">Partial = no funds/deals/metas · Temporary = full account lock · Life Ban = permanent</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -747,6 +833,7 @@
     let allProfiles = [];
     let reviewingProfile = null;
     let verificationFilter = 'submitted';
+    let currentUser = null;
 
     // --- AUTH METHODS ---
 
@@ -762,8 +849,9 @@
       document.getElementById('login-form').classList.add('hidden');
       document.getElementById('verifying-state').classList.remove('hidden');
 
-      // Admin email already verified — enter dashboard directly
-      // Try Stripe verification for account info, but don't block on failure
+      const { data: { session } } = await sb.auth.getSession();
+      if (session?.user) currentUser = session.user;
+
       try {
         const res = await apiCall('login');
         if (!res.error && res.account) {
@@ -826,6 +914,29 @@
       renderVerificationQueue();
       loadAccounts();
       loadMetaReviews();
+      updateTabBadges();
+      loadReportCounts();
+    }
+
+    function updateTabBadges() {
+      const pendingVerif = allProfiles.filter(p => p.verification_status === 'submitted').length;
+      setBadge('badge-verification', pendingVerif);
+      const pendingDeals = allDealPayouts.filter(i => i.status !== 'paid').length;
+      setBadge('badge-dealpayouts', pendingDeals);
+    }
+
+    function setBadge(id, count) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (count > 0) { el.textContent = count > 99 ? '99+' : count; el.classList.remove('hidden'); }
+      else { el.classList.add('hidden'); }
+    }
+
+    async function loadReportCounts() {
+      const { count } = await sb.from('reports').select('id', { count: 'exact', head: true }).eq('status', 'pending');
+      const c = count || 0;
+      setBadge('badge-reports', c);
+      document.getElementById('stat-reports').textContent = c;
     }
 
     // VERIFICATION QUEUE
@@ -1489,6 +1600,9 @@
     // ===== REPORTS =====
     let reportsLoaded = false;
     let allReports = [];
+    let activeReport = null;
+    let activeReportMessages = [];
+    let activeReportHistory = [];
 
     async function loadReports() {
       reportsLoaded = true;
@@ -1501,6 +1615,8 @@
       document.getElementById('reports-loading').classList.add('hidden');
       if (error) { document.getElementById('no-reports').textContent = 'Error: ' + error.message; document.getElementById('no-reports').classList.remove('hidden'); return; }
       allReports = data || [];
+      const pendingCount = allReports.filter(r => r.status === 'pending').length;
+      setBadge('badge-reports', pendingCount);
       filterReports();
     }
 
@@ -1527,48 +1643,360 @@
                 <span class="font-semibold text-sm text-gray-900">${esc(reported)}</span>
                 <span class="text-xs text-gray-400">reported by ${esc(reporter)}</span>
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColor} border">${esc(r.status)}</span>
+                ${r.warning_count > 0 ? `<span class="text-xs bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded-full font-medium">${r.warning_count} warning${r.warning_count > 1 ? 's' : ''}</span>` : ''}
               </div>
               <p class="text-sm text-red-600 font-medium mt-1">${esc(r.reason)}</p>
               ${r.details ? `<p class="text-xs text-gray-500 mt-0.5">${esc(r.details)}</p>` : ''}
               <p class="text-xs text-gray-400 mt-1">${new Date(r.created_at).toLocaleString()}</p>
             </div>
             <div class="flex items-center gap-1 flex-shrink-0">
-              ${r.status === 'pending' ? `<button onclick="updateReport('${r.id}', 'reviewed')" class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-lg hover:bg-blue-100 font-medium">Review</button>` : ''}
-              ${r.status !== 'resolved' ? `<button onclick="updateReport('${r.id}', 'resolved')" class="text-xs bg-green-50 text-green-600 px-2.5 py-1 rounded-lg hover:bg-green-100 font-medium">Resolve</button>` : ''}
-              <button onclick="notifyReportedUser('${r.reported?.id}', '${esc(reported)}', '${esc(r.reason)}')" class="text-xs bg-red-50 text-red-600 px-2.5 py-1 rounded-lg hover:bg-red-100 font-medium">Notify</button>
+              <button onclick="openReportReview('${r.id}')" class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1.5 rounded-lg hover:bg-blue-100 font-medium">Review</button>
+              <button onclick="quickResolveReport('${r.id}')" class="text-xs bg-green-50 text-green-600 px-2.5 py-1.5 rounded-lg hover:bg-green-100 font-medium">Resolve</button>
+              <button onclick="quickNotifyReport('${r.id}')" class="text-xs bg-orange-50 text-orange-600 px-2.5 py-1.5 rounded-lg hover:bg-orange-100 font-medium">Notify</button>
             </div>
           </div>
         </div>`;
       }).join('');
     }
 
-    async function updateReport(id, status) {
-      const { error } = await sb.from('reports').update({ status }).eq('id', id);
-      if (error) { showToast('Error: ' + error.message, 'error'); return; }
-      const r = allReports.find(x => x.id === id);
-      if (r) r.status = status;
-      filterReports();
-      showToast('Report ' + status, 'success');
+    // --- REVIEW MODAL ---
+    async function openReportReview(reportId) {
+      activeReport = allReports.find(r => r.id === reportId);
+      if (!activeReport) return;
+      const r = activeReport;
+      const reported = r.reported || {};
+      const reporter = r.reporter || {};
+      const reportedName = reported.display_name || reported.username || '?';
+      const reporterName = reporter.display_name || reporter.username || '?';
+
+      // Avatar
+      document.getElementById('rr-reported-avatar').innerHTML = reported.avatar_url
+        ? `<img src="${esc(reported.avatar_url)}" class="w-12 h-12 rounded-full object-cover">`
+        : `<div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center"><span class="text-lg font-bold text-red-600">${esc(reportedName[0])}</span></div>`;
+      document.getElementById('rr-reported-name').textContent = reportedName;
+      document.getElementById('rr-reported-email').textContent = reported.email || '';
+      document.getElementById('rr-reason').textContent = r.reason;
+      document.getElementById('rr-details').textContent = r.details || '';
+      document.getElementById('rr-reporter-name').textContent = reporterName;
+      document.getElementById('rr-report-date').textContent = new Date(r.created_at).toLocaleString();
+
+      const statusColors = { pending: 'bg-yellow-100 text-yellow-700', reviewed: 'bg-blue-100 text-blue-700', resolved: 'bg-green-100 text-green-700' };
+      const badge = document.getElementById('rr-status-badge');
+      badge.className = 'text-xs px-2 py-0.5 rounded-full font-medium ' + (statusColors[r.status] || 'bg-gray-100 text-gray-500');
+      badge.textContent = r.status;
+
+      // Mark as reviewed if pending
+      if (r.status === 'pending') {
+        await sb.from('reports').update({ status: 'reviewed' }).eq('id', reportId);
+        r.status = 'reviewed';
+        badge.className = 'text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700';
+        badge.textContent = 'reviewed';
+        filterReports();
+      }
+
+      // Load past reports + sanctions for this user
+      await loadReportHistory(reported.id);
+
+      // Show warning count
+      const totalWarnings = activeReportHistory.filter(h => h._type === 'sanction' && h.sanction_type === 'warning').length;
+      const totalPastReports = activeReportHistory.filter(h => h._type === 'report').length;
+      document.getElementById('rr-warning-count').textContent = `${totalWarnings} warning${totalWarnings !== 1 ? 's' : ''} · ${totalPastReports} past report${totalPastReports !== 1 ? 's' : ''}`;
+
+      // Sanction status
+      const profile = allProfiles.find(p => p.id === reported.id);
+      const sanctionEl = document.getElementById('rr-sanction-status');
+      const sanctionLabels = { none: '', warned: 'Warned', partial_lock: 'Partial Lock', temporary_lock: 'Temporarily Locked', life_ban: 'BANNED' };
+      const sanctionColors = { none: '', warned: 'bg-yellow-100 text-yellow-700', partial_lock: 'bg-orange-100 text-orange-700', temporary_lock: 'bg-red-100 text-red-700', life_ban: 'bg-red-600 text-white' };
+      const sStatus = profile?.sanction_status || 'none';
+      if (sStatus !== 'none') {
+        sanctionEl.className = 'text-xs px-2 py-0.5 rounded-full font-medium ' + (sanctionColors[sStatus] || '');
+        sanctionEl.textContent = sanctionLabels[sStatus] || sStatus;
+        sanctionEl.classList.remove('hidden');
+      } else { sanctionEl.classList.add('hidden'); }
+
+      // Show escalation if 3+ warnings
+      document.getElementById('rr-escalation').classList.toggle('hidden', totalWarnings < 2);
+
+      // Load report messages
+      await loadReportMessages(reportId);
+
+      document.getElementById('rr-msg-input').value = '';
+      document.getElementById('report-review-modal').classList.remove('hidden');
     }
 
-    async function notifyReportedUser(userId, userName, reason) {
-      if (!userId) return;
-      const msg = `Hola ${userName}, hemos recibido un reporte sobre tu cuenta por: "${reason}". Por favor revisa tu comportamiento en la plataforma. Si crees que esto es un error, puedes responder a este mensaje. — Admin CREO`;
-      const adminId = currentUser.id;
-      const { data: existing } = await sb.from('conversations').select('id').or(`and(user1_id.eq.${adminId},user2_id.eq.${userId}),and(user1_id.eq.${userId},user2_id.eq.${adminId})`).limit(1);
-      let convoId;
-      if (existing && existing.length > 0) {
-        convoId = existing[0].id;
-      } else {
-        const { data: newConvo, error: cErr } = await sb.from('conversations').insert({ user1_id: adminId, user2_id: userId }).select('id').single();
-        if (cErr) { showToast('Error creating conversation: ' + cErr.message, 'error'); return; }
-        convoId = newConvo.id;
+    function closeReportReview() {
+      document.getElementById('report-review-modal').classList.add('hidden');
+      activeReport = null;
+      loadReportCounts();
+    }
+
+    async function loadReportHistory(userId) {
+      if (!userId) { activeReportHistory = []; renderReportHistory(); return; }
+      const [reportsRes, sanctionsRes] = await Promise.all([
+        sb.from('reports').select('id, reason, status, created_at, warning_count').eq('reported_user_id', userId).order('created_at', { ascending: false }).limit(20),
+        sb.from('user_sanctions').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(20)
+      ]);
+      const reports = (reportsRes.data || []).map(r => ({ ...r, _type: 'report' }));
+      const sanctions = (sanctionsRes.data || []).map(s => ({ ...s, _type: 'sanction' }));
+      activeReportHistory = [...reports, ...sanctions].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      renderReportHistory();
+    }
+
+    function renderReportHistory() {
+      const section = document.getElementById('rr-history-section');
+      const list = document.getElementById('rr-history-list');
+      if (activeReportHistory.length === 0) { section.classList.add('hidden'); return; }
+      section.classList.remove('hidden');
+
+      const sanctionIcons = { warning: '⚠️', partial_lock: '🔒', temporary_lock: '🚫', life_ban: '⛔' };
+      const sanctionLabels = { warning: 'Warning', partial_lock: 'Partial Lock', temporary_lock: 'Temp Lock', life_ban: 'Life Ban' };
+
+      list.innerHTML = activeReportHistory.map(h => {
+        if (h._type === 'report') {
+          const isCurrent = activeReport && h.id === activeReport.id;
+          return `<div class="flex items-center gap-2 text-xs p-2 rounded-lg ${isCurrent ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'}">
+            <span class="text-red-500">📋</span>
+            <span class="text-gray-700 flex-1">Report: <strong>${esc(h.reason)}</strong></span>
+            <span class="text-xs px-1.5 py-0.5 rounded-full ${h.status === 'resolved' ? 'bg-green-100 text-green-700' : h.status === 'reviewed' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}">${esc(h.status)}</span>
+            <span class="text-gray-400">${new Date(h.created_at).toLocaleDateString()}</span>
+          </div>`;
+        } else {
+          return `<div class="flex items-center gap-2 text-xs p-2 rounded-lg bg-orange-50">
+            <span>${sanctionIcons[h.sanction_type] || '⚠️'}</span>
+            <span class="text-gray-700 flex-1"><strong>${sanctionLabels[h.sanction_type] || h.sanction_type}</strong>${h.reason ? ': ' + esc(h.reason) : ''}</span>
+            <span class="text-xs px-1.5 py-0.5 rounded-full ${h.is_active ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-500'}">${h.is_active ? 'Active' : 'Expired'}</span>
+            <span class="text-gray-400">${new Date(h.created_at).toLocaleDateString()}</span>
+          </div>`;
+        }
+      }).join('');
+    }
+
+    async function loadReportMessages(reportId) {
+      const { data } = await sb.from('report_messages').select('*').eq('report_id', reportId).order('created_at', { ascending: true });
+      activeReportMessages = data || [];
+      renderReportMessages();
+    }
+
+    function renderReportMessages() {
+      const container = document.getElementById('rr-messages');
+      document.getElementById('rr-msg-count').textContent = activeReportMessages.length ? `${activeReportMessages.length} message${activeReportMessages.length > 1 ? 's' : ''}` : '';
+      if (!activeReportMessages.length) {
+        container.innerHTML = '<p class="text-xs text-gray-400 text-center py-3">No messages yet</p>';
+        return;
       }
-      const { error: mErr } = await sb.from('messages').insert({ conversation_id: convoId, sender_id: adminId, content: msg, message_type: 'text' });
-      if (mErr) { showToast('Error sending: ' + mErr.message, 'error'); return; }
-      await sb.from('conversations').update({ last_message: msg, last_message_at: new Date().toISOString() }).eq('id', convoId);
-      await sb.from('notifications').insert([{ user_id: userId, type: 'admin_report', title: 'Notificación del Admin sobre un reporte', body: 'Revisa tus mensajes para más detalles', link: 'messages.html' }]);
-      showToast('Notification sent to ' + userName, 'success');
+      container.innerHTML = activeReportMessages.map(m => {
+        const isSystem = m.message_type === 'system' || m.message_type === 'action';
+        const isWarning = m.message_type === 'warning';
+        const bg = isSystem ? 'bg-gray-200 text-gray-600' : isWarning ? 'bg-orange-100 text-orange-800 border border-orange-200' : 'bg-creo-purple text-white';
+        const icon = isWarning ? '⚠️ ' : isSystem ? '⚙️ ' : '';
+        return `<div class="flex ${isSystem ? 'justify-center' : 'justify-end'}">
+          <div class="${bg} px-3 py-2 rounded-lg max-w-[80%] text-xs ${isSystem ? 'rounded-full' : ''}">
+            ${icon}${esc(m.content)}
+            <span class="block text-[10px] opacity-60 mt-0.5">${new Date(m.created_at).toLocaleString()}</span>
+          </div>
+        </div>`;
+      }).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function sendReportMessage() {
+      if (!activeReport) return;
+      const input = document.getElementById('rr-msg-input');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      // Save to report_messages
+      await sb.from('report_messages').insert({
+        report_id: activeReport.id,
+        sender_id: currentUser.id,
+        sender_role: 'admin',
+        content: text,
+        message_type: 'message'
+      });
+
+      // Also send as private message to user
+      const userId = activeReport.reported?.id;
+      if (userId) {
+        await sendPrivateMessageToUser(userId, text);
+        await sendPushNotification(userId, 'Mensaje del Admin', text);
+      }
+
+      await loadReportMessages(activeReport.id);
+      showToast('Message sent', 'success');
+    }
+
+    async function sendPrivateMessageToUser(userId, text) {
+      if (!currentUser) return;
+      await sb.from('messages').insert({
+        sender_id: currentUser.id,
+        receiver_id: userId,
+        body: text
+      });
+    }
+
+    async function sendPushNotification(userId, title, body) {
+      await sb.from('notifications').insert({
+        user_id: userId,
+        type: 'admin_report',
+        title: title,
+        body: body.substring(0, 200),
+        link: 'messages.html',
+        category: 'admin',
+        priority: 'high',
+        icon: '⚠️'
+      });
+    }
+
+    // --- QUICK ACTIONS ---
+    async function quickNotifyReport(reportId) {
+      const r = allReports.find(x => x.id === reportId);
+      if (!r || !r.reported?.id) return;
+      const reported = r.reported;
+      const name = reported.display_name || reported.username || 'usuario';
+      const msg = `Hola ${name}, hemos recibido un reporte sobre tu cuenta por: "${r.reason}". Por favor revisa tu comportamiento en la plataforma. Si crees que esto es un error, puedes contactarnos. — Admin CREO`;
+
+      await sendPrivateMessageToUser(reported.id, msg);
+      await sendPushNotification(reported.id, 'Notificación del Admin', msg);
+
+      // Record warning
+      await sb.from('report_messages').insert({ report_id: reportId, sender_id: currentUser.id, sender_role: 'admin', content: msg, message_type: 'warning' });
+      await sb.from('user_sanctions').insert({ user_id: reported.id, report_id: reportId, sanction_type: 'warning', reason: r.reason, admin_id: currentUser.id });
+      await sb.from('reports').update({ warning_count: (r.warning_count || 0) + 1, status: 'reviewed' }).eq('id', reportId);
+      r.warning_count = (r.warning_count || 0) + 1;
+      r.status = 'reviewed';
+
+      // Update profile warning count
+      const profile = allProfiles.find(p => p.id === reported.id);
+      if (profile) {
+        const newCount = (profile.total_warnings || 0) + 1;
+        await sb.from('profiles').update({ total_warnings: newCount, sanction_status: 'warned' }).eq('id', reported.id);
+        profile.total_warnings = newCount;
+        profile.sanction_status = 'warned';
+      }
+
+      filterReports();
+      showToast(`Warning sent to ${name} (${r.warning_count} total)`, 'success');
+    }
+
+    async function quickResolveReport(reportId) {
+      const { error } = await sb.from('reports').update({
+        status: 'resolved',
+        resolved_at: new Date().toISOString(),
+        resolved_by: currentUser?.id
+      }).eq('id', reportId);
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+
+      // Log system message
+      await sb.from('report_messages').insert({ report_id: reportId, sender_id: currentUser?.id, sender_role: 'admin', content: 'Report resolved by admin', message_type: 'system' });
+
+      const r = allReports.find(x => x.id === reportId);
+      if (r) r.status = 'resolved';
+      filterReports();
+      loadReportCounts();
+      showToast('Report resolved', 'success');
+    }
+
+    // --- MODAL ACTIONS ---
+    async function sendReportNotification() {
+      if (!activeReport) return;
+      const reported = activeReport.reported;
+      if (!reported?.id) return;
+      const name = reported.display_name || reported.username || 'usuario';
+      const warningNum = (activeReport.warning_count || 0) + 1;
+      const msg = `⚠️ Advertencia ${warningNum}: Hola ${name}, has recibido una advertencia oficial por: "${activeReport.reason}". ${warningNum >= 3 ? 'Esta es tu última advertencia antes de acciones más severas.' : 'Por favor respeta las normas de la comunidad.'} — Admin CREO`;
+
+      await sendPrivateMessageToUser(reported.id, msg);
+      await sendPushNotification(reported.id, `Advertencia ${warningNum}`, msg);
+
+      await sb.from('report_messages').insert({ report_id: activeReport.id, sender_id: currentUser.id, sender_role: 'admin', content: `Warning #${warningNum} sent`, message_type: 'warning' });
+      await sb.from('user_sanctions').insert({ user_id: reported.id, report_id: activeReport.id, sanction_type: 'warning', reason: activeReport.reason, admin_id: currentUser.id });
+      await sb.from('reports').update({ warning_count: warningNum }).eq('id', activeReport.id);
+      activeReport.warning_count = warningNum;
+
+      const profile = allProfiles.find(p => p.id === reported.id);
+      if (profile) {
+        const newTotal = (profile.total_warnings || 0) + 1;
+        await sb.from('profiles').update({ total_warnings: newTotal, sanction_status: 'warned' }).eq('id', reported.id);
+        profile.total_warnings = newTotal;
+      }
+
+      // Show escalation if 3+ warnings
+      const totalWarnings = activeReportHistory.filter(h => h._type === 'sanction' && h.sanction_type === 'warning').length + 1;
+      document.getElementById('rr-escalation').classList.toggle('hidden', totalWarnings < 2);
+      document.getElementById('rr-warning-count').textContent = `${totalWarnings} warning${totalWarnings !== 1 ? 's' : ''} · ${activeReportHistory.filter(h => h._type === 'report').length} past reports`;
+
+      await loadReportMessages(activeReport.id);
+      showToast(`Warning #${warningNum} sent to ${name}`, 'success');
+    }
+
+    async function resolveReport() {
+      if (!activeReport) return;
+      await sb.from('reports').update({ status: 'resolved', resolved_at: new Date().toISOString(), resolved_by: currentUser?.id }).eq('id', activeReport.id);
+      await sb.from('report_messages').insert({ report_id: activeReport.id, sender_id: currentUser?.id, sender_role: 'admin', content: 'Report resolved', message_type: 'system' });
+      activeReport.status = 'resolved';
+      closeReportReview();
+      filterReports();
+      showToast('Report resolved', 'success');
+    }
+
+    async function applySanction(sanctionType) {
+      if (!activeReport || !activeReport.reported?.id) return;
+      const reported = activeReport.reported;
+      const name = reported.display_name || reported.username || 'usuario';
+
+      const labels = { partial_lock: 'Bloqueo Parcial (sin fondos, deals ni metas)', temporary_lock: 'Bloqueo Temporal (cuenta suspendida)', life_ban: 'Baneo Permanente (cuenta eliminada de la plataforma)' };
+      const confirmMsg = sanctionType === 'life_ban'
+        ? `⛔ ¿Estás seguro de BANEAR PERMANENTEMENTE a ${name}?\n\nEsto es irreversible.`
+        : `¿Aplicar ${labels[sanctionType]} a ${name}?`;
+      if (!confirm(confirmMsg)) return;
+
+      let expiresAt = null;
+      if (sanctionType === 'temporary_lock') {
+        expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      }
+
+      // Insert sanction
+      await sb.from('user_sanctions').insert({
+        user_id: reported.id,
+        report_id: activeReport.id,
+        sanction_type: sanctionType,
+        reason: activeReport.reason,
+        admin_id: currentUser.id,
+        expires_at: expiresAt
+      });
+
+      // Update profile
+      const profileUpdate = { sanction_status: sanctionType };
+      if (expiresAt) profileUpdate.sanction_expires_at = expiresAt;
+      if (sanctionType === 'life_ban') {
+        profileUpdate.verification_status = 'banned';
+        profileUpdate.banned_at = new Date().toISOString();
+        profileUpdate.ban_reason = 'Reports: ' + activeReport.reason;
+      }
+      await sb.from('profiles').update(profileUpdate).eq('id', reported.id);
+
+      // Notify user
+      const sanctionMessages = {
+        partial_lock: `🔒 Tu cuenta ha sido parcialmente bloqueada por: "${activeReport.reason}". No podrás liberar fondos, publicar brand deals ni crear metas hasta nuevo aviso. Contacta al admin si tienes preguntas.`,
+        temporary_lock: `🚫 Tu cuenta ha sido temporalmente suspendida por 30 días por: "${activeReport.reason}". Durante este periodo no podrás acceder a las funciones de la plataforma.`,
+        life_ban: `⛔ Tu cuenta ha sido permanentemente baneada por: "${activeReport.reason}". Esta decisión es final.`
+      };
+      const sanctionMsg = sanctionMessages[sanctionType];
+      await sendPrivateMessageToUser(reported.id, sanctionMsg);
+      await sendPushNotification(reported.id, labels[sanctionType].split(' (')[0], sanctionMsg);
+
+      // Log
+      await sb.from('report_messages').insert({ report_id: activeReport.id, sender_id: currentUser.id, sender_role: 'admin', content: `Sanction applied: ${sanctionType}`, message_type: 'action' });
+
+      // Resolve the report
+      await sb.from('reports').update({ status: 'resolved', resolved_at: new Date().toISOString(), resolved_by: currentUser?.id }).eq('id', activeReport.id);
+      activeReport.status = 'resolved';
+
+      closeReportReview();
+      filterReports();
+      loadDashboard();
+      showToast(`${labels[sanctionType].split(' (')[0]} applied to ${name}`, 'success');
     }
 
     // ===== ANNOUNCEMENTS =====
@@ -2088,6 +2516,8 @@
       }
       allMetaReviews = data;
       renderMetaReviews();
+      const pendingMetas = data.filter(m => m.fund_status?.includes('review')).length;
+      setBadge('badge-metareviews', pendingMetas);
     }
 
     function filterMetaReviews(filter) {
