@@ -1707,70 +1707,18 @@ async function startCreoIdVerification() {
   }
 }
 
-// ========== THEME ==========
+// ========== THEME (light mode only) ==========
 function initTheme() {
-  const saved = localStorage.getItem('creo-theme') || 'light';
-  applyTheme(saved);
+  localStorage.setItem('creo-theme', 'light');
+  document.documentElement.classList.remove('dark');
+  document.body.classList.add('bg-white', 'text-gray-900');
+  document.body.classList.remove('bg-gray-900', 'text-white');
 }
-function isDark() { return document.documentElement.classList.contains('dark'); }
-function applyTheme(theme) {
-  const dark = theme === 'dark';
-  if (dark) {
-    document.documentElement.classList.add('dark');
-    document.body.classList.add('bg-gray-900', 'text-white');
-    document.body.classList.remove('bg-white', 'text-gray-900');
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.body.classList.add('bg-white', 'text-gray-900');
-    document.body.classList.remove('bg-gray-900', 'text-white');
-  }
-  localStorage.setItem('creo-theme', theme);
-  updateThemeIcons();
-  applyThemeToFixedElements(dark);
-}
-function toggleTheme() {
-  const current = localStorage.getItem('creo-theme') || 'light';
-  applyTheme(current === 'light' ? 'dark' : 'light');
-}
-function updateThemeIcons() {
-  const dk = document.documentElement.classList.contains('dark');
-  document.querySelectorAll('.theme-icon-sun').forEach(e => e.classList.toggle('hidden', dk));
-  document.querySelectorAll('.theme-icon-moon').forEach(e => e.classList.toggle('hidden', !dk));
-}
-function applyThemeToFixedElements(dark) {
-  const sidebar = document.getElementById('creo-sidebar');
-  if (sidebar) {
-    if (dark) {
-      sidebar.classList.remove('bg-white', 'border-gray-200');
-      sidebar.classList.add('bg-gray-900', 'border-gray-700');
-    } else {
-      sidebar.classList.remove('bg-gray-900', 'border-gray-700');
-      sidebar.classList.add('bg-white', 'border-gray-200');
-    }
-  }
-  const themeBtn = document.getElementById('theme-toggle-btn');
-  if (themeBtn) {
-    if (dark) {
-      themeBtn.style.background = 'rgba(45,27,105,0.7)';
-      themeBtn.style.borderColor = 'rgba(255,255,255,0.15)';
-    } else {
-      themeBtn.style.background = '';
-      themeBtn.style.borderColor = '';
-    }
-  }
-  document.querySelectorAll('.dark-aware-header').forEach(h => {
-    if (dark) { h.classList.remove('bg-white/90', 'border-gray-200'); h.classList.add('bg-gray-900/90', 'border-gray-700'); }
-    else { h.classList.remove('bg-gray-900/90', 'border-gray-700'); h.classList.add('bg-white/90', 'border-gray-200'); }
-  });
-  document.querySelectorAll('.dark-aware-card').forEach(c => {
-    if (dark) { c.classList.remove('bg-white', 'border-gray-200', 'border-gray-100'); c.classList.add('bg-gray-800', 'border-gray-700'); }
-    else { c.classList.remove('bg-gray-800', 'border-gray-700'); c.classList.add('bg-white', 'border-gray-200'); }
-  });
-  document.querySelectorAll('.dark-aware-input').forEach(inp => {
-    if (dark) { inp.classList.remove('bg-gray-50', 'bg-gray-100', 'border-gray-300', 'border-gray-200', 'text-gray-900', 'placeholder-gray-400'); inp.classList.add('bg-gray-800', 'border-gray-600', 'text-white', 'placeholder-gray-500'); }
-    else { inp.classList.remove('bg-gray-800', 'border-gray-600', 'text-white', 'placeholder-gray-500'); inp.classList.add('bg-gray-50', 'border-gray-300', 'text-gray-900', 'placeholder-gray-400'); }
-  });
-}
+function isDark() { return false; }
+function applyTheme() { initTheme(); }
+function toggleTheme() {}
+function updateThemeIcons() {}
+function applyThemeToFixedElements() {}
 
 // Generic file upload helper
 async function uploadToStorage(file, bucket, maxMB) {
@@ -1885,11 +1833,6 @@ function renderSidebar(activePage) {
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
         ${getCreoLang() === 'es' ? 'English' : 'Español'}
       </button>
-      <button onclick="toggleTheme()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-100 transition w-full">
-        <svg class="w-5 h-5 theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        <svg class="w-5 h-5 theme-icon-moon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-        ${t('tema')}
-      </button>
       <div id="sidebar-auth-area"></div>
     </div>`;
   document.body.appendChild(sidebar);
@@ -1942,11 +1885,6 @@ function renderSidebar(activePage) {
         <button onclick="toggleCreoLang()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-100 transition w-full">
           <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
           ${getCreoLang() === 'es' ? 'English' : 'Español'}
-        </button>
-        <button onclick="toggleTheme()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-100 transition w-full">
-          <svg class="w-5 h-5 theme-icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-          <svg class="w-5 h-5 theme-icon-moon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-          ${t('tema')}
         </button>
         <div id="mobile-auth-area"></div>
       </div>
@@ -2229,41 +2167,10 @@ function acceptCookies() {
   }
 }
 
-// Inject global dark-mode CSS overrides
+// Inject global CSS
 (function() {
   const style = document.createElement('style');
   style.textContent = `
-    .dark .glass { background: rgba(26,10,62,0.6) !important; border-color: rgba(255,255,255,0.15) !important; }
-    .dark .glass-dark { background: rgba(26,10,62,0.8) !important; }
-    .dark .text-gray-900 { color: #f3f4f6 !important; }
-    .dark .text-gray-800 { color: #e5e7eb !important; }
-    .dark .text-gray-700 { color: #d1d5db !important; }
-    .dark .text-gray-600 { color: #9ca3af !important; }
-    .dark .bg-gray-50 { background-color: #111827 !important; }
-    .dark .bg-gray-100 { background-color: #1f2937 !important; }
-    .dark .bg-white { background-color: #1f2937 !important; }
-    .dark .bg-white\\/90 { background-color: rgba(17,24,39,0.9) !important; }
-    .dark .border-gray-200 { border-color: #374151 !important; }
-    .dark .border-gray-300 { border-color: #4b5563 !important; }
-    .dark .border-gray-100 { border-color: #374151 !important; }
-    .dark input, .dark textarea, .dark select { color: #f3f4f6 !important; }
-    .dark input::placeholder, .dark textarea::placeholder { color: #6b7280 !important; }
-    .dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
-    .dark textarea, .dark select {
-      background-color: #1f2937 !important;
-      border-color: #4b5563 !important;
-    }
-    .dark input:focus, .dark textarea:focus, .dark select:focus {
-      border-color: #33f0b0 !important;
-    }
-    .dark .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.4), 0 8px 10px -6px rgba(0,0,0,0.4) !important; }
-    .dark .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5) !important; }
-    .dark .hover\\:bg-gray-50:hover { background-color: #374151 !important; }
-    .dark .hover\\:bg-gray-100:hover { background-color: #374151 !important; }
-    .dark .hover\\:bg-gray-200:hover { background-color: #4b5563 !important; }
-    .dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: #374151 !important; }
-    body.bg-gray-900 { background-color: #111827 !important; }
-
     /* Real-time notification bubble */
     .creo-notif-bubble {
       position: fixed;
