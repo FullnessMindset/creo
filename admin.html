@@ -2067,7 +2067,7 @@
       btn.disabled = false; btn.textContent = 'Broadcast';
       if (error) { showToast('Error: ' + error.message, 'error'); return; }
 
-      if (target === 'all') {
+      if (target === 'global') {
         for (const p of allProfiles) {
           if (p.id === currentUser.id) continue;
           await sb.from('notifications').insert([{ user_id: p.id, type: 'admin_report', title: 'Anuncio de CREO', body: message.substring(0, 120), category: 'admin', priority: 'high', icon: '📢', link: 'comunidad.html' }]);
