@@ -535,9 +535,65 @@
         <div id="my-biz-list" class="space-y-3"></div>
       </div>
 
-      <!-- TAB: Stripe -->
+      <!-- TAB: Stripe / Herramientas -->
       <div id="panel-stripe" class="tab-panel hidden space-y-4">
-        <!-- Stripe connect -->
+
+        <!-- Status Overview Card -->
+        <div class="bg-white p-5 rounded-xl border border-gray-200 space-y-4">
+          <h3 class="font-bold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            Estado de tu Cuenta
+          </h3>
+
+          <!-- Creo ID Verification Status -->
+          <div id="status-creo-id" class="flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50">
+            <div id="creo-id-icon" class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-sm text-gray-900">CREO ID</p>
+              <p id="creo-id-status-text" class="text-xs text-gray-500">Cargando...</p>
+            </div>
+            <span id="creo-id-badge" class="text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-500">...</span>
+          </div>
+
+          <!-- Stripe Payment Status -->
+          <div id="status-stripe" class="flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50">
+            <div id="stripe-icon" class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-sm text-gray-900">Pagos (Stripe)</p>
+              <p id="stripe-status-text" class="text-xs text-gray-500">Cargando...</p>
+            </div>
+            <span id="stripe-badge" class="text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-500">...</span>
+          </div>
+
+          <!-- Payment Readiness Summary -->
+          <div id="payment-readiness" class="hidden p-4 rounded-xl border-2 border-dashed border-gray-200">
+            <p class="font-semibold text-sm text-gray-900 mb-2">Listo para recibir pagos</p>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="flex items-center gap-1.5">
+                <span id="check-id" class="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center"><svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
+                <span class="text-gray-600">CREO ID verificado</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span id="check-stripe" class="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center"><svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
+                <span class="text-gray-600">Stripe conectado</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span id="check-charges" class="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center"><svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
+                <span class="text-gray-600">Cargos habilitados</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span id="check-payouts" class="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center"><svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></span>
+                <span class="text-gray-600">Pagos habilitados</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stripe connect action -->
         <div id="stripe-connect-regular">
           <div class="bg-amber-50 p-6 rounded-xl border border-amber-200 space-y-3">
             <h3 class="font-bold text-amber-800">Conexión con Stripe</h3>
@@ -545,7 +601,7 @@
             <button id="stripe-btn" onclick="startStripeOnboarding()" class="w-full bg-creo-purple text-white py-3 rounded-xl font-bold transition hover:opacity-90">Conectar Stripe</button>
           </div>
           <div class="bg-white p-4 rounded-xl border border-gray-200 mt-4">
-            <p class="text-xs text-gray-500">CREO retiene un 5% de comisión por transacción. Stripe maneja todo el procesamiento de pagos de forma segura.</p>
+            <p class="text-xs text-gray-500">CREO retiene un 5% de comisión por transacción. Stripe cobra un 3% adicional al que paga. Tú recibes el 95% de cada pago.</p>
           </div>
         </div>
       </div>
@@ -1444,6 +1500,7 @@
           }
 
           updateVerificationUI(data);
+          loadAccountStatus(data, null);
           loadMetas();
           loadMetaInvites();
           loadPosts();
@@ -2649,8 +2706,132 @@
         } else {
           showToast('Stripe no conectado aún', 'warning');
         }
+        loadAccountStatus(currentProfile, result);
       } catch (e) {
         showToast('Error al verificar Stripe', 'error');
+      }
+    }
+
+    function setCheck(id, ok) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (ok) {
+        el.className = 'w-4 h-4 rounded-full bg-green-500 flex items-center justify-center';
+        el.innerHTML = '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>';
+      } else {
+        el.className = 'w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center';
+        el.innerHTML = '<svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>';
+      }
+    }
+
+    async function loadAccountStatus(profile, stripeResult) {
+      if (!profile) return;
+      const vStatus = profile.verification_status || 'pending';
+      const idVerified = profile.identity_verified || false;
+
+      // --- Creo ID ---
+      const creoIdIcon = document.getElementById('creo-id-icon');
+      const creoIdText = document.getElementById('creo-id-status-text');
+      const creoIdBadge = document.getElementById('creo-id-badge');
+      const statusCreoId = document.getElementById('status-creo-id');
+
+      if (vStatus === 'approved') {
+        creoIdIcon.className = 'w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0';
+        creoIdIcon.innerHTML = '<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+        creoIdText.textContent = 'Tu identidad ha sido verificada. Puedes recibir pagos y crear metas.';
+        creoIdBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-green-100 text-green-700';
+        creoIdBadge.textContent = 'Aprobado';
+        statusCreoId.className = 'flex items-center gap-3 p-4 rounded-xl border border-green-200 bg-green-50';
+      } else if (vStatus === 'submitted') {
+        creoIdIcon.className = 'w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0';
+        creoIdIcon.innerHTML = '<svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+        creoIdText.textContent = 'Tu solicitud está siendo revisada por nuestro equipo. Te notificaremos cuando esté lista.';
+        creoIdBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-yellow-100 text-yellow-700';
+        creoIdBadge.textContent = 'En Revisión';
+        statusCreoId.className = 'flex items-center gap-3 p-4 rounded-xl border border-yellow-200 bg-yellow-50';
+      } else if (vStatus === 'rejected') {
+        creoIdIcon.className = 'w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0';
+        creoIdIcon.innerHTML = '<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+        creoIdText.textContent = (profile.rejection_reason ? 'Razón: ' + profile.rejection_reason + '. ' : '') + 'Puedes corregir y enviar de nuevo.';
+        creoIdBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-red-100 text-red-700';
+        creoIdBadge.textContent = 'Rechazado';
+        statusCreoId.className = 'flex items-center gap-3 p-4 rounded-xl border border-red-200 bg-red-50';
+      } else {
+        creoIdIcon.className = 'w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0';
+        creoIdIcon.innerHTML = '<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg>';
+        creoIdText.textContent = 'Completa el formulario de verificación para empezar a recibir pagos.';
+        creoIdBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-500';
+        creoIdBadge.textContent = 'Pendiente';
+        statusCreoId.className = 'flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50';
+      }
+
+      // --- Stripe ---
+      const stripeIcon = document.getElementById('stripe-icon');
+      const stripeText = document.getElementById('stripe-status-text');
+      const stripeBadge = document.getElementById('stripe-badge');
+      const statusStripe = document.getElementById('status-stripe');
+
+      let sr = stripeResult;
+      if (!sr) {
+        try {
+          const { data: { session } } = await sb.auth.getSession();
+          if (session) {
+            const res = await fetch(SUPABASE_URL + '/functions/v1/check-stripe-status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token }
+            });
+            sr = await res.json();
+          }
+        } catch (_) {}
+      }
+
+      if (sr && sr.status === 'complete') {
+        stripeIcon.className = 'w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0';
+        stripeIcon.innerHTML = '<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+        stripeText.textContent = 'Tu cuenta de Stripe está lista. Cargos y pagos habilitados.';
+        stripeBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-green-100 text-green-700';
+        stripeBadge.textContent = 'Activo';
+        statusStripe.className = 'flex items-center gap-3 p-4 rounded-xl border border-green-200 bg-green-50';
+      } else if (sr && sr.status === 'incomplete') {
+        stripeIcon.className = 'w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0';
+        stripeIcon.innerHTML = '<svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
+        let details = [];
+        if (!sr.details_submitted) details.push('datos incompletos');
+        if (!sr.charges_enabled) details.push('cargos no habilitados');
+        if (!sr.payouts_enabled) details.push('pagos no habilitados');
+        stripeText.textContent = 'Configuración incompleta: ' + details.join(', ') + '.';
+        stripeBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-yellow-100 text-yellow-700';
+        stripeBadge.textContent = 'Incompleto';
+        statusStripe.className = 'flex items-center gap-3 p-4 rounded-xl border border-yellow-200 bg-yellow-50';
+      } else {
+        stripeIcon.className = 'w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0';
+        stripeIcon.innerHTML = '<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>';
+        stripeText.textContent = 'Conecta tu cuenta de Stripe para empezar a recibir pagos.';
+        stripeBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-500';
+        stripeBadge.textContent = 'No conectado';
+        statusStripe.className = 'flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50';
+      }
+
+      // --- Payment readiness checklist ---
+      const readiness = document.getElementById('payment-readiness');
+      readiness.classList.remove('hidden');
+      const idOk = vStatus === 'approved' || idVerified;
+      const stripeOk = sr && sr.status === 'complete';
+      const chargesOk = sr && sr.charges_enabled;
+      const payoutsOk = sr && sr.payouts_enabled;
+      setCheck('check-id', idOk);
+      setCheck('check-stripe', stripeOk || (sr && sr.status === 'incomplete'));
+      setCheck('check-charges', chargesOk);
+      setCheck('check-payouts', payoutsOk);
+
+      if (idOk && stripeOk) {
+        readiness.className = 'p-4 rounded-xl border-2 border-green-300 bg-green-50';
+        readiness.querySelector('p').textContent = '¡Listo para recibir pagos!';
+        readiness.querySelector('p').className = 'font-semibold text-sm text-green-700 mb-2';
+      } else {
+        readiness.className = 'p-4 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50';
+        readiness.querySelector('p').textContent = 'Pasos pendientes para recibir pagos';
+        readiness.querySelector('p').className = 'font-semibold text-sm text-amber-700 mb-2';
       }
     }
 

@@ -314,6 +314,8 @@
                   <th class="text-left px-5 py-3">Provider</th>
                   <th class="text-left px-5 py-3">Profile</th>
                   <th class="text-left px-5 py-3">Username</th>
+                  <th class="text-left px-5 py-3">Creo ID</th>
+                  <th class="text-left px-5 py-3">Stripe</th>
                   <th class="text-left px-5 py-3">Registered</th>
                   <th class="text-left px-5 py-3">Last Sign In</th>
                   <th class="text-left px-5 py-3">Type</th>
@@ -1082,6 +1084,12 @@
       return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 border border-gray-200">Not Started</span>';
     }
 
+    function stripeBadge(p) {
+      if (p.stripe_onboarded) return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">Active</span>';
+      if (p.stripe_connect_id) return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 border border-yellow-200">Incomplete</span>';
+      return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 border border-gray-200">Not Connected</span>';
+    }
+
     function typeBadge(type) {
       const t = type || 'creator';
       if (t === 'admin') return '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">Admin</span>';
@@ -1108,7 +1116,7 @@
             </a>
           </td>
           <td class="px-5 py-3">${statusBadge(p.verification_status)}</td>
-          <td class="px-5 py-3">${p.stripe_connect_id ? badge(true) : badge(false)}</td>
+          <td class="px-5 py-3">${stripeBadge(p)}</td>
           <td class="px-5 py-3">${p.identity_verified ? badge(true) : badge(false)}</td>
           <td class="px-5 py-3 text-gray-500 text-xs">${new Date(p.created_at).toLocaleDateString()}</td>
           <td class="px-5 py-3">${typeBadge(p.account_type)}</td>
@@ -1722,6 +1730,8 @@
           <td class="px-5 py-3">${providerBadge}</td>
           <td class="px-5 py-3">${profileBadge}</td>
           <td class="px-5 py-3 text-gray-500">${username !== '-' ? '<a href="${PROFILE_BASE}' + esc(username) + '" target="_blank" class="text-creo-purple hover:underline">@' + esc(username) + '</a>' : '-'}${displayName ? ' <span class="text-gray-400 text-xs">(' + esc(displayName) + ')</span>' : ''}</td>
+          <td class="px-5 py-3">${u.has_profile ? statusBadge(u.profile?.verification_status) : '<span class="text-xs text-gray-300">—</span>'}</td>
+          <td class="px-5 py-3">${u.has_profile ? stripeBadge(u.profile || {}) : '<span class="text-xs text-gray-300">—</span>'}</td>
           <td class="px-5 py-3 text-gray-500 text-xs">${registered}</td>
           <td class="px-5 py-3 text-gray-500 text-xs">${lastLogin}</td>
           <td class="px-5 py-3">${typeSelect}</td>
