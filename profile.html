@@ -408,14 +408,19 @@
 
     <!-- PAYMENT: Mi Meta — shows creator's active metas (DEFAULT TAB) -->
     <div id="pay-metas" class="pay-panel">
-      <div class="space-y-4">
+      <div class="glass p-6 rounded-2xl shadow-xl space-y-4">
+        <div id="mec-meta-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
+        <div class="text-center">
+          <h3 id="mec-meta-heading" class="text-lg font-bold text-gray-900" data-i18n="miMeta">Mi Meta</h3>
+          <p id="mec-meta-subtext" class="text-xs text-gray-500 mt-1" data-i18n="miMetaSub">Apoya las metas del creador</p>
+        </div>
         <div id="pay-metas-list" class="space-y-4"></div>
-        <div id="pay-metas-empty-visitor" class="hidden glass p-6 rounded-2xl shadow-xl text-center space-y-2">
+        <div id="pay-metas-empty-visitor" class="hidden text-center space-y-2 py-4">
           <svg class="w-12 h-12 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
           <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasPublicadas">No hay metas publicadas aún</p>
           <p id="pay-metas-encourage" class="text-xs text-gray-400"></p>
         </div>
-        <div id="pay-metas-empty-owner" class="hidden glass p-6 rounded-2xl shadow-xl text-center space-y-3">
+        <div id="pay-metas-empty-owner" class="hidden text-center space-y-3 py-4">
           <svg class="w-12 h-12 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
           <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasOwner">Aún no has publicado ninguna meta</p>
           <p class="text-xs text-gray-400" data-i18n="noMetasOwnerSub">Comparte tu meta con la comunidad de CREO y recibe apoyo</p>
@@ -693,9 +698,30 @@
       }
       if (sub.title) document.getElementById('pay-tab-sub').textContent = sub.title;
 
-      // Mi Meta tab label
+      // Mi Meta
       const meta = ms.meta || {};
-      if (meta.title) document.getElementById('pay-tab-metas').textContent = meta.title;
+      if (meta.title) {
+        document.getElementById('mec-meta-heading').textContent = meta.title;
+        document.getElementById('pay-tab-metas').textContent = meta.title;
+      }
+      if (meta.description) document.getElementById('mec-meta-subtext').textContent = meta.description;
+      if (meta.button_color) {
+        document.querySelectorAll('#pay-metas [onclick^="contributeMeta"]').forEach(btn => {
+          btn.style.background = meta.button_color;
+        });
+      }
+      if (meta.card_color) {
+        const payMetasCard = document.getElementById('pay-metas').querySelector('.glass');
+        if (payMetasCard) payMetasCard.style.background = meta.card_color;
+      }
+      if (meta.image_url) {
+        const hero = document.getElementById('mec-meta-hero');
+        const isVid = /\.(mp4|webm|mov)$/i.test(meta.image_url);
+        hero.innerHTML = isVid
+          ? `<video src="${esc(meta.image_url)}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
+          : `<img src="${esc(meta.image_url)}" class="w-full h-40 object-cover rounded-xl" alt="">`;
+        hero.classList.remove('hidden');
+      }
     }
 
     function disablePayments() {
@@ -976,8 +1002,8 @@
           const pct = Math.min(100, Math.round(m.raised_cents / m.goal_amount_cents * 100));
           const raised = (m.raised_cents / 100).toFixed(2);
           const goal = (m.goal_amount_cents / 100).toFixed(2);
-          return `<div class="glass p-5 rounded-2xl shadow-xl space-y-3">
-            <h3 class="text-base font-bold text-gray-900">${esc(m.title)}</h3>
+          return `<div class="border border-gray-100 rounded-xl p-4 space-y-3">
+            <h4 class="text-sm font-bold text-gray-900">${esc(m.title)}</h4>
             ${m.description ? `<p class="text-xs text-gray-500">${esc(m.description)}</p>` : ''}
             <div>
               <div class="flex justify-between text-sm mb-1.5">
@@ -992,11 +1018,11 @@
             ${canPay ? `<div class="flex gap-2">
               <div class="relative flex-1">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-bold">$</span>
-                <input type="number" id="pay-meta-amount-${m.id}" min="1" value="10" step="1" class="w-full pl-7 pr-3 py-2.5 border border-gray-200 bg-white/50 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+                <input type="number" id="pay-meta-tab-amount-${m.id}" min="1" value="10" step="1" class="w-full pl-7 pr-3 py-2.5 border border-gray-200 bg-white/50 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
               </div>
-              <button onclick="contributeMeta('${m.id}')" class="bg-creo-purple hover:bg-creo-light text-white font-bold py-2.5 px-5 rounded-lg transition text-sm flex items-center gap-1.5">
+              <button onclick="contributeMetaFromTab('${m.id}')" class="bg-creo-purple hover:bg-creo-light text-white font-bold py-2.5 px-5 rounded-lg transition text-sm flex items-center gap-1.5">
                 <img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="">
-                Contribuir
+                <span data-i18n="contribuir">Contribuir</span>
               </button>
             </div>` : ''}
           </div>`;
@@ -1019,6 +1045,23 @@
         if (data.url) window.location.href = data.url;
         else { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Apoyar Creador</span>'; btn.disabled = false; }
       } catch (e) { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Apoyar Creador</span>'; btn.disabled = false; }
+    }
+
+    async function contributeMetaFromTab(metaId) {
+      const input = document.getElementById('pay-meta-tab-amount-' + metaId);
+      if (!input) return;
+      const amount = parseFloat(input.value);
+      if (amount < 1 || isNaN(amount)) return showToast('Monto mínimo: $1.00', 'error');
+      showCreoLoading();
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-meta-checkout`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ creator_connect_id: creatorProfile.stripe_connect_id || 'platform', amount_usd: amount, meta_id: metaId, success_url: window.location.href.split('?')[0] + '?u=' + username + '&status=meta_completed', cancel_url: window.location.href })
+        });
+        const data = await response.json();
+        if (data.url) window.location.href = data.url;
+        else { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error: ' + (data.error || 'Unknown'), 'error'); }
+      } catch (e) { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error de conexión', 'error'); }
     }
 
     async function contributeMeta(metaId) {
@@ -2872,7 +2915,7 @@
       });
 
       // Meta contribute buttons + Creamos buttons
-      document.querySelectorAll('[id^="meta-btn-"], .creamos-btn').forEach(el => {
+      document.querySelectorAll('[id^="meta-btn-"], #pay-metas button[onclick^="contributeMetaFromTab"], .creamos-btn').forEach(el => {
         el.style.backgroundColor = buttonColor;
         el.style.color = btnTextColor;
         el.style.borderColor = 'transparent';
