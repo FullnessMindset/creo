@@ -376,7 +376,6 @@
               <select id="report-filter" onchange="filterReports()" class="bg-gray-50 border border-gray-300 px-3 py-1.5 rounded-lg text-sm text-gray-900 outline-none">
                 <option value="pending">Pending</option>
                 <option value="reviewed">Reviewed</option>
-                <option value="resolved">Resolved</option>
                 <option value="all">All</option>
               </select>
               <button onclick="loadReports()" class="text-xs text-creo-purple font-semibold hover:underline">Refresh</button>
@@ -1880,21 +1879,14 @@
     }
 
     async function quickResolveReport(reportId) {
-      const { error } = await sb.from('reports').update({
-        status: 'resolved',
-        resolved_at: new Date().toISOString(),
-        resolved_by: currentUser?.id
-      }).eq('id', reportId);
+      if (!confirm('Resolve and remove this report?')) return;
+      const { error } = await sb.from('reports').delete().eq('id', reportId);
       if (error) { showToast('Error: ' + error.message, 'error'); return; }
 
-      // Log system message
-      await sb.from('report_messages').insert({ report_id: reportId, sender_id: currentUser?.id, sender_role: 'admin', content: 'Report resolved by admin', message_type: 'system' });
-
-      const r = allReports.find(x => x.id === reportId);
-      if (r) r.status = 'resolved';
+      allReports = allReports.filter(x => x.id !== reportId);
       filterReports();
       loadReportCounts();
-      showToast('Report resolved', 'success');
+      showToast('Report resolved and removed', 'success');
     }
 
     // --- MODAL ACTIONS ---
@@ -1932,12 +1924,14 @@
 
     async function resolveReport() {
       if (!activeReport) return;
-      await sb.from('reports').update({ status: 'resolved', resolved_at: new Date().toISOString(), resolved_by: currentUser?.id }).eq('id', activeReport.id);
-      await sb.from('report_messages').insert({ report_id: activeReport.id, sender_id: currentUser?.id, sender_role: 'admin', content: 'Report resolved', message_type: 'system' });
-      activeReport.status = 'resolved';
+      if (!confirm('Resolve and remove this report?')) return;
+      const reportId = activeReport.id;
+      await sb.from('reports').delete().eq('id', reportId);
+      allReports = allReports.filter(x => x.id !== reportId);
       closeReportReview();
       filterReports();
-      showToast('Report resolved', 'success');
+      loadReportCounts();
+      showToast('Report resolved and removed', 'success');
     }
 
     async function applySanction(sanctionType) {
