@@ -33,57 +33,26 @@
     .creo-btn { animation: pulse-creo 2s ease-in-out infinite; }
     @keyframes pulse-creo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
 
-    /* Portrait: vertical scroll, horizontal videos centered */
+    /* Portrait: vertical scroll */
     @media (orientation: portrait) {
-      #feed-scroll {
-        scroll-snap-type: y mandatory;
-        overflow-y: auto;
-        overflow-x: hidden;
-      }
-      .feed-card {
-        scroll-snap-align: center;
-        margin-bottom: 1rem;
-      }
+      #feed-scroll { scroll-snap-type: y proximity; overflow-y: auto; overflow-x: hidden; }
+      .feed-card { scroll-snap-align: start; margin-bottom: 1rem; }
     }
 
     /* Landscape / Desktop: horizontal scroll */
     @media (orientation: landscape) {
       body { overflow: hidden; }
       #feed-scroll {
-        scroll-snap-type: x mandatory;
-        overflow-x: auto;
-        overflow-y: hidden;
-        height: calc(100vh - 3.5rem);
-        max-width: none;
-        padding: 0 2rem;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        scrollbar-width: none;
+        scroll-snap-type: x mandatory; overflow-x: auto; overflow-y: hidden;
+        height: calc(100vh - 3.5rem); max-width: none; padding: 0 2rem;
+        display: flex; flex-direction: row; align-items: center; scrollbar-width: none;
       }
       #feed-scroll::-webkit-scrollbar { display: none; }
-      #feed-scroll #feed-content {
-        display: flex;
-        flex-direction: row;
-        gap: 1.5rem;
-        height: 100%;
-        align-items: center;
-      }
-      #feed-scroll #feed-content > * {
-        margin-top: 0 !important;
-      }
-      .feed-card {
-        scroll-snap-align: center;
-        min-width: 70vw;
-        max-width: 80vw;
-        flex-shrink: 0;
-      }
-      .feed-card .feed-video-wrap {
-        max-height: 75vh;
-      }
-      .feed-card video, .feed-card iframe {
-        max-height: 70vh !important;
-      }
+      #feed-scroll #feed-content { display: flex; flex-direction: row; gap: 1.5rem; height: 100%; align-items: center; }
+      #feed-scroll #feed-content > * { margin-top: 0 !important; }
+      .feed-card { scroll-snap-align: center; min-width: 70vw; max-width: 80vw; flex-shrink: 0; }
+      .feed-card .feed-media-wrap { max-height: 75vh; }
+      .feed-card video, .feed-card iframe { max-height: 70vh !important; }
       .landscape-hide { display: none !important; }
       #feed-loading, #feed-empty, #load-more { min-width: 70vw; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     }
@@ -91,6 +60,22 @@
     .animate-slide-up { animation: slide-up 0.3s ease-out; }
     .like-bounce { animation: like-pop 0.3s ease-out; }
     @keyframes like-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+    /* Adaptive media sizing */
+    .feed-media-reel { aspect-ratio: 9/16; max-height: 70vh; }
+    .feed-media-square { aspect-ratio: 1/1; }
+    .feed-media-landscape { aspect-ratio: 16/9; }
+    .feed-media-portrait { aspect-ratio: 3/4; max-height: 65vh; }
+
+    /* Creo popup tabs */
+    .creo-tab { padding: 0.5rem 1rem; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; transition: all 0.2s; cursor: pointer; }
+    .creo-tab-active { background: #33f0b0; color: #1a0a3e; }
+    .creo-tab:not(.creo-tab-active) { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); }
+    .creo-tab:not(.creo-tab-active):hover { background: rgba(255,255,255,0.2); }
+
+    /* Progress bar */
+    .meta-progress-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.15); overflow: hidden; }
+    .meta-progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #33f0b0, #28c48e); transition: width 0.5s ease; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
@@ -122,7 +107,7 @@
         <svg class="w-10 h-10 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
       </div>
       <h3 class="text-xl font-bold mb-2">No hay contenido aún</h3>
-      <p class="text-gray-400 text-sm">Sé el primero en publicar un video</p>
+      <p class="text-gray-400 text-sm">Sé el primero en publicar</p>
     </div>
 
     <!-- Load More -->
@@ -153,6 +138,88 @@
     </div>
   </div>
 
+  <!-- CREO Support Popup -->
+  <div id="creo-popup" class="fixed inset-0 z-[60] hidden">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeCreoPopup()"></div>
+    <div class="absolute bottom-0 left-0 right-0 max-w-lg mx-auto rounded-t-3xl max-h-[85vh] flex flex-col animate-slide-up shadow-2xl overflow-hidden" style="background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 100%);">
+      <!-- Header -->
+      <div class="flex items-center justify-between px-5 pt-5 pb-3">
+        <div class="flex items-center gap-3">
+          <div id="creo-popup-avatar" class="w-10 h-10 rounded-full border-2 border-creo-mint overflow-hidden flex-shrink-0"></div>
+          <div>
+            <h3 id="creo-popup-name" class="text-white font-bold text-sm truncate max-w-[200px]"></h3>
+            <p id="creo-popup-user" class="text-white/50 text-xs"></p>
+          </div>
+        </div>
+        <button onclick="closeCreoPopup()" class="text-white/40 hover:text-white p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex gap-2 px-5 pb-3">
+        <button onclick="showCreoTab('tip')" id="creo-tab-tip" class="creo-tab creo-tab-active">Yo Creo en Ti</button>
+        <button onclick="showCreoTab('meta')" id="creo-tab-meta" class="creo-tab">Mi Meta</button>
+        <button onclick="showCreoTab('sub')" id="creo-tab-sub" class="creo-tab">Apoyo Full</button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="flex-1 overflow-y-auto px-5 pb-5">
+        <!-- Tip Tab -->
+        <div id="creo-panel-tip" class="space-y-4">
+          <p class="text-white/60 text-xs text-center">Envía un apoyo único al creador</p>
+          <div>
+            <label class="text-white/70 text-xs font-medium">Cantidad (USD)</label>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="text-white/50 text-lg">$</span>
+              <input id="creo-tip-amount" type="number" value="5.00" min="1" step="0.01" class="flex-1 bg-white/10 border border-white/20 text-white p-3 rounded-xl text-sm outline-none focus:border-creo-mint">
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="document.getElementById('creo-tip-amount').value='5'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$5</button>
+            <button onclick="document.getElementById('creo-tip-amount').value='10'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$10</button>
+            <button onclick="document.getElementById('creo-tip-amount').value='25'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$25</button>
+            <button onclick="document.getElementById('creo-tip-amount').value='50'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$50</button>
+          </div>
+          <button onclick="creoPopupTip()" id="creo-tip-btn" class="w-full bg-creo-mint text-creo-purple py-3 rounded-xl font-bold text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
+            <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Apoyar Creador
+          </button>
+        </div>
+
+        <!-- Meta Tab -->
+        <div id="creo-panel-meta" class="space-y-4 hidden">
+          <p class="text-white/60 text-xs text-center">Apoya las metas del creador</p>
+          <div id="creo-metas-list" class="space-y-3">
+            <p class="text-white/40 text-xs text-center py-4">Cargando metas...</p>
+          </div>
+          <div id="creo-metas-empty" class="hidden text-center py-4">
+            <svg class="w-10 h-10 text-white/20 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            <p class="text-white/40 text-xs">No hay metas activas</p>
+          </div>
+        </div>
+
+        <!-- Sub Tab -->
+        <div id="creo-panel-sub" class="space-y-4 hidden">
+          <p class="text-white/60 text-xs text-center">Apoya mensualmente con una cantidad que elijas</p>
+          <div>
+            <label class="text-white/70 text-xs font-medium">Cantidad Mensual (USD)</label>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="text-white/50 text-lg">$</span>
+              <input id="creo-sub-amount" type="number" value="10.00" min="3" step="0.01" class="flex-1 bg-white/10 border border-white/20 text-white p-3 rounded-xl text-sm outline-none focus:border-creo-mint">
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="document.getElementById('creo-sub-amount').value='5'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$5/mes</button>
+            <button onclick="document.getElementById('creo-sub-amount').value='10'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$10/mes</button>
+            <button onclick="document.getElementById('creo-sub-amount').value='25'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$25/mes</button>
+          </div>
+          <button onclick="creoPopupSub()" id="creo-sub-btn" class="w-full bg-creo-mint text-creo-purple py-3 rounded-xl font-bold text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
+            <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Suscribirme Mensualmente
+          </button>
+          <p class="text-white/30 text-xs text-center">Puedes cancelar en cualquier momento</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     let feedOffset = 0;
     const FEED_LIMIT = 10;
@@ -163,8 +230,10 @@
     let activeCommentsPostId = null;
     let replyingToCommentId = null;
     let replyingToName = null;
+    let creoPopupProfile = null;
 
-    // Orientation handling
+    const SUPABASE_URL = 'https://qddxoyjtoxtdcezwuvcq.supabase.co';
+
     function handleOrientation() {
       const isLandscape = window.matchMedia('(orientation: landscape)').matches;
       const header = document.getElementById('feed-header');
@@ -198,6 +267,7 @@
       }
     }
 
+    // ===== LIKES =====
     async function toggleLike(postId) {
       if (!currentUser) { showToast('Inicia sesión para dar like', 'error'); return; }
       const btn = document.getElementById('like-' + postId);
@@ -223,6 +293,7 @@
       countEl.textContent = data.count > 0 ? data.count : '';
     }
 
+    // ===== COMMENTS =====
     async function toggleCommentLike(commentId) {
       if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
       const { data, error } = await sb.rpc('toggle_comment_like', { p_comment_id: commentId });
@@ -422,16 +493,13 @@
       if (e.key === 'Enter') submitComment();
     });
 
-    // Autoplay: play/pause videos as they scroll into view, unmute the visible one
+    // ===== VIDEO OBSERVER =====
     const videoObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         const video = entry.target;
         if (entry.isIntersecting) {
           video.muted = false;
-          video.play().catch(() => {
-            video.muted = true;
-            video.play().catch(() => {});
-          });
+          video.play().catch(() => { video.muted = true; video.play().catch(() => {}); });
         } else {
           video.pause();
           video.muted = true;
@@ -439,20 +507,77 @@
       });
     }, { threshold: 0.5 });
 
+    // ===== UNIFIED FEED LOADER =====
     async function loadFeed() {
       if (allLoaded) return;
 
-      const { data, error } = await sb
-        .from('posts')
-        .select('*, profiles(username, display_name, avatar_url, stripe_connect_id)')
-        .order('created_at', { ascending: false })
-        .range(feedOffset, feedOffset + FEED_LIMIT - 1);
+      // Load both tables in parallel
+      const [postsRes, communityRes] = await Promise.all([
+        sb.from('posts')
+          .select('*, profiles:creator_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded)')
+          .order('created_at', { ascending: false })
+          .range(feedOffset, feedOffset + FEED_LIMIT - 1),
+        sb.from('community_posts')
+          .select('*, author:author_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded)')
+          .or('profile_only.is.null,profile_only.eq.false')
+          .order('created_at', { ascending: false })
+          .range(feedOffset, feedOffset + FEED_LIMIT - 1)
+      ]);
 
       document.getElementById('feed-loading').classList.add('hidden');
 
-      if (error) { showToast('Error cargando feed', 'error'); return; }
+      // Normalize both into common format
+      const items = [];
 
-      if (!data || data.length === 0) {
+      if (postsRes.data) {
+        postsRes.data.forEach(p => {
+          items.push({
+            id: p.id,
+            source: 'posts',
+            creatorId: p.creator_id,
+            profile: p.profiles,
+            created_at: p.created_at,
+            caption: p.caption,
+            title: null,
+            body: p.caption,
+            mediaType: 'embed_video',
+            videoUrl: p.video_url,
+            videoType: p.video_type,
+            mediaUrls: [],
+            videoOrientation: null,
+            likeCount: p.like_count || p.likes_count || 0,
+            commentCount: p.comment_count || p.comments_count || 0
+          });
+        });
+      }
+
+      if (communityRes.data) {
+        communityRes.data.forEach(p => {
+          const prof = p.author;
+          items.push({
+            id: p.id,
+            source: 'community',
+            creatorId: p.author_id,
+            profile: prof,
+            created_at: p.created_at,
+            caption: null,
+            title: p.title,
+            body: p.body,
+            mediaType: p.post_type,
+            videoUrl: null,
+            videoType: null,
+            mediaUrls: p.media_urls || [],
+            videoOrientation: p.video_orientation,
+            likeCount: p.like_count || 0,
+            commentCount: p.comment_count || 0
+          });
+        });
+      }
+
+      // Sort merged by created_at descending
+      items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      if (items.length === 0) {
         if (feedOffset === 0) document.getElementById('feed-empty').classList.remove('hidden');
         allLoaded = true;
         document.getElementById('load-more').classList.add('hidden');
@@ -461,27 +586,71 @@
 
       const container = document.getElementById('feed-content');
 
-      data.forEach(post => {
-        const profile = post.profiles;
+      items.forEach(item => {
+        if (!item.profile) return;
+        const profile = item.profile;
         const card = document.createElement('div');
         card.className = 'feed-card rounded-2xl overflow-hidden shadow-xl glass';
-        card.dataset.creatorId = post.creator_id;
+        card.dataset.creatorId = item.creatorId;
+        card.dataset.source = item.source;
 
         const avatarHTML = profile.avatar_url
           ? `<img src="${esc(profile.avatar_url)}" class="w-10 h-10 rounded-full object-cover border-2 border-creo-mint" alt="">`
           : `<div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold text-sm">${esc((profile.display_name || profile.username || '?')[0].toUpperCase())}</span></div>`;
 
-        const isLiked = userLikes.has(post.id);
-        const isDirectVideo = post.video_type === 'direct' && post.video_url && !post.video_url.includes('youtube');
-        const videoHTML = isDirectVideo
-          ? `<video src="${esc(post.video_url)}" class="w-full aspect-video object-contain bg-black feed-video" autoplay muted loop playsinline></video>`
-          : getAutoplayEmbedHTML(post.video_url, post.video_type);
+        const isLiked = userLikes.has(item.id);
+
+        // Build media HTML based on content type
+        let mediaHTML = '';
+        let mediaClass = '';
+
+        if (item.source === 'posts') {
+          // Original video post (YouTube, TikTok, Instagram, direct)
+          const isDirectVideo = item.videoType === 'direct' && item.videoUrl && !item.videoUrl.includes('youtube');
+          if (isDirectVideo) {
+            mediaHTML = `<video src="${esc(item.videoUrl)}" class="w-full object-contain bg-black feed-video" autoplay muted loop playsinline></video>`;
+            mediaClass = 'feed-media-landscape';
+          } else {
+            mediaHTML = getAutoplayEmbedHTML(item.videoUrl, item.videoType);
+            mediaClass = 'feed-media-landscape';
+          }
+        } else {
+          // Community post — adaptive sizing
+          const urls = item.mediaUrls;
+          if (item.mediaType === 'video' && urls.length > 0) {
+            const vUrl = urls[0];
+            const isVert = item.videoOrientation === 'vertical';
+            mediaClass = isVert ? 'feed-media-reel' : 'feed-media-landscape';
+            mediaHTML = `<video src="${esc(vUrl)}" class="w-full h-full object-contain bg-black feed-video" autoplay muted loop playsinline></video>`;
+          } else if (item.mediaType === 'photo' && urls.length > 0) {
+            if (urls.length === 1) {
+              mediaHTML = `<img src="${esc(urls[0])}" class="w-full h-full object-cover" alt="" onload="adaptImageSize(this)">`;
+              mediaClass = 'feed-media-square';
+            } else {
+              mediaHTML = `<div class="grid ${urls.length === 2 ? 'grid-cols-2' : urls.length === 3 ? 'grid-cols-2' : 'grid-cols-2'} gap-0.5">${urls.slice(0, 4).map((u, i) =>
+                `<div class="${urls.length === 3 && i === 0 ? 'row-span-2' : ''} overflow-hidden ${urls.length <= 2 ? 'aspect-square' : 'aspect-square'}"><img src="${esc(u)}" class="w-full h-full object-cover" alt=""></div>`
+              ).join('')}${urls.length > 4 ? `<div class="aspect-square bg-black/50 flex items-center justify-center text-white font-bold text-lg">+${urls.length - 4}</div>` : ''}</div>`;
+              mediaClass = '';
+            }
+          } else if (item.mediaType === 'text' || urls.length === 0) {
+            // Text-only post — no media section
+            mediaHTML = '';
+            mediaClass = '';
+          }
+        }
+
+        const hasMedia = mediaHTML !== '';
+        const isDirectVideo = item.source === 'posts' && item.videoType === 'direct' && item.videoUrl && !item.videoUrl.includes('youtube');
+        const isCommunityVideo = item.source === 'community' && item.mediaType === 'video' && item.mediaUrls.length > 0;
+
+        const textContent = item.title || item.body || item.caption || '';
+        const displayText = textContent.length > 200 ? textContent.substring(0, 200) + '...' : textContent;
 
         card.innerHTML = `
-          <div class="relative feed-video-wrap">
-            <div class="w-full bg-black rounded-t-2xl overflow-hidden">${videoHTML}</div>
-            ${isDirectVideo ? `<div class="absolute bottom-4 left-3 z-10"><button class="mute-toggle w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white/70 hover:text-white transition" onclick="toggleMute(this)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg></button></div>` : ''}
-          </div>
+          ${hasMedia ? `<div class="relative feed-media-wrap">
+            <div class="w-full bg-black rounded-t-2xl overflow-hidden ${mediaClass}">${mediaHTML}</div>
+            ${(isDirectVideo || isCommunityVideo) ? `<div class="absolute bottom-4 left-3 z-10"><button class="mute-toggle w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white/70 hover:text-white transition" onclick="toggleMute(this)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg></button></div>` : ''}
+          </div>` : ''}
 
           <div class="p-4">
             <div class="flex items-center justify-between">
@@ -489,32 +658,34 @@
                 <a href="profile.html?u=${esc(profile.username)}" class="flex-shrink-0">${avatarHTML}</a>
                 <div class="min-w-0">
                   <a href="profile.html?u=${esc(profile.username)}" class="font-bold text-sm text-gray-900 hover:text-creo-mintDark transition block truncate">${esc(profile.display_name || profile.username)}</a>
-                  <span class="text-gray-600 text-xs">@${esc(profile.username)} · ${timeAgo(post.created_at)}</span>
+                  <span class="text-gray-600 text-xs">@${esc(profile.username)} · ${timeAgo(item.created_at)}</span>
                 </div>
               </div>
               <div class="flex items-center gap-3">
-                <button id="like-${post.id}" onclick="toggleLike('${post.id}')" class="flex items-center gap-1.5 transition group">
+                <button id="like-${item.id}" onclick="toggleLike('${item.id}')" class="flex items-center gap-1.5 transition group">
                   <svg class="w-5 h-5" fill="${isLiked ? '#33f0b0' : 'none'}" stroke="${isLiked ? '#33f0b0' : 'currentColor'}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                  <span id="like-count-${post.id}" class="text-xs font-semibold text-gray-700">${post.like_count > 0 ? post.like_count : ''}</span>
+                  <span id="like-count-${item.id}" class="text-xs font-semibold text-gray-700">${item.likeCount > 0 ? item.likeCount : ''}</span>
                 </button>
 
-                <button onclick="openComments('${post.id}')" class="flex items-center gap-1.5 transition group">
+                <button onclick="openComments('${item.id}')" class="flex items-center gap-1.5 transition group">
                   <svg class="w-5 h-5 text-gray-600 group-hover:text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                  <span id="comment-count-${post.id}" class="text-xs font-semibold text-gray-500">${post.comment_count > 0 ? post.comment_count : ''}</span>
+                  <span id="comment-count-${item.id}" class="text-xs font-semibold text-gray-500">${item.commentCount > 0 ? item.commentCount : ''}</span>
                 </button>
 
                 <button onclick="shareCreator('${esc(profile.username)}')" class="transition group">
                   <svg class="w-5 h-5 text-gray-600 group-hover:text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                 </button>
 
-                <button onclick="openCreoChoice('${esc(profile.username)}')" class="creo-btn flex-shrink-0">
+                <button onclick="openCreoPopup('${esc(profile.username)}')" class="creo-btn flex-shrink-0">
                   <div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint hover:bg-creo-mint/30 transition">
                     <img src="assets/logo-icon.png" class="w-6 h-6 rounded-full object-contain" alt="CREO">
                   </div>
                 </button>
               </div>
             </div>
-            ${post.caption ? `<p class="text-sm text-gray-800 leading-relaxed mt-2">${esc(post.caption)}</p>` : ''}
+            ${item.title ? `<p class="text-sm font-bold text-gray-900 mt-2">${esc(item.title)}</p>` : ''}
+            ${displayText && !item.title ? `<p class="text-sm text-gray-800 leading-relaxed mt-2">${esc(displayText)}</p>` : ''}
+            ${displayText && item.title ? `<p class="text-sm text-gray-700 leading-relaxed mt-1">${esc(displayText)}</p>` : ''}
           </div>
         `;
 
@@ -524,12 +695,32 @@
         if (video) videoObserver.observe(video);
       });
 
-      feedOffset += data.length;
-      if (data.length < FEED_LIMIT) {
+      feedOffset += FEED_LIMIT;
+      const totalLoaded = (postsRes.data?.length || 0) + (communityRes.data?.length || 0);
+      if (totalLoaded < FEED_LIMIT) {
         allLoaded = true;
         document.getElementById('load-more').classList.add('hidden');
       } else {
         document.getElementById('load-more').classList.remove('hidden');
+      }
+    }
+
+    // Adapt single image size based on natural dimensions
+    function adaptImageSize(img) {
+      const wrap = img.closest('.feed-media-wrap');
+      if (!wrap) return;
+      const ratio = img.naturalWidth / img.naturalHeight;
+      const mediaDiv = wrap.querySelector('div');
+      if (!mediaDiv) return;
+      mediaDiv.classList.remove('feed-media-square', 'feed-media-landscape', 'feed-media-portrait', 'feed-media-reel');
+      if (ratio > 1.4) {
+        mediaDiv.classList.add('feed-media-landscape');
+      } else if (ratio < 0.65) {
+        mediaDiv.classList.add('feed-media-reel');
+      } else if (ratio < 0.85) {
+        mediaDiv.classList.add('feed-media-portrait');
+      } else {
+        mediaDiv.classList.add('feed-media-square');
       }
     }
 
@@ -571,7 +762,7 @@
         showToast('Enlace copiado', 'success');
       }
       const { data: prof } = await sb.from('profiles').select('id').eq('username', username).single();
-      if (prof) createNotification(prof.id, 'share', 'Alguien compartió tu perfil', null, 'profile.html?u=' + prof.username);
+      if (prof) createNotification(prof.id, 'share', 'Alguien compartió tu perfil', null, 'profile.html?u=' + username);
     }
 
     function timeAgo(dateStr) {
@@ -591,14 +782,12 @@
       const isLandscape = window.matchMedia('(orientation: landscape)').matches;
 
       if (isLandscape) {
-        // Convert vertical wheel to horizontal scroll on desktop
         feed.addEventListener('wheel', (e) => {
           if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
             e.preventDefault();
             feed.scrollBy({ left: e.deltaY, behavior: 'auto' });
           }
         }, { passive: false });
-
         feed.addEventListener('scroll', () => {
           if (allLoaded) return;
           if (feed.scrollLeft + feed.clientWidth >= feed.scrollWidth - 500) loadFeed();
@@ -611,12 +800,173 @@
       }
     }
 
-    function openCreoChoice(username) {
-      const overlay = document.getElementById('creo-loading');
-      overlay.querySelector('.creo-loading-text').textContent = 'Gracias por Creer';
-      overlay.querySelector('.creo-loading-sub').textContent = 'En unos segundos conocerás la Historia de este Creador...';
-      overlay.classList.remove('hidden');
-      setTimeout(() => { window.location.href = 'profile.html?u=' + username; }, 2500);
+    // ===== CREO SUPPORT POPUP =====
+    async function openCreoPopup(username) {
+      const popup = document.getElementById('creo-popup');
+      popup.classList.remove('hidden');
+      const nav = document.getElementById('bottom-nav');
+      if (nav) nav.style.display = 'none';
+
+      // Reset to tip tab
+      showCreoTab('tip');
+
+      // Load creator profile
+      const { data: prof } = await sb.from('profiles').select('id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, mecenas_settings').eq('username', username).single();
+      if (!prof) { showToast('Creador no encontrado', 'error'); closeCreoPopup(); return; }
+      creoPopupProfile = prof;
+
+      // Set header
+      document.getElementById('creo-popup-name').textContent = prof.display_name || prof.username;
+      document.getElementById('creo-popup-user').textContent = '@' + prof.username;
+      document.getElementById('creo-popup-avatar').innerHTML = prof.avatar_url
+        ? `<img src="${esc(prof.avatar_url)}" class="w-full h-full object-cover" alt="">`
+        : `<div class="w-full h-full bg-creo-mint/20 flex items-center justify-center"><span class="text-creo-mint font-bold">${esc((prof.display_name || prof.username || '?')[0].toUpperCase())}</span></div>`;
+
+      // Apply mecenas settings
+      const ms = prof.mecenas_settings || {};
+      if (ms.tip?.title) document.getElementById('creo-tab-tip').textContent = ms.tip.title;
+      if (ms.meta?.title) document.getElementById('creo-tab-meta').textContent = ms.meta.title;
+      if (ms.sub?.title) document.getElementById('creo-tab-sub').textContent = ms.sub.title;
+
+      // Disable payments if no stripe
+      const isPlatform = prof.id === '67133679-4e5f-49aa-8a22-43af41b917ee';
+      if (!prof.stripe_onboarded && !isPlatform) {
+        document.getElementById('creo-tip-btn').disabled = true;
+        document.getElementById('creo-tip-btn').textContent = 'Pagos no disponibles';
+        document.getElementById('creo-tip-btn').classList.add('opacity-50');
+        document.getElementById('creo-sub-btn').disabled = true;
+        document.getElementById('creo-sub-btn').textContent = 'Pagos no disponibles';
+        document.getElementById('creo-sub-btn').classList.add('opacity-50');
+      } else {
+        document.getElementById('creo-tip-btn').disabled = false;
+        document.getElementById('creo-tip-btn').innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Apoyar Creador';
+        document.getElementById('creo-tip-btn').classList.remove('opacity-50');
+        document.getElementById('creo-sub-btn').disabled = false;
+        document.getElementById('creo-sub-btn').innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Suscribirme Mensualmente';
+        document.getElementById('creo-sub-btn').classList.remove('opacity-50');
+      }
+
+      // Load metas
+      const metasList = document.getElementById('creo-metas-list');
+      const metasEmpty = document.getElementById('creo-metas-empty');
+      metasList.innerHTML = '<p class="text-white/40 text-xs text-center py-4">Cargando...</p>';
+      metasEmpty.classList.add('hidden');
+
+      const { data: metas } = await sb.from('metas').select('*').eq('creator_id', prof.id).eq('is_active', true).order('created_at', { ascending: false });
+
+      if (!metas || metas.length === 0) {
+        metasList.innerHTML = '';
+        metasEmpty.classList.remove('hidden');
+      } else {
+        metasEmpty.classList.add('hidden');
+        metasList.innerHTML = metas.map(m => {
+          const pct = m.goal_amount_cents > 0 ? Math.min(100, Math.round((m.raised_cents / m.goal_amount_cents) * 100)) : 0;
+          const raised = (m.raised_cents / 100).toFixed(2);
+          const goal = (m.goal_amount_cents / 100).toFixed(2);
+          return `<div class="bg-white/10 rounded-xl p-4 space-y-2">
+            <h4 class="text-white font-bold text-sm">${esc(m.title)}</h4>
+            ${m.description ? `<p class="text-white/50 text-xs leading-relaxed">${esc(m.description.length > 100 ? m.description.substring(0, 100) + '...' : m.description)}</p>` : ''}
+            <div class="flex justify-between text-xs text-white/60">
+              <span>$${raised}</span>
+              <span>de $${goal}</span>
+            </div>
+            <div class="meta-progress-bar"><div class="meta-progress-fill" style="width:${pct}%"></div></div>
+            <span class="text-white/40 text-[10px]">${pct}%</span>
+            <div class="flex items-center gap-2 mt-1">
+              <div class="flex items-center gap-1 flex-1">
+                <span class="text-white/50 text-sm">$</span>
+                <input id="creo-meta-amt-${m.id}" type="number" value="10" min="1" step="0.01" class="flex-1 bg-white/10 border border-white/20 text-white p-2 rounded-lg text-xs outline-none focus:border-creo-mint">
+              </div>
+              <button onclick="creoPopupMeta('${m.id}')" class="bg-creo-mint text-creo-purple px-4 py-2 rounded-lg text-xs font-bold hover:opacity-90 transition flex items-center gap-1">
+                <img src="assets/logo-icon.png" class="w-3.5 h-3.5 rounded-full" alt="">Contribuir
+              </button>
+            </div>
+          </div>`;
+        }).join('');
+      }
+    }
+
+    function closeCreoPopup() {
+      document.getElementById('creo-popup').classList.add('hidden');
+      const nav = document.getElementById('bottom-nav');
+      if (nav) nav.style.display = '';
+      creoPopupProfile = null;
+    }
+
+    function showCreoTab(tab) {
+      ['tip', 'meta', 'sub'].forEach(t => {
+        document.getElementById('creo-panel-' + t).classList.toggle('hidden', t !== tab);
+        document.getElementById('creo-tab-' + t).classList.toggle('creo-tab-active', t === tab);
+      });
+    }
+
+    async function creoPopupTip() {
+      if (!creoPopupProfile) return;
+      const amount = parseFloat(document.getElementById('creo-tip-amount').value);
+      if (amount < 1 || isNaN(amount)) return showToast('Monto mínimo: $1.00', 'error');
+      const btn = document.getElementById('creo-tip-btn');
+      btn.disabled = true; btn.textContent = 'Procesando...';
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            creator_connect_id: creoPopupProfile.stripe_connect_id || 'platform',
+            creator_id: creoPopupProfile.id,
+            creator_username: creoPopupProfile.username,
+            amount_usd: amount,
+            success_url: window.location.href.split('?')[0] + '?status=completed',
+            cancel_url: window.location.href
+          })
+        });
+        const data = await response.json();
+        if (data.url) window.location.href = data.url;
+        else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Apoyar Creador'; btn.disabled = false; }
+      } catch (e) { showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Apoyar Creador'; btn.disabled = false; }
+    }
+
+    async function creoPopupMeta(metaId) {
+      if (!creoPopupProfile) return;
+      const input = document.getElementById('creo-meta-amt-' + metaId);
+      const amount = parseFloat(input?.value);
+      if (amount < 1 || isNaN(amount)) return showToast('Monto mínimo: $1.00', 'error');
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-meta-checkout`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            creator_connect_id: creoPopupProfile.stripe_connect_id || 'platform',
+            amount_usd: amount,
+            meta_id: metaId,
+            success_url: window.location.href.split('?')[0] + '?status=meta_completed',
+            cancel_url: window.location.href
+          })
+        });
+        const data = await response.json();
+        if (data.url) window.location.href = data.url;
+        else showToast('Error: ' + (data.error || 'Unknown'), 'error');
+      } catch (e) { showToast('Error de conexión', 'error'); }
+    }
+
+    async function creoPopupSub() {
+      if (!creoPopupProfile) return;
+      const amount = parseFloat(document.getElementById('creo-sub-amount').value);
+      if (amount < 3 || isNaN(amount)) return showToast('Monto mínimo mensual: $3.00', 'error');
+      const btn = document.getElementById('creo-sub-btn');
+      btn.disabled = true; btn.textContent = 'Procesando...';
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-subscription-checkout`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            creator_connect_id: creoPopupProfile.stripe_connect_id || 'platform',
+            creator_id: creoPopupProfile.id,
+            amount_usd: amount,
+            success_url: window.location.href.split('?')[0] + '?status=subscribed',
+            cancel_url: window.location.href
+          })
+        });
+        const data = await response.json();
+        if (data.url) window.location.href = data.url;
+        else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Suscribirme Mensualmente'; btn.disabled = false; }
+      } catch (e) { showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Suscribirme Mensualmente'; btn.disabled = false; }
     }
 
     window.onload = async () => {
@@ -629,15 +979,5 @@
       setupInfiniteScroll();
     };
   </script>
-
-  <!-- "Yo Creo en Ti" loading overlay -->
-  <div id="creo-loading" class="fixed inset-0 z-[200] flex flex-col items-center justify-center hidden" style="background:rgba(26,10,62,0.85);backdrop-filter:blur(20px);">
-    <img src="assets/logo-icon.png" class="w-20 h-20 rounded-full shadow-2xl mb-6 float-anim" alt="CREO">
-    <p class="creo-loading-text text-white text-2xl font-bold tracking-wider">Yo Creo en Ti</p>
-    <p class="creo-loading-sub text-creo-mint text-sm mt-2">Cargando perfil del creador...</p>
-    <div class="mt-6 w-48 h-1.5 bg-white/20 rounded-full overflow-hidden">
-      <div class="h-full bg-creo-mint rounded-full animate-pulse" style="width:70%"></div>
-    </div>
-  </div>
 </body>
 </html>
