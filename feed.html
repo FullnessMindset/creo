@@ -249,9 +249,10 @@
   </div>
 
   <script>
-    let feedOffset = 0;
-    const FEED_LIMIT = 10;
+    let feedCursor = 0;
+    const FEED_LIMIT = 15;
     let allLoaded = false;
+    let useRankedFeed = true;
     let currentUser = null;
     let userLikes = new Set();
     let userCommentLikes = new Set();
@@ -571,77 +572,97 @@
       return `<div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-white shadow flex items-center justify-center ring-1 ring-creo-mint" title="Creador Verificado"><img src="assets/logo-icon.png" alt="Verified" class="w-3 h-3 rounded-full object-contain"></div>`;
     }
 
-    // ===== UNIFIED FEED LOADER =====
+    // ===== UNIFIED FEED LOADER (ranked with fallback) =====
+    function toFeedItem(p, source) {
+      if (source === 'posts') {
+        return {
+          id: p.id, source: 'posts', creatorId: p.creator_id, profile: p.profiles || p.profile,
+          created_at: p.created_at, caption: p.caption, title: null, body: null,
+          mediaType: 'embed_video', videoUrl: p.video_url, videoType: p.video_type,
+          mediaUrls: [], videoOrientation: null,
+          likeCount: p.like_count || p.likes_count || 0, commentCount: p.comment_count || p.comments_count || 0
+        };
+      }
+      return {
+        id: p.id, source: 'community', creatorId: p.author_id, profile: p.author || p.profile,
+        created_at: p.created_at, caption: null, title: p.title, body: p.body,
+        mediaType: p.post_type, videoUrl: null, videoType: null,
+        mediaUrls: p.media_urls || [], videoOrientation: p.video_orientation,
+        likeCount: p.like_count || 0, commentCount: p.comment_count || 0
+      };
+    }
+
     async function loadFeed() {
       if (allLoaded) return;
 
-      const [postsRes, communityRes] = await Promise.all([
-        sb.from('posts')
-          .select('*, profiles:creator_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, identity_verified, verification_status, account_type, email)')
-          .order('created_at', { ascending: false })
-          .range(feedOffset, feedOffset + FEED_LIMIT - 1),
-        sb.from('community_posts')
-          .select('*, author:author_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, identity_verified, verification_status, account_type, email)')
-          .or('profile_only.is.null,profile_only.eq.false')
-          .order('created_at', { ascending: false })
-          .range(feedOffset, feedOffset + FEED_LIMIT - 1)
-      ]);
+      let items = [];
+
+      // Try ranked feed first
+      if (useRankedFeed) {
+        try {
+          const res = await fetch(SUPABASE_URL + '/functions/v1/get-feed', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
+            body: JSON.stringify({ surface: 'feed', cursor: feedCursor, limit: FEED_LIMIT, user_id: currentUser?.id || null })
+          });
+          if (res.ok) {
+            const result = await res.json();
+            items = (result.items || []).map(item => {
+              const content = item.content || {};
+              const source = item.content_type === 'post' ? 'posts' : 'community';
+              const fi = toFeedItem(content, source);
+              fi.profile = fi.profile || item.profile || {};
+              fi._tier = item.tier;
+              fi._contentType = item.content_type;
+              return fi;
+            }).filter(fi => fi.profile);
+            if (!result.has_more) allLoaded = true;
+            feedCursor = result.next_cursor || (feedCursor + items.length);
+          } else {
+            useRankedFeed = false;
+          }
+        } catch (e) {
+          console.warn('Ranked feed unavailable, using direct query', e);
+          useRankedFeed = false;
+        }
+      }
+
+      // Fallback: direct Supabase queries
+      if (!useRankedFeed) {
+        const [postsRes, communityRes] = await Promise.all([
+          sb.from('posts')
+            .select('*, profiles:creator_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, identity_verified, verification_status, account_type, email)')
+            .order('created_at', { ascending: false })
+            .range(feedCursor, feedCursor + FEED_LIMIT - 1),
+          sb.from('community_posts')
+            .select('*, author:author_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, identity_verified, verification_status, account_type, email)')
+            .or('profile_only.is.null,profile_only.eq.false')
+            .order('created_at', { ascending: false })
+            .range(feedCursor, feedCursor + FEED_LIMIT - 1)
+        ]);
+        if (postsRes.data) postsRes.data.forEach(p => items.push(toFeedItem(p, 'posts')));
+        if (communityRes.data) communityRes.data.forEach(p => items.push(toFeedItem(p, 'community')));
+        items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        feedCursor += FEED_LIMIT;
+        const totalLoaded = (postsRes.data?.length || 0) + (communityRes.data?.length || 0);
+        if (totalLoaded < FEED_LIMIT) allLoaded = true;
+      }
 
       document.getElementById('feed-loading').classList.add('hidden');
 
-      const items = [];
-
-      if (postsRes.data) {
-        postsRes.data.forEach(p => {
-          items.push({
-            id: p.id,
-            source: 'posts',
-            creatorId: p.creator_id,
-            profile: p.profiles,
-            created_at: p.created_at,
-            caption: p.caption,
-            title: null,
-            body: null,
-            mediaType: 'embed_video',
-            videoUrl: p.video_url,
-            videoType: p.video_type,
-            mediaUrls: [],
-            videoOrientation: null,
-            likeCount: p.like_count || p.likes_count || 0,
-            commentCount: p.comment_count || p.comments_count || 0
-          });
-        });
-      }
-
-      if (communityRes.data) {
-        communityRes.data.forEach(p => {
-          items.push({
-            id: p.id,
-            source: 'community',
-            creatorId: p.author_id,
-            profile: p.author,
-            created_at: p.created_at,
-            caption: null,
-            title: p.title,
-            body: p.body,
-            mediaType: p.post_type,
-            videoUrl: null,
-            videoType: null,
-            mediaUrls: p.media_urls || [],
-            videoOrientation: p.video_orientation,
-            likeCount: p.like_count || 0,
-            commentCount: p.comment_count || 0
-          });
-        });
-      }
-
-      items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
       if (items.length === 0) {
-        if (feedOffset === 0) document.getElementById('feed-empty').classList.remove('hidden');
+        if (feedCursor <= FEED_LIMIT) document.getElementById('feed-empty').classList.remove('hidden');
         allLoaded = true;
         document.getElementById('load-more').classList.add('hidden');
         return;
+      }
+
+      // Record impressions for ranking
+      if (currentUser) {
+        items.forEach(fi => {
+          const ct = fi._contentType || (fi.source === 'posts' ? 'post' : 'community_post');
+          sb.rpc('record_impression', { p_content_type: ct, p_content_id: fi.id }).catch(() => {});
+        });
       }
 
       const container = document.getElementById('feed-content');
@@ -762,10 +783,7 @@
         if (video) videoObserver.observe(video);
       });
 
-      feedOffset += FEED_LIMIT;
-      const totalLoaded = (postsRes.data?.length || 0) + (communityRes.data?.length || 0);
-      if (totalLoaded < FEED_LIMIT) {
-        allLoaded = true;
+      if (allLoaded) {
         document.getElementById('load-more').classList.add('hidden');
       } else {
         document.getElementById('load-more').classList.remove('hidden');
