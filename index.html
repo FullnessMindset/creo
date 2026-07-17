@@ -554,7 +554,10 @@
               <p class="font-semibold text-sm text-gray-900">CREO ID</p>
               <p id="creo-id-status-text" class="text-xs text-gray-500">Cargando...</p>
             </div>
-            <span id="creo-id-badge" class="text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-500">...</span>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span id="creo-id-badge" class="text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-500">...</span>
+              <button id="creo-id-action-btn" class="hidden text-xs px-3 py-1.5 rounded-lg font-semibold transition"></button>
+            </div>
           </div>
 
           <!-- Stripe Payment Status -->
@@ -566,7 +569,10 @@
               <p class="font-semibold text-sm text-gray-900">Pagos (Stripe)</p>
               <p id="stripe-status-text" class="text-xs text-gray-500">Cargando...</p>
             </div>
-            <span id="stripe-badge" class="text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-500">...</span>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span id="stripe-badge" class="text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-500">...</span>
+              <button id="stripe-action-btn" class="hidden text-xs px-3 py-1.5 rounded-lg font-semibold transition"></button>
+            </div>
           </div>
 
           <!-- Payment Readiness Summary -->
@@ -1578,7 +1584,8 @@
       const { data: urlData } = sb.storage.from(bucket).getPublicUrl(path);
       const publicUrl = urlData.publicUrl;
 
-      await sb.from('profiles').update({ [profileField]: publicUrl }).eq('id', currentUser.id);
+      const { error: upErr } = await sb.from('profiles').update({ [profileField]: publicUrl }).eq('id', currentUser.id);
+      if (upErr) return showToast('Error al guardar: ' + upErr.message, 'error');
 
       const preview = document.getElementById(previewId);
       preview.innerHTML = `<img src="${esc(publicUrl)}" class="w-full h-full object-cover">`;
@@ -1914,8 +1921,8 @@
       loadMetas();
     }
 
-    async function toggleMeta(id, active) { await sb.from('metas').update({ is_active: active }).eq('id', id); loadMetas(); }
-    async function deleteMeta(id) { if (!confirm('¿Eliminar esta meta?')) return; await sb.from('metas').delete().eq('id', id); showToast('Meta eliminada', 'success'); loadMetas(); }
+    async function toggleMeta(id, active) { const { error } = await sb.from('metas').update({ is_active: active }).eq('id', id); if (error) return showToast('Error: ' + error.message, 'error'); loadMetas(); }
+    async function deleteMeta(id) { if (!confirm('¿Eliminar esta meta?')) return; const { error } = await sb.from('metas').delete().eq('id', id); if (error) return showToast('Error: ' + error.message, 'error'); showToast('Meta eliminada', 'success'); loadMetas(); }
 
     function editMeta(id) {
       const m = myMetasCache.find(x => x.id === id);
@@ -2230,7 +2237,7 @@
       stages[metaId].status = 'stage2_review';
       saveMetaStages(stages);
 
-      await sb.from('metas').update({
+      const { error: s2Err } = await sb.from('metas').update({
         fund_stage: 2,
         fund_status: 'stage2_review',
         stage2_receipt_urls: receiptUrls,
@@ -2238,6 +2245,7 @@
         stage2_update_media: mediaUrls,
         stage2_submitted_at: new Date().toISOString()
       }).eq('id', metaId);
+      if (s2Err) return showToast('Error: ' + s2Err.message, 'error');
 
       showToast('Etapa 2 enviada para revisión del admin');
       loadMetas();
@@ -2265,13 +2273,14 @@
       stages[metaId].status = 'stage3_review';
       saveMetaStages(stages);
 
-      await sb.from('metas').update({
+      const { error: s3Err } = await sb.from('metas').update({
         fund_stage: 3,
         fund_status: 'stage3_review',
         stage3_proof_urls: proofUrls,
         stage3_proof_text: text,
         stage3_submitted_at: new Date().toISOString()
       }).eq('id', metaId);
+      if (s3Err) return showToast('Error: ' + s3Err.message, 'error');
 
       showToast('Prueba final enviada para revisión del admin');
       loadMetas();
@@ -2293,12 +2302,13 @@
       stages[metaId].status = 'cancelled_review';
       saveMetaStages(stages);
 
-      await sb.from('metas').update({
+      const { error: cErr } = await sb.from('metas').update({
         fund_status: 'cancelled_review',
         cancellation_reason: reason,
         cancellation_submitted_at: new Date().toISOString(),
         is_active: false
       }).eq('id', metaId);
+      if (cErr) return showToast('Error: ' + cErr.message, 'error');
 
       showToast('Meta cancelada. El admin revisará tu explicación.');
       loadMetas();
@@ -2586,7 +2596,8 @@
 
     async function deletePost(id) {
       if (!confirm('¿Eliminar?')) return;
-      await sb.from('community_posts').delete().eq('id', id);
+      const { error } = await sb.from('community_posts').delete().eq('id', id);
+      if (error) return showToast('Error: ' + error.message, 'error');
       showToast('Post eliminado', 'success');
       loadPosts();
     }
@@ -2745,6 +2756,8 @@
       const creoIdBadge = document.getElementById('creo-id-badge');
       const statusCreoId = document.getElementById('status-creo-id');
 
+      const creoIdBtn = document.getElementById('creo-id-action-btn');
+
       if (vStatus === 'approved') {
         creoIdIcon.className = 'w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0';
         creoIdIcon.innerHTML = '<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
@@ -2752,6 +2765,10 @@
         creoIdBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-green-100 text-green-700';
         creoIdBadge.textContent = 'Aprobado';
         statusCreoId.className = 'flex items-center gap-3 p-4 rounded-xl border border-green-200 bg-green-50';
+        creoIdBtn.textContent = 'Ver';
+        creoIdBtn.className = 'text-xs px-3 py-1.5 rounded-lg font-semibold transition bg-green-100 text-green-700 hover:bg-green-200';
+        creoIdBtn.onclick = () => { showTab('verify'); };
+        creoIdBtn.classList.remove('hidden');
       } else if (vStatus === 'submitted') {
         creoIdIcon.className = 'w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0';
         creoIdIcon.innerHTML = '<svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
@@ -2759,6 +2776,10 @@
         creoIdBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-yellow-100 text-yellow-700';
         creoIdBadge.textContent = 'En Revisión';
         statusCreoId.className = 'flex items-center gap-3 p-4 rounded-xl border border-yellow-200 bg-yellow-50';
+        creoIdBtn.textContent = 'Ver Estado';
+        creoIdBtn.className = 'text-xs px-3 py-1.5 rounded-lg font-semibold transition bg-yellow-100 text-yellow-700 hover:bg-yellow-200';
+        creoIdBtn.onclick = () => { showTab('verify'); };
+        creoIdBtn.classList.remove('hidden');
       } else if (vStatus === 'rejected') {
         creoIdIcon.className = 'w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0';
         creoIdIcon.innerHTML = '<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
@@ -2766,6 +2787,10 @@
         creoIdBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-red-100 text-red-700';
         creoIdBadge.textContent = 'Rechazado';
         statusCreoId.className = 'flex items-center gap-3 p-4 rounded-xl border border-red-200 bg-red-50';
+        creoIdBtn.textContent = 'Verificar';
+        creoIdBtn.className = 'text-xs px-3 py-1.5 rounded-lg font-semibold transition bg-red-600 text-white hover:bg-red-700';
+        creoIdBtn.onclick = () => { showTab('verify'); };
+        creoIdBtn.classList.remove('hidden');
       } else {
         creoIdIcon.className = 'w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0';
         creoIdIcon.innerHTML = '<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg>';
@@ -2773,6 +2798,10 @@
         creoIdBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-500';
         creoIdBadge.textContent = 'Pendiente';
         statusCreoId.className = 'flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50';
+        creoIdBtn.textContent = 'Verificar';
+        creoIdBtn.className = 'text-xs px-3 py-1.5 rounded-lg font-semibold transition bg-creo-purple text-white hover:opacity-90';
+        creoIdBtn.onclick = () => { showTab('verify'); };
+        creoIdBtn.classList.remove('hidden');
       }
 
       // --- Stripe ---
@@ -2795,6 +2824,8 @@
         } catch (_) {}
       }
 
+      const stripeBtn = document.getElementById('stripe-action-btn');
+
       if (sr && sr.status === 'complete') {
         stripeIcon.className = 'w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0';
         stripeIcon.innerHTML = '<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
@@ -2802,6 +2833,10 @@
         stripeBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-green-100 text-green-700';
         stripeBadge.textContent = 'Activo';
         statusStripe.className = 'flex items-center gap-3 p-4 rounded-xl border border-green-200 bg-green-50';
+        stripeBtn.textContent = 'Mi Stripe';
+        stripeBtn.className = 'text-xs px-3 py-1.5 rounded-lg font-semibold transition bg-creo-purple text-white hover:opacity-90';
+        stripeBtn.onclick = () => { window.open('https://connect.stripe.com/express_login', '_blank'); };
+        stripeBtn.classList.remove('hidden');
       } else if (sr && sr.status === 'incomplete') {
         stripeIcon.className = 'w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0';
         stripeIcon.innerHTML = '<svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
@@ -2813,6 +2848,10 @@
         stripeBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-yellow-100 text-yellow-700';
         stripeBadge.textContent = 'Incompleto';
         statusStripe.className = 'flex items-center gap-3 p-4 rounded-xl border border-yellow-200 bg-yellow-50';
+        stripeBtn.textContent = 'Completar';
+        stripeBtn.className = 'text-xs px-3 py-1.5 rounded-lg font-semibold transition bg-yellow-500 text-white hover:bg-yellow-600';
+        stripeBtn.onclick = () => { startStripeOnboarding(); };
+        stripeBtn.classList.remove('hidden');
       } else {
         stripeIcon.className = 'w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0';
         stripeIcon.innerHTML = '<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>';
@@ -2820,6 +2859,10 @@
         stripeBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-500';
         stripeBadge.textContent = 'No conectado';
         statusStripe.className = 'flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50';
+        stripeBtn.textContent = 'Conectar';
+        stripeBtn.className = 'text-xs px-3 py-1.5 rounded-lg font-semibold transition bg-creo-purple text-white hover:opacity-90';
+        stripeBtn.onclick = () => { showTab('stripe'); };
+        stripeBtn.classList.remove('hidden');
       }
 
       // --- Payment readiness checklist ---
@@ -3079,7 +3122,8 @@
 
     async function deleteBusinessLink(id) {
       if (!confirm('¿Eliminar este enlace?')) return;
-      await sb.from('business_links').delete().eq('id', id).eq('creator_id', currentUser.id);
+      const { error } = await sb.from('business_links').delete().eq('id', id).eq('creator_id', currentUser.id);
+      if (error) return showToast('Error: ' + error.message, 'error');
       showToast('Enlace eliminado', 'success');
       loadMyBusinessLinks();
     }

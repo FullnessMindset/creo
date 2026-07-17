@@ -1638,13 +1638,14 @@
     async function selectGif(url) {
       const { data: { user } } = await sb.auth.getUser();
       if (!user) return;
-      await sb.from('messages').insert({
+      const { error } = await sb.from('messages').insert({
         sender_id: user.id,
         receiver_id: creatorProfile.id,
         body: null,
         media_url: url,
         media_type: 'gif'
       });
+      if (error) return showToast('Error al enviar GIF', 'error');
       document.getElementById('gif-picker').classList.add('hidden');
       loadDMHistory();
     }
@@ -1832,7 +1833,8 @@
         const idx = reactions[emoji].indexOf(user.id);
         if (idx >= 0) { reactions[emoji].splice(idx, 1); if (!reactions[emoji].length) delete reactions[emoji]; }
         else { reactions[emoji].push(user.id); }
-        await sb.from('messages').update({ reactions }).eq('id', msgId);
+        const { error: rErr } = await sb.from('messages').update({ reactions }).eq('id', msgId);
+        if (rErr) { showToast('Error al reaccionar', 'error'); return; }
         const other = msg.sender_id === user.id ? msg.receiver_id : msg.sender_id;
         if (idx < 0) createNotification(other, 'message', `Reacción ${emoji}`, null, 'messages.html#chat-' + user.id);
       } finally {
@@ -2519,13 +2521,14 @@
     // ===== COMPLETED METAS HISTORY =====
     async function loadCompletedMetas(creatorId) {
       const today = new Date().toISOString().split('T')[0];
-      const { data, error } = await sb.from('metas')
+      const { data: allMetas, error } = await sb.from('metas')
         .select('id, title, description, goal_amount_cents, raised_cents, start_date, end_date, images, fund_status, completion_badge')
         .eq('creator_id', creatorId)
-        .or(`end_date.lt.${today},raised_cents.gte.goal_amount_cents`)
         .order('end_date', { ascending: false })
-        .limit(20);
-      if (error || !data || data.length === 0) return;
+        .limit(50);
+      if (error || !allMetas) return;
+      const data = allMetas.filter(m => m.end_date < today || m.raised_cents >= m.goal_amount_cents);
+      if (data.length === 0) return;
 
       const section = document.getElementById('completed-metas-inline');
       section.classList.remove('hidden');
