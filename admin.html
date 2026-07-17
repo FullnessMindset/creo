@@ -165,6 +165,10 @@
         <button onclick="showTab('dealpayouts')" id="tab-dealpayouts" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition relative">Deal Payouts<span id="badge-dealpayouts" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
         <button onclick="showTab('reports')" id="tab-reports" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition relative">Reports<span id="badge-reports" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
         <button onclick="showTab('announcements')" id="tab-announcements" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Announcements</button>
+        <button onclick="showTab('moderation')" id="tab-moderation" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition relative">Moderation<span id="badge-moderation" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('manipulation')" id="tab-manipulation" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition relative">Anti-Abuse<span id="badge-manipulation" class="hidden absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('fairness')" id="tab-fairness" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Fairness</button>
+        <button onclick="showTab('featureflags')" id="tab-featureflags" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Feature Flags</button>
         <button onclick="showTab('stripe')" id="tab-stripe" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
           Stripe
@@ -518,6 +522,107 @@
       </div>
 
       <!-- STRIPE PANEL -->
+      <!-- ═══ MODERATION QUEUE ═══ -->
+      <div id="panel-moderation" class="hidden fade-in space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-gray-900">Moderation Queue</h2>
+          <button onclick="loadModerationQueue()" class="text-xs text-creo-purple font-semibold hover:underline">Refresh</button>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3" id="moderation-stats-cards"></div>
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="filterModeration('pending')" class="mod-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">Pending</button>
+          <button onclick="filterModeration('escalated')" class="mod-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">Escalated</button>
+          <button onclick="filterModeration('appealed')" class="mod-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">Appealed</button>
+          <button onclick="filterModeration('approved')" class="mod-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">Approved</button>
+          <button onclick="filterModeration('removed')" class="mod-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">Removed</button>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                <tr>
+                  <th class="px-4 py-3 text-left">Content</th>
+                  <th class="px-4 py-3 text-left">Category</th>
+                  <th class="px-4 py-3 text-left">Confidence</th>
+                  <th class="px-4 py-3 text-left">Source</th>
+                  <th class="px-4 py-3 text-left">Status</th>
+                  <th class="px-4 py-3 text-left">Date</th>
+                  <th class="px-4 py-3 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="moderation-body" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+          <div id="moderation-empty" class="p-8 text-center text-gray-400 text-sm">Loading moderation queue...</div>
+        </div>
+      </div>
+
+      <!-- ═══ MANIPULATION ALERTS ═══ -->
+      <div id="panel-manipulation" class="hidden fade-in space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-gray-900">Anti-Manipulation Alerts</h2>
+          <button onclick="loadManipulationAlerts()" class="text-xs text-creo-purple font-semibold hover:underline">Refresh</button>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                <tr>
+                  <th class="px-4 py-3 text-left">Account</th>
+                  <th class="px-4 py-3 text-left">Signal</th>
+                  <th class="px-4 py-3 text-left">Confidence</th>
+                  <th class="px-4 py-3 text-left">Action Taken</th>
+                  <th class="px-4 py-3 text-left">Post</th>
+                  <th class="px-4 py-3 text-left">Date</th>
+                  <th class="px-4 py-3 text-left">Details</th>
+                </tr>
+              </thead>
+              <tbody id="manipulation-body" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+          <div id="manipulation-empty" class="p-8 text-center text-gray-400 text-sm">Loading alerts...</div>
+        </div>
+      </div>
+
+      <!-- ═══ FAIRNESS METRICS ═══ -->
+      <div id="panel-fairness" class="hidden fade-in space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-gray-900">Creator Fairness Metrics</h2>
+          <button onclick="loadFairnessMetrics()" class="text-xs text-creo-purple font-semibold hover:underline">Refresh</button>
+        </div>
+        <p class="text-sm text-gray-500">Rolling exposure/impression distribution across creator size tiers. Verifies the fairness engine is working correctly.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="fairness-cards"></div>
+        <div id="fairness-empty" class="p-8 text-center text-gray-400 text-sm">Loading fairness data...</div>
+      </div>
+
+      <!-- ═══ FEATURE FLAGS ═══ -->
+      <div id="panel-featureflags" class="hidden fade-in space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-gray-900">Feature Flags & Rollback Controls</h2>
+          <button onclick="loadFeatureFlags()" class="text-xs text-creo-purple font-semibold hover:underline">Refresh</button>
+        </div>
+        <p class="text-sm text-gray-500">Toggle ranking features instantly without redeploying. Set value to 0 to disable, 1 to enable.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="feature-flags-grid"></div>
+        <div class="mt-6">
+          <h3 class="text-md font-bold text-gray-900 mb-3">Algorithm Config (All Parameters)</h3>
+          <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                  <tr>
+                    <th class="px-4 py-3 text-left">Key</th>
+                    <th class="px-4 py-3 text-left">Value</th>
+                    <th class="px-4 py-3 text-left">Description</th>
+                    <th class="px-4 py-3 text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="algo-config-body" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="panel-stripe" class="hidden fade-in space-y-6">
         <!-- Balance Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -869,6 +974,10 @@
       const el = document.getElementById('auth-error');
       el.textContent = msg; el.classList.remove('hidden');
       setTimeout(() => el.classList.add('hidden'), 5000);
+    }
+
+    function showSuccess(msg) {
+      alert(msg);
     }
 
     // --- API ---
@@ -1272,14 +1381,19 @@
       const active = document.getElementById('tab-' + tab);
       active.classList.add('bg-creo-purple', 'text-white');
       active.classList.remove('text-gray-500');
-      ['verification', 'creators', 'transactions', 'accounts', 'links', 'allusers', 'metareviews', 'dealpayouts', 'reports', 'announcements', 'stripe'].forEach(p => {
-        document.getElementById('panel-' + p).classList.toggle('hidden', p !== tab);
+      ['verification', 'creators', 'transactions', 'accounts', 'links', 'allusers', 'metareviews', 'dealpayouts', 'reports', 'announcements', 'stripe', 'moderation', 'manipulation', 'fairness', 'featureflags'].forEach(p => {
+        const el = document.getElementById('panel-' + p);
+        if (el) el.classList.toggle('hidden', p !== tab);
       });
       if (tab === 'stripe' && !stripeDataLoaded) loadStripeData();
       if (tab === 'allusers' && !allUsersLoaded) loadAllUsers();
       if (tab === 'dealpayouts' && !dealPayoutsLoaded) loadDealPayouts();
       if (tab === 'reports' && !reportsLoaded) loadReports();
       if (tab === 'announcements' && !announcementsLoaded) loadAnnouncements();
+      if (tab === 'moderation' && !moderationLoaded) loadModerationQueue();
+      if (tab === 'manipulation' && !manipulationLoaded) loadManipulationAlerts();
+      if (tab === 'fairness' && !fairnessLoaded) loadFairnessMetrics();
+      if (tab === 'featureflags' && !featureFlagsLoaded) loadFeatureFlags();
     }
 
     // ===== DEAL PAYOUTS TAB =====
@@ -2497,6 +2611,232 @@
     // ===== META FUND RELEASE REVIEWS =====
     let allMetaReviews = [];
     let metaReviewFilter = 'pending';
+
+    // ═══════════════════════════════════════════════════
+    // MODERATION QUEUE TAB
+    // ═══════════════════════════════════════════════════
+    let moderationLoaded = false;
+    let moderationFilter = 'pending';
+
+    async function loadModerationQueue() {
+      moderationLoaded = true;
+      const [statsRes, queueRes] = await Promise.all([
+        apiCall('moderation-stats'),
+        apiCall('moderation-queue', { status: moderationFilter })
+      ]);
+
+      if (statsRes.stats) {
+        const cards = document.getElementById('moderation-stats-cards');
+        const colors = { pending: 'yellow', approved: 'green', removed: 'red', appealed: 'blue', escalated: 'red' };
+        cards.innerHTML = Object.entries(statsRes.stats).map(([k, v]) => `
+          <div class="bg-${colors[k] || 'gray'}-50 border border-${colors[k] || 'gray'}-200 rounded-xl p-4 text-center">
+            <p class="text-2xl font-bold text-${colors[k] || 'gray'}-700">${v}</p>
+            <p class="text-xs text-${colors[k] || 'gray'}-600 uppercase tracking-wider mt-1">${k}</p>
+          </div>
+        `).join('');
+
+        if (statsRes.stats.pending > 0) {
+          const badge = document.getElementById('badge-moderation');
+          badge.textContent = statsRes.stats.pending;
+          badge.classList.remove('hidden');
+        }
+      }
+
+      renderModerationQueue(queueRes.flags || []);
+    }
+
+    function filterModeration(status) {
+      moderationFilter = status;
+      document.querySelectorAll('.mod-filter-btn').forEach(b => b.classList.remove('ring-2', 'ring-creo-purple'));
+      event.target.classList.add('ring-2', 'ring-creo-purple');
+      apiCall('moderation-queue', { status }).then(res => renderModerationQueue(res.flags || []));
+    }
+
+    function renderModerationQueue(flags) {
+      const body = document.getElementById('moderation-body');
+      const empty = document.getElementById('moderation-empty');
+      if (!flags.length) {
+        body.innerHTML = '';
+        empty.textContent = 'No flags with this status.';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+      body.innerHTML = flags.map(f => {
+        const date = new Date(f.created_at).toLocaleDateString();
+        const confPct = f.confidence ? Math.round(f.confidence * 100) + '%' : '—';
+        const statusColors = { pending: 'yellow', approved: 'green', removed: 'red', appealed: 'blue', escalated: 'red' };
+        const sc = statusColors[f.status] || 'gray';
+        const actions = f.status === 'pending' || f.status === 'appealed' || f.status === 'escalated'
+          ? `<button onclick="reviewModerationFlag('${f.id}','approved')" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-semibold mr-1">Approve</button>
+             <button onclick="reviewModerationFlag('${f.id}','removed')" class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded font-semibold">Remove</button>`
+          : `<span class="text-xs text-gray-400">Decided</span>`;
+        return `<tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 text-xs font-mono">${f.content_type}:${(f.content_id || '').substring(0, 8)}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-${sc}-100 text-${sc}-800">${f.category}</span></td>
+          <td class="px-4 py-3 text-xs">${confPct}</td>
+          <td class="px-4 py-3 text-xs">${f.source}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-${sc}-100 text-${sc}-800">${f.status}</span></td>
+          <td class="px-4 py-3 text-xs text-gray-500">${date}</td>
+          <td class="px-4 py-3">${actions}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function reviewModerationFlag(flagId, decision) {
+      const notes = prompt('Review notes (optional):');
+      const res = await apiCall('moderation-review', { flag_id: flagId, decision, notes: notes || '' });
+      if (res.success) { showSuccess('Moderation decision saved'); loadModerationQueue(); }
+      else showError(res.error || 'Failed');
+    }
+
+    // ═══════════════════════════════════════════════════
+    // MANIPULATION ALERTS TAB
+    // ═══════════════════════════════════════════════════
+    let manipulationLoaded = false;
+
+    async function loadManipulationAlerts() {
+      manipulationLoaded = true;
+      const res = await apiCall('manipulation-alerts', { min_confidence: 0.3 });
+      const signals = res.signals || [];
+      const body = document.getElementById('manipulation-body');
+      const empty = document.getElementById('manipulation-empty');
+
+      if (!signals.length) {
+        body.innerHTML = '';
+        empty.textContent = 'No manipulation signals detected.';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      const highConfCount = signals.filter(s => s.confidence >= 0.8).length;
+      if (highConfCount > 0) {
+        const badge = document.getElementById('badge-manipulation');
+        badge.textContent = highConfCount;
+        badge.classList.remove('hidden');
+      }
+
+      body.innerHTML = signals.map(s => {
+        const date = new Date(s.created_at).toLocaleDateString();
+        const confPct = Math.round(s.confidence * 100) + '%';
+        const confColor = s.confidence >= 0.8 ? 'red' : s.confidence >= 0.5 ? 'orange' : 'yellow';
+        const acctName = s.account?.username || s.account?.display_name || (s.account_id || '').substring(0, 8);
+        const postRef = s.post?.caption ? s.post.caption.substring(0, 30) + '...' : (s.post_id || '').substring(0, 8);
+        const details = s.details ? JSON.stringify(s.details) : '';
+        return `<tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 text-xs font-semibold">${acctName}${s.account?.sanction_status && s.account.sanction_status !== 'none' ? ' <span class="text-red-500">(' + s.account.sanction_status + ')</span>' : ''}</td>
+          <td class="px-4 py-3 text-xs">${s.signal_type.replace(/_/g, ' ')}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-${confColor}-100 text-${confColor}-800">${confPct}</span></td>
+          <td class="px-4 py-3 text-xs">${s.action_taken.replace(/_/g, ' ')}</td>
+          <td class="px-4 py-3 text-xs font-mono">${postRef}</td>
+          <td class="px-4 py-3 text-xs text-gray-500">${date}</td>
+          <td class="px-4 py-3 text-xs text-gray-400 max-w-[200px] truncate" title="${details}">${details}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ═══════════════════════════════════════════════════
+    // FAIRNESS METRICS TAB
+    // ═══════════════════════════════════════════════════
+    let fairnessLoaded = false;
+
+    async function loadFairnessMetrics() {
+      fairnessLoaded = true;
+      const res = await apiCall('fairness-metrics');
+      const metrics = res.metrics || [];
+      const cards = document.getElementById('fairness-cards');
+      const empty = document.getElementById('fairness-empty');
+
+      if (!metrics.length) {
+        cards.innerHTML = '';
+        empty.textContent = 'No fairness data yet. Metrics populate after feed scores are generated.';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      const tierColors = { small: 'emerald', medium: 'blue', large: 'purple', mega: 'amber' };
+      cards.innerHTML = metrics.map(m => {
+        const c = tierColors[m.creator_tier] || 'gray';
+        return `<div class="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-${c}-700 bg-${c}-100 px-2 py-0.5 rounded-full">${m.creator_tier}</span>
+            <span class="text-xs text-gray-400">${m.creator_count} creators</span>
+          </div>
+          <div class="space-y-2">
+            <div>
+              <p class="text-xs text-gray-500">Impressions Today</p>
+              <p class="text-xl font-bold text-gray-900">${Number(m.total_impressions_today).toLocaleString()}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Avg Score</p>
+              <p class="text-lg font-semibold text-gray-700">${Number(m.avg_score).toFixed(2)}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Avg Engagement</p>
+              <p class="text-lg font-semibold text-gray-700">${Number(m.avg_engagement).toFixed(2)}</p>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // ═══════════════════════════════════════════════════
+    // FEATURE FLAGS TAB
+    // ═══════════════════════════════════════════════════
+    let featureFlagsLoaded = false;
+
+    async function loadFeatureFlags() {
+      featureFlagsLoaded = true;
+      const [flagsRes, configRes] = await Promise.all([
+        apiCall('feature-flags'),
+        apiCall('algorithm-config')
+      ]);
+
+      const flags = flagsRes.flags || [];
+      const grid = document.getElementById('feature-flags-grid');
+      grid.innerHTML = flags.map(f => {
+        const enabled = Number(f.value) === 1;
+        const label = f.key.replace('feature_flag_', '').replace(/_/g, ' ');
+        return `<div class="bg-white border border-gray-200 rounded-xl p-5 flex items-center justify-between">
+          <div>
+            <p class="font-semibold text-gray-900 capitalize">${label}</p>
+            <p class="text-xs text-gray-500 mt-0.5">${f.description || ''}</p>
+          </div>
+          <button onclick="toggleFeatureFlag('${f.key}', ${enabled ? 0 : 1})" class="px-4 py-2 rounded-lg text-sm font-bold transition ${enabled ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700' : 'bg-red-100 text-red-700 hover:bg-green-100 hover:text-green-700'}">
+            ${enabled ? 'ON' : 'OFF'}
+          </button>
+        </div>`;
+      }).join('');
+
+      const allConfig = configRes.config || [];
+      const configBody = document.getElementById('algo-config-body');
+      configBody.innerHTML = allConfig.map(c => `<tr class="hover:bg-gray-50">
+        <td class="px-4 py-3 text-xs font-mono font-semibold">${c.key}</td>
+        <td class="px-4 py-3"><input type="number" value="${c.value}" id="cfg-${c.key}" class="w-24 bg-gray-50 border border-gray-300 rounded px-2 py-1 text-sm"></td>
+        <td class="px-4 py-3 text-xs text-gray-500">${c.description || ''}</td>
+        <td class="px-4 py-3"><button onclick="updateAlgoConfig('${c.key}')" class="text-xs bg-creo-purple text-white px-3 py-1 rounded font-semibold hover:bg-creo-light transition">Save</button></td>
+      </tr>`).join('');
+    }
+
+    async function toggleFeatureFlag(key, newValue) {
+      const res = await apiCall('update-feature-flag', { key, value: newValue });
+      if (res.success) { showSuccess(key.replace('feature_flag_', '') + ' ' + (newValue ? 'enabled' : 'disabled')); loadFeatureFlags(); }
+      else showError(res.error || 'Failed');
+    }
+
+    async function updateAlgoConfig(key) {
+      const input = document.getElementById('cfg-' + key);
+      if (!input) return;
+      const res = await apiCall('update-algorithm-config', { key, value: Number(input.value) });
+      if (res.success) showSuccess(key + ' updated');
+      else showError(res.error || 'Failed');
+    }
+
+    // ═══════════════════════════════════════════════════
+    // END PART 3 TABS
+    // ═══════════════════════════════════════════════════
 
     async function loadMetaReviews() {
       const { data, error } = await sb.from('metas')
