@@ -67,22 +67,25 @@
     .feed-media-landscape { aspect-ratio: 16/9; }
     .feed-media-portrait { aspect-ratio: 3/4; max-height: 65vh; }
 
-    /* Creo popup tabs */
-    .creo-tab { padding: 0.5rem 1rem; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; transition: all 0.2s; cursor: pointer; }
-    .creo-tab-active { background: #33f0b0; color: #1a0a3e; }
-    .creo-tab:not(.creo-tab-active) { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); }
-    .creo-tab:not(.creo-tab-active):hover { background: rgba(255,255,255,0.2); }
+    /* Follow button */
+    .feed-follow-btn { font-size: 11px; padding: 3px 10px; border-radius: 9999px; font-weight: 600; transition: all 0.2s; cursor: pointer; border: 1px solid rgba(51,240,176,0.4); }
+    .feed-follow-btn:not(.following) { background: transparent; color: #1a0a3e; }
+    .feed-follow-btn:not(.following):hover { background: rgba(51,240,176,0.15); }
+    .feed-follow-btn.following { background: #33f0b0; color: #1a0a3e; }
 
     /* Progress bar */
-    .meta-progress-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.15); overflow: hidden; }
+    .meta-progress-bar { height: 6px; border-radius: 3px; background: rgba(0,0,0,0.08); overflow: hidden; }
     .meta-progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #33f0b0, #28c48e); transition: width 0.5s ease; }
+
+    /* Pay tab active */
+    .pay-tab-active { background: #1a0a3e; color: white; }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen transition-colors duration-300">
+<body class="bg-gray-50 text-gray-900 min-h-screen">
   <script src="shared.js"></script>
 
   <!-- Header -->
-  <div id="feed-header" class="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-sm border-b border-gray-200 dark-aware-header landscape-hide">
+  <div id="feed-header" class="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-sm border-b border-gray-200 landscape-hide">
     <div class="max-w-3xl mx-auto flex items-center justify-between px-4 py-3">
       <a href="index.html" class="flex items-center gap-2 no-underline">
         <div class="w-8 h-8 rounded-full bg-creo-purple flex items-center justify-center flex-shrink-0"><img src="assets/logo-icon.png" alt="CREO" class="w-6 h-6 rounded-full object-contain"></div>
@@ -138,83 +141,99 @@
     </div>
   </div>
 
-  <!-- CREO Support Popup -->
+  <!-- CREO Support Popup — matches profile.html payment sections -->
   <div id="creo-popup" class="fixed inset-0 z-[60] hidden">
-    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeCreoPopup()"></div>
-    <div class="absolute bottom-0 left-0 right-0 max-w-lg mx-auto rounded-t-3xl max-h-[85vh] flex flex-col animate-slide-up shadow-2xl overflow-hidden" style="background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 100%);">
-      <!-- Header -->
+    <div class="absolute inset-0 bg-black/60" onclick="closeCreoPopup()"></div>
+    <div class="absolute bottom-0 left-0 right-0 max-w-lg mx-auto rounded-t-3xl max-h-[85vh] flex flex-col animate-slide-up shadow-2xl bg-white overflow-hidden">
+      <!-- Header with creator info -->
       <div class="flex items-center justify-between px-5 pt-5 pb-3">
         <div class="flex items-center gap-3">
-          <div id="creo-popup-avatar" class="w-10 h-10 rounded-full border-2 border-creo-mint overflow-hidden flex-shrink-0"></div>
+          <div id="creo-popup-avatar" class="relative w-12 h-12 rounded-full border-2 border-creo-mint overflow-visible flex-shrink-0"></div>
           <div>
-            <h3 id="creo-popup-name" class="text-white font-bold text-sm truncate max-w-[200px]"></h3>
-            <p id="creo-popup-user" class="text-white/50 text-xs"></p>
+            <h3 id="creo-popup-name" class="text-gray-900 font-bold text-sm truncate max-w-[200px]"></h3>
+            <p id="creo-popup-user" class="text-creo-purple text-xs font-medium"></p>
           </div>
         </div>
-        <button onclick="closeCreoPopup()" class="text-white/40 hover:text-white p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        <button onclick="closeCreoPopup()" class="text-gray-400 hover:text-gray-700 p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
 
-      <!-- Tabs -->
-      <div class="flex gap-2 px-5 pb-3">
-        <button onclick="showCreoTab('tip')" id="creo-tab-tip" class="creo-tab creo-tab-active">Yo Creo en Ti</button>
-        <button onclick="showCreoTab('meta')" id="creo-tab-meta" class="creo-tab">Mi Meta</button>
-        <button onclick="showCreoTab('sub')" id="creo-tab-sub" class="creo-tab">Apoyo Full</button>
+      <!-- Payment Tabs — same style as profile.html -->
+      <div class="flex glass rounded-xl overflow-hidden mx-5 mb-3">
+        <button onclick="showCreoTab('tip')" id="creo-tab-tip" class="flex-1 py-3 text-xs font-semibold text-center transition pay-tab-active">Yo Creo en Ti</button>
+        <button onclick="showCreoTab('meta')" id="creo-tab-meta" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400">Mi Meta</button>
+        <button onclick="showCreoTab('sub')" id="creo-tab-sub" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400">Apoyo Full</button>
       </div>
 
       <!-- Tab Content -->
       <div class="flex-1 overflow-y-auto px-5 pb-5">
-        <!-- Tip Tab -->
-        <div id="creo-panel-tip" class="space-y-4">
-          <p class="text-white/60 text-xs text-center">Envía un apoyo único al creador</p>
+        <!-- Tip Tab — matches profile.html pay-tip -->
+        <div id="creo-panel-tip" class="glass p-6 rounded-2xl shadow-xl space-y-4">
+          <div id="creo-mec-tip-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
+          <div class="text-center">
+            <h3 id="creo-mec-tip-heading" class="text-lg font-bold text-gray-900">Yo Creo en Ti</h3>
+            <p id="creo-mec-tip-subtext" class="text-xs text-gray-500 mt-1">Envía un apoyo único al creador</p>
+          </div>
           <div>
-            <label class="text-white/70 text-xs font-medium">Cantidad (USD)</label>
-            <div class="flex items-center gap-2 mt-1">
-              <span class="text-white/50 text-lg">$</span>
-              <input id="creo-tip-amount" type="number" value="5.00" min="1" step="0.01" class="flex-1 bg-white/10 border border-white/20 text-white p-3 rounded-xl text-sm outline-none focus:border-creo-mint">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad (USD)</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</span>
+              <input id="creo-tip-amount" type="number" min="1" value="5.00" step="0.50" class="w-full pl-8 pr-4 py-3 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-lg font-bold outline-none focus:ring-2 focus:ring-creo-purple">
+            </div>
+            <div class="flex gap-2 mt-3">
+              <button onclick="document.getElementById('creo-tip-amount').value='5'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$5</button>
+              <button onclick="document.getElementById('creo-tip-amount').value='10'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$10</button>
+              <button onclick="document.getElementById('creo-tip-amount').value='25'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$25</button>
+              <button onclick="document.getElementById('creo-tip-amount').value='50'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$50</button>
             </div>
           </div>
-          <div class="flex gap-2">
-            <button onclick="document.getElementById('creo-tip-amount').value='5'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$5</button>
-            <button onclick="document.getElementById('creo-tip-amount').value='10'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$10</button>
-            <button onclick="document.getElementById('creo-tip-amount').value='25'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$25</button>
-            <button onclick="document.getElementById('creo-tip-amount').value='50'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$50</button>
-          </div>
-          <button onclick="creoPopupTip()" id="creo-tip-btn" class="w-full bg-creo-mint text-creo-purple py-3 rounded-xl font-bold text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
-            <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Apoyar Creador
+          <button onclick="creoPopupTip()" id="creo-tip-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
+            <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
+            <span>Apoyar Creador</span>
           </button>
         </div>
 
-        <!-- Meta Tab -->
-        <div id="creo-panel-meta" class="space-y-4 hidden">
-          <p class="text-white/60 text-xs text-center">Apoya las metas del creador</p>
-          <div id="creo-metas-list" class="space-y-3">
-            <p class="text-white/40 text-xs text-center py-4">Cargando metas...</p>
-          </div>
-          <div id="creo-metas-empty" class="hidden text-center py-4">
-            <svg class="w-10 h-10 text-white/20 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-            <p class="text-white/40 text-xs">No hay metas activas</p>
+        <!-- Meta Tab — matches profile.html pay-metas -->
+        <div id="creo-panel-meta" class="hidden">
+          <div class="glass p-6 rounded-2xl shadow-xl space-y-4">
+            <div id="creo-mec-meta-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
+            <div class="text-center">
+              <h3 id="creo-mec-meta-heading" class="text-lg font-bold text-gray-900">Mi Meta</h3>
+              <p id="creo-mec-meta-subtext" class="text-xs text-gray-500 mt-1">Apoya las metas del creador</p>
+            </div>
+            <div id="creo-metas-list" class="space-y-4"></div>
+            <div id="creo-metas-empty" class="hidden text-center space-y-2 py-4">
+              <svg class="w-12 h-12 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              <p class="text-sm font-semibold text-gray-500">No hay metas publicadas aún</p>
+            </div>
           </div>
         </div>
 
-        <!-- Sub Tab -->
-        <div id="creo-panel-sub" class="space-y-4 hidden">
-          <p class="text-white/60 text-xs text-center">Apoya mensualmente con una cantidad que elijas</p>
-          <div>
-            <label class="text-white/70 text-xs font-medium">Cantidad Mensual (USD)</label>
-            <div class="flex items-center gap-2 mt-1">
-              <span class="text-white/50 text-lg">$</span>
-              <input id="creo-sub-amount" type="number" value="10.00" min="3" step="0.01" class="flex-1 bg-white/10 border border-white/20 text-white p-3 rounded-xl text-sm outline-none focus:border-creo-mint">
+        <!-- Sub Tab — matches profile.html pay-sub -->
+        <div id="creo-panel-sub" class="hidden">
+          <div class="glass p-6 rounded-2xl shadow-xl space-y-4">
+            <div id="creo-mec-sub-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
+            <div class="text-center">
+              <h3 id="creo-mec-sub-heading" class="text-lg font-bold text-gray-900">Apoyo Full</h3>
+              <p id="creo-mec-sub-subtext" class="text-xs text-gray-500 mt-1">Apoya mensualmente con una cantidad que tú elijas</p>
             </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad Mensual (USD)</label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</span>
+                <input id="creo-sub-amount" type="number" min="3" value="10.00" step="1" class="w-full pl-8 pr-4 py-3 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-lg font-bold outline-none focus:ring-2 focus:ring-creo-purple">
+              </div>
+              <div class="flex gap-2 mt-3">
+                <button onclick="document.getElementById('creo-sub-amount').value='5'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$5/mes</button>
+                <button onclick="document.getElementById('creo-sub-amount').value='10'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$10/mes</button>
+                <button onclick="document.getElementById('creo-sub-amount').value='25'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$25/mes</button>
+              </div>
+            </div>
+            <button onclick="creoPopupSub()" id="creo-sub-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
+              <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
+              <span>Suscribirme Mensualmente</span>
+            </button>
+            <p class="text-xs text-gray-400 text-center">Puedes cancelar en cualquier momento</p>
           </div>
-          <div class="flex gap-2">
-            <button onclick="document.getElementById('creo-sub-amount').value='5'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$5/mes</button>
-            <button onclick="document.getElementById('creo-sub-amount').value='10'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$10/mes</button>
-            <button onclick="document.getElementById('creo-sub-amount').value='25'" class="flex-1 py-2 rounded-lg bg-white/10 text-white/70 text-xs font-semibold hover:bg-white/20 transition">$25/mes</button>
-          </div>
-          <button onclick="creoPopupSub()" id="creo-sub-btn" class="w-full bg-creo-mint text-creo-purple py-3 rounded-xl font-bold text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
-            <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Suscribirme Mensualmente
-          </button>
-          <p class="text-white/30 text-xs text-center">Puedes cancelar en cualquier momento</p>
         </div>
       </div>
     </div>
@@ -231,25 +250,21 @@
     let replyingToCommentId = null;
     let replyingToName = null;
     let creoPopupProfile = null;
-
-    // SUPABASE_URL is defined in shared.js
+    let userFollows = new Set();
 
     function handleOrientation() {
       const isLandscape = window.matchMedia('(orientation: landscape)').matches;
       const header = document.getElementById('feed-header');
       const nav = document.getElementById('bottom-nav');
-      const themeBtn = document.getElementById('theme-toggle-btn');
       const bell = document.getElementById('notif-bell');
       if (isLandscape) {
         if (header) header.classList.add('landscape-hide');
         if (nav) nav.classList.add('landscape-hide');
-        if (themeBtn) themeBtn.classList.add('landscape-hide');
         if (bell) bell.classList.add('landscape-hide');
         document.body.style.paddingBottom = '0';
       } else {
         if (header) header.classList.remove('landscape-hide');
         if (nav) nav.classList.remove('landscape-hide');
-        if (themeBtn) themeBtn.classList.remove('landscape-hide');
         if (bell) bell.classList.remove('landscape-hide');
         document.body.style.paddingBottom = '4rem';
       }
@@ -264,6 +279,25 @@
         if (data) data.forEach(l => userLikes.add(l.post_id));
         const { data: cl } = await sb.from('comment_likes').select('comment_id').eq('user_id', user.id);
         if (cl) cl.forEach(l => userCommentLikes.add(l.comment_id));
+        const { data: follows } = await sb.from('follows').select('following_id').eq('follower_id', user.id);
+        if (follows) follows.forEach(f => userFollows.add(f.following_id));
+      }
+    }
+
+    // ===== FOLLOW =====
+    async function toggleFeedFollow(creatorId, btn) {
+      if (!currentUser) { showToast('Inicia sesión para seguir', 'error'); return; }
+      const { data, error } = await sb.rpc('toggle_follow', { p_following_id: creatorId });
+      if (error) { showToast('Error', 'error'); return; }
+      if (data.followed) {
+        userFollows.add(creatorId);
+        btn.textContent = 'Siguiendo';
+        btn.classList.add('following');
+        createNotification(creatorId, 'follow', 'Tienes un nuevo seguidor', null, 'feed.html');
+      } else {
+        userFollows.delete(creatorId);
+        btn.textContent = 'Seguir';
+        btn.classList.remove('following');
       }
     }
 
@@ -507,18 +541,38 @@
       });
     }, { threshold: 0.5 });
 
+    // ===== BADGE HELPERS =====
+    function isVerified(profile) {
+      return (profile.stripe_onboarded && profile.identity_verified) || isAdmin(profile.email || '');
+    }
+
+    function isAdmin(email) {
+      return email === 'fullnessmindset@gmail.com';
+    }
+
+    function isBrand(profile) {
+      return profile.account_type === 'brand';
+    }
+
+    function getVerifiedBadgeHTML(profile) {
+      if (!isVerified(profile) && !isBrand(profile)) return '';
+      if (isBrand(profile)) {
+        return `<div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-creo-purple shadow flex items-center justify-center ring-1 ring-white" title="Brand Verificado"><svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm-1 15l-4-4 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z"/></svg></div>`;
+      }
+      return `<div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-white shadow flex items-center justify-center ring-1 ring-creo-mint" title="Creador Verificado"><img src="assets/logo-icon.png" alt="Verified" class="w-3 h-3 rounded-full object-contain"></div>`;
+    }
+
     // ===== UNIFIED FEED LOADER =====
     async function loadFeed() {
       if (allLoaded) return;
 
-      // Load both tables in parallel
       const [postsRes, communityRes] = await Promise.all([
         sb.from('posts')
-          .select('*, profiles:creator_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded)')
+          .select('*, profiles:creator_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, identity_verified, verification_status, account_type, email)')
           .order('created_at', { ascending: false })
           .range(feedOffset, feedOffset + FEED_LIMIT - 1),
         sb.from('community_posts')
-          .select('*, author:author_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded)')
+          .select('*, author:author_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, identity_verified, verification_status, account_type, email)')
           .or('profile_only.is.null,profile_only.eq.false')
           .order('created_at', { ascending: false })
           .range(feedOffset, feedOffset + FEED_LIMIT - 1)
@@ -526,7 +580,6 @@
 
       document.getElementById('feed-loading').classList.add('hidden');
 
-      // Normalize both into common format
       const items = [];
 
       if (postsRes.data) {
@@ -539,7 +592,7 @@
             created_at: p.created_at,
             caption: p.caption,
             title: null,
-            body: p.caption,
+            body: null,
             mediaType: 'embed_video',
             videoUrl: p.video_url,
             videoType: p.video_type,
@@ -553,12 +606,11 @@
 
       if (communityRes.data) {
         communityRes.data.forEach(p => {
-          const prof = p.author;
           items.push({
             id: p.id,
             source: 'community',
             creatorId: p.author_id,
-            profile: prof,
+            profile: p.author,
             created_at: p.created_at,
             caption: null,
             title: p.title,
@@ -574,7 +626,6 @@
         });
       }
 
-      // Sort merged by created_at descending
       items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
       if (items.length === 0) {
@@ -594,18 +645,21 @@
         card.dataset.creatorId = item.creatorId;
         card.dataset.source = item.source;
 
-        const avatarHTML = profile.avatar_url
+        const badgeHTML = getVerifiedBadgeHTML(profile);
+        const avatarHTML = `<div class="relative flex-shrink-0">${profile.avatar_url
           ? `<img src="${esc(profile.avatar_url)}" class="w-10 h-10 rounded-full object-cover border-2 border-creo-mint" alt="">`
-          : `<div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold text-sm">${esc((profile.display_name || profile.username || '?')[0].toUpperCase())}</span></div>`;
+          : `<div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold text-sm">${esc((profile.display_name || profile.username || '?')[0].toUpperCase())}</span></div>`
+        }${badgeHTML}</div>`;
 
         const isLiked = userLikes.has(item.id);
+        const isOwnPost = currentUser && currentUser.id === item.creatorId;
+        const isFollowing = userFollows.has(item.creatorId);
 
         // Build media HTML based on content type
         let mediaHTML = '';
         let mediaClass = '';
 
         if (item.source === 'posts') {
-          // Original video post (YouTube, TikTok, Instagram, direct)
           const isDirectVideo = item.videoType === 'direct' && item.videoUrl && !item.videoUrl.includes('youtube');
           if (isDirectVideo) {
             mediaHTML = `<video src="${esc(item.videoUrl)}" class="w-full object-contain bg-black feed-video" autoplay muted loop playsinline></video>`;
@@ -615,27 +669,21 @@
             mediaClass = 'feed-media-landscape';
           }
         } else {
-          // Community post — adaptive sizing
           const urls = item.mediaUrls;
           if (item.mediaType === 'video' && urls.length > 0) {
-            const vUrl = urls[0];
             const isVert = item.videoOrientation === 'vertical';
             mediaClass = isVert ? 'feed-media-reel' : 'feed-media-landscape';
-            mediaHTML = `<video src="${esc(vUrl)}" class="w-full h-full object-contain bg-black feed-video" autoplay muted loop playsinline></video>`;
+            mediaHTML = `<video src="${esc(urls[0])}" class="w-full h-full object-contain bg-black feed-video" autoplay muted loop playsinline></video>`;
           } else if (item.mediaType === 'photo' && urls.length > 0) {
             if (urls.length === 1) {
               mediaHTML = `<img src="${esc(urls[0])}" class="w-full h-full object-cover" alt="" onload="adaptImageSize(this)">`;
               mediaClass = 'feed-media-square';
             } else {
-              mediaHTML = `<div class="grid ${urls.length === 2 ? 'grid-cols-2' : urls.length === 3 ? 'grid-cols-2' : 'grid-cols-2'} gap-0.5">${urls.slice(0, 4).map((u, i) =>
-                `<div class="${urls.length === 3 && i === 0 ? 'row-span-2' : ''} overflow-hidden ${urls.length <= 2 ? 'aspect-square' : 'aspect-square'}"><img src="${esc(u)}" class="w-full h-full object-cover" alt=""></div>`
+              mediaHTML = `<div class="grid grid-cols-2 gap-0.5">${urls.slice(0, 4).map((u, i) =>
+                `<div class="${urls.length === 3 && i === 0 ? 'row-span-2' : ''} overflow-hidden aspect-square"><img src="${esc(u)}" class="w-full h-full object-cover" alt=""></div>`
               ).join('')}${urls.length > 4 ? `<div class="aspect-square bg-black/50 flex items-center justify-center text-white font-bold text-lg">+${urls.length - 4}</div>` : ''}</div>`;
               mediaClass = '';
             }
-          } else if (item.mediaType === 'text' || urls.length === 0) {
-            // Text-only post — no media section
-            mediaHTML = '';
-            mediaClass = '';
           }
         }
 
@@ -643,8 +691,16 @@
         const isDirectVideo = item.source === 'posts' && item.videoType === 'direct' && item.videoUrl && !item.videoUrl.includes('youtube');
         const isCommunityVideo = item.source === 'community' && item.mediaType === 'video' && item.mediaUrls.length > 0;
 
-        const textContent = item.title || item.body || item.caption || '';
-        const displayText = textContent.length > 200 ? textContent.substring(0, 200) + '...' : textContent;
+        // Build display text — avoid showing title and body if they're the same
+        const title = item.title || '';
+        const body = item.body || item.caption || '';
+        const bodyIsSameAsTitle = title && body && title.trim() === body.trim();
+        const displayBody = bodyIsSameAsTitle ? '' : (body.length > 200 ? body.substring(0, 200) + '...' : body);
+
+        // Follow button (hidden for own posts)
+        const followBtnHTML = !isOwnPost && currentUser
+          ? `<button onclick="toggleFeedFollow('${item.creatorId}', this)" class="feed-follow-btn ${isFollowing ? 'following' : ''}">${isFollowing ? 'Siguiendo' : 'Seguir'}</button>`
+          : '';
 
         card.innerHTML = `
           ${hasMedia ? `<div class="relative feed-media-wrap">
@@ -653,21 +709,24 @@
           </div>` : ''}
 
           <div class="p-4">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-3 min-w-0">
                 <a href="profile.html?u=${esc(profile.username)}" class="flex-shrink-0">${avatarHTML}</a>
                 <div class="min-w-0">
-                  <a href="profile.html?u=${esc(profile.username)}" class="font-bold text-sm text-gray-900 hover:text-creo-mintDark transition block truncate">${esc(profile.display_name || profile.username)}</a>
-                  <span class="text-gray-600 text-xs">@${esc(profile.username)} · ${timeAgo(item.created_at)}</span>
+                  <div class="flex items-center gap-2">
+                    <a href="profile.html?u=${esc(profile.username)}" class="font-bold text-sm text-gray-900 hover:text-creo-mintDark transition truncate">${esc(profile.display_name || profile.username)}</a>
+                    ${followBtnHTML}
+                  </div>
+                  <span class="text-gray-500 text-xs">@${esc(profile.username)} · ${timeAgo(item.created_at)}</span>
                 </div>
               </div>
-              <div class="flex items-center gap-3">
-                <button id="like-${item.id}" onclick="toggleLike('${item.id}')" class="flex items-center gap-1.5 transition group">
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <button id="like-${item.id}" onclick="toggleLike('${item.id}')" class="flex items-center gap-1 transition group">
                   <svg class="w-5 h-5" fill="${isLiked ? '#33f0b0' : 'none'}" stroke="${isLiked ? '#33f0b0' : 'currentColor'}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                   <span id="like-count-${item.id}" class="text-xs font-semibold text-gray-700">${item.likeCount > 0 ? item.likeCount : ''}</span>
                 </button>
 
-                <button onclick="openComments('${item.id}')" class="flex items-center gap-1.5 transition group">
+                <button onclick="openComments('${item.id}')" class="flex items-center gap-1 transition group">
                   <svg class="w-5 h-5 text-gray-600 group-hover:text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                   <span id="comment-count-${item.id}" class="text-xs font-semibold text-gray-500">${item.commentCount > 0 ? item.commentCount : ''}</span>
                 </button>
@@ -677,15 +736,14 @@
                 </button>
 
                 <button onclick="openCreoPopup('${esc(profile.username)}')" class="creo-btn flex-shrink-0">
-                  <div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint hover:bg-creo-mint/30 transition">
-                    <img src="assets/logo-icon.png" class="w-6 h-6 rounded-full object-contain" alt="CREO">
+                  <div class="w-9 h-9 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint hover:bg-creo-mint/30 transition">
+                    <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full object-contain" alt="CREO">
                   </div>
                 </button>
               </div>
             </div>
-            ${item.title ? `<p class="text-sm font-bold text-gray-900 mt-2">${esc(item.title)}</p>` : ''}
-            ${displayText && !item.title ? `<p class="text-sm text-gray-800 leading-relaxed mt-2">${esc(displayText)}</p>` : ''}
-            ${displayText && item.title ? `<p class="text-sm text-gray-700 leading-relaxed mt-1">${esc(displayText)}</p>` : ''}
+            ${title ? `<p class="text-sm font-bold text-gray-900 mt-2">${esc(title)}</p>` : ''}
+            ${displayBody ? `<p class="text-sm text-gray-700 leading-relaxed mt-1">${esc(displayBody)}</p>` : ''}
           </div>
         `;
 
@@ -705,7 +763,6 @@
       }
     }
 
-    // Adapt single image size based on natural dimensions
     function adaptImageSize(img) {
       const wrap = img.closest('.feed-media-wrap');
       if (!wrap) return;
@@ -713,15 +770,10 @@
       const mediaDiv = wrap.querySelector('div');
       if (!mediaDiv) return;
       mediaDiv.classList.remove('feed-media-square', 'feed-media-landscape', 'feed-media-portrait', 'feed-media-reel');
-      if (ratio > 1.4) {
-        mediaDiv.classList.add('feed-media-landscape');
-      } else if (ratio < 0.65) {
-        mediaDiv.classList.add('feed-media-reel');
-      } else if (ratio < 0.85) {
-        mediaDiv.classList.add('feed-media-portrait');
-      } else {
-        mediaDiv.classList.add('feed-media-square');
-      }
+      if (ratio > 1.4) mediaDiv.classList.add('feed-media-landscape');
+      else if (ratio < 0.65) mediaDiv.classList.add('feed-media-reel');
+      else if (ratio < 0.85) mediaDiv.classList.add('feed-media-portrait');
+      else mediaDiv.classList.add('feed-media-square');
     }
 
     function getAutoplayEmbedHTML(url, type) {
@@ -800,58 +852,112 @@
       }
     }
 
-    // ===== CREO SUPPORT POPUP =====
+    // ===== CREO SUPPORT POPUP — linked to profile.html payment flow =====
     async function openCreoPopup(username) {
       const popup = document.getElementById('creo-popup');
       popup.classList.remove('hidden');
       const nav = document.getElementById('bottom-nav');
       if (nav) nav.style.display = 'none';
 
-      // Reset to tip tab
       showCreoTab('tip');
 
-      // Load creator profile
-      const { data: prof } = await sb.from('profiles').select('id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, mecenas_settings').eq('username', username).single();
+      const { data: prof } = await sb.from('profiles').select('id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, identity_verified, mecenas_settings, account_type, email').eq('username', username).single();
       if (!prof) { showToast('Creador no encontrado', 'error'); closeCreoPopup(); return; }
       creoPopupProfile = prof;
 
-      // Set header
+      // Avatar with badge
+      const badgeHTML = getVerifiedBadgeHTML(prof);
       document.getElementById('creo-popup-name').textContent = prof.display_name || prof.username;
       document.getElementById('creo-popup-user').textContent = '@' + prof.username;
-      document.getElementById('creo-popup-avatar').innerHTML = prof.avatar_url
-        ? `<img src="${esc(prof.avatar_url)}" class="w-full h-full object-cover" alt="">`
-        : `<div class="w-full h-full bg-creo-mint/20 flex items-center justify-center"><span class="text-creo-mint font-bold">${esc((prof.display_name || prof.username || '?')[0].toUpperCase())}</span></div>`;
+      document.getElementById('creo-popup-avatar').innerHTML = (prof.avatar_url
+        ? `<img src="${esc(prof.avatar_url)}" class="w-12 h-12 rounded-full object-cover" alt="">`
+        : `<div class="w-12 h-12 rounded-full bg-creo-mint/20 flex items-center justify-center"><span class="text-creo-mint font-bold text-lg">${esc((prof.display_name || prof.username || '?')[0].toUpperCase())}</span></div>`
+      ) + badgeHTML;
 
-      // Apply mecenas settings
+      // Apply mecenas settings — same as profile.html applyMecenasSettings
       const ms = prof.mecenas_settings || {};
-      if (ms.tip?.title) document.getElementById('creo-tab-tip').textContent = ms.tip.title;
-      if (ms.meta?.title) document.getElementById('creo-tab-meta').textContent = ms.meta.title;
-      if (ms.sub?.title) document.getElementById('creo-tab-sub').textContent = ms.sub.title;
+
+      // Tip settings
+      const tip = ms.tip || {};
+      document.getElementById('creo-mec-tip-heading').textContent = tip.title || 'Yo Creo en Ti';
+      document.getElementById('creo-mec-tip-subtext').textContent = tip.description || 'Envía un apoyo único al creador';
+      document.getElementById('creo-tab-tip').textContent = tip.title || 'Yo Creo en Ti';
+      if (tip.button_color) document.getElementById('creo-tip-btn').style.background = tip.button_color;
+      else document.getElementById('creo-tip-btn').style.background = '';
+      if (tip.card_color) document.getElementById('creo-panel-tip').style.background = tip.card_color;
+      else document.getElementById('creo-panel-tip').style.background = '';
+      const tipHero = document.getElementById('creo-mec-tip-hero');
+      if (tip.image_url) {
+        const isVid = /\.(mp4|webm|mov)$/i.test(tip.image_url);
+        tipHero.innerHTML = isVid
+          ? `<video src="${esc(tip.image_url)}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
+          : `<img src="${esc(tip.image_url)}" class="w-full h-40 object-cover rounded-xl" alt="">`;
+        tipHero.classList.remove('hidden');
+      } else { tipHero.classList.add('hidden'); tipHero.innerHTML = ''; }
+
+      // Sub settings
+      const sub = ms.sub || {};
+      document.getElementById('creo-mec-sub-heading').textContent = sub.title || 'Apoyo Full';
+      document.getElementById('creo-mec-sub-subtext').textContent = sub.description || 'Apoya mensualmente con una cantidad que tú elijas';
+      document.getElementById('creo-tab-sub').textContent = sub.title || 'Apoyo Full';
+      if (sub.button_color) document.getElementById('creo-sub-btn').style.background = sub.button_color;
+      else document.getElementById('creo-sub-btn').style.background = '';
+      const subCard = document.querySelector('#creo-panel-sub .glass');
+      if (sub.card_color && subCard) subCard.style.background = sub.card_color;
+      else if (subCard) subCard.style.background = '';
+      const subHero = document.getElementById('creo-mec-sub-hero');
+      if (sub.image_url) {
+        const isVid = /\.(mp4|webm|mov)$/i.test(sub.image_url);
+        subHero.innerHTML = isVid
+          ? `<video src="${esc(sub.image_url)}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
+          : `<img src="${esc(sub.image_url)}" class="w-full h-40 object-cover rounded-xl" alt="">`;
+        subHero.classList.remove('hidden');
+      } else { subHero.classList.add('hidden'); subHero.innerHTML = ''; }
+
+      // Meta settings
+      const meta = ms.meta || {};
+      document.getElementById('creo-mec-meta-heading').textContent = meta.title || 'Mi Meta';
+      document.getElementById('creo-mec-meta-subtext').textContent = meta.description || 'Apoya las metas del creador';
+      document.getElementById('creo-tab-meta').textContent = meta.title || 'Mi Meta';
+      const metaCard = document.querySelector('#creo-panel-meta .glass');
+      if (meta.card_color && metaCard) metaCard.style.background = meta.card_color;
+      else if (metaCard) metaCard.style.background = '';
+      const metaHero = document.getElementById('creo-mec-meta-hero');
+      if (meta.image_url) {
+        const isVid = /\.(mp4|webm|mov)$/i.test(meta.image_url);
+        metaHero.innerHTML = isVid
+          ? `<video src="${esc(meta.image_url)}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
+          : `<img src="${esc(meta.image_url)}" class="w-full h-40 object-cover rounded-xl" alt="">`;
+        metaHero.classList.remove('hidden');
+      } else { metaHero.classList.add('hidden'); metaHero.innerHTML = ''; }
 
       // Disable payments if no stripe
       const isPlatform = prof.id === '67133679-4e5f-49aa-8a22-43af41b917ee';
       if (!prof.stripe_onboarded && !isPlatform) {
         document.getElementById('creo-tip-btn').disabled = true;
-        document.getElementById('creo-tip-btn').textContent = 'Pagos no disponibles';
-        document.getElementById('creo-tip-btn').classList.add('opacity-50');
+        document.getElementById('creo-tip-btn').innerHTML = '<span>Pagos no disponibles</span>';
+        document.getElementById('creo-tip-btn').className = 'w-full bg-gray-300 text-gray-500 font-bold py-3 px-4 rounded-xl cursor-default';
         document.getElementById('creo-sub-btn').disabled = true;
-        document.getElementById('creo-sub-btn').textContent = 'Pagos no disponibles';
-        document.getElementById('creo-sub-btn').classList.add('opacity-50');
+        document.getElementById('creo-sub-btn').innerHTML = '<span>Pagos no disponibles</span>';
+        document.getElementById('creo-sub-btn').className = 'w-full bg-gray-300 text-gray-500 font-bold py-3 px-4 rounded-xl cursor-default';
       } else {
         document.getElementById('creo-tip-btn').disabled = false;
-        document.getElementById('creo-tip-btn').innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Apoyar Creador';
-        document.getElementById('creo-tip-btn').classList.remove('opacity-50');
+        document.getElementById('creo-tip-btn').innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Apoyar Creador</span>';
+        document.getElementById('creo-tip-btn').className = 'w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2';
+        if (tip.button_color) document.getElementById('creo-tip-btn').style.background = tip.button_color;
         document.getElementById('creo-sub-btn').disabled = false;
-        document.getElementById('creo-sub-btn').innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Suscribirme Mensualmente';
-        document.getElementById('creo-sub-btn').classList.remove('opacity-50');
+        document.getElementById('creo-sub-btn').innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Suscribirme Mensualmente</span>';
+        document.getElementById('creo-sub-btn').className = 'w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2';
+        if (sub.button_color) document.getElementById('creo-sub-btn').style.background = sub.button_color;
       }
 
-      // Load metas
+      // Load metas — same rendering as profile.html
       const metasList = document.getElementById('creo-metas-list');
       const metasEmpty = document.getElementById('creo-metas-empty');
-      metasList.innerHTML = '<p class="text-white/40 text-xs text-center py-4">Cargando...</p>';
+      metasList.innerHTML = '<div class="text-center py-6"><div class="inline-block w-5 h-5 border-2 border-creo-mintDark border-t-transparent rounded-full animate-spin"></div></div>';
       metasEmpty.classList.add('hidden');
 
+      const canPay = !!prof.stripe_onboarded || isPlatform;
       const { data: metas } = await sb.from('metas').select('*').eq('creator_id', prof.id).eq('is_active', true).order('created_at', { ascending: false });
 
       if (!metas || metas.length === 0) {
@@ -859,28 +965,39 @@
         metasEmpty.classList.remove('hidden');
       } else {
         metasEmpty.classList.add('hidden');
+        const today = new Date().toISOString().split('T')[0];
         metasList.innerHTML = metas.map(m => {
           const pct = m.goal_amount_cents > 0 ? Math.min(100, Math.round((m.raised_cents / m.goal_amount_cents) * 100)) : 0;
           const raised = (m.raised_cents / 100).toFixed(2);
           const goal = (m.goal_amount_cents / 100).toFixed(2);
-          return `<div class="bg-white/10 rounded-xl p-4 space-y-2">
-            <h4 class="text-white font-bold text-sm">${esc(m.title)}</h4>
-            ${m.description ? `<p class="text-white/50 text-xs leading-relaxed">${esc(m.description.length > 100 ? m.description.substring(0, 100) + '...' : m.description)}</p>` : ''}
-            <div class="flex justify-between text-xs text-white/60">
-              <span>$${raised}</span>
+          const expired = m.end_date < today;
+          const completed = pct >= 100;
+
+          let statusBadge = '';
+          if (completed) statusBadge = '<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">Completada</span>';
+          else if (expired) statusBadge = '<span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-semibold">Expirada</span>';
+
+          return `<div class="glass p-4 rounded-xl space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-sm text-gray-900">${esc(m.title)}</h4>
+              ${statusBadge}
+            </div>
+            ${m.description ? `<p class="text-gray-500 text-xs leading-relaxed">${esc(m.description.length > 120 ? m.description.substring(0, 120) + '...' : m.description)}</p>` : ''}
+            <div class="flex justify-between text-xs text-gray-500">
+              <span class="font-bold text-creo-mintDark">$${raised}</span>
               <span>de $${goal}</span>
             </div>
             <div class="meta-progress-bar"><div class="meta-progress-fill" style="width:${pct}%"></div></div>
-            <span class="text-white/40 text-[10px]">${pct}%</span>
-            <div class="flex items-center gap-2 mt-1">
-              <div class="flex items-center gap-1 flex-1">
-                <span class="text-white/50 text-sm">$</span>
-                <input id="creo-meta-amt-${m.id}" type="number" value="10" min="1" step="0.01" class="flex-1 bg-white/10 border border-white/20 text-white p-2 rounded-lg text-xs outline-none focus:border-creo-mint">
+            <span class="text-gray-400 text-[10px]">${pct}%</span>
+            ${canPay && !expired && !completed ? `<div class="flex items-center gap-2 mt-1">
+              <div class="relative flex-1">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">$</span>
+                <input id="creo-meta-amt-${m.id}" type="number" value="10" min="1" step="0.01" class="w-full pl-7 pr-3 py-2.5 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-sm font-bold outline-none focus:ring-2 focus:ring-creo-purple">
               </div>
-              <button onclick="creoPopupMeta('${m.id}')" class="bg-creo-mint text-creo-purple px-4 py-2 rounded-lg text-xs font-bold hover:opacity-90 transition flex items-center gap-1">
+              <button onclick="creoPopupMeta('${m.id}')" class="bg-creo-purple hover:bg-creo-light text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1"${meta.button_color ? ` style="background:${meta.button_color}"` : ''}>
                 <img src="assets/logo-icon.png" class="w-3.5 h-3.5 rounded-full" alt="">Contribuir
               </button>
-            </div>
+            </div>` : ''}
           </div>`;
         }).join('');
       }
@@ -896,7 +1013,14 @@
     function showCreoTab(tab) {
       ['tip', 'meta', 'sub'].forEach(t => {
         document.getElementById('creo-panel-' + t).classList.toggle('hidden', t !== tab);
-        document.getElementById('creo-tab-' + t).classList.toggle('creo-tab-active', t === tab);
+        const tabBtn = document.getElementById('creo-tab-' + t);
+        if (t === tab) {
+          tabBtn.classList.add('pay-tab-active');
+          tabBtn.classList.remove('text-gray-400');
+        } else {
+          tabBtn.classList.remove('pay-tab-active');
+          tabBtn.classList.add('text-gray-400');
+        }
       });
     }
 
@@ -920,8 +1044,8 @@
         });
         const data = await response.json();
         if (data.url) window.location.href = data.url;
-        else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Apoyar Creador'; btn.disabled = false; }
-      } catch (e) { showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Apoyar Creador'; btn.disabled = false; }
+        else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Apoyar Creador</span>'; btn.disabled = false; }
+      } catch (e) { showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Apoyar Creador</span>'; btn.disabled = false; }
     }
 
     async function creoPopupMeta(metaId) {
@@ -965,8 +1089,8 @@
         });
         const data = await response.json();
         if (data.url) window.location.href = data.url;
-        else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Suscribirme Mensualmente'; btn.disabled = false; }
-      } catch (e) { showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">Suscribirme Mensualmente'; btn.disabled = false; }
+        else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Suscribirme Mensualmente</span>'; btn.disabled = false; }
+      } catch (e) { showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Suscribirme Mensualmente</span>'; btn.disabled = false; }
     }
 
     window.onload = async () => {
