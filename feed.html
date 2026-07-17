@@ -93,16 +93,6 @@
 <body class="bg-gray-50 text-gray-900 min-h-screen">
   <script src="shared.js"></script>
 
-  <!-- Header -->
-  <div id="feed-header" class="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-sm border-b border-gray-200 landscape-hide">
-    <div class="max-w-3xl mx-auto flex items-center justify-between px-4 py-3">
-      <a href="index.html" class="flex items-center gap-2 no-underline">
-        <div class="w-8 h-8 rounded-full bg-creo-purple flex items-center justify-center flex-shrink-0"><img src="assets/logo-icon.png" alt="CREO" class="w-6 h-6 rounded-full object-contain"></div>
-        <h1 class="text-lg font-bold tracking-[0.15em] text-creo-purple">CREADORES</h1>
-      </a>
-    </div>
-  </div>
-
   <!-- Feed Container -->
   <div id="feed-scroll" class="max-w-3xl mx-auto pt-14 pb-20 px-4">
     <div id="feed-content" class="space-y-4"></div>
@@ -264,19 +254,21 @@
 
     function handleOrientation() {
       const isLandscape = window.matchMedia('(orientation: landscape)').matches;
-      const header = document.getElementById('feed-header');
-      const nav = document.getElementById('bottom-nav');
+      const header = document.getElementById('creo-mobile-header');
+      const sidebar = document.getElementById('creo-sidebar');
       const bell = document.getElementById('notif-bell');
       if (isLandscape) {
         if (header) header.classList.add('landscape-hide');
-        if (nav) nav.classList.add('landscape-hide');
+        if (sidebar) sidebar.classList.add('landscape-hide');
         if (bell) bell.classList.add('landscape-hide');
         document.body.style.paddingBottom = '0';
+        document.body.style.paddingTop = '0';
       } else {
         if (header) header.classList.remove('landscape-hide');
-        if (nav) nav.classList.remove('landscape-hide');
+        if (sidebar) sidebar.classList.remove('landscape-hide');
         if (bell) bell.classList.remove('landscape-hide');
         document.body.style.paddingBottom = '4rem';
+        document.body.style.paddingTop = '60px';
       }
     }
     window.matchMedia('(orientation: landscape)').addEventListener('change', handleOrientation);
