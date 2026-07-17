@@ -58,6 +58,13 @@
     }
 
     .animate-slide-up { animation: slide-up 0.3s ease-out; }
+
+    /* Skeleton loading */
+    @keyframes skeleton-pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+    .skeleton { animation: skeleton-pulse 1.5s ease-in-out infinite; background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%); background-size: 200% 100%; border-radius: 0.5rem; }
     .like-bounce { animation: like-pop 0.3s ease-out; }
     @keyframes like-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
@@ -97,10 +104,51 @@
   <div id="feed-scroll" class="max-w-3xl mx-auto pt-14 pb-20 px-4">
     <div id="feed-content" class="space-y-4"></div>
 
-    <!-- Loading -->
-    <div id="feed-loading" class="text-center py-12">
-      <div class="inline-block w-8 h-8 border-2 border-creo-mint border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-gray-400 text-sm mt-3">Cargando creadores...</p>
+    <!-- Skeleton Loading -->
+    <div id="feed-loading" class="space-y-4">
+      <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="skeleton w-10 h-10 rounded-full"></div>
+          <div class="flex-1">
+            <div class="skeleton h-3.5 w-28 mb-1.5"></div>
+            <div class="skeleton h-2.5 w-16"></div>
+          </div>
+          <div class="skeleton h-6 w-16 rounded-full"></div>
+        </div>
+        <div class="skeleton w-full aspect-video rounded-xl mb-3"></div>
+        <div class="skeleton h-3 w-3/4 mb-2"></div>
+        <div class="skeleton h-3 w-1/2"></div>
+        <div class="flex gap-4 mt-3">
+          <div class="skeleton h-4 w-12"></div>
+          <div class="skeleton h-4 w-12"></div>
+          <div class="skeleton h-4 w-12"></div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="skeleton w-10 h-10 rounded-full"></div>
+          <div class="flex-1">
+            <div class="skeleton h-3.5 w-20 mb-1.5"></div>
+            <div class="skeleton h-2.5 w-12"></div>
+          </div>
+        </div>
+        <div class="skeleton w-full aspect-square rounded-xl mb-3"></div>
+        <div class="skeleton h-3 w-2/3"></div>
+        <div class="flex gap-4 mt-3">
+          <div class="skeleton h-4 w-12"></div>
+          <div class="skeleton h-4 w-12"></div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="skeleton w-10 h-10 rounded-full"></div>
+          <div class="flex-1">
+            <div class="skeleton h-3.5 w-24 mb-1.5"></div>
+            <div class="skeleton h-2.5 w-14"></div>
+          </div>
+        </div>
+        <div class="skeleton w-full aspect-video rounded-xl"></div>
+      </div>
     </div>
 
     <!-- Empty State -->
@@ -308,25 +356,43 @@
       if (!currentUser) { showToast('Inicia sesión para dar like', 'error'); return; }
       const btn = document.getElementById('like-' + postId);
       const countEl = document.getElementById('like-count-' + postId);
+      const svg = btn.querySelector('svg');
       btn.classList.add('like-bounce');
       setTimeout(() => btn.classList.remove('like-bounce'), 300);
 
-      const { data, error } = await sb.rpc('toggle_post_like', { p_post_id: postId });
-      if (error) { showToast('Error', 'error'); return; }
+      // Optimistic UI: update immediately, rollback on failure
+      const wasLiked = userLikes.has(postId);
+      const prevCount = parseInt(countEl.textContent) || 0;
 
-      if (data.liked) {
+      if (wasLiked) {
+        userLikes.delete(postId);
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        countEl.textContent = prevCount > 1 ? prevCount - 1 : '';
+      } else {
         userLikes.add(postId);
-        btn.querySelector('svg').setAttribute('fill', '#33f0b0');
-        btn.querySelector('svg').setAttribute('stroke', '#33f0b0');
+        svg.setAttribute('fill', '#33f0b0');
+        svg.setAttribute('stroke', '#33f0b0');
+        countEl.textContent = prevCount + 1;
+      }
+
+      const { data, error } = await sb.rpc('toggle_post_like', { p_post_id: postId });
+      if (error) {
+        // Rollback
+        if (wasLiked) { userLikes.add(postId); svg.setAttribute('fill', '#33f0b0'); svg.setAttribute('stroke', '#33f0b0'); }
+        else { userLikes.delete(postId); svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor'); }
+        countEl.textContent = prevCount > 0 ? prevCount : '';
+        showToast('Error', 'error');
+        return;
+      }
+
+      // Sync with server count
+      countEl.textContent = data.count > 0 ? data.count : '';
+      if (data.liked) {
         const card = btn.closest('.feed-card');
         const postCreatorId = card?.dataset?.creatorId;
         if (postCreatorId) createNotification(postCreatorId, 'like', 'A alguien le gustó tu publicación', null, 'feed.html');
-      } else {
-        userLikes.delete(postId);
-        btn.querySelector('svg').setAttribute('fill', 'none');
-        btn.querySelector('svg').setAttribute('stroke', 'currentColor');
       }
-      countEl.textContent = data.count > 0 ? data.count : '';
     }
 
     // ===== COMMENTS =====

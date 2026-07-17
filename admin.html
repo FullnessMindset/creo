@@ -169,6 +169,7 @@
         <button onclick="showTab('manipulation')" id="tab-manipulation" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition relative">Anti-Abuse<span id="badge-manipulation" class="hidden absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
         <button onclick="showTab('fairness')" id="tab-fairness" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Fairness</button>
         <button onclick="showTab('featureflags')" id="tab-featureflags" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Feature Flags</button>
+        <button onclick="showTab('monitoring')" id="tab-monitoring" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition">Monitoring</button>
         <button onclick="showTab('stripe')" id="tab-stripe" class="tab-btn px-5 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
           Stripe
@@ -621,6 +622,31 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- ═══ MONITORING ═══ -->
+      <div id="panel-monitoring" class="hidden fade-in space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-gray-900">System Monitoring</h2>
+          <button onclick="loadMonitoring()" class="text-xs text-creo-purple font-semibold hover:underline">Refresh</button>
+        </div>
+
+        <!-- Health Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="health-cards"></div>
+
+        <!-- Feed Latency -->
+        <div class="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
+          <h3 class="font-semibold text-gray-900">Feed Latency (last hour)</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="latency-cards"></div>
+        </div>
+
+        <!-- Creator Coverage -->
+        <div class="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
+          <h3 class="font-semibold text-gray-900">Creator Coverage</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="coverage-cards"></div>
+        </div>
+
+        <div id="monitoring-empty" class="p-8 text-center text-gray-400 text-sm hidden">Loading monitoring data...</div>
       </div>
 
       <div id="panel-stripe" class="hidden fade-in space-y-6">
@@ -1381,7 +1407,7 @@
       const active = document.getElementById('tab-' + tab);
       active.classList.add('bg-creo-purple', 'text-white');
       active.classList.remove('text-gray-500');
-      ['verification', 'creators', 'transactions', 'accounts', 'links', 'allusers', 'metareviews', 'dealpayouts', 'reports', 'announcements', 'stripe', 'moderation', 'manipulation', 'fairness', 'featureflags'].forEach(p => {
+      ['verification', 'creators', 'transactions', 'accounts', 'links', 'allusers', 'metareviews', 'dealpayouts', 'reports', 'announcements', 'stripe', 'moderation', 'manipulation', 'fairness', 'featureflags', 'monitoring'].forEach(p => {
         const el = document.getElementById('panel-' + p);
         if (el) el.classList.toggle('hidden', p !== tab);
       });
@@ -1394,6 +1420,7 @@
       if (tab === 'manipulation' && !manipulationLoaded) loadManipulationAlerts();
       if (tab === 'fairness' && !fairnessLoaded) loadFairnessMetrics();
       if (tab === 'featureflags' && !featureFlagsLoaded) loadFeatureFlags();
+      if (tab === 'monitoring' && !monitoringLoaded) loadMonitoring();
     }
 
     // ===== DEAL PAYOUTS TAB =====
@@ -2835,7 +2862,65 @@
     }
 
     // ═══════════════════════════════════════════════════
-    // END PART 3 TABS
+    // MONITORING TAB (Part 4)
+    // ═══════════════════════════════════════════════════
+    let monitoringLoaded = false;
+
+    async function loadMonitoring() {
+      monitoringLoaded = true;
+      const [healthRes, latencyRes] = await Promise.all([
+        apiCall('system-health'),
+        apiCall('feed-latency-history')
+      ]);
+
+      const h = healthRes.health || {};
+      const healthCards = document.getElementById('health-cards');
+      healthCards.innerHTML = [
+        { label: 'Moderation Queue', value: h.moderation_queue_depth || 0, color: (h.moderation_queue_depth || 0) > 10 ? 'red' : 'green' },
+        { label: 'Escalated', value: h.escalated_count || 0, color: (h.escalated_count || 0) > 0 ? 'red' : 'green' },
+        { label: 'Abuse Alerts (24h)', value: h.manipulation_alerts_24h || 0, color: (h.manipulation_alerts_24h || 0) > 20 ? 'orange' : 'green' },
+        { label: 'High Conf Alerts', value: h.high_confidence_alerts_24h || 0, color: (h.high_confidence_alerts_24h || 0) > 5 ? 'red' : 'green' },
+        { label: 'Avg Feed Latency', value: Math.round(h.avg_feed_latency_1h || 0) + 'ms', color: (h.avg_feed_latency_1h || 0) > 200 ? 'red' : 'green' },
+        { label: 'Max Feed Latency', value: Math.round(h.max_feed_latency_1h || 0) + 'ms', color: (h.max_feed_latency_1h || 0) > 500 ? 'red' : 'yellow' },
+        { label: 'Impressions Today', value: Number(h.total_impressions_today || 0).toLocaleString(), color: 'blue' },
+        { label: 'Scored Posts', value: h.total_scored_posts || 0, color: 'blue' },
+      ].map(c => `
+        <div class="bg-${c.color}-50 border border-${c.color}-200 rounded-xl p-4 text-center">
+          <p class="text-xl font-bold text-${c.color}-700">${c.value}</p>
+          <p class="text-[10px] text-${c.color}-600 uppercase tracking-wider mt-1">${c.label}</p>
+        </div>
+      `).join('');
+
+      const s = latencyRes.summary || {};
+      const latencyCards = document.getElementById('latency-cards');
+      const p95Color = (s.p95 || 0) > 200 ? 'red' : 'green';
+      latencyCards.innerHTML = [
+        { label: 'Avg', value: (s.avg || 0) + 'ms' },
+        { label: 'P50', value: (s.p50 || 0) + 'ms' },
+        { label: 'P95', value: (s.p95 || 0) + 'ms', color: p95Color },
+        { label: 'P99', value: (s.p99 || 0) + 'ms' },
+      ].map(c => `
+        <div class="bg-${c.color || 'gray'}-50 border border-${c.color || 'gray'}-200 rounded-xl p-3 text-center">
+          <p class="text-lg font-bold text-gray-900">${c.value}</p>
+          <p class="text-[10px] text-gray-500 uppercase">${c.label}</p>
+        </div>
+      `).join('');
+
+      const coverageCards = document.getElementById('coverage-cards');
+      coverageCards.innerHTML = [
+        { label: 'Total Creators', value: h.total_creators || 0 },
+        { label: 'Small Creators (<1k)', value: h.small_creators || 0 },
+        { label: 'Scored Creators', value: h.scored_creators || 0 },
+      ].map(c => `
+        <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
+          <p class="text-xl font-bold text-creo-purple">${c.value}</p>
+          <p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">${c.label}</p>
+        </div>
+      `).join('');
+    }
+
+    // ═══════════════════════════════════════════════════
+    // END PART 3/4 TABS
     // ═══════════════════════════════════════════════════
 
     async function loadMetaReviews() {
