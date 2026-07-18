@@ -611,19 +611,7 @@
       if (e.key === 'Enter') submitComment();
     });
 
-    // ===== VIDEO OBSERVER =====
-    const videoObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const video = entry.target;
-        if (entry.isIntersecting) {
-          video.muted = false;
-          video.play().catch(() => { video.muted = true; video.play().catch(() => {}); });
-        } else {
-          video.pause();
-          video.muted = true;
-        }
-      });
-    }, { threshold: 0.5 });
+    // Video observer moved to enhanced feedVideoObserver below
 
     // ===== BADGE HELPERS =====
     function isVerified(profile) {
@@ -900,7 +888,7 @@
         container.appendChild(card);
 
         const video = card.querySelector('video.feed-video');
-        if (video) videoObserver.observe(video);
+        if (video) { allFeedVideos.add(video); feedVideoObserver.observe(video); }
       });
 
       // Preload next batch media
@@ -1321,6 +1309,98 @@
         else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Suscribirme Mensualmente</span>'; btn.disabled = false; }
       } catch (e) { showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Suscribirme Mensualmente</span>'; btn.disabled = false; }
     }
+
+    // ===== KEYBOARD SHORTCUTS (desktop) =====
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      const popup = document.getElementById('creo-popup');
+      const drawer = document.getElementById('comments-drawer');
+      if (popup && !popup.classList.contains('hidden')) {
+        if (e.key === 'Escape') closeCreoPopup();
+        return;
+      }
+      if (drawer && !drawer.classList.contains('hidden')) {
+        if (e.key === 'Escape') closeComments();
+        return;
+      }
+      const cards = Array.from(document.querySelectorAll('.feed-card'));
+      if (!cards.length) return;
+      const isLandscape = window.matchMedia('(orientation: landscape)').matches;
+
+      if (e.key === 'ArrowDown' || e.key === 'j') {
+        e.preventDefault();
+        scrollToAdjacentCard(cards, 1, isLandscape);
+      } else if (e.key === 'ArrowUp' || e.key === 'k') {
+        e.preventDefault();
+        scrollToAdjacentCard(cards, -1, isLandscape);
+      } else if (e.key === 'ArrowRight' && isLandscape) {
+        e.preventDefault();
+        scrollToAdjacentCard(cards, 1, true);
+      } else if (e.key === 'ArrowLeft' && isLandscape) {
+        e.preventDefault();
+        scrollToAdjacentCard(cards, -1, true);
+      } else if (e.key === 'l') {
+        const card = getVisibleCard(cards, isLandscape);
+        if (card) { const id = card.querySelector('[id^="like-"]')?.id?.replace('like-',''); if (id) toggleLike(id); }
+      } else if (e.key === 'c') {
+        const card = getVisibleCard(cards, isLandscape);
+        if (card) { const btn = card.querySelector('[onclick^="openComments"]'); if (btn) btn.click(); }
+      } else if (e.key === 'm') {
+        const card = getVisibleCard(cards, isLandscape);
+        const video = card?.querySelector('video');
+        if (video) video.muted = !video.muted;
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        const card = getVisibleCard(cards, isLandscape);
+        const video = card?.querySelector('video');
+        if (video) { video.paused ? video.play() : video.pause(); }
+      } else if (e.key === 'f') {
+        const card = getVisibleCard(cards, isLandscape);
+        const video = card?.querySelector('video');
+        if (video) { document.fullscreenElement ? document.exitFullscreen() : video.requestFullscreen?.(); }
+      }
+    });
+
+    function getVisibleCard(cards, isLandscape) {
+      const feed = document.getElementById('feed-scroll');
+      for (const card of cards) {
+        const rect = card.getBoundingClientRect();
+        if (isLandscape) {
+          const feedRect = feed.getBoundingClientRect();
+          if (rect.left >= feedRect.left - 50 && rect.left < feedRect.right - 100) return card;
+        } else {
+          if (rect.top >= -100 && rect.top < window.innerHeight / 2) return card;
+        }
+      }
+      return cards[0];
+    }
+
+    function scrollToAdjacentCard(cards, direction, isLandscape) {
+      const current = getVisibleCard(cards, isLandscape);
+      if (!current) return;
+      const idx = cards.indexOf(current);
+      const next = cards[idx + direction];
+      if (!next) return;
+      if (isLandscape) {
+        next.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      } else {
+        next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // ===== ENHANCED VIDEO OBSERVER — pause offscreen, resume visible =====
+    const allFeedVideos = new Set();
+    const feedVideoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          allFeedVideos.forEach(v => { if (v !== video) { v.pause(); v.muted = true; } });
+          video.play().catch(() => { video.muted = true; video.play().catch(() => {}); });
+        } else {
+          video.pause();
+        }
+      });
+    }, { threshold: [0, 0.5, 1] });
 
     window.onload = async () => {
       await initAuth();
