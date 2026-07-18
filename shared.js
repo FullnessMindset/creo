@@ -1891,16 +1891,35 @@ function renderSidebar(activePage) {
     </div>`;
   document.body.appendChild(mobileMenu);
 
-  // Adjust body padding and make modals respect sidebar on desktop
-  document.body.style.paddingTop = '60px';
-  document.body.classList.add('lg:pl-[220px]');
+  // Global safe-area layout system via CSS variables
   const style = document.createElement('style');
+  style.id = 'creo-layout-vars';
   style.textContent = `
+    :root {
+      --creo-header-h: 57px;
+      --creo-sidebar-w: 220px;
+      --creo-nav-top: var(--creo-header-h);
+      --creo-nav-left: 0px;
+      --creo-content-top: var(--creo-header-h);
+      --creo-content-left: 0px;
+    }
     @media(min-width:1024px){
-      body{padding-top:0!important;}
-      .fixed.inset-0:not(#creo-sidebar):not(#creo-mobile-menu):not(#creo-mobile-header){left:220px!important;}
-    }`;
+      :root {
+        --creo-header-h: 0px;
+        --creo-nav-top: 0px;
+        --creo-nav-left: var(--creo-sidebar-w);
+        --creo-content-top: 0px;
+        --creo-content-left: var(--creo-sidebar-w);
+      }
+      body { padding-top: 0 !important; padding-left: var(--creo-sidebar-w) !important; }
+      .fixed.inset-0:not(#creo-sidebar):not(#creo-mobile-menu):not(#creo-mobile-header) { left: var(--creo-sidebar-w) !important; }
+    }
+    @media(max-width:1023px){
+      body { padding-top: var(--creo-header-h) !important; }
+    }
+  `;
   document.head.appendChild(style);
+  document.body.classList.add('lg:pl-[220px]');
 
   updateSidebarAuth();
 }

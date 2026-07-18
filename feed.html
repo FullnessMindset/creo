@@ -39,7 +39,7 @@
       body { overflow: hidden; }
       #feed-scroll {
         scroll-snap-type: x mandatory; overflow-x: auto; overflow-y: hidden;
-        height: calc(100vh - 3.5rem); max-width: none; padding: 0 2rem;
+        height: 100vh; max-width: none; padding: 0 2rem;
         display: flex; flex-direction: row; align-items: center; scrollbar-width: none;
       }
       #feed-scroll::-webkit-scrollbar { display: none; }
@@ -96,7 +96,7 @@
   <script src="shared.js"></script>
 
   <!-- Feed Container -->
-  <div id="feed-scroll" class="max-w-3xl mx-auto pt-14 pb-20 px-4">
+  <div id="feed-scroll" class="max-w-3xl mx-auto pb-20 px-4" style="padding-top:var(--creo-content-top, 57px)">
     <div id="feed-content" class="space-y-4"></div>
 
     <!-- Skeleton Loading -->
@@ -305,13 +305,15 @@
         if (sidebar) sidebar.classList.add('landscape-hide');
         if (bell) bell.classList.add('landscape-hide');
         document.body.style.paddingBottom = '0';
-        document.body.style.paddingTop = '0';
+        document.documentElement.style.setProperty('--creo-header-h', '0px');
+        document.documentElement.style.setProperty('--creo-content-top', '0px');
       } else {
         if (header) header.classList.remove('landscape-hide');
         if (sidebar) sidebar.classList.remove('landscape-hide');
         if (bell) bell.classList.remove('landscape-hide');
         document.body.style.paddingBottom = '4rem';
-        document.body.style.paddingTop = '60px';
+        document.documentElement.style.removeProperty('--creo-header-h');
+        document.documentElement.style.removeProperty('--creo-content-top');
       }
     }
     window.matchMedia('(orientation: landscape)').addEventListener('change', handleOrientation);
