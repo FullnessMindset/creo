@@ -2,1090 +2,893 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>CREO — Creadores</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="description" content="CREO — Descubre y apoya a tus creadores favoritos con tips, metas y suscripciones">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="CREO — Descubre y apoya a tus creadores favoritos">
   <meta property="og:title" content="CREO — Creadores">
-  <meta property="og:description" content="Descubre y apoya a tus creadores favoritos con tips, metas y suscripciones">
+  <meta property="og:description" content="Descubre y apoya a tus creadores favoritos">
   <meta property="og:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
-  <meta property="og:url" content="https://fullnessmindset.github.io/creo/feed.html">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary">
   <link rel="icon" href="assets/logo-icon.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/logo-icon.png">
   <link rel="stylesheet" href="tailwind.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    body { overscroll-behavior: contain; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overscroll-behavior: none; }
     input, select, textarea { font-size: max(16px, 1em) !important; }
+
+    /* ===== FULLSCREEN VIDEO GRID ===== */
+    #creo-stage { position: fixed; inset: 0; z-index: 1; }
+    #creo-video-wrap { position: absolute; inset: 0; transition: all 0.35s cubic-bezier(0.4,0,0.2,1); }
+    #creo-video-wrap video { width: 100%; height: 100%; object-fit: cover; }
+    #creo-video-wrap.split { top: 0; left: 0; width: 50%; height: 50%; border-radius: 0 0 12px 0; }
+
+    /* ===== OVERLAY UI ===== */
+    #creo-ui { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
+    #creo-ui > * { pointer-events: auto; }
+
+    /* Right action column */
+    .creo-actions { position: absolute; right: 16px; bottom: 80px; display: flex; flex-direction: column; align-items: center; gap: 20px; z-index: 15; }
+    .creo-actions.split-mode { right: 8px; bottom: 40px; gap: 12px; }
+    .creo-act-btn { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); color: #fff; border: none; cursor: pointer; transition: all 0.2s; }
+    .creo-act-btn:active { transform: scale(0.9); }
+    .creo-act-btn.creo-tip { width: 56px; height: 56px; background: rgba(51,240,176,0.2); border: 2px solid #33f0b0; }
+    .creo-act-count { font-size: 11px; color: #fff; text-align: center; margin-top: -4px; text-shadow: 0 1px 4px rgba(0,0,0,0.7); font-weight: 700; }
+
+    /* Share popup */
+    .creo-share-popup { position: absolute; right: 64px; top: 0; background: rgba(26,10,62,0.95); backdrop-filter: blur(12px); border-radius: 12px; padding: 6px; min-width: 180px; z-index: 30; display: none; }
+    .creo-share-popup.open { display: block; animation: fadeSlideIn 0.2s ease-out; }
+    .creo-share-item { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 8px; color: #fff; font-size: 13px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s; }
+    .creo-share-item:hover { background: rgba(255,255,255,0.1); }
+
+    /* Bottom-left creator info */
+    .creo-creator-info { position: absolute; left: 16px; bottom: 80px; display: flex; align-items: flex-end; gap: 10px; z-index: 12; max-width: 50%; }
+    .creo-creator-info.split-mode { left: 8px; bottom: 40px; }
+    .creo-creator-avatar { position: relative; flex-shrink: 0; }
+    .creo-creator-avatar img, .creo-creator-avatar .av-placeholder { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #33f0b0; }
+    .creo-creator-avatar .av-placeholder { display: flex; align-items: center; justify-content: center; background: rgba(51,240,176,0.2); }
+    .creo-badge { position: absolute; bottom: -2px; right: -2px; }
+
+    /* Top-left recommended profiles */
+    .creo-recommended { position: absolute; top: 16px; left: 16px; display: flex; gap: -8px; z-index: 12; }
+    .creo-rec-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(51,240,176,0.5); cursor: pointer; object-fit: cover; margin-left: -8px; transition: transform 0.2s, box-shadow 0.2s; }
+    .creo-rec-avatar:first-child { margin-left: 0; }
+    .creo-rec-avatar:hover { transform: scale(1.15); box-shadow: 0 0 12px rgba(51,240,176,0.4); z-index: 5; }
+    .creo-rec-placeholder { width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(51,240,176,0.5); margin-left: -8px; display: flex; align-items: center; justify-content: center; background: rgba(51,240,176,0.15); font-size: 11px; font-weight: 700; color: #33f0b0; cursor: pointer; transition: transform 0.2s; }
+    .creo-rec-placeholder:first-child { margin-left: 0; }
+    .creo-rec-placeholder:hover { transform: scale(1.15); }
+
+    /* Top-right share button */
+    .creo-top-share { position: absolute; top: 16px; right: 16px; z-index: 12; }
+
+    /* Video controls bar */
+    .creo-controls { position: absolute; bottom: 0; left: 0; right: 0; z-index: 14; background: linear-gradient(transparent, rgba(0,0,0,0.7)); padding: 30px 16px 16px; display: flex; flex-direction: column; gap: 6px; opacity: 0; transition: opacity 0.3s; }
+    #creo-stage:hover .creo-controls, .creo-controls.visible { opacity: 1; }
+    .creo-seek { width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.2); cursor: pointer; appearance: none; -webkit-appearance: none; outline: none; }
+    .creo-seek::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #33f0b0; cursor: pointer; margin-top: -5px; }
+    .creo-seek::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #33f0b0; border: none; cursor: pointer; }
+    .creo-ctrl-row { display: flex; align-items: center; gap: 12px; }
+    .creo-ctrl-btn { background: none; border: none; color: rgba(255,255,255,0.8); cursor: pointer; display: flex; align-items: center; transition: color 0.15s; padding: 0; }
+    .creo-ctrl-btn:hover { color: #33f0b0; }
+    .creo-time { font-size: 11px; color: rgba(255,255,255,0.6); font-variant-numeric: tabular-nums; }
+
+    /* ===== SPLIT PANEL (comments / tip) ===== */
+    #creo-panel { position: fixed; top: 0; right: 0; width: 50%; height: 50%; z-index: 20; background: #fff; color: #1a1a2e; display: none; overflow: hidden; border-radius: 0 0 0 12px; }
+    #creo-panel.active { display: flex; flex-direction: column; animation: fadeSlideIn 0.3s ease-out; }
+    #creo-panel.fullscreen { width: 100%; height: 100%; border-radius: 0; }
+
+    /* Comment cards — tweet style, horizontal scroll */
+    .creo-comments-scroll { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding: 12px; flex: 1; scrollbar-width: none; }
+    .creo-comments-scroll::-webkit-scrollbar { display: none; }
+    .creo-comment-card { flex: 0 0 280px; scroll-snap-align: start; background: #f8f9fa; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px; border: 1px solid #e5e7eb; min-height: 120px; }
+    .creo-comment-card.own { border: 2px solid #33f0b0; box-shadow: 0 0 12px rgba(51,240,176,0.15); }
+    .creo-comment-card .cc-header { display: flex; align-items: center; gap: 8px; }
+    .creo-comment-card .cc-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+    .creo-comment-card .cc-name { font-weight: 700; font-size: 12px; color: #1a0a3e; }
+    .creo-comment-card .cc-time { font-size: 10px; color: #9ca3af; }
+    .creo-comment-card .cc-body { font-size: 13px; line-height: 1.5; color: #374151; flex: 1; }
+    .creo-comment-card .cc-actions { display: flex; gap: 16px; font-size: 11px; color: #9ca3af; }
+    .creo-comment-card .cc-actions button { background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: color 0.15s; }
+    .creo-comment-card .cc-actions button:hover { color: #1a0a3e; }
+
+    /* Tip panel content */
+    .creo-tip-panel { padding: 20px; overflow-y: auto; flex: 1; }
+
+    /* ===== INFO CARD ===== */
+    .creo-info-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; background: rgba(26,10,62,0.95); backdrop-filter: blur(20px); border-radius: 20px; padding: 32px; max-width: 400px; width: 90%; text-align: center; border: 1px solid rgba(51,240,176,0.3); }
+    .creo-info-card h2 { font-size: 20px; font-weight: 800; color: #33f0b0; margin-bottom: 12px; }
+    .creo-info-card p { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.6; }
+    .creo-info-card button { margin-top: 20px; background: #33f0b0; color: #1a0a3e; border: none; padding: 12px 32px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 0.2s; }
+    .creo-info-card button:hover { transform: scale(1.05); }
+
+    /* Double-tap like animation */
+    @keyframes doubleTapHeart { 0% { transform: translate(-50%,-50%) scale(0); opacity: 1; } 50% { transform: translate(-50%,-50%) scale(1.2); opacity: 1; } 100% { transform: translate(-50%,-50%) scale(1.5); opacity: 0; } }
+    .double-tap-heart { position: absolute; top: 50%; left: 50%; width: 80px; height: 80px; pointer-events: none; z-index: 50; animation: doubleTapHeart 0.8s ease-out forwards; }
+
+    @keyframes fadeSlideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
     .glass { background: rgba(255,255,255,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.4); }
-    .glass-dark { background: rgba(26,10,62,0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-    @keyframes slide-up { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    .float-anim { animation: float 3s ease-in-out infinite; }
-    .creo-btn { animation: pulse-creo 2s ease-in-out infinite; }
-    @keyframes pulse-creo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-
-    /* Portrait: vertical scroll */
-    @media (orientation: portrait) {
-      #feed-scroll { scroll-snap-type: y proximity; overflow-y: auto; overflow-x: hidden; }
-      .feed-card { scroll-snap-align: start; margin-bottom: 1rem; }
-    }
-
-    /* Landscape / Desktop: horizontal scroll */
-    @media (orientation: landscape) {
-      body { overflow: hidden; }
-      #feed-scroll {
-        scroll-snap-type: x mandatory; overflow-x: auto; overflow-y: hidden;
-        height: 100vh; max-width: none; padding: 0 2rem;
-        display: flex; flex-direction: row; align-items: center; scrollbar-width: none;
-      }
-      #feed-scroll::-webkit-scrollbar { display: none; }
-      #feed-scroll #feed-content { display: flex; flex-direction: row; gap: 1.5rem; height: 100%; align-items: center; }
-      #feed-scroll #feed-content > * { margin-top: 0 !important; }
-      .feed-card { scroll-snap-align: center; min-width: 70vw; max-width: 80vw; flex-shrink: 0; }
-      .feed-card .feed-media-wrap { max-height: 75vh; }
-      .feed-card video, .feed-card iframe { max-height: 70vh !important; }
-      .landscape-hide { display: none !important; }
-      #feed-loading, #feed-empty, #load-more { min-width: 70vw; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    }
-
-    .animate-slide-up { animation: slide-up 0.3s ease-out; }
-
-    /* Overlay drag handle for mobile */
-    .overlay-drag-handle { width: 36px; height: 4px; border-radius: 2px; background: rgba(0,0,0,0.15); margin: 8px auto 4px; flex-shrink: 0; }
-    @media(min-width:1024px) { .overlay-drag-handle { display: none; } }
-
-    /* Skeleton loading */
-    @keyframes skeleton-pulse {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 0.8; }
-    }
-    .skeleton { animation: skeleton-pulse 1.5s ease-in-out infinite; background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%); background-size: 200% 100%; border-radius: 0.5rem; }
-    .like-bounce { animation: like-pop 0.3s ease-out; }
-    @keyframes like-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
-
-    /* Comment card interactive states */
-    .comment-card { transition: background 0.15s; border-radius: 0.5rem; padding: 6px 8px; margin: -6px -8px; }
-    .comment-card:hover { background: rgba(0,0,0,0.03); }
-    .comment-card .comment-actions { opacity: 0; transition: opacity 0.15s; }
-    .comment-card:hover .comment-actions { opacity: 1; }
-    @media(max-width:1023px) { .comment-card .comment-actions { opacity: 1; } }
-
-    /* Comment heart animation */
-    @keyframes heart-burst { 0% { transform: scale(1); } 30% { transform: scale(1.4); } 60% { transform: scale(0.9); } 100% { transform: scale(1); } }
-    .heart-burst { animation: heart-burst 0.4s ease-out; }
-
-    /* Desktop comments: full-height side panel */
-    @media(min-width:1024px) {
-      #comments-drawer .animate-slide-up { animation: none; }
-    }
-
-    /* Floating action buttons on video cards */
-    .feed-floating-actions {
-      position: absolute; right: 10px; bottom: 14px; z-index: 10;
-      display: flex; flex-direction: column; align-items: center; gap: 14px;
-    }
-    .feed-fab {
-      width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.45); backdrop-filter: blur(8px); color: #fff; border: none; cursor: pointer;
-      transition: transform 0.15s, background 0.15s; position: relative;
-    }
-    .feed-fab:active { transform: scale(0.9); }
-    .feed-fab-count { font-size: 10px; color: #fff; text-align: center; margin-top: -6px; text-shadow: 0 1px 3px rgba(0,0,0,0.6); font-weight: 600; }
-
-    /* Share menu */
-    .share-menu { position: absolute; right: 48px; bottom: 0; background: rgba(26,10,62,0.95); backdrop-filter: blur(12px); border-radius: 12px; padding: 6px; min-width: 160px; z-index: 20; display: none; }
-    .share-menu.open { display: block; animation: slide-up 0.2s ease-out; }
-    .share-menu-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; color: #fff; font-size: 13px; cursor: pointer; transition: background 0.15s; white-space: nowrap; border: none; background: none; width: 100%; text-align: left; }
-    .share-menu-item:hover { background: rgba(255,255,255,0.1); }
-
-    /* Custom video controls */
-    .feed-video-controls {
-      position: absolute; bottom: 0; left: 0; right: 0; z-index: 8;
-      background: linear-gradient(transparent, rgba(0,0,0,0.6));
-      padding: 24px 12px 8px; display: flex; flex-direction: column; gap: 4px;
-      opacity: 0; transition: opacity 0.25s; pointer-events: none;
-    }
-    .feed-media-wrap:hover .feed-video-controls,
-    .feed-video-controls.visible { opacity: 1; pointer-events: auto; }
-    .feed-seek-bar { width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.25); cursor: pointer; appearance: none; -webkit-appearance: none; outline: none; }
-    .feed-seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #33f0b0; cursor: pointer; margin-top: -4px; }
-    .feed-seek-bar::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #33f0b0; cursor: pointer; border: none; }
-    .feed-seek-bar::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; }
-    .feed-seek-bar::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.25); }
-    .feed-vc-row { display: flex; align-items: center; gap: 8px; }
-    .feed-vc-btn { background: none; border: none; color: rgba(255,255,255,0.8); cursor: pointer; padding: 2px; transition: color 0.15s; display: flex; align-items: center; }
-    .feed-vc-btn:hover { color: #33f0b0; }
-    .feed-vc-time { font-size: 10px; color: rgba(255,255,255,0.7); font-variant-numeric: tabular-nums; min-width: 60px; }
-    .feed-speed-menu { position: absolute; bottom: 32px; right: 8px; background: rgba(0,0,0,0.85); border-radius: 8px; padding: 4px; display: none; z-index: 25; }
-    .feed-speed-menu.open { display: block; }
-    .feed-speed-opt { display: block; padding: 4px 12px; color: #fff; font-size: 11px; cursor: pointer; border-radius: 4px; border: none; background: none; width: 100%; text-align: left; }
-    .feed-speed-opt:hover, .feed-speed-opt.active { background: rgba(51,240,176,0.2); color: #33f0b0; }
-
-    /* Adaptive media sizing */
-    .feed-media-reel { aspect-ratio: 9/16; max-height: 70vh; }
-    .feed-media-square { aspect-ratio: 1/1; }
-    .feed-media-landscape { aspect-ratio: 16/9; }
-    .feed-media-portrait { aspect-ratio: 3/4; max-height: 65vh; }
-
-    /* Suggested creator bubble */
-    .suggested-bubble { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 72px; cursor: pointer; text-decoration: none; }
-    .suggested-bubble .sb-avatar { width: 56px; height: 56px; border-radius: 50%; border: 2px solid #33f0b0; padding: 2px; transition: transform 0.2s, box-shadow 0.2s; }
-    .suggested-bubble .sb-avatar img, .suggested-bubble .sb-avatar div { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-    .suggested-bubble:hover .sb-avatar { transform: scale(1.08); box-shadow: 0 4px 16px rgba(51,240,176,0.3); }
-    .suggested-bubble .sb-name { font-size: 10px; font-weight: 600; color: #374151; text-align: center; max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .suggested-bubble .sb-badge { position: absolute; bottom: 0; right: 0; }
-
-    /* Follow button */
-    .feed-follow-btn { font-size: 11px; padding: 3px 10px; border-radius: 9999px; font-weight: 600; transition: all 0.2s; cursor: pointer; border: 1px solid rgba(51,240,176,0.4); }
-    .feed-follow-btn:not(.following) { background: transparent; color: #1a0a3e; }
-    .feed-follow-btn:not(.following):hover { background: rgba(51,240,176,0.15); }
-    .feed-follow-btn.following { background: #33f0b0; color: #1a0a3e; }
 
     /* Progress bar */
     .meta-progress-bar { height: 6px; border-radius: 3px; background: rgba(0,0,0,0.08); overflow: hidden; }
     .meta-progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #33f0b0, #28c48e); transition: width 0.5s ease; }
 
-    /* Pay tab active */
-    .pay-tab-active { background: #1a0a3e; color: white; }
-
-    /* Meta media slider in popup */
-    .creo-meta-media { position: relative; overflow: hidden; border-radius: 0.75rem; }
-    .creo-meta-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-    .creo-meta-slider::-webkit-scrollbar { display: none; }
-    .creo-meta-slider .creo-meta-slide { flex: 0 0 100%; scroll-snap-align: start; min-width: 100%; }
-    .creo-meta-dots { display: flex; gap: 4px; justify-content: center; margin-top: 6px; }
-    .creo-meta-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(0,0,0,0.2); transition: all 0.2s; }
-    .creo-meta-dots .dot.active { background: #1a0a3e; transform: scale(1.3); }
+    /* Pay tabs */
+    .pay-tab-active { background: #1a0a3e !important; color: white !important; }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen">
+<body>
   <script src="shared.js"></script>
 
-  <!-- Suggested Creators Rail -->
-  <div id="suggested-rail" class="hidden max-w-3xl mx-auto px-4" style="padding-top:var(--creo-content-top, 57px)">
-    <div class="flex items-center justify-between mb-2">
-      <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Creadores sugeridos</h3>
-      <button onclick="document.getElementById('suggested-rail').classList.add('hidden')" class="text-gray-300 hover:text-gray-500 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-    </div>
-    <div id="suggested-list" class="flex gap-4 overflow-x-auto pb-3 scrollbar-hide" style="scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
-    <style>#suggested-list::-webkit-scrollbar{display:none;}</style>
+  <!-- Welcome Info Card (first visit) -->
+  <div id="creo-welcome" class="creo-info-card" style="display:none;">
+    <h2>Bienvenido a la Experiencia Completa</h2>
+    <p>Gira tu teléfono para la mejor experiencia. En desktop ya estás listo.</p>
+    <p style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.5);">Desliza horizontal para ver más videos del mismo creador. Desliza vertical para descubrir otros creadores.</p>
+    <button onclick="dismissWelcome()">Empezar</button>
   </div>
 
-  <!-- Feed Container -->
-  <div id="feed-scroll" class="max-w-3xl mx-auto pb-20 px-4">
-    <div id="feed-content" class="space-y-4 mt-2"></div>
-
-    <!-- Skeleton Loading -->
-    <div id="feed-loading" class="space-y-4">
-      <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 p-4">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="skeleton w-10 h-10 rounded-full"></div>
-          <div class="flex-1">
-            <div class="skeleton h-3.5 w-28 mb-1.5"></div>
-            <div class="skeleton h-2.5 w-16"></div>
-          </div>
-          <div class="skeleton h-6 w-16 rounded-full"></div>
-        </div>
-        <div class="skeleton w-full aspect-video rounded-xl mb-3"></div>
-        <div class="skeleton h-3 w-3/4 mb-2"></div>
-        <div class="skeleton h-3 w-1/2"></div>
-        <div class="flex gap-4 mt-3">
-          <div class="skeleton h-4 w-12"></div>
-          <div class="skeleton h-4 w-12"></div>
-          <div class="skeleton h-4 w-12"></div>
-        </div>
-      </div>
-      <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 p-4">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="skeleton w-10 h-10 rounded-full"></div>
-          <div class="flex-1">
-            <div class="skeleton h-3.5 w-20 mb-1.5"></div>
-            <div class="skeleton h-2.5 w-12"></div>
-          </div>
-        </div>
-        <div class="skeleton w-full aspect-square rounded-xl mb-3"></div>
-        <div class="skeleton h-3 w-2/3"></div>
-        <div class="flex gap-4 mt-3">
-          <div class="skeleton h-4 w-12"></div>
-          <div class="skeleton h-4 w-12"></div>
-        </div>
-      </div>
-      <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 p-4">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="skeleton w-10 h-10 rounded-full"></div>
-          <div class="flex-1">
-            <div class="skeleton h-3.5 w-24 mb-1.5"></div>
-            <div class="skeleton h-2.5 w-14"></div>
-          </div>
-        </div>
-        <div class="skeleton w-full aspect-video rounded-xl"></div>
-      </div>
+  <!-- FULLSCREEN VIDEO STAGE -->
+  <div id="creo-stage">
+    <div id="creo-video-wrap">
+      <video id="creo-video" autoplay muted loop playsinline></video>
     </div>
 
-    <!-- Empty State -->
-    <div id="feed-empty" class="text-center py-20 hidden">
-      <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-        <svg class="w-10 h-10 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-      </div>
-      <h3 class="text-xl font-bold mb-2">No hay contenido aún</h3>
-      <p class="text-gray-400 text-sm">Sé el primero en publicar</p>
-    </div>
-
-    <!-- Load More -->
-    <div id="load-more" class="text-center py-4 hidden">
-      <button onclick="loadFeed()" class="px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-semibold transition">Cargar más</button>
-    </div>
-  </div>
-
-  <!-- Comments Drawer -->
-  <div id="comments-drawer" class="fixed inset-0 z-[55] hidden" style="transition:opacity 0.25s;">
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeComments()"></div>
-    <div class="absolute bottom-0 left-0 right-0 lg:right-auto lg:left-[var(--creo-content-left,0)] lg:w-[50%] lg:top-0 lg:bottom-0 lg:max-h-none lg:rounded-none max-w-3xl mx-auto lg:mx-0 rounded-t-2xl max-h-[70vh] flex flex-col animate-slide-up shadow-2xl glass lg:border-l lg:border-gray-200">
-      <div class="overlay-drag-handle"></div>
-      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-        <h3 class="font-bold text-sm" id="comments-title">Comentarios</h3>
-        <button onclick="closeComments()" class="text-gray-400 hover:text-gray-700 p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-      </div>
-      <div id="comments-list" class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
-      <div id="comments-input-area" class="border-t border-gray-200 px-4 py-3">
-        <div id="reply-indicator" class="hidden flex items-center justify-between mb-2 px-1">
-          <span class="text-xs text-creo-mintDark font-semibold" id="reply-to-label">Respondiendo a...</span>
-          <button onclick="cancelReply()" class="text-gray-400 hover:text-gray-700 text-xs">Cancelar</button>
-        </div>
-        <div class="flex gap-2">
-          <input id="comment-input" type="text" maxlength="500" placeholder="Escribe un comentario..." class="flex-1 bg-gray-100 border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-creo-mint">
-          <button onclick="submitComment()" class="bg-creo-mint text-creo-purple font-bold px-4 py-2 rounded-full text-sm hover:bg-creo-mintDark transition">Enviar</button>
-        </div>
+    <!-- Video Controls -->
+    <div class="creo-controls" id="creo-controls">
+      <input type="range" class="creo-seek" id="creo-seek" min="0" max="100" value="0">
+      <div class="creo-ctrl-row">
+        <button class="creo-ctrl-btn" id="ctrl-play" onclick="togglePlay()">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg>
+        </button>
+        <button class="creo-ctrl-btn" id="ctrl-mute" onclick="toggleMuteCtrl()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+        </button>
+        <span class="creo-time" id="creo-time">0:00 / 0:00</span>
+        <span style="flex:1"></span>
+        <button class="creo-ctrl-btn" onclick="toggleFullscreenVideo()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- CREO Support Popup — matches profile.html payment sections -->
-  <div id="creo-popup" class="fixed inset-0 z-[60] hidden" style="transition:opacity 0.25s;">
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeCreoPopup()"></div>
-    <div class="absolute bottom-0 left-0 right-0 lg:right-auto lg:left-[var(--creo-content-left,0)] lg:w-[50%] lg:top-0 lg:bottom-0 lg:max-h-none lg:rounded-none max-w-lg mx-auto lg:mx-0 rounded-t-3xl max-h-[85vh] flex flex-col animate-slide-up shadow-2xl bg-white overflow-hidden lg:border-l lg:border-gray-200">
-      <div class="overlay-drag-handle"></div>
-      <!-- Header with creator info -->
-      <div class="flex items-center justify-between px-5 pt-2 pb-3">
-        <div class="flex items-center gap-3">
-          <div id="creo-popup-avatar" class="relative w-12 h-12 rounded-full border-2 border-creo-mint overflow-visible flex-shrink-0"></div>
-          <div>
-            <h3 id="creo-popup-name" class="text-gray-900 font-bold text-sm truncate max-w-[200px]"></h3>
-            <p id="creo-popup-user" class="text-creo-purple text-xs font-medium"></p>
-          </div>
-        </div>
-        <button onclick="closeCreoPopup()" class="text-gray-400 hover:text-gray-700 p-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-      </div>
+  <!-- OVERLAY UI -->
+  <div id="creo-ui">
+    <!-- Top-left: Recommended profiles -->
+    <div class="creo-recommended" id="creo-recommended"></div>
 
-      <!-- Payment Tabs — same style as profile.html -->
-      <div class="flex glass rounded-xl overflow-hidden mx-5 mb-3">
-        <button onclick="showCreoTab('tip')" id="creo-tab-tip" class="flex-1 py-3 text-xs font-semibold text-center transition pay-tab-active">Yo Creo en Ti</button>
-        <button onclick="showCreoTab('meta')" id="creo-tab-meta" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400">Mi Meta</button>
-        <button onclick="showCreoTab('sub')" id="creo-tab-sub" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400">Apoyo Full</button>
-      </div>
-
-      <!-- Tab Content -->
-      <div class="flex-1 overflow-y-auto px-5 pb-5">
-        <!-- Tip Tab — matches profile.html pay-tip -->
-        <div id="creo-panel-tip" class="glass p-6 rounded-2xl shadow-xl space-y-4">
-          <div id="creo-mec-tip-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
-          <div class="text-center">
-            <h3 id="creo-mec-tip-heading" class="text-lg font-bold text-gray-900">Yo Creo en Ti</h3>
-            <p id="creo-mec-tip-subtext" class="text-xs text-gray-500 mt-1">Envía un apoyo único al creador</p>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad (USD)</label>
-            <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</span>
-              <input id="creo-tip-amount" type="number" min="1" value="5.00" step="0.50" class="w-full pl-8 pr-4 py-3 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-lg font-bold outline-none focus:ring-2 focus:ring-creo-purple">
-            </div>
-            <div class="flex gap-2 mt-3">
-              <button onclick="document.getElementById('creo-tip-amount').value='5'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$5</button>
-              <button onclick="document.getElementById('creo-tip-amount').value='10'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$10</button>
-              <button onclick="document.getElementById('creo-tip-amount').value='25'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$25</button>
-              <button onclick="document.getElementById('creo-tip-amount').value='50'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$50</button>
-            </div>
-          </div>
-          <button onclick="creoPopupTip()" id="creo-tip-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
-            <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-            <span>Apoyar Creador</span>
-          </button>
-        </div>
-
-        <!-- Meta Tab — matches profile.html pay-metas -->
-        <div id="creo-panel-meta" class="hidden">
-          <div class="glass p-6 rounded-2xl shadow-xl space-y-4">
-            <div id="creo-mec-meta-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
-            <div class="text-center">
-              <h3 id="creo-mec-meta-heading" class="text-lg font-bold text-gray-900">Mi Meta</h3>
-              <p id="creo-mec-meta-subtext" class="text-xs text-gray-500 mt-1">Apoya las metas del creador</p>
-            </div>
-            <div id="creo-metas-list" class="space-y-4"></div>
-            <div id="creo-metas-empty" class="hidden text-center space-y-2 py-4">
-              <svg class="w-12 h-12 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-              <p class="text-sm font-semibold text-gray-500">No hay metas publicadas aún</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sub Tab — matches profile.html pay-sub -->
-        <div id="creo-panel-sub" class="hidden">
-          <div class="glass p-6 rounded-2xl shadow-xl space-y-4">
-            <div id="creo-mec-sub-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
-            <div class="text-center">
-              <h3 id="creo-mec-sub-heading" class="text-lg font-bold text-gray-900">Apoyo Full</h3>
-              <p id="creo-mec-sub-subtext" class="text-xs text-gray-500 mt-1">Apoya mensualmente con una cantidad que tú elijas</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad Mensual (USD)</label>
-              <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</span>
-                <input id="creo-sub-amount" type="number" min="3" value="10.00" step="1" class="w-full pl-8 pr-4 py-3 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-lg font-bold outline-none focus:ring-2 focus:ring-creo-purple">
-              </div>
-              <div class="flex gap-2 mt-3">
-                <button onclick="document.getElementById('creo-sub-amount').value='5'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$5/mes</button>
-                <button onclick="document.getElementById('creo-sub-amount').value='10'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$10/mes</button>
-                <button onclick="document.getElementById('creo-sub-amount').value='25'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$25/mes</button>
-              </div>
-            </div>
-            <button onclick="creoPopupSub()" id="creo-sub-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
-              <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-              <span>Suscribirme Mensualmente</span>
-            </button>
-            <p class="text-xs text-gray-400 text-center">Puedes cancelar en cualquier momento</p>
-          </div>
-        </div>
+    <!-- Top-right: Share button -->
+    <div class="creo-top-share">
+      <button class="creo-act-btn" onclick="toggleSharePopup()" style="width:40px;height:40px;background:rgba(0,0,0,0.3);">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19V5m0 0l-4 4m4-4l4 4"/></svg>
+      </button>
+      <div class="creo-share-popup" id="creo-share-popup">
+        <button class="creo-share-item" onclick="shareToCreo()"><svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Enviar en CREO</button>
+        <button class="creo-share-item" onclick="shareAddToProfile()"><svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>Agregar a Yo Creo en Ellos</button>
+        <button class="creo-share-item" onclick="shareExternal()"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>Compartir link</button>
       </div>
     </div>
+
+    <!-- Bottom-left: Creator info -->
+    <div class="creo-creator-info" id="creo-creator-info">
+      <div class="creo-creator-avatar" id="creo-creator-avatar"></div>
+      <div>
+        <a id="creo-creator-name" href="#" class="text-white font-bold text-sm drop-shadow-lg hover:text-green-300 transition" style="text-decoration:none;"></a>
+        <p id="creo-creator-caption" class="text-white/70 text-xs drop-shadow mt-0.5" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></p>
+      </div>
+    </div>
+
+    <!-- Right: Action buttons -->
+    <div class="creo-actions" id="creo-actions">
+      <!-- Like -->
+      <div>
+        <button class="creo-act-btn" id="creo-like-btn" onclick="toggleCreoLike()">
+          <svg class="w-6 h-6" id="creo-like-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        </button>
+        <div class="creo-act-count" id="creo-like-count"></div>
+      </div>
+      <!-- Comment -->
+      <div>
+        <button class="creo-act-btn" onclick="openCreoComments()" style="width:42px;height:42px;">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        </button>
+        <div class="creo-act-count" id="creo-comment-count"></div>
+      </div>
+      <!-- CREO Tip -->
+      <button class="creo-act-btn creo-tip" onclick="openCreoTip()">
+        <img src="assets/logo-icon.png" class="w-7 h-7 rounded-full" alt="CREO">
+      </button>
+    </div>
+  </div>
+
+  <!-- SPLIT PANEL (Comments / Tip) -->
+  <div id="creo-panel">
+    <div id="creo-panel-header" style="display:flex;align-items:center;justify-content:between;padding:12px 16px;border-bottom:1px solid #e5e7eb;flex-shrink:0;">
+      <span id="creo-panel-title" style="font-weight:700;font-size:14px;flex:1;"></span>
+      <button onclick="togglePanelFullscreen()" style="background:none;border:none;cursor:pointer;color:#9ca3af;margin-right:8px;"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg></button>
+      <button onclick="closePanel()" style="background:none;border:none;cursor:pointer;color:#9ca3af;"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div id="creo-panel-body" style="flex:1;overflow:hidden;"></div>
   </div>
 
   <script>
-    let feedCursor = 0;
-    const FEED_LIMIT = 15;
-    let allLoaded = false;
-    let useRankedFeed = true;
+    /* ===== STATE ===== */
     let currentUser = null;
     let userLikes = new Set();
     let userCommentLikes = new Set();
-    let activeCommentsPostId = null;
-    let replyingToCommentId = null;
-    let replyingToName = null;
-    let creoPopupProfile = null;
     let userFollows = new Set();
+    let creoPopupProfile = null;
 
-    function handleOrientation() {
-      const isLandscape = window.matchMedia('(orientation: landscape)').matches;
-      const header = document.getElementById('creo-mobile-header');
-      const sidebar = document.getElementById('creo-sidebar');
-      const bell = document.getElementById('notif-bell');
-      if (isLandscape) {
-        if (header) header.classList.add('landscape-hide');
-        if (sidebar) sidebar.classList.add('landscape-hide');
-        if (bell) bell.classList.add('landscape-hide');
-        document.body.style.paddingBottom = '0';
-        document.documentElement.style.setProperty('--creo-header-h', '0px');
-        document.documentElement.style.setProperty('--creo-content-top', '0px');
-      } else {
-        if (header) header.classList.remove('landscape-hide');
-        if (sidebar) sidebar.classList.remove('landscape-hide');
-        if (bell) bell.classList.remove('landscape-hide');
-        document.body.style.paddingBottom = '4rem';
-        document.documentElement.style.removeProperty('--creo-header-h');
-        document.documentElement.style.removeProperty('--creo-content-top');
-      }
-    }
-    window.matchMedia('(orientation: landscape)').addEventListener('change', handleOrientation);
+    // Feed data: grouped by creator
+    let creatorGroups = []; // [{creator: profile, posts: [post, ...]}, ...]
+    let currentCreatorIdx = 0;
+    let currentPostIdx = 0;
+    let feedLoaded = false;
+    let panelMode = null; // 'comments' | 'tip' | null
 
+    /* ===== AUTH ===== */
     async function initAuth() {
       const { data: { user } } = await sb.auth.getUser();
       currentUser = user;
       if (user) {
-        const { data } = await sb.from('post_likes').select('post_id').eq('user_id', user.id);
-        if (data) data.forEach(l => userLikes.add(l.post_id));
-        const { data: cl } = await sb.from('comment_likes').select('comment_id').eq('user_id', user.id);
-        if (cl) cl.forEach(l => userCommentLikes.add(l.comment_id));
-        const { data: follows } = await sb.from('follows').select('following_id').eq('follower_id', user.id);
-        if (follows) follows.forEach(f => userFollows.add(f.following_id));
+        const [likesRes, clRes, followsRes] = await Promise.all([
+          sb.from('post_likes').select('post_id').eq('user_id', user.id),
+          sb.from('comment_likes').select('comment_id').eq('user_id', user.id),
+          sb.from('follows').select('following_id').eq('follower_id', user.id)
+        ]);
+        if (likesRes.data) likesRes.data.forEach(l => userLikes.add(l.post_id));
+        if (clRes.data) clRes.data.forEach(l => userCommentLikes.add(l.comment_id));
+        if (followsRes.data) followsRes.data.forEach(f => userFollows.add(f.following_id));
       }
     }
 
-    // ===== FOLLOW =====
-    async function toggleFeedFollow(creatorId, btn) {
-      if (!currentUser) { showToast('Inicia sesión para seguir', 'error'); return; }
-      const { data, error } = await sb.rpc('toggle_follow', { p_following_id: creatorId });
-      if (error) { showToast('Error', 'error'); return; }
-      if (data.followed) {
-        userFollows.add(creatorId);
-        btn.textContent = 'Siguiendo';
-        btn.classList.add('following');
-        createNotification(creatorId, 'follow', 'Tienes un nuevo seguidor', null, 'feed.html');
+    /* ===== WELCOME CARD ===== */
+    function showWelcome() {
+      if (localStorage.getItem('creo-welcome-seen')) return;
+      document.getElementById('creo-welcome').style.display = '';
+    }
+    function dismissWelcome() {
+      localStorage.setItem('creo-welcome-seen', '1');
+      document.getElementById('creo-welcome').style.display = 'none';
+    }
+
+    /* ===== LOAD FEED — group posts by creator ===== */
+    async function loadCreoFeed() {
+      const { data: posts } = await sb.from('posts')
+        .select('*, profiles:creator_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, identity_verified, verification_status, account_type, email, bio, social_links, mecenas_settings)')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (!posts || posts.length === 0) return;
+
+      const groupMap = new Map();
+      posts.forEach(p => {
+        const prof = p.profiles;
+        if (!prof) return;
+        const key = prof.id;
+        if (!groupMap.has(key)) groupMap.set(key, { creator: prof, posts: [] });
+        groupMap.get(key).posts.push(p);
+      });
+      creatorGroups = Array.from(groupMap.values());
+
+      if (creatorGroups.length > 0) {
+        currentCreatorIdx = 0;
+        currentPostIdx = 0;
+        playCurrentPost();
+        loadRecommended();
+        feedLoaded = true;
+      }
+    }
+
+    /* ===== PLAY CURRENT POST ===== */
+    function playCurrentPost() {
+      if (!creatorGroups.length) return;
+      const group = creatorGroups[currentCreatorIdx];
+      if (!group) return;
+      const post = group.posts[currentPostIdx];
+      if (!post) return;
+      const creator = group.creator;
+
+      const video = document.getElementById('creo-video');
+      const isDirectVideo = post.video_type === 'direct' && post.video_url && !post.video_url.includes('youtube');
+
+      if (isDirectVideo) {
+        video.src = post.video_url;
+        video.load();
+        video.play().catch(() => { video.muted = true; video.play().catch(() => {}); });
+      } else if (post.video_type === 'youtube') {
+        const ytId = extractVideoId(post.video_url, 'youtube');
+        video.poster = ytId ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg` : '';
+        video.src = '';
       } else {
-        userFollows.delete(creatorId);
-        btn.textContent = 'Seguir';
-        btn.classList.remove('following');
+        video.src = post.video_url || '';
+        video.load();
+        video.play().catch(() => {});
+      }
+
+      // Update creator info
+      const avatarEl = document.getElementById('creo-creator-avatar');
+      const badge = getVerifiedBadgeHTML(creator);
+      avatarEl.innerHTML = (creator.avatar_url
+        ? `<img src="${esc(creator.avatar_url)}" alt="">`
+        : `<div class="av-placeholder"><span style="color:#33f0b0;font-weight:700;font-size:16px;">${esc((creator.display_name || creator.username || '?')[0].toUpperCase())}</span></div>`
+      ) + (badge ? `<div class="creo-badge">${badge}</div>` : '');
+
+      document.getElementById('creo-creator-name').textContent = creator.display_name || creator.username;
+      document.getElementById('creo-creator-name').href = `profile.html?u=${esc(creator.username)}`;
+      document.getElementById('creo-creator-caption').textContent = post.caption || '';
+
+      // Update like state
+      const isLiked = userLikes.has(post.id);
+      const likeSvg = document.getElementById('creo-like-svg');
+      likeSvg.setAttribute('fill', isLiked ? '#33f0b0' : 'none');
+      likeSvg.setAttribute('stroke', isLiked ? '#33f0b0' : 'currentColor');
+      document.getElementById('creo-like-count').textContent = post.like_count > 0 ? post.like_count : '';
+      document.getElementById('creo-comment-count').textContent = post.comment_count > 0 ? post.comment_count : '';
+
+      // Store for reference
+      creoPopupProfile = creator;
+
+      // Record impression
+      if (currentUser) {
+        sb.rpc('record_impression', { p_content_type: 'post', p_content_id: post.id }).catch(() => {});
       }
     }
 
-    // ===== LIKES =====
-    async function toggleLike(postId) {
-      if (!currentUser) { showToast('Inicia sesión para dar like', 'error'); return; }
-      const btn = document.getElementById('like-' + postId);
-      const countEl = document.getElementById('like-count-' + postId);
-      const svg = btn.querySelector('svg');
-      btn.classList.add('like-bounce');
-      setTimeout(() => btn.classList.remove('like-bounce'), 300);
+    function getCurrentPost() {
+      if (!creatorGroups.length) return null;
+      return creatorGroups[currentCreatorIdx]?.posts[currentPostIdx] || null;
+    }
 
-      // Optimistic UI: update immediately, rollback on failure
-      const wasLiked = userLikes.has(postId);
-      const prevCount = parseInt(countEl.textContent) || 0;
+    function getCurrentCreator() {
+      if (!creatorGroups.length) return null;
+      return creatorGroups[currentCreatorIdx]?.creator || null;
+    }
+
+    /* ===== NAVIGATION: horizontal=same creator, vertical=diff creator ===== */
+    function navigateHorizontal(dir) {
+      const group = creatorGroups[currentCreatorIdx];
+      if (!group) return;
+      const newIdx = currentPostIdx + dir;
+      if (newIdx < 0 || newIdx >= group.posts.length) return;
+      currentPostIdx = newIdx;
+      playCurrentPost();
+      if (panelMode === 'comments') openCreoComments();
+    }
+
+    function navigateVertical(dir) {
+      const newIdx = currentCreatorIdx + dir;
+      if (newIdx < 0 || newIdx >= creatorGroups.length) return;
+      currentCreatorIdx = newIdx;
+      currentPostIdx = 0;
+      playCurrentPost();
+      loadRecommended();
+      if (panelMode === 'comments') openCreoComments();
+    }
+
+    // Swipe detection
+    let touchStartX = 0, touchStartY = 0;
+    document.getElementById('creo-stage').addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.getElementById('creo-stage').addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      const absDx = Math.abs(dx), absDy = Math.abs(dy);
+      if (Math.max(absDx, absDy) < 30) return; // too small
+      if (absDx > absDy) {
+        navigateHorizontal(dx < 0 ? 1 : -1);
+      } else {
+        navigateVertical(dy < 0 ? 1 : -1);
+      }
+    }, { passive: true });
+
+    // Keyboard nav
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'Escape') { closePanel(); return; }
+      if (e.key === 'ArrowRight') { e.preventDefault(); navigateHorizontal(1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); navigateHorizontal(-1); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); navigateVertical(1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); navigateVertical(-1); }
+      else if (e.key === 'l') toggleCreoLike();
+      else if (e.key === 'c') openCreoComments();
+      else if (e.key === 'm') toggleMuteCtrl();
+      else if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+      else if (e.key === 'f') toggleFullscreenVideo();
+    });
+
+    /* ===== DOUBLE TAP TO LIKE ===== */
+    let lastTapTime = 0;
+    document.getElementById('creo-stage').addEventListener('click', (e) => {
+      if (e.target.closest('.creo-controls') || e.target.closest('.creo-actions') || e.target.closest('.creo-creator-info') || e.target.closest('.creo-recommended') || e.target.closest('.creo-top-share')) return;
+
+      const now = Date.now();
+      if (now - lastTapTime < 400) {
+        // Double tap — like
+        doDoubleTapLike(e);
+        lastTapTime = 0;
+      } else {
+        lastTapTime = now;
+        // Single tap on video when in split mode — go back fullscreen
+        if (panelMode) {
+          setTimeout(() => {
+            if (Date.now() - lastTapTime >= 350) closePanel();
+          }, 350);
+        }
+      }
+    });
+
+    function doDoubleTapLike(e) {
+      // Show heart animation
+      const heart = document.createElement('div');
+      heart.className = 'double-tap-heart';
+      heart.innerHTML = '<svg viewBox="0 0 24 24" fill="#33f0b0" style="width:100%;height:100%;filter:drop-shadow(0 2px 8px rgba(51,240,176,0.5))"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>';
+      document.getElementById('creo-stage').appendChild(heart);
+      setTimeout(() => heart.remove(), 800);
+
+      const post = getCurrentPost();
+      if (!post) return;
+      if (!userLikes.has(post.id)) toggleCreoLike();
+    }
+
+    /* ===== LIKE ===== */
+    async function toggleCreoLike() {
+      const post = getCurrentPost();
+      if (!post) return;
+      if (!currentUser) { showToast('Inicia sesión para dar like', 'error'); return; }
+
+      const wasLiked = userLikes.has(post.id);
+      const likeSvg = document.getElementById('creo-like-svg');
+      const countEl = document.getElementById('creo-like-count');
+      const prevCount = post.like_count || 0;
 
       if (wasLiked) {
-        userLikes.delete(postId);
-        svg.setAttribute('fill', 'none');
-        svg.setAttribute('stroke', 'currentColor');
-        countEl.textContent = prevCount > 1 ? prevCount - 1 : '';
+        userLikes.delete(post.id);
+        likeSvg.setAttribute('fill', 'none');
+        likeSvg.setAttribute('stroke', 'currentColor');
+        post.like_count = Math.max(0, prevCount - 1);
       } else {
-        userLikes.add(postId);
-        svg.setAttribute('fill', '#33f0b0');
-        svg.setAttribute('stroke', '#33f0b0');
-        countEl.textContent = prevCount + 1;
+        userLikes.add(post.id);
+        likeSvg.setAttribute('fill', '#33f0b0');
+        likeSvg.setAttribute('stroke', '#33f0b0');
+        post.like_count = prevCount + 1;
       }
+      countEl.textContent = post.like_count > 0 ? post.like_count : '';
 
-      const { data, error } = await sb.rpc('toggle_post_like', { p_post_id: postId });
+      const { data, error } = await sb.rpc('toggle_post_like', { p_post_id: post.id });
       if (error) {
-        // Rollback
-        if (wasLiked) { userLikes.add(postId); svg.setAttribute('fill', '#33f0b0'); svg.setAttribute('stroke', '#33f0b0'); }
-        else { userLikes.delete(postId); svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor'); }
-        countEl.textContent = prevCount > 0 ? prevCount : '';
+        if (wasLiked) { userLikes.add(post.id); post.like_count = prevCount; }
+        else { userLikes.delete(post.id); post.like_count = prevCount; }
+        playCurrentPost();
         showToast('Error', 'error');
         return;
       }
-
-      // Sync with server count
+      post.like_count = data.count;
       countEl.textContent = data.count > 0 ? data.count : '';
       if (data.liked) {
-        const card = btn.closest('.feed-card');
-        const postCreatorId = card?.dataset?.creatorId;
-        if (postCreatorId) createNotification(postCreatorId, 'like', 'A alguien le gustó tu publicación', null, 'feed.html');
+        const creator = getCurrentCreator();
+        if (creator) createNotification(creator.id, 'like', 'A alguien le gustó tu publicación', null, 'feed.html');
       }
     }
 
-    // ===== COMMENTS =====
-    async function toggleCommentLike(commentId) {
-      if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
-      const { data, error } = await sb.rpc('toggle_comment_like', { p_comment_id: commentId });
-      if (error) { showToast('Error', 'error'); return; }
-      if (data.liked) userCommentLikes.add(commentId);
-      else userCommentLikes.delete(commentId);
-      openComments(activeCommentsPostId);
-    }
+    /* ===== COMMENTS — split screen, tweet cards ===== */
+    async function openCreoComments() {
+      const post = getCurrentPost();
+      if (!post) return;
+      enterSplitMode('comments');
+      document.getElementById('creo-panel-title').textContent = 'Comentarios';
 
-    function startReply(commentId, displayName) {
-      replyingToCommentId = commentId;
-      replyingToName = displayName;
-      document.getElementById('reply-indicator').classList.remove('hidden');
-      document.getElementById('reply-to-label').textContent = 'Respondiendo a ' + displayName;
-      document.getElementById('comment-input').placeholder = 'Responder a ' + displayName + '...';
-      document.getElementById('comment-input').focus();
-    }
-
-    function cancelReply() {
-      replyingToCommentId = null;
-      replyingToName = null;
-      document.getElementById('reply-indicator').classList.add('hidden');
-      document.getElementById('comment-input').placeholder = 'Escribe un comentario...';
-    }
-
-    async function openComments(postId) {
-      activeCommentsPostId = postId;
-      const drawer = document.getElementById('comments-drawer');
-      drawer.classList.remove('hidden');
-      const nav = document.getElementById('bottom-nav');
-      if (nav) nav.style.display = 'none';
-      if (!currentUser) { const { data: { user } } = await sb.auth.getUser(); currentUser = user; }
-      cancelReply();
-      document.getElementById('comments-list').innerHTML = '<div class="text-center py-6"><div class="inline-block w-5 h-5 border-2 border-creo-mintDark border-t-transparent rounded-full animate-spin"></div></div>';
+      const body = document.getElementById('creo-panel-body');
+      body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="width:24px;height:24px;border:3px solid #33f0b0;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
 
       const { data } = await sb
         .from('post_comments')
         .select('*, profiles:user_id(username, display_name, avatar_url)')
-        .eq('post_id', postId)
+        .eq('post_id', post.id)
         .order('created_at', { ascending: true });
 
-      const list = document.getElementById('comments-list');
-      const topLevel = (data || []).filter(c => !c.parent_id);
-      const replies = (data || []).filter(c => c.parent_id);
-      const replyMap = {};
-      replies.forEach(r => { (replyMap[r.parent_id] = replyMap[r.parent_id] || []).push(r); });
-
-      document.getElementById('comments-title').textContent = `Comentarios (${data ? data.length : 0})`;
-
-      if (!data || data.length === 0) {
-        list.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">Sin comentarios aún. ¡Sé el primero!</p>';
-        return;
-      }
-
-      list.innerHTML = topLevel.map(c => renderComment(c, replyMap, postId)).join('');
-      list.scrollTop = list.scrollHeight;
-    }
-
-    function renderComment(c, replyMap, postId) {
-      const p = c.profiles || {};
-      const name = p.display_name || p.username || 'Usuario';
-      const profileLink = p.username ? `profile.html?u=${encodeURIComponent(p.username)}` : '#';
-      const avatar = p.avatar_url
-        ? `<a href="${profileLink}"><img src="${esc(p.avatar_url)}" class="w-8 h-8 rounded-full object-cover flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition"></a>`
-        : `<a href="${profileLink}" class="w-8 h-8 rounded-full bg-creo-mint/20 flex items-center justify-center flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition"><span class="text-creo-mint text-xs font-bold">${esc(name[0].toUpperCase())}</span></a>`;
-      const canDelete = currentUser && currentUser.id === c.user_id;
-      const isLiked = userCommentLikes.has(c.id);
-      const childReplies = replyMap[c.id] || [];
-
-      return `<div class="space-y-2">
-        <div class="comment-card flex gap-2">
-          ${avatar}
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2">
-              <a href="${profileLink}" class="font-semibold text-xs text-creo-purple hover:underline">${esc(name)}</a>
-              <span class="text-gray-500 text-xs">${timeAgo(c.created_at)}</span>
-              ${canDelete ? `<span class="comment-actions ml-auto flex gap-1"><button onclick="editFeedComment('${c.id}','${postId}', this)" class="text-gray-300 hover:text-blue-400 text-xs transition">✎</button><button onclick="deleteComment('${c.id}','${postId}')" class="text-gray-300 hover:text-red-400 text-xs transition">✕</button></span>` : ''}
-            </div>
-            <p class="text-sm text-gray-900 leading-relaxed comment-body">${esc(c.body)}</p>
-            <div class="flex items-center gap-4 mt-1">
-              <button id="cl-${c.id}" onclick="animateCommentLike(this);toggleCommentLike('${c.id}')" class="flex items-center gap-1 text-xs ${isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'} transition">
-                <svg class="w-3.5 h-3.5" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                ${c.like_count > 0 ? c.like_count : ''}
-              </button>
-              ${currentUser ? `<button onclick="startReply('${c.id}','${esc(name)}')" class="text-xs text-gray-400 hover:text-creo-mintDark transition">Responder</button>` : ''}
-            </div>
+      const comments = data || [];
+      body.innerHTML = `
+        <div style="display:flex;flex-direction:column;height:100%;">
+          <div class="creo-comments-scroll" id="creo-comments-scroll">
+            ${comments.length === 0 ? '<div style="flex:0 0 280px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px;">Sin comentarios aún. ¡Sé el primero!</div>' : ''}
+            ${comments.map(c => renderCreoComment(c, post.id)).join('')}
+          </div>
+          <div style="padding:8px 12px;border-top:1px solid #e5e7eb;display:flex;gap:8px;flex-shrink:0;">
+            <input id="creo-comment-input" type="text" maxlength="500" placeholder="Escribe un comentario..." style="flex:1;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:9999px;padding:8px 16px;font-size:13px;outline:none;color:#1a1a2e;">
+            <button onclick="submitCreoComment()" style="background:#33f0b0;color:#1a0a3e;border:none;padding:8px 20px;border-radius:9999px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;">New Comment</button>
           </div>
         </div>
-        ${childReplies.length > 0 ? `<div class="ml-10 space-y-2 border-l border-gray-200 pl-3">${childReplies.map(r => renderReply(r, postId)).join('')}</div>` : ''}
-      </div>`;
+      `;
+
+      document.getElementById('creo-comment-input')?.addEventListener('keydown', e => {
+        if (e.key === 'Enter') submitCreoComment();
+      });
     }
 
-    function animateCommentLike(btn) {
-      const svg = btn.querySelector('svg');
-      if (svg) { svg.classList.add('heart-burst'); setTimeout(() => svg.classList.remove('heart-burst'), 400); }
-    }
-
-    function renderReply(c, postId) {
+    function renderCreoComment(c, postId) {
       const p = c.profiles || {};
       const name = p.display_name || p.username || 'Usuario';
-      const profileLink = p.username ? `profile.html?u=${encodeURIComponent(p.username)}` : '#';
-      const avatar = p.avatar_url
-        ? `<a href="${profileLink}"><img src="${esc(p.avatar_url)}" class="w-6 h-6 rounded-full object-cover flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition"></a>`
-        : `<a href="${profileLink}" class="w-6 h-6 rounded-full bg-creo-mint/20 flex items-center justify-center flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition"><span class="text-creo-mint text-[10px] font-bold">${esc(name[0].toUpperCase())}</span></a>`;
-      const canDelete = currentUser && currentUser.id === c.user_id;
+      const isOwn = currentUser && currentUser.id === c.user_id;
       const isLiked = userCommentLikes.has(c.id);
+      const avatar = p.avatar_url
+        ? `<img src="${esc(p.avatar_url)}" class="cc-avatar" alt="">`
+        : `<div class="cc-avatar" style="background:#e8faf3;display:flex;align-items:center;justify-content:center;border-radius:50%;"><span style="color:#33f0b0;font-weight:700;font-size:10px;">${esc(name[0].toUpperCase())}</span></div>`;
 
-      return `<div class="comment-card flex gap-2">
-        ${avatar}
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2">
-            <a href="${profileLink}" class="font-semibold text-[11px] text-creo-purple hover:underline">${esc(name)}</a>
-            <span class="text-gray-400 text-[10px]">${timeAgo(c.created_at)}</span>
-            ${canDelete ? `<span class="comment-actions ml-auto flex gap-1"><button onclick="editFeedComment('${c.id}','${postId}', this)" class="text-gray-300 hover:text-blue-400 text-[10px] transition">✎</button><button onclick="deleteComment('${c.id}','${postId}')" class="text-gray-300 hover:text-red-400 text-[10px] transition">✕</button></span>` : ''}
-          </div>
-          <p class="text-xs text-gray-600 leading-relaxed comment-body">${esc(c.body)}</p>
-          <button onclick="animateCommentLike(this);toggleCommentLike('${c.id}')" class="flex items-center gap-1 mt-1 text-[10px] ${isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'} transition">
-            <svg class="w-3 h-3" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+      return `<div class="creo-comment-card ${isOwn ? 'own' : ''}">
+        <div class="cc-header">
+          ${avatar}
+          <a href="profile.html?u=${esc(p.username || '')}" class="cc-name" style="text-decoration:none;">${esc(name)}</a>
+          <span class="cc-time">${timeAgo(c.created_at)}</span>
+        </div>
+        <div class="cc-body">${esc(c.body)}</div>
+        <div class="cc-actions">
+          <button onclick="toggleCreoCommentLike('${c.id}')">
+            <svg style="width:14px;height:14px;" fill="${isLiked ? 'red' : 'none'}" stroke="${isLiked ? 'red' : 'currentColor'}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
             ${c.like_count > 0 ? c.like_count : ''}
+          </button>
+          <button onclick="window.location.href='profile.html?u=${esc(p.username || '')}'">
+            <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            Perfil
+          </button>
+          <button onclick="shareCommentExternal('${esc(p.username || '')}')">
+            <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
           </button>
         </div>
       </div>`;
     }
 
-    function closeComments() {
-      document.getElementById('comments-drawer').classList.add('hidden');
-      const nav = document.getElementById('bottom-nav');
-      if (nav) nav.style.display = '';
-      activeCommentsPostId = null;
-      cancelReply();
-    }
-
-    async function submitComment() {
-      if (!currentUser) {
-        const { data: { user } } = await sb.auth.getUser();
-        currentUser = user;
-      }
+    async function submitCreoComment() {
       if (!currentUser) { showToast('Inicia sesión para comentar', 'error'); return; }
-      const input = document.getElementById('comment-input');
+      const input = document.getElementById('creo-comment-input');
       const body = input.value.trim();
       if (!body) return;
       input.value = '';
+      const post = getCurrentPost();
+      if (!post) return;
 
-      let result;
-      if (replyingToCommentId) {
-        result = await sb.rpc('add_comment_reply', { p_comment_id: replyingToCommentId, p_body: body });
-      } else {
-        result = await sb.rpc('add_post_comment', { p_post_id: activeCommentsPostId, p_body: body });
-      }
+      const { data, error } = await sb.rpc('add_post_comment', { p_post_id: post.id, p_body: body });
+      if (error) { showToast(error.message || 'Error', 'error'); return; }
+      if (data) post.comment_count = data.count;
+      document.getElementById('creo-comment-count').textContent = post.comment_count > 0 ? post.comment_count : '';
 
-      if (result.error) { showToast(result.error.message || 'Error al comentar', 'error'); return; }
+      const creator = getCurrentCreator();
+      if (creator) createNotification(creator.id, 'comment', 'Nuevo comentario en tu publicación', body, 'feed.html');
 
-      const postCards = document.querySelectorAll('.feed-card');
-      for (const pc of postCards) {
-        const likeBtn = pc.querySelector(`#like-${activeCommentsPostId}`);
-        if (likeBtn && pc.dataset.creatorId) {
-          createNotification(pc.dataset.creatorId, 'comment', 'Nuevo comentario en tu publicación', body, 'feed.html');
-          break;
-        }
-      }
-
-      const countEl = document.getElementById('comment-count-' + activeCommentsPostId);
-      if (countEl && result.data) countEl.textContent = result.data.count > 0 ? result.data.count : '';
-
-      cancelReply();
-      openComments(activeCommentsPostId);
+      openCreoComments(); // refresh
     }
 
-    async function deleteComment(commentId, postId) {
-      if (!confirm('¿Eliminar comentario?')) return;
-      await sb.from('post_comments').delete().eq('id', commentId);
-      const { count } = await sb.from('post_comments').select('id', { count: 'exact', head: true }).eq('post_id', postId);
-      await sb.from('posts').update({ comment_count: count || 0 }).eq('id', postId);
-      const countEl = document.getElementById('comment-count-' + postId);
-      if (countEl) countEl.textContent = count > 0 ? count : '';
-      openComments(postId);
+    async function toggleCreoCommentLike(commentId) {
+      if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
+      const { data, error } = await sb.rpc('toggle_comment_like', { p_comment_id: commentId });
+      if (error) return;
+      if (data.liked) userCommentLikes.add(commentId);
+      else userCommentLikes.delete(commentId);
+      openCreoComments();
     }
 
-    function editFeedComment(commentId, postId, btnEl) {
-      const commentDiv = btnEl.closest('.flex-1');
-      const bodyP = commentDiv.querySelector('.comment-body');
-      if (!bodyP) return;
-      const oldText = bodyP.textContent;
-      bodyP.innerHTML = `<textarea id="edit-fc-${commentId}" class="w-full border border-gray-300 bg-white p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" rows="2">${esc(oldText)}</textarea>
-        <div class="flex gap-2 mt-1">
-          <button onclick="saveFeedCommentEdit('${commentId}','${postId}')" class="text-xs px-3 py-1 bg-creo-purple text-white rounded-lg">Guardar</button>
-          <button onclick="openComments('${postId}')" class="text-xs px-3 py-1 bg-gray-200 text-gray-600 rounded-lg">Cancelar</button>
-        </div>`;
+    function shareCommentExternal(username) {
+      const url = 'https://fullnessmindset.github.io/creo/profile.html?u=' + username;
+      if (navigator.share) navigator.share({ title: 'CREO', url });
+      else { navigator.clipboard.writeText(url); showToast('Enlace copiado', 'success'); }
     }
 
-    async function saveFeedCommentEdit(commentId, postId) {
-      const textarea = document.getElementById('edit-fc-' + commentId);
-      const body = textarea.value.trim();
-      if (!body) return showToast('El comentario no puede estar vacío', 'error');
-      const { error } = await sb.from('post_comments').update({ body }).eq('id', commentId);
-      if (error) return showToast('Error: ' + error.message, 'error');
-      showToast('Comentario actualizado', 'success');
-      openComments(postId);
+    /* ===== TIP — split screen with Mi Meta card ===== */
+    async function openCreoTip() {
+      const creator = getCurrentCreator();
+      if (!creator) return;
+      enterSplitMode('tip');
+      document.getElementById('creo-panel-title').textContent = creator.display_name || creator.username;
+
+      const body = document.getElementById('creo-panel-body');
+      const ms = creator.mecenas_settings || {};
+      const tip = ms.tip || {};
+      const meta = ms.meta || {};
+      const sub = ms.sub || {};
+      const isPlatform = creator.id === '67133679-4e5f-49aa-8a22-43af41b917ee';
+      const canPay = !!creator.stripe_onboarded || isPlatform;
+
+      body.innerHTML = `<div class="creo-tip-panel">
+        <!-- Tabs -->
+        <div style="display:flex;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;margin-bottom:16px;">
+          <button onclick="showTipTab('tip')" id="tt-tip" class="pay-tab-active" style="flex:1;padding:10px;font-size:12px;font-weight:600;text-align:center;border:none;cursor:pointer;transition:all 0.2s;">${esc(tip.title || 'Yo Creo en Ti')}</button>
+          <button onclick="showTipTab('meta')" id="tt-meta" style="flex:1;padding:10px;font-size:12px;font-weight:600;text-align:center;border:none;cursor:pointer;transition:all 0.2s;background:#fff;color:#9ca3af;">${esc(meta.title || 'Mi Meta')}</button>
+          <button onclick="showTipTab('sub')" id="tt-sub" style="flex:1;padding:10px;font-size:12px;font-weight:600;text-align:center;border:none;cursor:pointer;transition:all 0.2s;background:#fff;color:#9ca3af;">${esc(sub.title || 'Apoyo Full')}</button>
+        </div>
+
+        <!-- Tip -->
+        <div id="tp-tip">
+          <div style="text-align:center;margin-bottom:12px;">
+            <h3 style="font-size:16px;font-weight:700;color:#1a0a3e;">${esc(tip.title || 'Yo Creo en Ti')}</h3>
+            <p style="font-size:11px;color:#9ca3af;">${esc(tip.description || 'Envía un apoyo único')}</p>
+          </div>
+          <div style="position:relative;margin-bottom:12px;">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9ca3af;font-weight:700;">$</span>
+            <input id="tip-amount" type="number" min="1" value="5" step="0.50" style="width:100%;padding:12px 12px 12px 28px;border:1px solid #e5e7eb;border-radius:12px;font-size:18px;font-weight:700;outline:none;color:#1a0a3e;">
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:16px;">
+            <button onclick="document.getElementById('tip-amount').value='5'" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;">$5</button>
+            <button onclick="document.getElementById('tip-amount').value='10'" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;">$10</button>
+            <button onclick="document.getElementById('tip-amount').value='25'" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;">$25</button>
+            <button onclick="document.getElementById('tip-amount').value='50'" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;">$50</button>
+          </div>
+          ${canPay ? `<button onclick="processTip()" id="tip-btn" style="width:100%;background:#1a0a3e;color:#fff;border:none;padding:14px;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;${tip.button_color ? 'background:' + tip.button_color : ''}"><img src="assets/logo-icon.png" style="width:20px;height:20px;border-radius:50%;" alt="">Apoyar Creador</button>` : '<p style="text-align:center;color:#9ca3af;font-size:12px;">Pagos no disponibles</p>'}
+        </div>
+
+        <!-- Meta -->
+        <div id="tp-meta" style="display:none;">
+          <div id="tp-metas-list"></div>
+        </div>
+
+        <!-- Sub -->
+        <div id="tp-sub" style="display:none;">
+          <div style="text-align:center;margin-bottom:12px;">
+            <h3 style="font-size:16px;font-weight:700;color:#1a0a3e;">${esc(sub.title || 'Apoyo Full')}</h3>
+            <p style="font-size:11px;color:#9ca3af;">${esc(sub.description || 'Apoya mensualmente')}</p>
+          </div>
+          <div style="position:relative;margin-bottom:12px;">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9ca3af;font-weight:700;">$</span>
+            <input id="sub-amount" type="number" min="3" value="10" step="1" style="width:100%;padding:12px 12px 12px 28px;border:1px solid #e5e7eb;border-radius:12px;font-size:18px;font-weight:700;outline:none;color:#1a0a3e;">
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:16px;">
+            <button onclick="document.getElementById('sub-amount').value='5'" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;">$5/mes</button>
+            <button onclick="document.getElementById('sub-amount').value='10'" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;">$10/mes</button>
+            <button onclick="document.getElementById('sub-amount').value='25'" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;font-size:12px;font-weight:600;cursor:pointer;">$25/mes</button>
+          </div>
+          ${canPay ? `<button onclick="processSub()" id="sub-btn" style="width:100%;background:#1a0a3e;color:#fff;border:none;padding:14px;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;${sub.button_color ? 'background:' + sub.button_color : ''}"><img src="assets/logo-icon.png" style="width:20px;height:20px;border-radius:50%;" alt="">Suscribirme</button>` : '<p style="text-align:center;color:#9ca3af;font-size:12px;">Pagos no disponibles</p>'}
+          <p style="font-size:10px;color:#9ca3af;text-align:center;margin-top:8px;">Puedes cancelar en cualquier momento</p>
+        </div>
+      </div>`;
+
+      // Load metas
+      loadTipMetas(creator);
     }
 
-    document.getElementById('comment-input')?.addEventListener('keydown', e => {
-      if (e.key === 'Enter') submitComment();
-    });
-
-    // Video observer moved to enhanced feedVideoObserver below
-
-    // ===== BADGE HELPERS =====
-    function isVerified(profile) {
-      return (profile.stripe_onboarded && profile.identity_verified) || isAdmin(profile.email || '');
+    function showTipTab(tab) {
+      ['tip', 'meta', 'sub'].forEach(t => {
+        const el = document.getElementById('tp-' + t);
+        const btn = document.getElementById('tt-' + t);
+        if (t === tab) { el.style.display = ''; btn.classList.add('pay-tab-active'); btn.style.background = ''; btn.style.color = ''; }
+        else { el.style.display = 'none'; btn.classList.remove('pay-tab-active'); btn.style.background = '#fff'; btn.style.color = '#9ca3af'; }
+      });
     }
 
-    function isAdmin(email) {
-      return email === 'fullnessmindset@gmail.com';
-    }
-
-    function isBrand(profile) {
-      return profile.account_type === 'brand';
-    }
-
-    function getVerifiedBadgeHTML(profile) {
-      if (!isVerified(profile) && !isBrand(profile)) return '';
-      if (isBrand(profile)) {
-        return `<div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-creo-purple shadow flex items-center justify-center ring-1 ring-white" title="Brand Verificado"><svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm-1 15l-4-4 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z"/></svg></div>`;
-      }
-      return `<div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-white shadow flex items-center justify-center ring-1 ring-creo-mint" title="Creador Verificado"><img src="assets/logo-icon.png" alt="Verified" class="w-3 h-3 rounded-full object-contain"></div>`;
-    }
-
-    // ===== UNIFIED FEED LOADER (ranked with fallback) =====
-    function toFeedItem(p, source) {
-      if (source === 'posts') {
-        return {
-          id: p.id, source: 'posts', creatorId: p.creator_id, profile: p.profiles || p.profile,
-          created_at: p.created_at, caption: p.caption, title: null, body: null,
-          mediaType: 'embed_video', videoUrl: p.video_url, videoType: p.video_type,
-          mediaUrls: [], videoOrientation: null,
-          likeCount: p.like_count || p.likes_count || 0, commentCount: p.comment_count || p.comments_count || 0
-        };
-      }
-      return {
-        id: p.id, source: 'community', creatorId: p.author_id, profile: p.author || p.profile,
-        created_at: p.created_at, caption: null, title: p.title, body: p.body,
-        mediaType: p.post_type, videoUrl: null, videoType: null,
-        mediaUrls: p.media_urls || [], videoOrientation: p.video_orientation,
-        likeCount: p.like_count || 0, commentCount: p.comment_count || 0
-      };
-    }
-
-    async function loadFeed() {
-      if (allLoaded) return;
-
-      let items = [];
-
-      // Try ranked feed first
-      if (useRankedFeed) {
-        try {
-          const res = await fetch(SUPABASE_URL + '/functions/v1/get-feed', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
-            body: JSON.stringify({ surface: 'feed', cursor: feedCursor, limit: FEED_LIMIT, user_id: currentUser?.id || null })
-          });
-          if (res.ok) {
-            const result = await res.json();
-            items = (result.items || []).map(item => {
-              const content = item.content || {};
-              const source = item.content_type === 'post' ? 'posts' : 'community';
-              const fi = toFeedItem(content, source);
-              fi.profile = fi.profile || item.profile || {};
-              fi._tier = item.tier;
-              fi._contentType = item.content_type;
-              return fi;
-            }).filter(fi => fi.profile);
-            if (!result.has_more) allLoaded = true;
-            feedCursor = result.next_cursor || (feedCursor + items.length);
-          } else {
-            useRankedFeed = false;
-          }
-        } catch (e) {
-          console.warn('Ranked feed unavailable, using direct query', e);
-          useRankedFeed = false;
-        }
-      }
-
-      // Fallback: direct Supabase queries
-      if (!useRankedFeed) {
-        const [postsRes, communityRes] = await Promise.all([
-          sb.from('posts')
-            .select('*, profiles:creator_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, identity_verified, verification_status, account_type, email)')
-            .order('created_at', { ascending: false })
-            .range(feedCursor, feedCursor + FEED_LIMIT - 1),
-          sb.from('community_posts')
-            .select('*, author:author_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, identity_verified, verification_status, account_type, email)')
-            .or('profile_only.is.null,profile_only.eq.false')
-            .order('created_at', { ascending: false })
-            .range(feedCursor, feedCursor + FEED_LIMIT - 1)
-        ]);
-        if (postsRes.data) postsRes.data.forEach(p => items.push(toFeedItem(p, 'posts')));
-        if (communityRes.data) communityRes.data.forEach(p => items.push(toFeedItem(p, 'community')));
-        items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        feedCursor += FEED_LIMIT;
-        const totalLoaded = (postsRes.data?.length || 0) + (communityRes.data?.length || 0);
-        if (totalLoaded < FEED_LIMIT) allLoaded = true;
-      }
-
-      document.getElementById('feed-loading').classList.add('hidden');
-
-      if (items.length === 0) {
-        if (feedCursor <= FEED_LIMIT) document.getElementById('feed-empty').classList.remove('hidden');
-        allLoaded = true;
-        document.getElementById('load-more').classList.add('hidden');
+    async function loadTipMetas(creator) {
+      const { data: metas } = await sb.from('metas').select('*').eq('creator_id', creator.id).eq('is_active', true).order('created_at', { ascending: false });
+      const list = document.getElementById('tp-metas-list');
+      if (!list) return;
+      if (!metas || metas.length === 0) {
+        list.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:12px;padding:20px;">No hay metas publicadas aún</p>';
         return;
       }
+      const isPlatform = creator.id === '67133679-4e5f-49aa-8a22-43af41b917ee';
+      const canPay = !!creator.stripe_onboarded || isPlatform;
+      const today = new Date().toISOString().split('T')[0];
 
-      // Record impressions for ranking
-      if (currentUser) {
-        items.forEach(fi => {
-          const ct = fi._contentType || (fi.source === 'posts' ? 'post' : 'community_post');
-          sb.rpc('record_impression', { p_content_type: ct, p_content_id: fi.id }).catch(() => {});
-        });
-      }
-
-      const container = document.getElementById('feed-content');
-
-      items.forEach(item => {
-        if (!item.profile) return;
-        const profile = item.profile;
-        const card = document.createElement('div');
-        card.className = 'feed-card rounded-2xl overflow-hidden shadow-xl glass';
-        card.dataset.creatorId = item.creatorId;
-        card.dataset.source = item.source;
-
-        const badgeHTML = getVerifiedBadgeHTML(profile);
-        const avatarHTML = `<div class="relative flex-shrink-0">${profile.avatar_url
-          ? `<img src="${esc(profile.avatar_url)}" class="w-10 h-10 rounded-full object-cover border-2 border-creo-mint" alt="">`
-          : `<div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold text-sm">${esc((profile.display_name || profile.username || '?')[0].toUpperCase())}</span></div>`
-        }${badgeHTML}</div>`;
-
-        const isLiked = userLikes.has(item.id);
-        const isOwnPost = currentUser && currentUser.id === item.creatorId;
-        const isFollowing = userFollows.has(item.creatorId);
-
-        // Build media HTML based on content type
-        let mediaHTML = '';
-        let mediaClass = '';
-
-        if (item.source === 'posts') {
-          const isDirectVideo = item.videoType === 'direct' && item.videoUrl && !item.videoUrl.includes('youtube');
-          if (isDirectVideo) {
-            mediaHTML = `<video src="${esc(item.videoUrl)}" class="w-full object-contain bg-black feed-video" autoplay muted loop playsinline></video>`;
-            mediaClass = 'feed-media-landscape';
-          } else {
-            mediaHTML = getAutoplayEmbedHTML(item.videoUrl, item.videoType);
-            mediaClass = 'feed-media-landscape';
-          }
-        } else {
-          const urls = item.mediaUrls;
-          if (item.mediaType === 'video' && urls.length > 0) {
-            const isVert = item.videoOrientation === 'vertical';
-            mediaClass = isVert ? 'feed-media-reel' : 'feed-media-landscape';
-            mediaHTML = `<video src="${esc(urls[0])}" class="w-full h-full object-contain bg-black feed-video" autoplay muted loop playsinline></video>`;
-          } else if (item.mediaType === 'photo' && urls.length > 0) {
-            if (urls.length === 1) {
-              mediaHTML = `<img src="${esc(urls[0])}" class="w-full h-full object-cover" alt="" onload="adaptImageSize(this)">`;
-              mediaClass = 'feed-media-square';
-            } else {
-              mediaHTML = `<div class="grid grid-cols-2 gap-0.5">${urls.slice(0, 4).map((u, i) =>
-                `<div class="${urls.length === 3 && i === 0 ? 'row-span-2' : ''} overflow-hidden aspect-square"><img src="${esc(u)}" class="w-full h-full object-cover" alt=""></div>`
-              ).join('')}${urls.length > 4 ? `<div class="aspect-square bg-black/50 flex items-center justify-center text-white font-bold text-lg">+${urls.length - 4}</div>` : ''}</div>`;
-              mediaClass = '';
-            }
-          }
-        }
-
-        const hasMedia = mediaHTML !== '';
-        const isDirectVideo = item.source === 'posts' && item.videoType === 'direct' && item.videoUrl && !item.videoUrl.includes('youtube');
-        const isCommunityVideo = item.source === 'community' && item.mediaType === 'video' && item.mediaUrls.length > 0;
-
-        // Build display text — avoid showing title and body if they're the same
-        const title = item.title || '';
-        const body = item.body || item.caption || '';
-        const bodyIsSameAsTitle = title && body && title.trim() === body.trim();
-        const displayBody = bodyIsSameAsTitle ? '' : (body.length > 200 ? body.substring(0, 200) + '...' : body);
-
-        // Follow button (hidden for own posts)
-        const followBtnHTML = !isOwnPost && currentUser
-          ? `<button onclick="toggleFeedFollow('${item.creatorId}', this)" class="feed-follow-btn ${isFollowing ? 'following' : ''}">${isFollowing ? 'Siguiendo' : 'Seguir'}</button>`
-          : '';
-
-        const hasVideo = isDirectVideo || isCommunityVideo;
-        const floatingActionsHTML = hasVideo ? `
-          <div class="feed-floating-actions">
-            <div>
-              <button id="like-${item.id}" onclick="toggleLike('${item.id}')" class="feed-fab" style="${isLiked ? 'color:#33f0b0' : ''}">
-                <svg class="w-5 h-5" fill="${isLiked ? '#33f0b0' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-              </button>
-              <div class="feed-fab-count"><span id="like-count-${item.id}">${item.likeCount > 0 ? item.likeCount : ''}</span></div>
-            </div>
-            <div>
-              <button onclick="openComments('${item.id}')" class="feed-fab">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-              </button>
-              <div class="feed-fab-count"><span id="comment-count-${item.id}">${item.commentCount > 0 ? item.commentCount : ''}</span></div>
-            </div>
-            <div class="relative">
-              <button onclick="toggleShareMenu(this)" class="feed-fab">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-              </button>
-              <div class="share-menu">
-                <button class="share-menu-item" onclick="shareInPlatform('${esc(profile.username)}','${item.id}')"><svg class="w-4 h-4 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Enviar en CREO</button>
-                <button class="share-menu-item" onclick="shareExternal('${esc(profile.username)}')"><svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>Compartir link</button>
-              </div>
-            </div>
-            <button onclick="openCreoPopup('${esc(profile.username)}')" class="feed-fab creo-btn" style="background:rgba(51,240,176,0.25);border:2px solid #33f0b0;">
-              <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full object-contain" alt="CREO">
-            </button>
-          </div>` : '';
-
-        const inlineActionsHTML = !hasVideo ? `
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <button id="like-${item.id}" onclick="toggleLike('${item.id}')" class="flex items-center gap-1 transition group">
-              <svg class="w-5 h-5" fill="${isLiked ? '#33f0b0' : 'none'}" stroke="${isLiked ? '#33f0b0' : 'currentColor'}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-              <span id="like-count-${item.id}" class="text-xs font-semibold text-gray-700">${item.likeCount > 0 ? item.likeCount : ''}</span>
-            </button>
-            <button onclick="openComments('${item.id}')" class="flex items-center gap-1 transition group">
-              <svg class="w-5 h-5 text-gray-600 group-hover:text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-              <span id="comment-count-${item.id}" class="text-xs font-semibold text-gray-500">${item.commentCount > 0 ? item.commentCount : ''}</span>
-            </button>
-            <button onclick="toggleShareMenu(this)" class="transition group relative">
-              <svg class="w-5 h-5 text-gray-600 group-hover:text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-              <div class="share-menu" style="right:0;bottom:32px;">
-                <button class="share-menu-item" onclick="event.stopPropagation();shareInPlatform('${esc(profile.username)}','${item.id}')"><svg class="w-4 h-4 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Enviar en CREO</button>
-                <button class="share-menu-item" onclick="event.stopPropagation();shareExternal('${esc(profile.username)}')"><svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>Compartir link</button>
-              </div>
-            </button>
-            <button onclick="openCreoPopup('${esc(profile.username)}')" class="creo-btn flex-shrink-0">
-              <div class="w-9 h-9 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint hover:bg-creo-mint/30 transition">
-                <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full object-contain" alt="CREO">
-              </div>
-            </button>
-          </div>` : '';
-
-        card.innerHTML = `
-          ${hasMedia ? `<div class="relative feed-media-wrap">
-            <div class="w-full bg-black rounded-t-2xl overflow-hidden ${mediaClass}">${mediaHTML}</div>
-            ${hasVideo ? `<div class="feed-video-controls">
-              <input type="range" class="feed-seek-bar" min="0" max="100" value="0" oninput="seekVideo(this)">
-              <div class="feed-vc-row">
-                <button class="feed-vc-btn" onclick="togglePlayPause(this)"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></button>
-                <button class="feed-vc-btn" onclick="toggleMute(this)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg></button>
-                <span class="feed-vc-time">0:00 / 0:00</span>
-                <span class="flex-1"></span>
-                <div class="relative">
-                  <button class="feed-vc-btn" onclick="toggleSpeedMenu(this)"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span style="font-size:10px;margin-left:2px;">1x</span></button>
-                  <div class="feed-speed-menu">
-                    <button class="feed-speed-opt" onclick="setSpeed(this,0.5)">0.5x</button>
-                    <button class="feed-speed-opt active" onclick="setSpeed(this,1)">1x</button>
-                    <button class="feed-speed-opt" onclick="setSpeed(this,1.5)">1.5x</button>
-                    <button class="feed-speed-opt" onclick="setSpeed(this,2)">2x</button>
-                  </div>
-                </div>
-                <button class="feed-vc-btn" onclick="toggleVideoFullscreen(this)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg></button>
-              </div>
-            </div>` : ''}
-            ${hasVideo ? `<div class="absolute bottom-4 left-0 right-0 z-10 px-3 pointer-events-none">
-              <div class="flex items-center gap-2 pointer-events-auto">
-                <a href="profile.html?u=${esc(profile.username)}" class="flex-shrink-0">${avatarHTML.replace('border-2 border-creo-mint', 'border-2 border-white shadow-lg')}</a>
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2">
-                    <a href="profile.html?u=${esc(profile.username)}" class="font-bold text-sm text-white drop-shadow-lg hover:text-creo-mint transition truncate">${esc(profile.display_name || profile.username)}</a>
-                    ${followBtnHTML ? followBtnHTML.replace('text-creo-purple', 'text-white').replace("border-creo-mint/40", "border-white/40") : ''}
-                  </div>
-                  <span class="text-white/70 text-xs drop-shadow">@${esc(profile.username)} · ${timeAgo(item.created_at)}</span>
-                </div>
-              </div>
-            </div>` : ''}
-            ${floatingActionsHTML}
-          </div>` : ''}
-
-          <div class="p-4">
-            ${!hasVideo ? `<div class="flex items-center justify-between gap-2">
-              <div class="flex items-center gap-3 min-w-0">
-                <a href="profile.html?u=${esc(profile.username)}" class="flex-shrink-0">${avatarHTML}</a>
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2">
-                    <a href="profile.html?u=${esc(profile.username)}" class="font-bold text-sm text-gray-900 hover:text-creo-mintDark transition truncate">${esc(profile.display_name || profile.username)}</a>
-                    ${followBtnHTML}
-                  </div>
-                  <span class="text-gray-500 text-xs">@${esc(profile.username)} · ${timeAgo(item.created_at)}</span>
-                </div>
-              </div>
-              ${inlineActionsHTML}
-            </div>` : ''}
-            ${title ? `<p class="text-sm font-bold text-gray-900 mt-2">${esc(title)}</p>` : ''}
-            ${displayBody ? `<p class="text-sm text-gray-700 leading-relaxed mt-1">${esc(displayBody)}</p>` : ''}
+      list.innerHTML = metas.map(m => {
+        const pct = m.goal_amount_cents > 0 ? Math.min(100, Math.round((m.raised_cents / m.goal_amount_cents) * 100)) : 0;
+        const raised = (m.raised_cents / 100).toFixed(2);
+        const goal = (m.goal_amount_cents / 100).toFixed(2);
+        const expired = m.end_date < today;
+        const completed = pct >= 100;
+        return `<div style="background:#f8f9fa;border-radius:12px;padding:14px;margin-bottom:12px;">
+          <h4 style="font-weight:700;font-size:13px;color:#1a0a3e;">${esc(m.title)}</h4>
+          ${m.description ? `<p style="font-size:11px;color:#9ca3af;margin-top:4px;">${esc(m.description.substring(0, 120))}</p>` : ''}
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#9ca3af;margin-top:8px;">
+            <span style="font-weight:700;color:#33f0b0;">$${raised}</span><span>de $${goal}</span>
           </div>
-        `;
-
-        container.appendChild(card);
-
-        const video = card.querySelector('video.feed-video');
-        if (video) { allFeedVideos.add(video); feedVideoObserver.observe(video); initVideoControls(video); }
-      });
-
-      // Preload next batch media
-      preloadNextMedia(items, Math.max(0, items.length - 3));
-
-      if (allLoaded) {
-        document.getElementById('load-more').classList.add('hidden');
-      } else {
-        document.getElementById('load-more').classList.remove('hidden');
-      }
+          <div class="meta-progress-bar" style="margin-top:6px;"><div class="meta-progress-fill" style="width:${pct}%"></div></div>
+          ${canPay && !expired && !completed ? `<div style="display:flex;gap:8px;margin-top:10px;">
+            <div style="position:relative;flex:1;">
+              <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#9ca3af;font-weight:700;font-size:12px;">$</span>
+              <input id="meta-amt-${m.id}" type="number" value="10" min="1" step="0.01" style="width:100%;padding:8px 8px 8px 24px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;font-weight:700;outline:none;color:#1a0a3e;">
+            </div>
+            <button onclick="processMeta('${m.id}')" style="background:#1a0a3e;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;"><img src="assets/logo-icon.png" style="width:14px;height:14px;border-radius:50%;" alt="">Contribuir</button>
+          </div>` : ''}
+        </div>`;
+      }).join('');
     }
 
-    function adaptImageSize(img) {
-      const wrap = img.closest('.feed-media-wrap');
-      if (!wrap) return;
-      const ratio = img.naturalWidth / img.naturalHeight;
-      const mediaDiv = wrap.querySelector('div');
-      if (!mediaDiv) return;
-      mediaDiv.classList.remove('feed-media-square', 'feed-media-landscape', 'feed-media-portrait', 'feed-media-reel');
-      if (ratio > 1.4) mediaDiv.classList.add('feed-media-landscape');
-      else if (ratio < 0.65) mediaDiv.classList.add('feed-media-reel');
-      else if (ratio < 0.85) mediaDiv.classList.add('feed-media-portrait');
-      else mediaDiv.classList.add('feed-media-square');
+    /* ===== PAYMENT FUNCTIONS ===== */
+    async function processTip() {
+      const creator = getCurrentCreator();
+      if (!creator) return;
+      const amount = parseFloat(document.getElementById('tip-amount').value);
+      if (amount < 1 || isNaN(amount)) return showToast('Monto mínimo: $1.00', 'error');
+      const btn = document.getElementById('tip-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Procesando...'; }
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ creator_connect_id: creator.stripe_connect_id || 'platform', creator_id: creator.id, creator_username: creator.username, amount_usd: amount, success_url: window.location.href.split('?')[0] + '?status=completed', cancel_url: window.location.href })
+        });
+        const data = await res.json();
+        if (data.url) window.location.href = data.url;
+        else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); if (btn) { btn.disabled = false; btn.innerHTML = '<img src="assets/logo-icon.png" style="width:20px;height:20px;border-radius:50%;" alt="">Apoyar Creador'; } }
+      } catch (e) { showToast('Error de conexión', 'error'); if (btn) { btn.disabled = false; btn.innerHTML = '<img src="assets/logo-icon.png" style="width:20px;height:20px;border-radius:50%;" alt="">Apoyar Creador'; } }
     }
 
-    function getAutoplayEmbedHTML(url, type) {
-      const cls = 'aspect-video';
-      if (type === 'youtube') {
-        const id = extractVideoId(url, 'youtube');
-        if (!id) return `<div class="w-full ${cls} bg-black flex items-center justify-center text-gray-400">Invalid YouTube URL</div>`;
-        return `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=0&loop=1&playlist=${id}&rel=0&playsinline=1" class="w-full ${cls}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
-      }
-      if (type === 'tiktok') {
-        const id = extractVideoId(url, 'tiktok');
-        if (!id) return `<div class="w-full ${cls} bg-black flex items-center justify-center text-gray-400">Invalid TikTok URL</div>`;
-        return `<iframe src="https://www.tiktok.com/embed/v2/${id}" class="w-full ${cls}" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
-      }
-      if (type === 'instagram') {
-        if (!/^https:\/\/(www\.)?instagram\.com\//i.test(url)) return `<div class="w-full ${cls} bg-black flex items-center justify-center text-gray-400">Invalid Instagram URL</div>`;
-        return `<iframe src="${esc(url.replace(/\/$/, ''))}/embed" class="w-full ${cls}" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
-      }
-      return `<video src="${esc(url)}" class="w-full ${cls} object-contain bg-black feed-video" autoplay muted loop playsinline></video>`;
+    async function processSub() {
+      const creator = getCurrentCreator();
+      if (!creator) return;
+      const amount = parseFloat(document.getElementById('sub-amount').value);
+      if (amount < 3 || isNaN(amount)) return showToast('Monto mínimo: $3.00', 'error');
+      const btn = document.getElementById('sub-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Procesando...'; }
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/create-subscription-checkout`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ creator_connect_id: creator.stripe_connect_id || 'platform', creator_id: creator.id, creator_username: creator.username, amount_usd: amount, success_url: window.location.href.split('?')[0] + '?status=subscribed', cancel_url: window.location.href })
+        });
+        const data = await res.json();
+        if (data.url) window.location.href = data.url;
+        else showToast('Error', 'error');
+      } catch (e) { showToast('Error de conexión', 'error'); }
     }
 
-    function toggleMute(btn) {
-      const wrap = btn.closest('.feed-media-wrap') || btn.closest('.feed-card');
-      const video = wrap?.querySelector('video');
-      if (!video) return;
-      video.muted = !video.muted;
-      btn.innerHTML = video.muted
-        ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>'
-        : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>';
+    async function processMeta(metaId) {
+      const creator = getCurrentCreator();
+      if (!creator) return;
+      const input = document.getElementById('meta-amt-' + metaId);
+      const amount = parseFloat(input?.value);
+      if (amount < 1 || isNaN(amount)) return showToast('Monto mínimo: $1.00', 'error');
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/create-meta-checkout`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ creator_connect_id: creator.stripe_connect_id || 'platform', creator_id: creator.id, creator_username: creator.username, amount_usd: amount, meta_id: metaId, success_url: window.location.href.split('?')[0] + '?status=meta_completed', cancel_url: window.location.href })
+        });
+        const data = await res.json();
+        if (data.url) window.location.href = data.url;
+        else showToast('Error', 'error');
+      } catch (e) { showToast('Error de conexión', 'error'); }
     }
 
-    // ===== SHARE MENU =====
-    function toggleShareMenu(btn) {
-      const menu = btn.closest('.relative')?.querySelector('.share-menu') || btn.querySelector('.share-menu');
-      if (!menu) return;
-      document.querySelectorAll('.share-menu.open').forEach(m => { if (m !== menu) m.classList.remove('open'); });
-      menu.classList.toggle('open');
+    /* ===== SPLIT MODE ===== */
+    function enterSplitMode(mode) {
+      panelMode = mode;
+      document.getElementById('creo-video-wrap').classList.add('split');
+      const panel = document.getElementById('creo-panel');
+      panel.classList.add('active');
+      panel.classList.remove('fullscreen');
+      // Move actions to split mode
+      document.getElementById('creo-actions').classList.add('split-mode');
+      document.getElementById('creo-creator-info').classList.add('split-mode');
+      history.pushState({ panel: mode }, '');
     }
 
+    function closePanel() {
+      if (!panelMode) return;
+      panelMode = null;
+      document.getElementById('creo-video-wrap').classList.remove('split');
+      const panel = document.getElementById('creo-panel');
+      panel.classList.remove('active', 'fullscreen');
+      document.getElementById('creo-actions').classList.remove('split-mode');
+      document.getElementById('creo-creator-info').classList.remove('split-mode');
+    }
+
+    function togglePanelFullscreen() {
+      const panel = document.getElementById('creo-panel');
+      panel.classList.toggle('fullscreen');
+    }
+
+    window.addEventListener('popstate', () => { if (panelMode) closePanel(); });
+
+    /* ===== SHARE ===== */
+    function toggleSharePopup() {
+      document.getElementById('creo-share-popup').classList.toggle('open');
+    }
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('.share-menu') && !e.target.closest('[onclick*="toggleShareMenu"]')) {
-        document.querySelectorAll('.share-menu.open').forEach(m => m.classList.remove('open'));
-      }
+      if (!e.target.closest('.creo-top-share')) document.getElementById('creo-share-popup').classList.remove('open');
     });
 
-    async function shareExternal(username) {
-      document.querySelectorAll('.share-menu.open').forEach(m => m.classList.remove('open'));
-      const url = 'https://fullnessmindset.github.io/creo/profile.html?u=' + username;
-      if (navigator.share) {
-        navigator.share({ title: 'CREO — Apoya a este creador', url });
-      } else {
-        navigator.clipboard.writeText(url);
-        showToast('Enlace copiado', 'success');
-      }
-      const { data: prof } = await sb.from('profiles').select('id').eq('username', username).single();
-      if (prof) createNotification(prof.id, 'share', 'Alguien compartió tu perfil', null, 'profile.html?u=' + username);
+    function shareToCreo() {
+      document.getElementById('creo-share-popup').classList.remove('open');
+      const creator = getCurrentCreator();
+      if (!creator) return;
+      if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
+      const url = 'https://fullnessmindset.github.io/creo/profile.html?u=' + creator.username;
+      window.location.href = 'messages.html?share=' + encodeURIComponent('¡Mira a este creador en CREO! ' + url);
     }
 
-    async function shareInPlatform(username, postId) {
-      document.querySelectorAll('.share-menu.open').forEach(m => m.classList.remove('open'));
-      if (!currentUser) { showToast('Inicia sesión para compartir', 'error'); return; }
-      const url = 'https://fullnessmindset.github.io/creo/profile.html?u=' + username;
-      const msg = '¡Mira a este creador en CREO! ' + url;
-      window.location.href = 'messages.html?share=' + encodeURIComponent(msg);
+    function shareAddToProfile() {
+      document.getElementById('creo-share-popup').classList.remove('open');
+      showToast('Agregado a Yo Creo en Ellos', 'success');
     }
 
-    // Keep old function for backward compat
-    async function shareCreator(username) { shareExternal(username); }
+    function shareExternal() {
+      document.getElementById('creo-share-popup').classList.remove('open');
+      const creator = getCurrentCreator();
+      if (!creator) return;
+      const url = 'https://fullnessmindset.github.io/creo/profile.html?u=' + creator.username;
+      if (navigator.share) navigator.share({ title: 'CREO — ' + (creator.display_name || creator.username), url });
+      else { navigator.clipboard.writeText(url); showToast('Enlace copiado', 'success'); }
+    }
 
-    // ===== MEDIA PRELOADING =====
-    function preloadNextMedia(items, startIdx) {
-      for (let i = startIdx; i < Math.min(startIdx + 3, items.length); i++) {
-        const item = items[i];
-        if (!item) continue;
-        if (item.source === 'posts' && item.videoType === 'direct' && item.videoUrl) {
-          const link = document.createElement('link');
-          link.rel = 'prefetch';
-          link.href = item.videoUrl;
-          link.as = 'video';
-          document.head.appendChild(link);
-        } else if (item.source === 'community' && item.mediaUrls?.length > 0) {
-          const link = document.createElement('link');
-          link.rel = 'prefetch';
-          link.href = item.mediaUrls[0];
-          link.as = item.mediaType === 'video' ? 'video' : 'image';
-          document.head.appendChild(link);
-        }
-      }
+    /* ===== RECOMMENDED PROFILES ===== */
+    async function loadRecommended() {
+      let query = sb.from('profiles')
+        .select('id, username, display_name, avatar_url, stripe_onboarded')
+        .eq('stripe_onboarded', true)
+        .limit(3);
+
+      const currentCreator = getCurrentCreator();
+      if (currentCreator) query = query.neq('id', currentCreator.id);
+      if (currentUser) query = query.neq('id', currentUser.id);
+
+      const { data } = await query;
+      const el = document.getElementById('creo-recommended');
+      if (!data || data.length === 0) { el.innerHTML = ''; return; }
+
+      el.innerHTML = data.map(p => {
+        const initial = (p.display_name || p.username || '?')[0].toUpperCase();
+        return p.avatar_url
+          ? `<img src="${esc(p.avatar_url)}" class="creo-rec-avatar" alt="${esc(p.display_name || p.username)}" onclick="visitRecommended('${esc(p.username)}')" title="${esc(p.display_name || p.username)}">`
+          : `<div class="creo-rec-placeholder" onclick="visitRecommended('${esc(p.username)}')" title="${esc(p.display_name || p.username)}">${esc(initial)}</div>`;
+      }).join('');
+    }
+
+    function visitRecommended(username) {
+      window.location.href = 'profile.html?u=' + username;
+    }
+
+    /* ===== VIDEO CONTROLS ===== */
+    const video = document.getElementById('creo-video');
+    const seekBar = document.getElementById('creo-seek');
+
+    video.addEventListener('timeupdate', () => {
+      if (!video.duration) return;
+      seekBar.value = (video.currentTime / video.duration) * 100;
+      document.getElementById('creo-time').textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
+    });
+
+    seekBar.addEventListener('input', () => {
+      if (!video.duration) return;
+      video.currentTime = (seekBar.value / 100) * video.duration;
+    });
+
+    function togglePlay() {
+      if (video.paused) { video.play(); document.getElementById('ctrl-play').innerHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>'; }
+      else { video.pause(); document.getElementById('ctrl-play').innerHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg>'; }
+    }
+
+    video.addEventListener('play', () => { document.getElementById('ctrl-play').innerHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>'; });
+    video.addEventListener('pause', () => { document.getElementById('ctrl-play').innerHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg>'; });
+
+    function toggleMuteCtrl() {
+      video.muted = !video.muted;
+      document.getElementById('ctrl-mute').innerHTML = video.muted
+        ? '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>'
+        : '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>';
+    }
+
+    function toggleFullscreenVideo() {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else video.requestFullscreen?.();
+    }
+
+    function fmtTime(s) {
+      if (!s || isNaN(s)) return '0:00';
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    /* ===== HELPERS ===== */
+    function isVerified(profile) {
+      return (profile.stripe_onboarded && profile.identity_verified) || profile.email === 'fullnessmindset@gmail.com';
+    }
+    function isBrand(profile) { return profile.account_type === 'brand'; }
+    function getVerifiedBadgeHTML(profile) {
+      if (!isVerified(profile) && !isBrand(profile)) return '';
+      if (isBrand(profile)) return `<div style="width:16px;height:16px;border-radius:50%;background:#1a0a3e;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,0.3);"><svg style="width:10px;height:10px;" fill="#fff" viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm-1 15l-4-4 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z"/></svg></div>`;
+      return `<div style="width:16px;height:16px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,0.3);border:1px solid #33f0b0;"><img src="assets/logo-icon.png" style="width:12px;height:12px;border-radius:50%;" alt=""></div>`;
     }
 
     function timeAgo(dateStr) {
@@ -1100,624 +903,26 @@
       return Math.floor(days / 30) + 'mes';
     }
 
-    function setupInfiniteScroll() {
-      const feed = document.getElementById('feed-scroll');
-      const isLandscape = window.matchMedia('(orientation: landscape)').matches;
-
-      if (isLandscape) {
-        feed.addEventListener('wheel', (e) => {
-          if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-            e.preventDefault();
-            feed.scrollBy({ left: e.deltaY, behavior: 'auto' });
-          }
-        }, { passive: false });
-        feed.addEventListener('scroll', () => {
-          if (allLoaded) return;
-          if (feed.scrollLeft + feed.clientWidth >= feed.scrollWidth - 500) loadFeed();
-        });
-      } else {
-        window.addEventListener('scroll', () => {
-          if (allLoaded) return;
-          if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) loadFeed();
-        });
-      }
-    }
-
-    // ===== CREO SUPPORT POPUP — linked to profile.html payment flow =====
-    async function openCreoPopup(username) {
-      const popup = document.getElementById('creo-popup');
-      popup.classList.remove('hidden');
-      const nav = document.getElementById('bottom-nav');
-      if (nav) nav.style.display = 'none';
-
-      showCreoTab('tip');
-
-      const { data: prof } = await sb.from('profiles').select('id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, identity_verified, mecenas_settings, account_type, email').eq('username', username).single();
-      if (!prof) { showToast('Creador no encontrado', 'error'); closeCreoPopup(); return; }
-      creoPopupProfile = prof;
-
-      // Avatar with badge
-      const badgeHTML = getVerifiedBadgeHTML(prof);
-      document.getElementById('creo-popup-name').textContent = prof.display_name || prof.username;
-      document.getElementById('creo-popup-user').textContent = '@' + prof.username;
-      document.getElementById('creo-popup-avatar').innerHTML = (prof.avatar_url
-        ? `<img src="${esc(prof.avatar_url)}" class="w-12 h-12 rounded-full object-cover" alt="">`
-        : `<div class="w-12 h-12 rounded-full bg-creo-mint/20 flex items-center justify-center"><span class="text-creo-mint font-bold text-lg">${esc((prof.display_name || prof.username || '?')[0].toUpperCase())}</span></div>`
-      ) + badgeHTML;
-
-      // Apply mecenas settings — same as profile.html applyMecenasSettings
-      const ms = prof.mecenas_settings || {};
-
-      // Tip settings
-      const tip = ms.tip || {};
-      document.getElementById('creo-mec-tip-heading').textContent = tip.title || 'Yo Creo en Ti';
-      document.getElementById('creo-mec-tip-subtext').textContent = tip.description || 'Envía un apoyo único al creador';
-      document.getElementById('creo-tab-tip').textContent = tip.title || 'Yo Creo en Ti';
-      if (tip.button_color) document.getElementById('creo-tip-btn').style.background = tip.button_color;
-      else document.getElementById('creo-tip-btn').style.background = '';
-      if (tip.card_color) document.getElementById('creo-panel-tip').style.background = tip.card_color;
-      else document.getElementById('creo-panel-tip').style.background = '';
-      const tipHero = document.getElementById('creo-mec-tip-hero');
-      if (tip.image_url) {
-        const isVid = /\.(mp4|webm|mov)$/i.test(tip.image_url);
-        tipHero.innerHTML = isVid
-          ? `<video src="${esc(tip.image_url)}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
-          : `<img src="${esc(tip.image_url)}" class="w-full h-40 object-cover rounded-xl" alt="">`;
-        tipHero.classList.remove('hidden');
-      } else { tipHero.classList.add('hidden'); tipHero.innerHTML = ''; }
-
-      // Sub settings
-      const sub = ms.sub || {};
-      document.getElementById('creo-mec-sub-heading').textContent = sub.title || 'Apoyo Full';
-      document.getElementById('creo-mec-sub-subtext').textContent = sub.description || 'Apoya mensualmente con una cantidad que tú elijas';
-      document.getElementById('creo-tab-sub').textContent = sub.title || 'Apoyo Full';
-      if (sub.button_color) document.getElementById('creo-sub-btn').style.background = sub.button_color;
-      else document.getElementById('creo-sub-btn').style.background = '';
-      const subCard = document.querySelector('#creo-panel-sub .glass');
-      if (sub.card_color && subCard) subCard.style.background = sub.card_color;
-      else if (subCard) subCard.style.background = '';
-      const subHero = document.getElementById('creo-mec-sub-hero');
-      if (sub.image_url) {
-        const isVid = /\.(mp4|webm|mov)$/i.test(sub.image_url);
-        subHero.innerHTML = isVid
-          ? `<video src="${esc(sub.image_url)}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
-          : `<img src="${esc(sub.image_url)}" class="w-full h-40 object-cover rounded-xl" alt="">`;
-        subHero.classList.remove('hidden');
-      } else { subHero.classList.add('hidden'); subHero.innerHTML = ''; }
-
-      // Meta settings
-      const meta = ms.meta || {};
-      document.getElementById('creo-mec-meta-heading').textContent = meta.title || 'Mi Meta';
-      document.getElementById('creo-mec-meta-subtext').textContent = meta.description || 'Apoya las metas del creador';
-      document.getElementById('creo-tab-meta').textContent = meta.title || 'Mi Meta';
-      const metaCard = document.querySelector('#creo-panel-meta .glass');
-      if (meta.card_color && metaCard) metaCard.style.background = meta.card_color;
-      else if (metaCard) metaCard.style.background = '';
-      const metaHero = document.getElementById('creo-mec-meta-hero');
-      if (meta.image_url) {
-        const isVid = /\.(mp4|webm|mov)$/i.test(meta.image_url);
-        metaHero.innerHTML = isVid
-          ? `<video src="${esc(meta.image_url)}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
-          : `<img src="${esc(meta.image_url)}" class="w-full h-40 object-cover rounded-xl" alt="">`;
-        metaHero.classList.remove('hidden');
-      } else { metaHero.classList.add('hidden'); metaHero.innerHTML = ''; }
-
-      // Disable payments if no stripe
-      const isPlatform = prof.id === '67133679-4e5f-49aa-8a22-43af41b917ee';
-      if (!prof.stripe_onboarded && !isPlatform) {
-        document.getElementById('creo-tip-btn').disabled = true;
-        document.getElementById('creo-tip-btn').innerHTML = '<span>Pagos no disponibles</span>';
-        document.getElementById('creo-tip-btn').className = 'w-full bg-gray-300 text-gray-500 font-bold py-3 px-4 rounded-xl cursor-default';
-        document.getElementById('creo-sub-btn').disabled = true;
-        document.getElementById('creo-sub-btn').innerHTML = '<span>Pagos no disponibles</span>';
-        document.getElementById('creo-sub-btn').className = 'w-full bg-gray-300 text-gray-500 font-bold py-3 px-4 rounded-xl cursor-default';
-      } else {
-        document.getElementById('creo-tip-btn').disabled = false;
-        document.getElementById('creo-tip-btn').innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Apoyar Creador</span>';
-        document.getElementById('creo-tip-btn').className = 'w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2';
-        if (tip.button_color) document.getElementById('creo-tip-btn').style.background = tip.button_color;
-        document.getElementById('creo-sub-btn').disabled = false;
-        document.getElementById('creo-sub-btn').innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Suscribirme Mensualmente</span>';
-        document.getElementById('creo-sub-btn').className = 'w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2';
-        if (sub.button_color) document.getElementById('creo-sub-btn').style.background = sub.button_color;
-      }
-
-      // Load metas — same rendering as profile.html
-      const metasList = document.getElementById('creo-metas-list');
-      const metasEmpty = document.getElementById('creo-metas-empty');
-      metasList.innerHTML = '<div class="text-center py-6"><div class="inline-block w-5 h-5 border-2 border-creo-mintDark border-t-transparent rounded-full animate-spin"></div></div>';
-      metasEmpty.classList.add('hidden');
-
-      const canPay = !!prof.stripe_onboarded || isPlatform;
-      const { data: metas } = await sb.from('metas').select('*').eq('creator_id', prof.id).eq('is_active', true).order('created_at', { ascending: false });
-
-      if (!metas || metas.length === 0) {
-        metasList.innerHTML = '';
-        metasEmpty.classList.remove('hidden');
-      } else {
-        metasEmpty.classList.add('hidden');
-        const today = new Date().toISOString().split('T')[0];
-        metasList.innerHTML = metas.map(m => {
-          const pct = m.goal_amount_cents > 0 ? Math.min(100, Math.round((m.raised_cents / m.goal_amount_cents) * 100)) : 0;
-          const raised = (m.raised_cents / 100).toFixed(2);
-          const goal = (m.goal_amount_cents / 100).toFixed(2);
-          const expired = m.end_date < today;
-          const completed = pct >= 100;
-          const images = m.images || [];
-
-          let statusBadge = '';
-          if (m.completion_badge === 'legitimate') statusBadge = '<span class="text-xs bg-green-600 text-white px-2 py-0.5 rounded-full font-bold">Meta Completada</span>';
-          else if (m.completion_badge === 'early_complete') statusBadge = '<span class="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full font-bold">Completada Temprano</span>';
-          else if (m.fund_status === 'fraud_banned') statusBadge = '<span class="text-xs bg-red-600 text-white px-2 py-0.5 rounded-full font-bold">Cancelada</span>';
-          else if (m.fund_status && m.fund_status.includes('review')) statusBadge = '<span class="text-xs bg-yellow-500 text-white px-2 py-0.5 rounded-full font-bold animate-pulse">En Review</span>';
-          else if (completed) statusBadge = '<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">Completada</span>';
-          else if (expired) statusBadge = '<span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-semibold">Expirada</span>';
-
-          const imageSection = images.length > 0 ? `
-            <div class="creo-meta-media">
-              <div class="creo-meta-slider" id="creo-meta-slider-${m.id}">
-                ${images.map(img => {
-                  const isVid = /\.(mp4|webm|mov)$/i.test(img);
-                  return isVid
-                    ? `<div class="creo-meta-slide"><video src="${esc(img)}" class="w-full aspect-video object-cover" autoplay muted loop playsinline></video></div>`
-                    : `<div class="creo-meta-slide"><img src="${esc(img)}" class="w-full aspect-video object-cover" alt=""></div>`;
-                }).join('')}
-              </div>
-              ${images.length > 1 ? `<div class="creo-meta-dots" id="creo-dots-${m.id}">${images.map((_, i) => `<span class="dot${i === 0 ? ' active' : ''}" onclick="slideCreoMeta('${m.id}',${i})"></span>`).join('')}</div>` : ''}
-            </div>` : '';
-
-          return `<div class="glass rounded-xl overflow-hidden space-y-0">
-            ${imageSection}
-            <div class="p-4 space-y-3">
-              <div class="flex items-center justify-between">
-                <h4 class="font-bold text-sm text-gray-900">${esc(m.title)}</h4>
-                ${statusBadge}
-              </div>
-              ${m.description ? `<p class="text-gray-500 text-xs leading-relaxed">${esc(m.description.length > 120 ? m.description.substring(0, 120) + '...' : m.description)}</p>` : ''}
-              <div class="flex justify-between text-xs text-gray-500">
-                <span class="font-bold text-creo-mintDark">$${raised}</span>
-                <span>de $${goal}</span>
-              </div>
-              <div class="meta-progress-bar"><div class="meta-progress-fill" style="width:${pct}%"></div></div>
-              <span class="text-gray-400 text-[10px]">${pct}%</span>
-              ${canPay && !expired && !completed ? `<div class="flex items-center gap-2 mt-1">
-                <div class="relative flex-1">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">$</span>
-                  <input id="creo-meta-amt-${m.id}" type="number" value="10" min="1" step="0.01" class="w-full pl-7 pr-3 py-2.5 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-sm font-bold outline-none focus:ring-2 focus:ring-creo-purple">
-                </div>
-                <button onclick="creoPopupMeta('${m.id}')" class="bg-creo-purple hover:bg-creo-light text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1"${meta.button_color ? ` style="background:${meta.button_color}"` : ''}>
-                  <img src="assets/logo-icon.png" class="w-3.5 h-3.5 rounded-full" alt="">Contribuir
-                </button>
-              </div>` : ''}
-            </div>
-          </div>`;
-        }).join('');
-      }
-    }
-
-    function closeCreoPopup() {
-      document.getElementById('creo-popup').classList.add('hidden');
-      const nav = document.getElementById('bottom-nav');
-      if (nav) nav.style.display = '';
-      creoPopupProfile = null;
-    }
-
-    function showCreoTab(tab) {
-      ['tip', 'meta', 'sub'].forEach(t => {
-        document.getElementById('creo-panel-' + t).classList.toggle('hidden', t !== tab);
-        const tabBtn = document.getElementById('creo-tab-' + t);
-        if (t === tab) {
-          tabBtn.classList.add('pay-tab-active');
-          tabBtn.classList.remove('text-gray-400');
-        } else {
-          tabBtn.classList.remove('pay-tab-active');
-          tabBtn.classList.add('text-gray-400');
-        }
-      });
-    }
-
-    function slideCreoMeta(metaId, idx) {
-      const slider = document.getElementById('creo-meta-slider-' + metaId);
-      if (!slider) return;
-      slider.scrollTo({ left: idx * slider.offsetWidth, behavior: 'smooth' });
-      const dots = document.getElementById('creo-dots-' + metaId);
-      if (dots) dots.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
-    }
-
-    async function creoPopupTip() {
-      if (!creoPopupProfile) return;
-      const amount = parseFloat(document.getElementById('creo-tip-amount').value);
-      if (amount < 1 || isNaN(amount)) return showToast('Monto mínimo: $1.00', 'error');
-      const btn = document.getElementById('creo-tip-btn');
-      btn.disabled = true; btn.textContent = 'Procesando...';
-      try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            creator_connect_id: creoPopupProfile.stripe_connect_id || 'platform',
-            creator_id: creoPopupProfile.id,
-            creator_username: creoPopupProfile.username,
-            amount_usd: amount,
-            success_url: window.location.href.split('?')[0] + '?status=completed',
-            cancel_url: window.location.href
-          })
-        });
-        const data = await response.json();
-        if (data.url) window.location.href = data.url;
-        else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Apoyar Creador</span>'; btn.disabled = false; }
-      } catch (e) { showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Apoyar Creador</span>'; btn.disabled = false; }
-    }
-
-    async function creoPopupMeta(metaId) {
-      if (!creoPopupProfile) return;
-      const input = document.getElementById('creo-meta-amt-' + metaId);
-      const amount = parseFloat(input?.value);
-      if (amount < 1 || isNaN(amount)) return showToast('Monto mínimo: $1.00', 'error');
-      try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-meta-checkout`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            creator_connect_id: creoPopupProfile.stripe_connect_id || 'platform',
-            creator_id: creoPopupProfile.id,
-            creator_username: creoPopupProfile.username,
-            amount_usd: amount,
-            meta_id: metaId,
-            success_url: window.location.href.split('?')[0] + '?status=meta_completed',
-            cancel_url: window.location.href
-          })
-        });
-        const data = await response.json();
-        if (data.url) window.location.href = data.url;
-        else showToast('Error: ' + (data.error || 'Unknown'), 'error');
-      } catch (e) { showToast('Error de conexión', 'error'); }
-    }
-
-    async function creoPopupSub() {
-      if (!creoPopupProfile) return;
-      const amount = parseFloat(document.getElementById('creo-sub-amount').value);
-      if (amount < 3 || isNaN(amount)) return showToast('Monto mínimo mensual: $3.00', 'error');
-      const btn = document.getElementById('creo-sub-btn');
-      btn.disabled = true; btn.textContent = 'Procesando...';
-      try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-subscription-checkout`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            creator_connect_id: creoPopupProfile.stripe_connect_id || 'platform',
-            creator_id: creoPopupProfile.id,
-            creator_username: creoPopupProfile.username,
-            amount_usd: amount,
-            success_url: window.location.href.split('?')[0] + '?status=subscribed',
-            cancel_url: window.location.href
-          })
-        });
-        const data = await response.json();
-        if (data.url) window.location.href = data.url;
-        else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Suscribirme Mensualmente</span>'; btn.disabled = false; }
-      } catch (e) { showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Suscribirme Mensualmente</span>'; btn.disabled = false; }
-    }
-
-    // ===== KEYBOARD SHORTCUTS (desktop) =====
-    document.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-      const popup = document.getElementById('creo-popup');
-      const drawer = document.getElementById('comments-drawer');
-      if (popup && !popup.classList.contains('hidden')) {
-        if (e.key === 'Escape') closeCreoPopup();
-        return;
-      }
-      if (drawer && !drawer.classList.contains('hidden')) {
-        if (e.key === 'Escape') closeComments();
-        return;
-      }
-      const cards = Array.from(document.querySelectorAll('.feed-card'));
-      if (!cards.length) return;
-      const isLandscape = window.matchMedia('(orientation: landscape)').matches;
-
-      if (e.key === 'ArrowDown' || e.key === 'j') {
-        e.preventDefault();
-        scrollToAdjacentCard(cards, 1, isLandscape);
-      } else if (e.key === 'ArrowUp' || e.key === 'k') {
-        e.preventDefault();
-        scrollToAdjacentCard(cards, -1, isLandscape);
-      } else if (e.key === 'ArrowRight' && isLandscape) {
-        e.preventDefault();
-        scrollToAdjacentCard(cards, 1, true);
-      } else if (e.key === 'ArrowLeft' && isLandscape) {
-        e.preventDefault();
-        scrollToAdjacentCard(cards, -1, true);
-      } else if (e.key === 'l') {
-        const card = getVisibleCard(cards, isLandscape);
-        if (card) { const id = card.querySelector('[id^="like-"]')?.id?.replace('like-',''); if (id) toggleLike(id); }
-      } else if (e.key === 'c') {
-        const card = getVisibleCard(cards, isLandscape);
-        if (card) { const btn = card.querySelector('[onclick^="openComments"]'); if (btn) btn.click(); }
-      } else if (e.key === 'm') {
-        const card = getVisibleCard(cards, isLandscape);
-        const video = card?.querySelector('video');
-        if (video) video.muted = !video.muted;
-      } else if (e.key === ' ') {
-        e.preventDefault();
-        const card = getVisibleCard(cards, isLandscape);
-        const video = card?.querySelector('video');
-        if (video) { video.paused ? video.play() : video.pause(); }
-      } else if (e.key === 'f') {
-        const card = getVisibleCard(cards, isLandscape);
-        const video = card?.querySelector('video');
-        if (video) { document.fullscreenElement ? document.exitFullscreen() : video.requestFullscreen?.(); }
-      }
-    });
-
-    function getVisibleCard(cards, isLandscape) {
-      const feed = document.getElementById('feed-scroll');
-      for (const card of cards) {
-        const rect = card.getBoundingClientRect();
-        if (isLandscape) {
-          const feedRect = feed.getBoundingClientRect();
-          if (rect.left >= feedRect.left - 50 && rect.left < feedRect.right - 100) return card;
-        } else {
-          if (rect.top >= -100 && rect.top < window.innerHeight / 2) return card;
-        }
-      }
-      return cards[0];
-    }
-
-    function scrollToAdjacentCard(cards, direction, isLandscape) {
-      const current = getVisibleCard(cards, isLandscape);
-      if (!current) return;
-      const idx = cards.indexOf(current);
-      const next = cards[idx + direction];
-      if (!next) return;
-      if (isLandscape) {
-        next.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-      } else {
-        next.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
-
-    // ===== ENHANCED VIDEO OBSERVER — pause offscreen, resume visible =====
-    const allFeedVideos = new Set();
-    const feedVideoObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const video = entry.target;
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-          allFeedVideos.forEach(v => { if (v !== video) { v.pause(); v.muted = true; } });
-          video.play().catch(() => { video.muted = true; video.play().catch(() => {}); });
-        } else {
-          video.pause();
-        }
-      });
-    }, { threshold: [0, 0.5, 1] });
-
-    // ===== CUSTOM VIDEO CONTROLS =====
-    function togglePlayPause(btn) {
-      const video = btn.closest('.feed-media-wrap').querySelector('video');
-      if (!video) return;
-      if (video.paused) { video.play(); btn.innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>'; }
-      else { video.pause(); btn.innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg>'; }
-    }
-
-    function seekVideo(range) {
-      const video = range.closest('.feed-media-wrap').querySelector('video');
-      if (!video || !video.duration) return;
-      video.currentTime = (range.value / 100) * video.duration;
-    }
-
-    function toggleSpeedMenu(btn) {
-      const menu = btn.closest('.relative').querySelector('.feed-speed-menu');
-      document.querySelectorAll('.feed-speed-menu.open').forEach(m => { if (m !== menu) m.classList.remove('open'); });
-      menu.classList.toggle('open');
-    }
-
-    function setSpeed(opt, speed) {
-      const wrap = opt.closest('.feed-media-wrap');
-      const video = wrap.querySelector('video');
-      if (video) video.playbackRate = speed;
-      const menu = opt.closest('.feed-speed-menu');
-      menu.querySelectorAll('.feed-speed-opt').forEach(o => o.classList.remove('active'));
-      opt.classList.add('active');
-      menu.classList.remove('open');
-      const label = opt.closest('.relative').querySelector('.feed-vc-btn span');
-      if (label) label.textContent = speed + 'x';
-    }
-
-    function toggleVideoFullscreen(btn) {
-      const video = btn.closest('.feed-media-wrap').querySelector('video');
-      if (!video) return;
-      if (document.fullscreenElement) document.exitFullscreen();
-      else video.requestFullscreen?.();
-    }
-
-    function fmtTime(s) {
-      if (!s || isNaN(s)) return '0:00';
-      const m = Math.floor(s / 60);
-      const sec = Math.floor(s % 60);
-      return m + ':' + (sec < 10 ? '0' : '') + sec;
-    }
-
-    function initVideoControls(video) {
-      const wrap = video.closest('.feed-media-wrap');
-      if (!wrap) return;
-      const seek = wrap.querySelector('.feed-seek-bar');
-      const timeEl = wrap.querySelector('.feed-vc-time');
-      const playBtn = wrap.querySelector('.feed-vc-btn');
-
-      video.addEventListener('timeupdate', () => {
-        if (!video.duration) return;
-        const pct = (video.currentTime / video.duration) * 100;
-        if (seek) seek.value = pct;
-        if (timeEl) timeEl.textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
-      });
-
-      video.addEventListener('play', () => {
-        if (playBtn) playBtn.innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>';
-      });
-
-      video.addEventListener('pause', () => {
-        if (playBtn) playBtn.innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg>';
-      });
-    }
-
-    // ===== SUGGESTED CREATORS =====
-    async function loadSuggestedCreators() {
-      let query = sb.from('profiles')
-        .select('id, username, display_name, avatar_url, stripe_onboarded, identity_verified, account_type, email')
-        .eq('stripe_onboarded', true)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (currentUser) {
-        const followedIds = Array.from(userFollows);
-        if (followedIds.length > 0) {
-          query = query.not('id', 'in', `(${followedIds.join(',')})`);
-        }
-        query = query.neq('id', currentUser.id);
-      }
-
-      const { data: creators } = await query;
-      if (!creators || creators.length === 0) return;
-
-      const rail = document.getElementById('suggested-rail');
-      const list = document.getElementById('suggested-list');
-      rail.classList.remove('hidden');
-
-      list.innerHTML = creators.map(p => {
-        const badge = getVerifiedBadgeHTML(p);
-        const initial = (p.display_name || p.username || '?')[0].toUpperCase();
-        return `<a href="profile.html?u=${esc(p.username)}" class="suggested-bubble">
-          <div class="sb-avatar relative">
-            ${p.avatar_url
-              ? `<img src="${esc(p.avatar_url)}" alt="${esc(p.display_name || p.username)}">`
-              : `<div class="bg-creo-mint/20 flex items-center justify-center"><span class="text-creo-mint font-bold text-lg">${esc(initial)}</span></div>`
-            }
-            ${badge ? `<div class="sb-badge">${badge}</div>` : ''}
-          </div>
-          <span class="sb-name">${esc(p.display_name || p.username)}</span>
-        </a>`;
-      }).join('');
-    }
-
-    // ===== OVERLAY MANAGER — history, gestures, blur =====
-    const overlayStack = [];
-
-    function pushOverlay(name, openFn, closeFn) {
-      overlayStack.push({ name, close: closeFn });
-      history.pushState({ overlay: name }, '');
-    }
-
-    function popOverlay() {
-      const top = overlayStack.pop();
-      if (top) top.close();
-    }
-
-    window.addEventListener('popstate', (e) => {
-      if (overlayStack.length > 0) {
-        const top = overlayStack.pop();
-        top.close();
-      }
-    });
-
-    // Swipe-down-to-dismiss for mobile overlays
-    function enableSwipeDismiss(el, closeFn) {
-      let startY = 0, currentY = 0, dragging = false;
-      const panel = el.querySelector('.animate-slide-up') || el.lastElementChild;
-      if (!panel) return;
-
-      panel.addEventListener('touchstart', (e) => {
-        const touch = e.touches[0];
-        startY = touch.clientY;
-        currentY = startY;
-        dragging = true;
-        panel.style.transition = 'none';
-      }, { passive: true });
-
-      panel.addEventListener('touchmove', (e) => {
-        if (!dragging) return;
-        currentY = e.touches[0].clientY;
-        const dy = Math.max(0, currentY - startY);
-        panel.style.transform = `translateY(${dy}px)`;
-        const bg = el.querySelector('.backdrop-blur-sm') || el.firstElementChild;
-        if (bg) bg.style.opacity = Math.max(0.2, 1 - dy / 300);
-      }, { passive: true });
-
-      panel.addEventListener('touchend', () => {
-        if (!dragging) return;
-        dragging = false;
-        const dy = currentY - startY;
-        panel.style.transition = 'transform 0.25s ease';
-        if (dy > 120) {
-          panel.style.transform = `translateY(100%)`;
-          setTimeout(() => {
-            panel.style.transform = '';
-            panel.style.transition = '';
-            closeFn();
-            if (overlayStack.length > 0 && overlayStack[overlayStack.length - 1].name) history.back();
-          }, 250);
-        } else {
-          panel.style.transform = '';
-          setTimeout(() => { panel.style.transition = ''; }, 250);
-        }
-        const bg = el.querySelector('.backdrop-blur-sm') || el.firstElementChild;
-        if (bg) bg.style.opacity = '';
-      }, { passive: true });
-    }
-
-    // Patch open/close to use overlay manager
-    const _origOpenComments = openComments;
-    openComments = async function(postId) {
-      pushOverlay('comments', null, () => {
-        const drawer = document.getElementById('comments-drawer');
-        drawer.classList.add('hidden');
-        const nav = document.getElementById('bottom-nav');
-        if (nav) nav.style.display = '';
-        activeCommentsPostId = null;
-        cancelReply();
-      });
-      await _origOpenComments(postId);
-    };
-
-    const _origCloseComments = closeComments;
-    closeComments = function() {
-      if (overlayStack.length > 0 && overlayStack[overlayStack.length - 1].name === 'comments') {
-        overlayStack.pop();
-        history.back();
-      }
-      _origCloseComments();
-    };
-
-    const _origOpenCreoPopup = openCreoPopup;
-    openCreoPopup = async function(username) {
-      pushOverlay('creo', null, () => {
-        const popup = document.getElementById('creo-popup');
-        popup.classList.add('hidden');
-        const nav = document.getElementById('bottom-nav');
-        if (nav) nav.style.display = '';
-        creoPopupProfile = null;
-      });
-      await _origOpenCreoPopup(username);
-    };
-
-    const _origCloseCreoPopup = closeCreoPopup;
-    closeCreoPopup = function() {
-      if (overlayStack.length > 0 && overlayStack[overlayStack.length - 1].name === 'creo') {
-        overlayStack.pop();
-        history.back();
-      }
-      _origCloseCreoPopup();
-    };
-
+    /* ===== INIT ===== */
     window.onload = async () => {
       await initAuth();
-      loadFeed();
+      await loadCreoFeed();
       renderBottomNav('feed');
       updateNavAuth();
       loadNotificationBell();
-      handleOrientation();
-      setupInfiniteScroll();
-      loadSuggestedCreators();
+      showWelcome();
 
-      // Enable swipe-to-dismiss on mobile
-      enableSwipeDismiss(document.getElementById('comments-drawer'), closeComments);
-      enableSwipeDismiss(document.getElementById('creo-popup'), closeCreoPopup);
+      // Hide sidebar/header for immersive mode
+      const header = document.getElementById('creo-mobile-header');
+      const sidebar = document.getElementById('creo-sidebar');
+      if (header) header.style.display = 'none';
+      if (sidebar) sidebar.style.display = 'none';
+      document.body.style.padding = '0';
+      document.body.style.margin = '0';
+
+      // Show bottom nav above the video
+      const nav = document.getElementById('bottom-nav');
+      if (nav) { nav.style.zIndex = '30'; nav.style.background = 'rgba(0,0,0,0.8)'; nav.style.borderTop = '1px solid rgba(255,255,255,0.1)'; }
     };
   </script>
 </body>
