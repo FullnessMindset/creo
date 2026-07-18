@@ -991,7 +991,7 @@
     }
 
     function showSuccess(msg) {
-      alert(msg);
+      showToast(msg, 'success');
     }
 
     // --- API ---
@@ -1252,7 +1252,7 @@
           rejection_reason: null,
         }
       });
-      if (res.error) return alert('Error: ' + res.error);
+      if (res.error) return showToast('Error: ' + res.error, 'error');
 
       await createNotification(reviewingProfile.id, 'approval', '¡Tu cuenta ha sido verificada!', 'Ya puedes recibir pagos y aparecer como creador verificado.', 'index.html');
 
@@ -1263,7 +1263,7 @@
     async function rejectCreator() {
       if (!reviewingProfile) return;
       const reason = document.getElementById('reject-reason').value.trim();
-      if (!reason) return alert('Please provide a rejection reason.');
+      if (!reason) return showToast('Please provide a rejection reason.', 'error');
 
       const res = await apiCall('update-profile', {
         profile_id: reviewingProfile.id,
@@ -1273,7 +1273,7 @@
           approved_at: null,
         }
       });
-      if (res.error) return alert('Error: ' + res.error);
+      if (res.error) return showToast('Error: ' + res.error, 'error');
 
       await createNotification(reviewingProfile.id, 'rejection', 'Verificación rechazada', reason, 'index.html#verify');
 
@@ -1519,7 +1519,7 @@
       let percent = parseInt(sel.value);
       if (sel.value === 'custom') {
         percent = parseInt(document.getElementById('dp-custom-' + requestId).value);
-        if (!percent || percent < 1 || percent > 100) return alert('Enter a valid percentage (1-100)');
+        if (!percent || percent < 1 || percent > 100) return showToast('Enter a valid percentage (1-100)', 'error');
       }
 
       const grossCents = Math.round(budgetCents * percent / 100);
@@ -1546,7 +1546,7 @@
       if (res.error) {
         btn.disabled = false;
         btn.innerHTML = origHtml;
-        alert('Error: ' + res.error);
+        showToast('Error: ' + res.error, 'error');
         return;
       }
 
@@ -1706,14 +1706,14 @@
         profile_id: id,
         updates: { username: document.getElementById('edit-username').value.trim(), display_name: document.getElementById('edit-display').value.trim(), bio: document.getElementById('edit-bio').value.trim(), account_type: document.getElementById('edit-type').value }
       });
-      if (res.error) return alert('Error: ' + res.error);
+      if (res.error) return showToast('Error: ' + res.error, 'error');
       closeModal(); loadDashboard();
     }
 
     async function deleteCreator(id, username) {
       if (!confirm('Delete creator "' + username + '"? This cannot be undone.')) return;
       const res = await apiCall('delete-profile', { profile_id: id });
-      if (res.error) return alert('Error: ' + res.error);
+      if (res.error) return showToast('Error: ' + res.error, 'error');
       loadDashboard();
     }
 
@@ -2551,8 +2551,8 @@
       const subject = document.getElementById('email-subject').value.trim();
       const message = document.getElementById('email-message').value.trim();
 
-      if (!subject) return alert('Please enter a subject');
-      if (!message) return alert('Please enter a message');
+      if (!subject) return showToast('Please enter a subject', 'error');
+      if (!message) return showToast('Please enter a message', 'error');
 
       let recipients = [];
       if (bulkEmailList.length > 0) {
@@ -2566,7 +2566,7 @@
           }
         });
       }
-      if (recipients.length === 0) return alert('Please enter at least one email address');
+      if (recipients.length === 0) return showToast('Please enter at least one email address', 'error');
 
       const basePayload = { subject, message };
 
@@ -2608,7 +2608,7 @@
       if (failed > 0 && sent === 0) {
         btn.disabled = false;
         btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Send Email';
-        alert('All emails failed to send');
+        showToast('All emails failed to send', 'error');
         return;
       }
 
@@ -3122,7 +3122,7 @@
           });
 
           if (payoutRes.error) {
-            alert('Payout failed: ' + payoutRes.error + '\n\nThe meta status was NOT updated. Fix the issue and try again.');
+            showToast('Payout failed: ' + payoutRes.error + '. The meta status was NOT updated.', 'error');
             return;
           }
           updateData.last_payout_transfer_id = payoutRes.transfer_id;
@@ -3132,7 +3132,7 @@
       }
 
       const { error } = await sb.from('metas').update(updateData).eq('id', metaId);
-      if (error) { alert('Error: ' + error.message); return; }
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
 
       // Notify creator
       if (meta.creator_id) {
@@ -3147,14 +3147,14 @@
     async function rejectMetaStage() {
       const metaId = document.getElementById('mr-meta-id').value;
       const notes = document.getElementById('mr-admin-notes').value.trim();
-      if (!notes) { alert('Escribe una razón para el rechazo'); return; }
+      if (!notes) { showToast('Escribe una razón para el rechazo', 'error'); return; }
 
       const { error } = await sb.from('metas').update({
         fund_status: 'rejected',
         admin_review_notes: notes,
         admin_reviewed_at: new Date().toISOString()
       }).eq('id', metaId);
-      if (error) { alert('Error: ' + error.message); return; }
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
 
       closeMetaReviewModal();
       await loadMetaReviews();
@@ -3181,7 +3181,7 @@
         }).eq('id', meta.creator_id);
       }
 
-      if (metaError) { alert('Error: ' + metaError.message); return; }
+      if (metaError) { showToast('Error: ' + metaError.message, 'error'); return; }
       closeMetaReviewModal();
       await loadMetaReviews();
     }
