@@ -767,13 +767,88 @@
 
   <!-- Review Modal -->
   <div id="review-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onclick="if(event.target===this)closeReviewModal()">
-    <div class="bg-white border border-gray-200 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-colors">
-      <div class="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
+    <div class="bg-white border border-gray-200 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto transition-colors">
+      <div class="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10 rounded-t-2xl">
         <h3 class="text-lg font-bold text-gray-900">Review Creator Application</h3>
-        <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-600 transition">&times;</button>
+        <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-600 transition text-2xl leading-none">&times;</button>
       </div>
       <div id="review-content" class="p-6 space-y-5"></div>
-      <div id="review-actions" class="p-6 border-t border-gray-200 space-y-3 sticky bottom-0 bg-white">
+
+      <div id="review-live-status" class="px-6 pb-2 space-y-4"></div>
+
+      <div id="review-manual-overrides" class="px-6 pb-4">
+        <details class="border border-orange-200 rounded-xl overflow-hidden">
+          <summary class="bg-orange-50 px-4 py-3 cursor-pointer text-sm font-semibold text-orange-700 flex items-center gap-2 select-none">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Manual Admin Overrides
+          </summary>
+          <div class="p-4 space-y-4 bg-white">
+            <p class="text-xs text-orange-600">Use these controls when Stripe API calls fail or status is stuck. Changes are written directly to the database.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs text-gray-500 uppercase font-medium">Verification Status</label>
+                <select id="override-verification-status" class="w-full bg-gray-50 border border-gray-300 p-2 rounded-lg text-sm mt-1 text-gray-900">
+                  <option value="">— no change —</option>
+                  <option value="approved">Approved</option>
+                  <option value="submitted">Pending (submitted)</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="started">In Progress (started)</option>
+                  <option value="needs_review">Needs Review</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 uppercase font-medium">Stripe Onboarded</label>
+                <select id="override-stripe-onboarded" class="w-full bg-gray-50 border border-gray-300 p-2 rounded-lg text-sm mt-1 text-gray-900">
+                  <option value="">— no change —</option>
+                  <option value="true">Yes (mark as onboarded)</option>
+                  <option value="false">No (mark as not onboarded)</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 uppercase font-medium">Identity Verified</label>
+                <select id="override-identity-verified" class="w-full bg-gray-50 border border-gray-300 p-2 rounded-lg text-sm mt-1 text-gray-900">
+                  <option value="">— no change —</option>
+                  <option value="true">Yes (mark as verified)</option>
+                  <option value="false">No (mark as not verified)</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 uppercase font-medium">Stripe Connect ID</label>
+                <input id="override-stripe-connect-id" type="text" placeholder="acct_xxx (leave empty = no change)" class="w-full bg-gray-50 border border-gray-300 p-2 rounded-lg text-sm mt-1 text-gray-900 font-mono">
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 uppercase font-medium">Stripe Identity ID</label>
+                <input id="override-stripe-identity-id" type="text" placeholder="vs_xxx (leave empty = no change)" class="w-full bg-gray-50 border border-gray-300 p-2 rounded-lg text-sm mt-1 text-gray-900 font-mono">
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 uppercase font-medium">Onboarding Completed</label>
+                <select id="override-onboarding-completed" class="w-full bg-gray-50 border border-gray-300 p-2 rounded-lg text-sm mt-1 text-gray-900">
+                  <option value="">— no change —</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs text-gray-500 uppercase font-medium">Admin Notes / Rejection Reason</label>
+              <input id="override-rejection-reason" type="text" placeholder="Optional reason or notes..." class="w-full bg-gray-50 border border-gray-300 p-2 rounded-lg text-sm mt-1 text-gray-900">
+            </div>
+
+            <div class="flex items-center gap-3 pt-1">
+              <button onclick="applyManualOverrides()" class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2 rounded-lg font-semibold transition text-sm">Apply Overrides</button>
+              <button onclick="syncStripeStatus()" class="bg-stripe-purple hover:bg-stripe-dark text-white px-5 py-2 rounded-lg font-semibold transition text-sm flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Sync from Stripe
+              </button>
+              <button onclick="resetIdentityVerification()" class="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg font-semibold transition text-sm">Reset Identity</button>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div id="review-actions" class="p-6 border-t border-gray-200 space-y-3 sticky bottom-0 bg-white rounded-b-2xl">
         <div>
           <label class="text-xs text-gray-500 uppercase">Rejection Reason (only if rejecting)</label>
           <input id="reject-reason" type="text" placeholder="Reason for rejection..." class="w-full bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900">
@@ -1143,20 +1218,30 @@
       const p = reviewingProfile;
       const socials = p.social_links || {};
       const content = document.getElementById('review-content');
+      const liveStatus = document.getElementById('review-live-status');
 
       let identityInfo = 'Not started';
+      let identityLiveStatus = null;
       if (p.stripe_identity_id) {
         try {
           const res = await apiCall('identity-status', { session_id: p.stripe_identity_id });
           if (res.status) {
+            identityLiveStatus = res.status;
             const s = res.status;
             identityInfo = s === 'verified' ? '<span class="text-green-600 font-bold">VERIFIED</span>' :
               s === 'requires_input' ? '<span class="text-yellow-600">Requires input</span>' :
               `<span class="text-gray-500">${esc(s)}</span>`;
           }
-        } catch(e) {}
+        } catch(e) { identityInfo = '<span class="text-red-400">API error</span>'; }
       }
       if (p.identity_verified) identityInfo = '<span class="text-green-600 font-bold">VERIFIED</span>';
+
+      let stripeLiveInfo = null;
+      if (p.stripe_connect_id) {
+        try {
+          stripeLiveInfo = await apiCall('stripe-account-status', { connect_id: p.stripe_connect_id });
+        } catch(e) {}
+      }
 
       let docsHtml = '';
       try {
@@ -1185,14 +1270,16 @@
           <div>
             <h4 class="text-lg font-bold text-gray-900">${esc(p.display_name || p.username)}</h4>
             <p class="text-sm text-gray-500">@${esc(p.username)}</p>
+            <p class="text-xs text-gray-400 font-mono mt-0.5">${p.id}</p>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="space-y-3">
             <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Personal Info</h5>
             <div class="bg-gray-50 p-3 rounded-lg space-y-2 text-sm">
               <p><span class="text-gray-400">Full Name:</span> <span class="text-gray-900 font-medium">${esc(p.full_name || 'Not provided')}</span></p>
+              <p><span class="text-gray-400">Email:</span> <span class="text-gray-900 font-medium">${esc(p.email || 'Not provided')}</span></p>
               <p><span class="text-gray-400">Phone:</span> <span class="text-gray-900 font-medium">${esc(p.phone || 'Not provided')}</span></p>
               <p><span class="text-gray-400">Type:</span> <span class="text-gray-900 font-medium">${p.business_type === 'company' ? 'Company' : 'Personal'}</span></p>
               ${p.business_name ? `<p><span class="text-gray-400">Business:</span> <span class="text-gray-900 font-medium">${esc(p.business_name)}</span></p>` : ''}
@@ -1200,14 +1287,17 @@
           </div>
 
           <div class="space-y-3">
-            <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Verification</h5>
+            <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">DB Status</h5>
             <div class="bg-gray-50 p-3 rounded-lg space-y-2 text-sm">
-              <p><span class="text-gray-400">Identity:</span> ${identityInfo}</p>
-              <p><span class="text-gray-400">Stripe:</span> ${p.stripe_onboarded ? '<span class="text-green-600 font-medium">Connected</span>' : p.stripe_connect_id ? '<span class="text-yellow-600 font-medium">Incomplete</span>' : '<span class="text-gray-400">Not connected</span>'}</p>
-              <p><span class="text-gray-400">Submitted:</span> <span class="text-gray-900">${p.submitted_at ? new Date(p.submitted_at).toLocaleString() : 'N/A'}</span></p>
-              <p><span class="text-gray-400">Attempts:</span> <span class="text-gray-900">${p.verification_attempts || 0}</span></p>
-              ${p.last_verification_at ? `<p><span class="text-gray-400">Last attempt:</span> <span class="text-gray-900">${new Date(p.last_verification_at).toLocaleString()}</span></p>` : ''}
+              <p><span class="text-gray-400">Verification:</span> ${statusBadge(p.verification_status)}</p>
+              <p><span class="text-gray-400">Identity (DB):</span> ${p.identity_verified ? '<span class="text-green-600 font-bold">VERIFIED</span>' : '<span class="text-gray-400">Not verified</span>'}</p>
+              <p><span class="text-gray-400">Stripe Onboarded (DB):</span> ${p.stripe_onboarded ? '<span class="text-green-600 font-medium">Yes</span>' : '<span class="text-gray-400">No</span>'}</p>
+              <p><span class="text-gray-400">Connect ID:</span> <span class="text-gray-900 font-mono text-xs">${esc(p.stripe_connect_id || 'None')}</span></p>
+              <p><span class="text-gray-400">Identity ID:</span> <span class="text-gray-900 font-mono text-xs">${esc(p.stripe_identity_id || 'None')}</span></p>
               <p><span class="text-gray-400">Onboarding:</span> ${p.onboarding_completed ? '<span class="text-green-600 font-medium">Completed</span>' : '<span class="text-gray-400">Not completed</span>'}</p>
+              <p><span class="text-gray-400">Attempts:</span> <span class="text-gray-900">${p.verification_attempts || 0}</span></p>
+              ${p.submitted_at ? `<p><span class="text-gray-400">Submitted:</span> <span class="text-gray-900">${new Date(p.submitted_at).toLocaleString()}</span></p>` : ''}
+              ${p.approved_at ? `<p><span class="text-gray-400">Approved:</span> <span class="text-gray-900">${new Date(p.approved_at).toLocaleString()}</span></p>` : ''}
               ${p.terms_accepted_at ? `<p><span class="text-gray-400">Terms accepted:</span> <span class="text-gray-900">${new Date(p.terms_accepted_at).toLocaleString()}</span></p>` : ''}
               ${p.rejection_reason ? `<p><span class="text-gray-400">Last rejection:</span> <span class="text-red-500">${esc(p.rejection_reason)}</span></p>` : ''}
             </div>
@@ -1229,8 +1319,67 @@
 
         ${docsHtml}
 
-        <a href="${PROFILE_BASE}${esc(p.username)}" target="_blank" class="block text-center text-xs text-creo-purple hover:underline">View Public Profile →</a>
+        <a href="${PROFILE_BASE}${esc(p.username)}" target="_blank" class="block text-center text-xs text-creo-purple hover:underline">View Public Profile &rarr;</a>
       `;
+
+      // Live Stripe & Identity status cards
+      let liveHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">';
+
+      // Stripe Connect live status
+      liveHtml += '<div class="border rounded-xl p-3 space-y-2">';
+      liveHtml += '<h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-stripe-purple" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>Stripe Connect (Live)</h5>';
+      if (stripeLiveInfo && !stripeLiveInfo.error) {
+        const s = stripeLiveInfo;
+        const chargesBadge = s.charges_enabled ? '<span class="text-green-600 font-medium">Enabled</span>' : '<span class="text-red-500 font-medium">Disabled</span>';
+        const payoutsBadge = s.payouts_enabled ? '<span class="text-green-600 font-medium">Enabled</span>' : '<span class="text-red-500 font-medium">Disabled</span>';
+        const detailsBadge = s.details_submitted ? '<span class="text-green-600 font-medium">Yes</span>' : '<span class="text-yellow-600 font-medium">No</span>';
+        liveHtml += `<div class="text-sm space-y-1">
+          <p><span class="text-gray-400">Charges:</span> ${chargesBadge}</p>
+          <p><span class="text-gray-400">Payouts:</span> ${payoutsBadge}</p>
+          <p><span class="text-gray-400">Details Submitted:</span> ${detailsBadge}</p>
+          <p><span class="text-gray-400">Email:</span> <span class="text-gray-700">${esc(s.email || 'N/A')}</span></p>
+          <p><span class="text-gray-400">Country:</span> <span class="text-gray-700">${esc(s.country || 'N/A')}</span></p>
+        </div>`;
+        // Mismatch warning
+        if (s.charges_enabled && s.details_submitted && !p.stripe_onboarded) {
+          liveHtml += '<p class="text-xs text-orange-600 bg-orange-50 p-2 rounded-lg mt-1 font-medium">&#9888; Stripe says active but DB says not onboarded. Use Sync or Manual Override.</p>';
+        }
+        if (!s.charges_enabled && p.stripe_onboarded) {
+          liveHtml += '<p class="text-xs text-orange-600 bg-orange-50 p-2 rounded-lg mt-1 font-medium">&#9888; DB says onboarded but Stripe charges are disabled.</p>';
+        }
+      } else if (p.stripe_connect_id) {
+        liveHtml += `<p class="text-xs text-red-500">Failed to fetch live status for ${esc(p.stripe_connect_id)}</p>`;
+      } else {
+        liveHtml += '<p class="text-xs text-gray-400">No Stripe Connect account</p>';
+      }
+      liveHtml += '</div>';
+
+      // Identity live status
+      liveHtml += '<div class="border rounded-xl p-3 space-y-2">';
+      liveHtml += '<h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>Identity Verification (Live)</h5>';
+      liveHtml += `<div class="text-sm space-y-1">
+        <p><span class="text-gray-400">Stripe API:</span> ${identityInfo}</p>
+        <p><span class="text-gray-400">Session ID:</span> <span class="text-gray-700 font-mono text-xs">${esc(p.stripe_identity_id || 'None')}</span></p>
+      </div>`;
+      // Mismatch
+      if (identityLiveStatus === 'verified' && !p.identity_verified) {
+        liveHtml += '<p class="text-xs text-orange-600 bg-orange-50 p-2 rounded-lg mt-1 font-medium">&#9888; Stripe says verified but DB says not. Use Sync or Manual Override.</p>';
+      }
+      if (identityLiveStatus && identityLiveStatus !== 'verified' && p.identity_verified) {
+        liveHtml += '<p class="text-xs text-orange-600 bg-orange-50 p-2 rounded-lg mt-1 font-medium">&#9888; DB says verified but Stripe says "' + esc(identityLiveStatus) + '".</p>';
+      }
+      liveHtml += '</div>';
+      liveHtml += '</div>';
+      liveStatus.innerHTML = liveHtml;
+
+      // Pre-fill override fields with current values
+      document.getElementById('override-verification-status').value = '';
+      document.getElementById('override-stripe-onboarded').value = '';
+      document.getElementById('override-identity-verified').value = '';
+      document.getElementById('override-stripe-connect-id').value = '';
+      document.getElementById('override-stripe-identity-id').value = '';
+      document.getElementById('override-onboarding-completed').value = '';
+      document.getElementById('override-rejection-reason').value = '';
 
       if (p.verification_status === 'approved') {
         document.getElementById('review-actions').classList.add('hidden');
@@ -1240,6 +1389,124 @@
 
       document.getElementById('reject-reason').value = '';
       document.getElementById('review-modal').classList.remove('hidden');
+    }
+
+    async function applyManualOverrides() {
+      if (!reviewingProfile) return;
+      const updates = {};
+
+      const vs = document.getElementById('override-verification-status').value;
+      if (vs) {
+        updates.verification_status = vs;
+        if (vs === 'approved') updates.approved_at = new Date().toISOString();
+        if (vs === 'rejected') updates.approved_at = null;
+      }
+
+      const so = document.getElementById('override-stripe-onboarded').value;
+      if (so) updates.stripe_onboarded = so === 'true';
+
+      const iv = document.getElementById('override-identity-verified').value;
+      if (iv) updates.identity_verified = iv === 'true';
+
+      const sci = document.getElementById('override-stripe-connect-id').value.trim();
+      if (sci) updates.stripe_connect_id = sci;
+
+      const sii = document.getElementById('override-stripe-identity-id').value.trim();
+      if (sii) updates.stripe_identity_id = sii;
+
+      const oc = document.getElementById('override-onboarding-completed').value;
+      if (oc) updates.onboarding_completed = oc === 'true';
+
+      const rr = document.getElementById('override-rejection-reason').value.trim();
+      if (rr) updates.rejection_reason = rr;
+
+      if (Object.keys(updates).length === 0) {
+        return showToast('No changes selected', 'error');
+      }
+
+      if (!confirm('Apply manual overrides to ' + (reviewingProfile.username || reviewingProfile.id) + '?\n\n' + JSON.stringify(updates, null, 2))) return;
+
+      const res = await apiCall('update-profile', { profile_id: reviewingProfile.id, updates });
+      if (res.error) return showToast('Error: ' + res.error, 'error');
+
+      showToast('Manual overrides applied to @' + (reviewingProfile.username || 'user'), 'success');
+
+      // Send notification if verification status changed
+      if (vs === 'approved') {
+        await createNotification(reviewingProfile.id, 'approval', '¡Tu cuenta ha sido verificada!', 'Un administrador verificó tu cuenta manualmente.', 'index.html');
+      } else if (vs === 'rejected' && rr) {
+        await createNotification(reviewingProfile.id, 'rejection', 'Verificación rechazada', rr, 'index.html#verify');
+      }
+
+      closeReviewModal();
+      loadDashboard();
+    }
+
+    async function syncStripeStatus() {
+      if (!reviewingProfile) return;
+      const p = reviewingProfile;
+      const updates = {};
+      let synced = [];
+
+      // Sync Stripe Connect
+      if (p.stripe_connect_id) {
+        try {
+          const acct = await apiCall('stripe-account-status', { connect_id: p.stripe_connect_id });
+          if (acct && !acct.error) {
+            const shouldBeOnboarded = acct.charges_enabled && acct.details_submitted;
+            if (p.stripe_onboarded !== shouldBeOnboarded) {
+              updates.stripe_onboarded = shouldBeOnboarded;
+              synced.push('stripe_onboarded → ' + shouldBeOnboarded);
+            }
+          }
+        } catch(e) { showToast('Failed to fetch Stripe Connect status', 'error'); }
+      }
+
+      // Sync Identity
+      if (p.stripe_identity_id) {
+        try {
+          const res = await apiCall('identity-status', { session_id: p.stripe_identity_id });
+          if (res.status) {
+            const shouldBeVerified = res.status === 'verified';
+            if (p.identity_verified !== shouldBeVerified) {
+              updates.identity_verified = shouldBeVerified;
+              synced.push('identity_verified → ' + shouldBeVerified);
+            }
+          }
+        } catch(e) { showToast('Failed to fetch Identity status', 'error'); }
+      }
+
+      if (Object.keys(updates).length === 0) {
+        showToast('DB already matches Stripe — no changes needed', 'success');
+        return;
+      }
+
+      const res = await apiCall('update-profile', { profile_id: p.id, updates });
+      if (res.error) return showToast('Sync error: ' + res.error, 'error');
+
+      showToast('Synced from Stripe: ' + synced.join(', '), 'success');
+      closeReviewModal();
+      loadDashboard();
+    }
+
+    async function resetIdentityVerification() {
+      if (!reviewingProfile) return;
+      if (!confirm('Reset identity verification for @' + (reviewingProfile.username || '') + '?\n\nThis clears the identity session ID and sets identity_verified to false. The user will need to re-verify.')) return;
+
+      const res = await apiCall('update-profile', {
+        profile_id: reviewingProfile.id,
+        updates: {
+          identity_verified: false,
+          stripe_identity_id: null,
+        }
+      });
+      if (res.error) return showToast('Error: ' + res.error, 'error');
+
+      await createNotification(reviewingProfile.id, 'system', 'Verificación de identidad reiniciada', 'Tu verificación de identidad fue reiniciada por un administrador. Por favor, verifica tu identidad nuevamente.', 'index.html');
+
+      showToast('Identity verification reset for @' + reviewingProfile.username, 'success');
+      closeReviewModal();
+      loadDashboard();
     }
 
     async function approveCreator() {
