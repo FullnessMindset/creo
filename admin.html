@@ -2414,17 +2414,24 @@
       const targetLabels = { global: 'Global', creator: 'Creadores', brand: 'Brands', empresa: 'Brands', admin: 'Admins', user: 'User' };
       list.innerHTML = anns.map(a => {
         const sc = styleColors[a.style] || styleColors.info;
+        const sent = a.sent_count ?? null;
+        const fail = a.failed_count ?? null;
+        const deliveryHtml = sent !== null ? `<span class="text-xs font-medium ${fail > 0 ? 'text-orange-500' : 'text-green-600'}">✓ ${sent} sent${fail > 0 ? `, ${fail} failed` : ''}</span>` : '<span class="text-xs text-gray-300">—</span>';
         return `<div class="px-5 py-3 hover:bg-gray-50 transition flex items-center gap-3">
           <div class="flex-1">
-            <div class="flex items-center gap-2 mb-1">
+            <div class="flex items-center gap-2 flex-wrap mb-1">
               <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${sc} border">${esc(a.style || 'info')}</span>
               <span class="text-xs text-gray-400">${esc(targetLabels[a.target_type] || a.target_type)}${a.target_user_id ? ' → ' + esc(a.target_username || a.target_user_id) : ''}</span>
+              ${deliveryHtml}
               <span class="text-xs text-gray-300">${new Date(a.created_at).toLocaleDateString()}</span>
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${a.is_active ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'}">${a.is_active ? 'LIVE' : 'OFF'}</span>
             </div>
             <p class="text-sm text-gray-900">${esc(a.message)}</p>
           </div>
           <div class="flex gap-1 flex-shrink-0">
+            <button onclick="editAnnouncement('${a.id}')" class="text-xs px-2.5 py-1 rounded-lg font-medium bg-blue-50 text-blue-600 hover:bg-blue-100">Edit</button>
             <button onclick="toggleAnnouncement('${a.id}', ${!a.is_active})" class="text-xs px-2.5 py-1 rounded-lg font-medium ${a.is_active ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}">${a.is_active ? 'Disable' : 'Enable'}</button>
+            <button onclick="resendAnnouncement('${a.id}')" class="text-xs px-2.5 py-1 rounded-lg font-medium bg-purple-50 text-creo-purple hover:bg-purple-100">Resend</button>
             <button onclick="deleteAnnouncement('${a.id}')" class="text-xs px-2.5 py-1 rounded-lg font-medium bg-gray-50 text-gray-500 hover:bg-gray-100">Delete</button>
           </div>
         </div>`;
@@ -2441,10 +2448,65 @@
       sel.innerHTML = allProfiles.map(p => `<option value="${p.id}">${esc(p.display_name || p.username)} (@${esc(p.username)})</option>`).join('');
     }
 
-    function closeAnnouncementForm() { document.getElementById('announcement-form').classList.add('hidden'); }
+    function closeAnnouncementForm() {
+      document.getElementById('announcement-form').classList.add('hidden');
+      document.getElementById('ann-send-btn').textContent = 'Broadcast';
+      document.getElementById('ann-send-btn').removeAttribute('data-edit-id');
+    }
 
     function toggleAnnUserSelect() {
       document.getElementById('ann-user-select').classList.toggle('hidden', document.getElementById('ann-target').value !== 'user');
+    }
+
+    function editAnnouncement(id) {
+      const a = allAnnouncements.find(x => x.id === id);
+      if (!a) return;
+      document.getElementById('announcement-form').classList.remove('hidden');
+      document.getElementById('ann-message').value = a.message;
+      document.getElementById('ann-target').value = a.target_type;
+      document.getElementById('ann-style').value = a.style || 'info';
+      toggleAnnUserSelect();
+      if (a.target_user_id) {
+        const sel = document.getElementById('ann-user-id');
+        sel.innerHTML = allProfiles.map(p => `<option value="${p.id}">${esc(p.display_name || p.username)} (@${esc(p.username)})</option>`).join('');
+        sel.value = a.target_user_id;
+      }
+      const btn = document.getElementById('ann-send-btn');
+      btn.textContent = 'Update';
+      btn.setAttribute('data-edit-id', id);
+    }
+
+    async function resendAnnouncement(id) {
+      const a = allAnnouncements.find(x => x.id === id);
+      if (!a) return;
+      if (!confirm(`Resend notifications for: "${a.message}"?`)) return;
+
+      let sent = 0, failed = 0;
+      const notif = { type: 'admin_report', category: 'admin', priority: 'high', icon: '📢', link: 'comunidad.html' };
+
+      if (a.target_type === 'global') {
+        const recipients = allProfiles.filter(p => p.id !== currentUser.id);
+        for (const p of recipients) {
+          const { error: nErr } = await sb.from('notifications').insert([{ ...notif, user_id: p.id, title: 'Anuncio de CREO', body: a.message.substring(0, 120) }]);
+          if (nErr) failed++; else sent++;
+        }
+      } else if (['creator','brand','admin'].includes(a.target_type)) {
+        const typeMap = { creator: ['creator'], brand: ['brand', 'empresa', 'business'], admin: ['admin'] };
+        const recipients = allProfiles.filter(p => p.id !== currentUser.id && typeMap[a.target_type]?.includes(p.account_type || 'creator'));
+        for (const p of recipients) {
+          const { error: nErr } = await sb.from('notifications').insert([{ ...notif, user_id: p.id, title: 'Anuncio de CREO', body: a.message.substring(0, 120) }]);
+          if (nErr) failed++; else sent++;
+        }
+      } else if (a.target_type === 'user' && a.target_user_id) {
+        const { error: nErr } = await sb.from('notifications').insert([{ ...notif, user_id: a.target_user_id, title: 'Mensaje del Admin', body: a.message.substring(0, 120) }]);
+        if (nErr) failed++; else sent++;
+      }
+
+      await sb.from('announcements').update({ sent_count: sent, failed_count: failed }).eq('id', id);
+
+      if (failed > 0) showToast(`Resent: ${sent} delivered, ${failed} failed`, 'warning');
+      else showToast(`Resent to ${sent} user${sent !== 1 ? 's' : ''}`, 'success');
+      loadAnnouncements();
     }
 
     async function sendAnnouncement() {
@@ -2452,16 +2514,39 @@
       if (!message) { showToast('Enter a message', 'error'); return; }
       const target = document.getElementById('ann-target').value;
       const style = document.getElementById('ann-style').value;
+      const btn = document.getElementById('ann-send-btn');
+      const editId = btn.getAttribute('data-edit-id');
+      btn.disabled = true;
+
+      if (editId) {
+        btn.textContent = 'Updating...';
+        const updates = { message, target_type: target, style };
+        if (target === 'user') {
+          updates.target_user_id = document.getElementById('ann-user-id').value;
+          const p = allProfiles.find(x => x.id === updates.target_user_id);
+          updates.target_username = p?.username || '';
+        } else {
+          updates.target_user_id = null;
+          updates.target_username = null;
+        }
+        const { error } = await sb.from('announcements').update(updates).eq('id', editId);
+        btn.disabled = false;
+        closeAnnouncementForm();
+        if (error) { showToast('Update failed: ' + error.message, 'error'); return; }
+        showToast('Announcement updated', 'success');
+        loadAnnouncements();
+        return;
+      }
+
+      btn.textContent = 'Sending...';
       const insert = { message, target_type: target, style, is_active: true, created_by: currentUser.id };
       if (target === 'user') {
         insert.target_user_id = document.getElementById('ann-user-id').value;
         const p = allProfiles.find(x => x.id === insert.target_user_id);
         insert.target_username = p?.username || '';
       }
-      const btn = document.getElementById('ann-send-btn');
-      btn.disabled = true; btn.textContent = 'Sending...';
 
-      const { error } = await sb.from('announcements').insert(insert);
+      const { data: inserted, error } = await sb.from('announcements').insert(insert).select().single();
       if (error) {
         btn.disabled = false; btn.textContent = 'Broadcast';
         showToast('Failed to save announcement: ' + error.message, 'error');
@@ -2478,7 +2563,7 @@
           const { error: nErr } = await sb.from('notifications').insert([{ ...notif, user_id: p.id, title: 'Anuncio de CREO', body: message.substring(0, 120) }]);
           if (nErr) { failed++; console.error('Notification failed for', p.username, nErr.message); } else { sent++; }
         }
-      } else if (target === 'creator' || target === 'brand' || target === 'admin') {
+      } else if (['creator','brand','admin'].includes(target)) {
         btn.textContent = 'Notifying users...';
         const typeMap = { creator: ['creator'], brand: ['brand', 'empresa', 'business'], admin: ['admin'] };
         const recipients = allProfiles.filter(p => p.id !== currentUser.id && typeMap[target].includes(p.account_type || 'creator'));
@@ -2491,15 +2576,19 @@
         if (nErr) { failed++; } else { sent++; }
       }
 
-      btn.disabled = false; btn.textContent = 'Broadcast';
+      if (inserted?.id) {
+        await sb.from('announcements').update({ sent_count: sent, failed_count: failed }).eq('id', inserted.id);
+      }
+
+      btn.disabled = false;
       closeAnnouncementForm();
 
       if (failed > 0 && sent > 0) {
-        showToast(`Announcement saved. Notified ${sent} users, ${failed} failed.`, 'warning');
+        showToast(`Sent! ${sent} delivered, ${failed} failed.`, 'warning');
       } else if (failed > 0 && sent === 0) {
-        showToast(`Announcement saved but all ${failed} notifications failed. Check RLS on notifications table.`, 'error');
+        showToast(`Saved but all ${failed} notifications failed. Check RLS.`, 'error');
       } else {
-        showToast(`Announcement broadcasted to ${sent} user${sent !== 1 ? 's' : ''}!`, 'success');
+        showToast(`Broadcasted to ${sent} user${sent !== 1 ? 's' : ''}!`, 'success');
       }
       loadAnnouncements();
     }

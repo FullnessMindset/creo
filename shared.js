@@ -2366,16 +2366,15 @@ function startNotifPolling() {
 function renderBottomNav(activePage) { renderSidebar(activePage); }
 function updateNavAuth() { updateSidebarAuth(); }
 
-// ========== ANNOUNCEMENT BAR ==========
+// ========== ANNOUNCEMENT BUBBLE ==========
+let _annBubbleTimer = null;
 async function loadAnnouncementBar() {
   try {
     const user = await getCachedUser();
     const { data: anns } = await sb.from('announcements').select('*').eq('is_active', true).order('created_at', { ascending: false });
     if (!anns || !anns.length) return;
     let profile = null;
-    if (user) {
-      profile = await getCachedProfile(user.id);
-    }
+    if (user) profile = await getCachedProfile(user.id);
     const dismissed = JSON.parse(localStorage.getItem('creo_dismissed_anns') || '[]');
     const matching = anns.filter(a => {
       if (dismissed.includes(a.id)) return false;
@@ -2389,21 +2388,83 @@ async function loadAnnouncementBar() {
       return false;
     });
     if (!matching.length) return;
-    const a = matching[0];
-    const colors = { info: 'bg-blue-600', success: 'bg-green-600', warning: 'bg-yellow-500 text-yellow-900', error: 'bg-red-600' };
-    const bar = document.createElement('div');
-    bar.id = 'announcement-bar';
-    bar.className = `${colors[a.style] || colors.info} text-white text-sm text-center py-2 px-4 relative z-50 font-medium`;
-    bar.innerHTML = `<span>${esc(a.message)}</span><button onclick="dismissAnnouncement('${esc(a.id)}')" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 text-lg leading-none">&times;</button>`;
-    document.body.prepend(bar);
-  } catch(e) { console.log('Announcement bar:', e); }
+    showAnnouncementBubble(matching[0], user);
+  } catch(e) { console.log('Announcement bubble:', e); }
 }
-function dismissAnnouncement(id) {
+
+function showAnnouncementBubble(a, user) {
+  const existing = document.getElementById('announcement-bubble');
+  if (existing) existing.remove();
+  if (_annBubbleTimer) { clearTimeout(_annBubbleTimer); _annBubbleTimer = null; }
+
+  const icons = { info: '📢', success: '✅', warning: '⚠️', error: '🚨' };
+  const bgColors = { info: '#1a0a3e', success: '#166534', warning: '#854d0e', error: '#991b1b' };
+  const bg = bgColors[a.style] || bgColors.info;
+  const icon = icons[a.style] || icons.info;
+
+  const bubble = document.createElement('div');
+  bubble.id = 'announcement-bubble';
+  bubble.setAttribute('data-ann-id', a.id);
+  bubble.setAttribute('data-ann-creator', a.created_by || '');
+  bubble.setAttribute('data-ann-message', a.message || '');
+  bubble.style.cssText = `position:fixed;bottom:80px;right:16px;z-index:9999;max-width:340px;width:calc(100% - 32px);background:${bg};color:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.25);animation:annBubbleIn 0.35s ease-out;font-family:inherit;`;
+  bubble.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:10px;">
+      <span style="font-size:20px;flex-shrink:0;margin-top:1px;">${icon}</span>
+      <div style="flex:1;min-width:0;">
+        <p style="font-size:11px;opacity:0.7;margin:0 0 3px;font-weight:600;letter-spacing:0.05em;">CREO Admin</p>
+        <p style="font-size:14px;line-height:1.4;margin:0;word-wrap:break-word;">${esc(a.message)}</p>
+      </div>
+      <button onclick="dismissAnnouncement('${esc(a.id)}')" style="flex-shrink:0;background:rgba(255,255,255,0.15);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:-2px;" aria-label="Close">&times;</button>
+    </div>
+    <div style="margin-top:8px;height:3px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;">
+      <div id="ann-bubble-progress" style="height:100%;background:rgba(255,255,255,0.5);border-radius:2px;width:100%;transition:width 10s linear;"></div>
+    </div>`;
+  document.body.appendChild(bubble);
+
+  if (!document.getElementById('ann-bubble-style')) {
+    const s = document.createElement('style');
+    s.id = 'ann-bubble-style';
+    s.textContent = `@keyframes annBubbleIn{from{opacity:0;transform:translateY(20px) scale(0.95);}to{opacity:1;transform:translateY(0) scale(1);}}@keyframes annBubbleOut{from{opacity:1;transform:translateY(0) scale(1);}to{opacity:0;transform:translateY(20px) scale(0.9);}}@media(min-width:1024px){#announcement-bubble{right:32px;bottom:32px;max-width:380px;}}`;
+    document.head.appendChild(s);
+  }
+
+  requestAnimationFrame(() => {
+    const bar = document.getElementById('ann-bubble-progress');
+    if (bar) bar.style.width = '0%';
+  });
+
+  _annBubbleTimer = setTimeout(() => dismissAnnouncement(a.id), 10000);
+}
+
+async function dismissAnnouncement(id) {
+  if (_annBubbleTimer) { clearTimeout(_annBubbleTimer); _annBubbleTimer = null; }
+  const bubble = document.getElementById('announcement-bubble');
+  if (!bubble) return;
+
+  const annId = bubble.getAttribute('data-ann-id');
+  const creatorId = bubble.getAttribute('data-ann-creator');
+  const message = bubble.getAttribute('data-ann-message');
+
+  bubble.style.animation = 'annBubbleOut 0.25s ease-in forwards';
+  setTimeout(() => bubble.remove(), 250);
+
   const dismissed = JSON.parse(localStorage.getItem('creo_dismissed_anns') || '[]');
-  dismissed.push(id);
+  if (!dismissed.includes(id)) dismissed.push(id);
   localStorage.setItem('creo_dismissed_anns', JSON.stringify(dismissed));
-  const bar = document.getElementById('announcement-bar');
-  if (bar) bar.remove();
+
+  // Save as a message conversation with admin
+  try {
+    const user = await getCachedUser();
+    if (user && creatorId && creatorId !== user.id && message) {
+      await sb.from('messages').insert({
+        sender_id: creatorId,
+        receiver_id: user.id,
+        body: '📢 ' + message,
+        is_read: true
+      });
+    }
+  } catch(e) { console.log('Save announcement to messages:', e); }
 }
 setTimeout(loadAnnouncementBar, 1500);
 
