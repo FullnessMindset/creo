@@ -35,6 +35,7 @@
     .creo-act-btn { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); color: #fff; border: none; cursor: pointer; transition: all 0.2s; }
     .creo-act-btn:active { transform: scale(0.9); }
     .creo-act-btn.creo-tip { width: 56px; height: 56px; background: rgba(51,240,176,0.2); border: 2px solid #33f0b0; }
+    .creo-act-btn.creo-small { width: 42px; height: 42px; }
     .creo-act-count { font-size: 11px; color: #fff; text-align: center; margin-top: -4px; text-shadow: 0 1px 4px rgba(0,0,0,0.7); font-weight: 700; }
 
     /* Share popup */
@@ -63,9 +64,9 @@
     /* Top-right share button */
     .creo-top-share { position: absolute; top: 16px; right: 16px; z-index: 12; }
 
-    /* Video controls bar */
+    /* Video controls bar — auto-hide */
     .creo-controls { position: absolute; bottom: 0; left: 0; right: 0; z-index: 14; background: linear-gradient(transparent, rgba(0,0,0,0.7)); padding: 30px 16px 16px; display: flex; flex-direction: column; gap: 6px; opacity: 0; transition: opacity 0.3s; }
-    #creo-stage:hover .creo-controls, .creo-controls.visible { opacity: 1; }
+    .creo-controls.visible { opacity: 1; }
     .creo-seek { width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.2); cursor: pointer; appearance: none; -webkit-appearance: none; outline: none; }
     .creo-seek::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #33f0b0; cursor: pointer; margin-top: -5px; }
     .creo-seek::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #33f0b0; border: none; cursor: pointer; }
@@ -74,10 +75,39 @@
     .creo-ctrl-btn:hover { color: #33f0b0; }
     .creo-time { font-size: 11px; color: rgba(255,255,255,0.6); font-variant-numeric: tabular-nums; }
 
-    /* ===== SPLIT PANEL (comments / tip) ===== */
+    /* ===== PANEL — desktop: top-right quadrant ===== */
     #creo-panel { position: fixed; top: 0; right: 0; width: 50%; height: 50%; z-index: 20; background: #fff; color: #1a1a2e; display: none; overflow: hidden; border-radius: 0 0 0 12px; }
     #creo-panel.active { display: flex; flex-direction: column; animation: fadeSlideIn 0.3s ease-out; }
     #creo-panel.fullscreen { width: 100%; height: 100%; border-radius: 0; }
+
+    /* ===== MOBILE BOTTOM SHEET ===== */
+    #creo-sheet-overlay { position: fixed; inset: 0; z-index: 19; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1); }
+    #creo-sheet-overlay.active { opacity: 1; pointer-events: auto; }
+
+    @media (max-width: 768px) {
+      #creo-panel { top: auto; right: 0; bottom: 0; left: 0; width: 100%; height: 93vh; border-radius: 20px 20px 0 0; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); display: flex !important; flex-direction: column; }
+      #creo-panel.active { transform: translateY(0); animation: none; }
+      #creo-panel.fullscreen { height: 100vh; border-radius: 0; }
+      #creo-video-wrap.split { width: 100% !important; height: 100% !important; border-radius: 0 !important; }
+      .creo-actions.split-mode { right: 16px; bottom: 80px; gap: 20px; }
+      .creo-creator-info.split-mode { left: 16px; bottom: 80px; }
+    }
+    @media (min-width: 769px) {
+      #creo-sheet-overlay { display: none !important; }
+      .creo-mini-video { display: none !important; }
+      .creo-sheet-handle { display: none !important; }
+    }
+
+    /* Mini video player inside mobile modal */
+    .creo-mini-video { width: 100%; height: 140px; background: #000; border-radius: 20px 20px 0 0; overflow: hidden; flex-shrink: 0; position: relative; }
+    .creo-mini-video video { width: 100%; height: 100%; object-fit: cover; }
+    .creo-mini-video .mini-creator { position: absolute; bottom: 8px; left: 12px; display: flex; align-items: center; gap: 8px; }
+    .creo-mini-video .mini-creator img, .creo-mini-video .mini-creator .mini-av { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 2px solid #33f0b0; }
+    .creo-mini-video .mini-creator .mini-av { display: flex; align-items: center; justify-content: center; background: rgba(51,240,176,0.2); font-size: 11px; font-weight: 700; color: #33f0b0; }
+    .creo-mini-video .mini-creator span { color: #fff; font-size: 12px; font-weight: 600; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+
+    /* Drag handle */
+    .creo-sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: #d1d5db; margin: 8px auto 4px; flex-shrink: 0; }
 
     /* Comment cards — tweet style, horizontal scroll */
     .creo-comments-scroll { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding: 12px; flex: 1; scrollbar-width: none; }
@@ -92,6 +122,11 @@
     .creo-comment-card .cc-actions { display: flex; gap: 16px; font-size: 11px; color: #9ca3af; }
     .creo-comment-card .cc-actions button { background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: color 0.15s; }
     .creo-comment-card .cc-actions button:hover { color: #1a0a3e; }
+
+    @media (max-width: 768px) {
+      .creo-comments-scroll { flex-direction: column; overflow-x: hidden; overflow-y: auto; scroll-snap-type: none; }
+      .creo-comment-card { flex: none; width: 100%; }
+    }
 
     /* Tip panel content */
     .creo-tip-panel { padding: 20px; overflow-y: auto; flex: 1; }
@@ -131,13 +166,16 @@
     <button onclick="dismissWelcome()">Empezar</button>
   </div>
 
+  <!-- Mobile bottom sheet overlay -->
+  <div id="creo-sheet-overlay" onclick="closePanel()"></div>
+
   <!-- FULLSCREEN VIDEO STAGE -->
   <div id="creo-stage">
     <div id="creo-video-wrap">
       <video id="creo-video" autoplay muted loop playsinline></video>
     </div>
 
-    <!-- Video Controls -->
+    <!-- Video Controls — auto-hide after inactivity -->
     <div class="creo-controls" id="creo-controls">
       <input type="range" class="creo-seek" id="creo-seek" min="0" max="100" value="0">
       <div class="creo-ctrl-row">
@@ -182,31 +220,38 @@
       </div>
     </div>
 
-    <!-- Right: Action buttons -->
+    <!-- Right: Action buttons (CREO tip largest, like/comment 25% smaller) -->
     <div class="creo-actions" id="creo-actions">
-      <!-- Like -->
+      <!-- Like (25% smaller) -->
       <div>
-        <button class="creo-act-btn" id="creo-like-btn" onclick="toggleCreoLike()">
-          <svg class="w-6 h-6" id="creo-like-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        <button class="creo-act-btn creo-small" id="creo-like-btn" onclick="toggleCreoLike()">
+          <svg class="w-5 h-5" id="creo-like-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
         </button>
         <div class="creo-act-count" id="creo-like-count"></div>
       </div>
-      <!-- Comment -->
+      <!-- Comment (25% smaller) -->
       <div>
-        <button class="creo-act-btn" onclick="openCreoComments()" style="width:42px;height:42px;">
+        <button class="creo-act-btn creo-small" onclick="openCreoComments()">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
         </button>
         <div class="creo-act-count" id="creo-comment-count"></div>
       </div>
-      <!-- CREO Tip -->
+      <!-- CREO Tip (largest) -->
       <button class="creo-act-btn creo-tip" onclick="openCreoTip()">
         <img src="assets/logo-icon.png" class="w-7 h-7 rounded-full" alt="CREO">
       </button>
     </div>
   </div>
 
-  <!-- SPLIT PANEL (Comments / Tip) -->
+  <!-- PANEL (desktop: split quadrant / mobile: bottom sheet) -->
   <div id="creo-panel">
+    <!-- Mobile mini video + handle -->
+    <div class="creo-mini-video" id="creo-mini-video">
+      <video id="creo-mini-vid" muted loop playsinline></video>
+      <div class="mini-creator" id="creo-mini-creator"></div>
+    </div>
+    <div class="creo-sheet-handle"></div>
+
     <div id="creo-panel-header" style="display:flex;align-items:center;justify-content:between;padding:12px 16px;border-bottom:1px solid #e5e7eb;flex-shrink:0;">
       <span id="creo-panel-title" style="font-weight:700;font-size:14px;flex:1;"></span>
       <button onclick="togglePanelFullscreen()" style="background:none;border:none;cursor:pointer;color:#9ca3af;margin-right:8px;"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg></button>
@@ -223,12 +268,24 @@
     let userFollows = new Set();
     let creoPopupProfile = null;
 
-    // Feed data: grouped by creator
-    let creatorGroups = []; // [{creator: profile, posts: [post, ...]}, ...]
+    let creatorGroups = [];
     let currentCreatorIdx = 0;
     let currentPostIdx = 0;
     let feedLoaded = false;
-    let panelMode = null; // 'comments' | 'tip' | null
+    let panelMode = null;
+
+    const isMobile = () => window.innerWidth <= 768;
+
+    /* ===== AUTO-HIDE VIDEO CONTROLS ===== */
+    let controlsTimer = null;
+    function showControls() {
+      const ctrl = document.getElementById('creo-controls');
+      ctrl.classList.add('visible');
+      clearTimeout(controlsTimer);
+      controlsTimer = setTimeout(() => ctrl.classList.remove('visible'), 3000);
+    }
+    document.getElementById('creo-stage').addEventListener('mousemove', showControls);
+    document.getElementById('creo-stage').addEventListener('touchstart', showControls, { passive: true });
 
     /* ===== AUTH ===== */
     async function initAuth() {
@@ -256,7 +313,7 @@
       document.getElementById('creo-welcome').style.display = 'none';
     }
 
-    /* ===== LOAD FEED — group posts by creator ===== */
+    /* ===== LOAD FEED ===== */
     async function loadCreoFeed() {
       const { data: posts } = await sb.from('posts')
         .select('*, profiles:creator_id(id, username, display_name, avatar_url, stripe_connect_id, stripe_onboarded, identity_verified, verification_status, account_type, email, bio, social_links, mecenas_settings)')
@@ -310,7 +367,6 @@
         video.play().catch(() => {});
       }
 
-      // Update creator info
       const avatarEl = document.getElementById('creo-creator-avatar');
       const badge = getVerifiedBadgeHTML(creator);
       avatarEl.innerHTML = (creator.avatar_url
@@ -322,7 +378,6 @@
       document.getElementById('creo-creator-name').href = `profile.html?u=${esc(creator.username)}`;
       document.getElementById('creo-creator-caption').textContent = post.caption || '';
 
-      // Update like state
       const isLiked = userLikes.has(post.id);
       const likeSvg = document.getElementById('creo-like-svg');
       likeSvg.setAttribute('fill', isLiked ? '#33f0b0' : 'none');
@@ -330,13 +385,41 @@
       document.getElementById('creo-like-count').textContent = post.like_count > 0 ? post.like_count : '';
       document.getElementById('creo-comment-count').textContent = post.comment_count > 0 ? post.comment_count : '';
 
-      // Store for reference
       creoPopupProfile = creator;
 
-      // Record impression
       if (currentUser) {
         sb.rpc('record_impression', { p_content_type: 'post', p_content_id: post.id }).catch(() => {});
       }
+
+      updateMiniVideo(post, creator);
+    }
+
+    function updateMiniVideo(post, creator) {
+      const miniVid = document.getElementById('creo-mini-vid');
+      const miniCreator = document.getElementById('creo-mini-creator');
+      if (!miniVid || !miniCreator) return;
+
+      const isDirectVideo = post.video_type === 'direct' && post.video_url && !post.video_url.includes('youtube');
+      if (isDirectVideo) {
+        miniVid.src = post.video_url;
+        miniVid.load();
+        miniVid.play().catch(() => {});
+      } else if (post.video_type === 'youtube') {
+        const ytId = extractVideoId(post.video_url, 'youtube');
+        miniVid.poster = ytId ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg` : '';
+        miniVid.src = '';
+      } else {
+        miniVid.src = post.video_url || '';
+        miniVid.load();
+        miniVid.play().catch(() => {});
+      }
+
+      const name = creator.display_name || creator.username || '?';
+      const initial = name[0].toUpperCase();
+      miniCreator.innerHTML = (creator.avatar_url
+        ? `<img src="${esc(creator.avatar_url)}" alt="">`
+        : `<div class="mini-av">${esc(initial)}</div>`
+      ) + `<span>${esc(name)}</span>`;
     }
 
     function getCurrentPost() {
@@ -349,7 +432,7 @@
       return creatorGroups[currentCreatorIdx]?.creator || null;
     }
 
-    /* ===== NAVIGATION: horizontal=same creator, vertical=diff creator ===== */
+    /* ===== NAVIGATION ===== */
     function navigateHorizontal(dir) {
       const group = creatorGroups[currentCreatorIdx];
       if (!group) return;
@@ -381,7 +464,7 @@
       const dx = e.changedTouches[0].clientX - touchStartX;
       const dy = e.changedTouches[0].clientY - touchStartY;
       const absDx = Math.abs(dx), absDy = Math.abs(dy);
-      if (Math.max(absDx, absDy) < 30) return; // too small
+      if (Math.max(absDx, absDy) < 30) return;
       if (absDx > absDy) {
         navigateHorizontal(dx < 0 ? 1 : -1);
       } else {
@@ -411,13 +494,11 @@
 
       const now = Date.now();
       if (now - lastTapTime < 400) {
-        // Double tap — like
         doDoubleTapLike(e);
         lastTapTime = 0;
       } else {
         lastTapTime = now;
-        // Single tap on video when in split mode — go back fullscreen
-        if (panelMode) {
+        if (panelMode && !isMobile()) {
           setTimeout(() => {
             if (Date.now() - lastTapTime >= 350) closePanel();
           }, 350);
@@ -426,7 +507,6 @@
     });
 
     function doDoubleTapLike(e) {
-      // Show heart animation
       const heart = document.createElement('div');
       heart.className = 'double-tap-heart';
       heart.innerHTML = '<svg viewBox="0 0 24 24" fill="#33f0b0" style="width:100%;height:100%;filter:drop-shadow(0 2px 8px rgba(51,240,176,0.5))"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>';
@@ -478,7 +558,7 @@
       }
     }
 
-    /* ===== COMMENTS — split screen, tweet cards ===== */
+    /* ===== COMMENTS ===== */
     async function openCreoComments() {
       const post = getCurrentPost();
       if (!post) return;
@@ -503,7 +583,7 @@
           </div>
           <div style="padding:8px 12px;border-top:1px solid #e5e7eb;display:flex;gap:8px;flex-shrink:0;">
             <input id="creo-comment-input" type="text" maxlength="500" placeholder="Escribe un comentario..." style="flex:1;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:9999px;padding:8px 16px;font-size:13px;outline:none;color:#1a1a2e;">
-            <button onclick="submitCreoComment()" style="background:#33f0b0;color:#1a0a3e;border:none;padding:8px 20px;border-radius:9999px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;">New Comment</button>
+            <button onclick="submitCreoComment()" style="background:#33f0b0;color:#1a0a3e;border:none;padding:8px 20px;border-radius:9999px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;">Comentar</button>
           </div>
         </div>
       `;
@@ -562,7 +642,7 @@
       const creator = getCurrentCreator();
       if (creator) createNotification(creator.id, 'comment', 'Nuevo comentario en tu publicación', body, 'feed.html');
 
-      openCreoComments(); // refresh
+      openCreoComments();
     }
 
     async function toggleCreoCommentLike(commentId) {
@@ -580,7 +660,7 @@
       else { navigator.clipboard.writeText(url); showToast('Enlace copiado', 'success'); }
     }
 
-    /* ===== TIP — split screen with Mi Meta card ===== */
+    /* ===== TIP ===== */
     async function openCreoTip() {
       const creator = getCurrentCreator();
       if (!creator) return;
@@ -596,14 +676,12 @@
       const canPay = !!creator.stripe_onboarded || isPlatform;
 
       body.innerHTML = `<div class="creo-tip-panel">
-        <!-- Tabs -->
         <div style="display:flex;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;margin-bottom:16px;">
           <button onclick="showTipTab('tip')" id="tt-tip" class="pay-tab-active" style="flex:1;padding:10px;font-size:12px;font-weight:600;text-align:center;border:none;cursor:pointer;transition:all 0.2s;">${esc(tip.title || 'Yo Creo en Ti')}</button>
           <button onclick="showTipTab('meta')" id="tt-meta" style="flex:1;padding:10px;font-size:12px;font-weight:600;text-align:center;border:none;cursor:pointer;transition:all 0.2s;background:#fff;color:#9ca3af;">${esc(meta.title || 'Mi Meta')}</button>
           <button onclick="showTipTab('sub')" id="tt-sub" style="flex:1;padding:10px;font-size:12px;font-weight:600;text-align:center;border:none;cursor:pointer;transition:all 0.2s;background:#fff;color:#9ca3af;">${esc(sub.title || 'Apoyo Full')}</button>
         </div>
 
-        <!-- Tip -->
         <div id="tp-tip">
           <div style="text-align:center;margin-bottom:12px;">
             <h3 style="font-size:16px;font-weight:700;color:#1a0a3e;">${esc(tip.title || 'Yo Creo en Ti')}</h3>
@@ -622,12 +700,10 @@
           ${canPay ? `<button onclick="processTip()" id="tip-btn" style="width:100%;background:#1a0a3e;color:#fff;border:none;padding:14px;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;${tip.button_color ? 'background:' + tip.button_color : ''}"><img src="assets/logo-icon.png" style="width:20px;height:20px;border-radius:50%;" alt="">Apoyar Creador</button>` : '<p style="text-align:center;color:#9ca3af;font-size:12px;">Pagos no disponibles</p>'}
         </div>
 
-        <!-- Meta -->
         <div id="tp-meta" style="display:none;">
           <div id="tp-metas-list"></div>
         </div>
 
-        <!-- Sub -->
         <div id="tp-sub" style="display:none;">
           <div style="text-align:center;margin-bottom:12px;">
             <h3 style="font-size:16px;font-weight:700;color:#1a0a3e;">${esc(sub.title || 'Apoyo Full')}</h3>
@@ -647,7 +723,6 @@
         </div>
       </div>`;
 
-      // Load metas
       loadTipMetas(creator);
     }
 
@@ -750,27 +825,39 @@
       } catch (e) { showToast('Error de conexión', 'error'); }
     }
 
-    /* ===== SPLIT MODE ===== */
+    /* ===== SPLIT MODE (desktop) / BOTTOM SHEET (mobile) ===== */
     function enterSplitMode(mode) {
       panelMode = mode;
-      document.getElementById('creo-video-wrap').classList.add('split');
       const panel = document.getElementById('creo-panel');
-      panel.classList.add('active');
-      panel.classList.remove('fullscreen');
-      // Move actions to split mode
-      document.getElementById('creo-actions').classList.add('split-mode');
-      document.getElementById('creo-creator-info').classList.add('split-mode');
+
+      if (isMobile()) {
+        document.getElementById('creo-sheet-overlay').classList.add('active');
+        panel.classList.add('active');
+        panel.classList.remove('fullscreen');
+      } else {
+        document.getElementById('creo-video-wrap').classList.add('split');
+        panel.classList.add('active');
+        panel.classList.remove('fullscreen');
+        document.getElementById('creo-actions').classList.add('split-mode');
+        document.getElementById('creo-creator-info').classList.add('split-mode');
+      }
       history.pushState({ panel: mode }, '');
     }
 
     function closePanel() {
       if (!panelMode) return;
       panelMode = null;
-      document.getElementById('creo-video-wrap').classList.remove('split');
       const panel = document.getElementById('creo-panel');
-      panel.classList.remove('active', 'fullscreen');
-      document.getElementById('creo-actions').classList.remove('split-mode');
-      document.getElementById('creo-creator-info').classList.remove('split-mode');
+
+      if (isMobile()) {
+        panel.classList.remove('active', 'fullscreen');
+        document.getElementById('creo-sheet-overlay').classList.remove('active');
+      } else {
+        document.getElementById('creo-video-wrap').classList.remove('split');
+        panel.classList.remove('active', 'fullscreen');
+        document.getElementById('creo-actions').classList.remove('split-mode');
+        document.getElementById('creo-creator-info').classList.remove('split-mode');
+      }
     }
 
     function togglePanelFullscreen() {
@@ -912,7 +999,6 @@
       loadNotificationBell();
       showWelcome();
 
-      // Hide sidebar/header for immersive mode
       const header = document.getElementById('creo-mobile-header');
       const sidebar = document.getElementById('creo-sidebar');
       if (header) header.style.display = 'none';
@@ -920,7 +1006,6 @@
       document.body.style.padding = '0';
       document.body.style.margin = '0';
 
-      // Show bottom nav above the video
       const nav = document.getElementById('bottom-nav');
       if (nav) { nav.style.zIndex = '30'; nav.style.background = 'rgba(0,0,0,0.8)'; nav.style.borderTop = '1px solid rgba(255,255,255,0.1)'; }
     };
