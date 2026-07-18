@@ -142,7 +142,7 @@
       </div>
 
       <!-- Tabs -->
-      <div class="flex space-x-1 bg-gray-100 p-1 rounded-xl border border-gray-200 transition-colors overflow-x-auto max-w-full" style="scrollbar-width:thin;-webkit-overflow-scrolling:touch">
+      <div class="flex space-x-1 bg-gray-100 p-1 rounded-xl border border-gray-200 transition-colors overflow-x-auto max-w-full sticky top-[57px] z-[5]" style="scrollbar-width:thin;-webkit-overflow-scrolling:touch">
         <button onclick="showTab('verification')" id="tab-verification" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-creo-purple text-white transition relative">Verification<span id="badge-verification" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
         <button onclick="showTab('creators')" id="tab-creators" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">Creators</button>
         <button onclick="showTab('transactions')" id="tab-transactions" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">Transactions</button>
@@ -2460,21 +2460,47 @@
       }
       const btn = document.getElementById('ann-send-btn');
       btn.disabled = true; btn.textContent = 'Sending...';
-      const { error } = await sb.from('announcements').insert(insert);
-      btn.disabled = false; btn.textContent = 'Broadcast';
-      if (error) { showToast('Error: ' + error.message, 'error'); return; }
 
-      if (target === 'global') {
-        for (const p of allProfiles) {
-          if (p.id === currentUser.id) continue;
-          await sb.from('notifications').insert([{ user_id: p.id, type: 'admin_report', title: 'Anuncio de CREO', body: message.substring(0, 120), category: 'admin', priority: 'high', icon: '📢', link: 'comunidad.html' }]);
-        }
-      } else if (target === 'user' && insert.target_user_id) {
-        await sb.from('notifications').insert([{ user_id: insert.target_user_id, type: 'admin_report', title: 'Mensaje del Admin', body: message.substring(0, 120), category: 'admin', priority: 'high', icon: '📢', link: 'comunidad.html' }]);
+      const { error } = await sb.from('announcements').insert(insert);
+      if (error) {
+        btn.disabled = false; btn.textContent = 'Broadcast';
+        showToast('Failed to save announcement: ' + error.message, 'error');
+        return;
       }
 
+      let sent = 0, failed = 0;
+      const notif = { type: 'admin_report', category: 'admin', priority: 'high', icon: '📢', link: 'comunidad.html' };
+
+      if (target === 'global') {
+        btn.textContent = 'Notifying users...';
+        const recipients = allProfiles.filter(p => p.id !== currentUser.id);
+        for (const p of recipients) {
+          const { error: nErr } = await sb.from('notifications').insert([{ ...notif, user_id: p.id, title: 'Anuncio de CREO', body: message.substring(0, 120) }]);
+          if (nErr) { failed++; console.error('Notification failed for', p.username, nErr.message); } else { sent++; }
+        }
+      } else if (target === 'creator' || target === 'brand' || target === 'admin') {
+        btn.textContent = 'Notifying users...';
+        const typeMap = { creator: ['creator'], brand: ['brand', 'empresa', 'business'], admin: ['admin'] };
+        const recipients = allProfiles.filter(p => p.id !== currentUser.id && typeMap[target].includes(p.account_type || 'creator'));
+        for (const p of recipients) {
+          const { error: nErr } = await sb.from('notifications').insert([{ ...notif, user_id: p.id, title: 'Anuncio de CREO', body: message.substring(0, 120) }]);
+          if (nErr) { failed++; } else { sent++; }
+        }
+      } else if (target === 'user' && insert.target_user_id) {
+        const { error: nErr } = await sb.from('notifications').insert([{ ...notif, user_id: insert.target_user_id, title: 'Mensaje del Admin', body: message.substring(0, 120) }]);
+        if (nErr) { failed++; } else { sent++; }
+      }
+
+      btn.disabled = false; btn.textContent = 'Broadcast';
       closeAnnouncementForm();
-      showToast('Announcement broadcasted!', 'success');
+
+      if (failed > 0 && sent > 0) {
+        showToast(`Announcement saved. Notified ${sent} users, ${failed} failed.`, 'warning');
+      } else if (failed > 0 && sent === 0) {
+        showToast(`Announcement saved but all ${failed} notifications failed. Check RLS on notifications table.`, 'error');
+      } else {
+        showToast(`Announcement broadcasted to ${sent} user${sent !== 1 ? 's' : ''}!`, 'success');
+      }
       loadAnnouncements();
     }
 
