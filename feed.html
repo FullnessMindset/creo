@@ -67,6 +67,22 @@
     .like-bounce { animation: like-pop 0.3s ease-out; }
     @keyframes like-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
+    /* Comment card interactive states */
+    .comment-card { transition: background 0.15s; border-radius: 0.5rem; padding: 6px 8px; margin: -6px -8px; }
+    .comment-card:hover { background: rgba(0,0,0,0.03); }
+    .comment-card .comment-actions { opacity: 0; transition: opacity 0.15s; }
+    .comment-card:hover .comment-actions { opacity: 1; }
+    @media(max-width:1023px) { .comment-card .comment-actions { opacity: 1; } }
+
+    /* Comment heart animation */
+    @keyframes heart-burst { 0% { transform: scale(1); } 30% { transform: scale(1.4); } 60% { transform: scale(0.9); } 100% { transform: scale(1); } }
+    .heart-burst { animation: heart-burst 0.4s ease-out; }
+
+    /* Desktop comments: full-height side panel */
+    @media(min-width:1024px) {
+      #comments-drawer .animate-slide-up { animation: none; }
+    }
+
     /* Floating action buttons on video cards */
     .feed-floating-actions {
       position: absolute; right: 10px; bottom: 14px; z-index: 10;
@@ -86,11 +102,42 @@
     .share-menu-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; color: #fff; font-size: 13px; cursor: pointer; transition: background 0.15s; white-space: nowrap; border: none; background: none; width: 100%; text-align: left; }
     .share-menu-item:hover { background: rgba(255,255,255,0.1); }
 
+    /* Custom video controls */
+    .feed-video-controls {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 8;
+      background: linear-gradient(transparent, rgba(0,0,0,0.6));
+      padding: 24px 12px 8px; display: flex; flex-direction: column; gap: 4px;
+      opacity: 0; transition: opacity 0.25s; pointer-events: none;
+    }
+    .feed-media-wrap:hover .feed-video-controls,
+    .feed-video-controls.visible { opacity: 1; pointer-events: auto; }
+    .feed-seek-bar { width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.25); cursor: pointer; appearance: none; -webkit-appearance: none; outline: none; }
+    .feed-seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #33f0b0; cursor: pointer; margin-top: -4px; }
+    .feed-seek-bar::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #33f0b0; cursor: pointer; border: none; }
+    .feed-seek-bar::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; }
+    .feed-seek-bar::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.25); }
+    .feed-vc-row { display: flex; align-items: center; gap: 8px; }
+    .feed-vc-btn { background: none; border: none; color: rgba(255,255,255,0.8); cursor: pointer; padding: 2px; transition: color 0.15s; display: flex; align-items: center; }
+    .feed-vc-btn:hover { color: #33f0b0; }
+    .feed-vc-time { font-size: 10px; color: rgba(255,255,255,0.7); font-variant-numeric: tabular-nums; min-width: 60px; }
+    .feed-speed-menu { position: absolute; bottom: 32px; right: 8px; background: rgba(0,0,0,0.85); border-radius: 8px; padding: 4px; display: none; z-index: 25; }
+    .feed-speed-menu.open { display: block; }
+    .feed-speed-opt { display: block; padding: 4px 12px; color: #fff; font-size: 11px; cursor: pointer; border-radius: 4px; border: none; background: none; width: 100%; text-align: left; }
+    .feed-speed-opt:hover, .feed-speed-opt.active { background: rgba(51,240,176,0.2); color: #33f0b0; }
+
     /* Adaptive media sizing */
     .feed-media-reel { aspect-ratio: 9/16; max-height: 70vh; }
     .feed-media-square { aspect-ratio: 1/1; }
     .feed-media-landscape { aspect-ratio: 16/9; }
     .feed-media-portrait { aspect-ratio: 3/4; max-height: 65vh; }
+
+    /* Suggested creator bubble */
+    .suggested-bubble { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 72px; cursor: pointer; text-decoration: none; }
+    .suggested-bubble .sb-avatar { width: 56px; height: 56px; border-radius: 50%; border: 2px solid #33f0b0; padding: 2px; transition: transform 0.2s, box-shadow 0.2s; }
+    .suggested-bubble .sb-avatar img, .suggested-bubble .sb-avatar div { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .suggested-bubble:hover .sb-avatar { transform: scale(1.08); box-shadow: 0 4px 16px rgba(51,240,176,0.3); }
+    .suggested-bubble .sb-name { font-size: 10px; font-weight: 600; color: #374151; text-align: center; max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .suggested-bubble .sb-badge { position: absolute; bottom: 0; right: 0; }
 
     /* Follow button */
     .feed-follow-btn { font-size: 11px; padding: 3px 10px; border-radius: 9999px; font-weight: 600; transition: all 0.2s; cursor: pointer; border: 1px solid rgba(51,240,176,0.4); }
@@ -118,9 +165,19 @@
 <body class="bg-gray-50 text-gray-900 min-h-screen">
   <script src="shared.js"></script>
 
+  <!-- Suggested Creators Rail -->
+  <div id="suggested-rail" class="hidden max-w-3xl mx-auto px-4" style="padding-top:var(--creo-content-top, 57px)">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Creadores sugeridos</h3>
+      <button onclick="document.getElementById('suggested-rail').classList.add('hidden')" class="text-gray-300 hover:text-gray-500 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div id="suggested-list" class="flex gap-4 overflow-x-auto pb-3 scrollbar-hide" style="scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
+    <style>#suggested-list::-webkit-scrollbar{display:none;}</style>
+  </div>
+
   <!-- Feed Container -->
-  <div id="feed-scroll" class="max-w-3xl mx-auto pb-20 px-4" style="padding-top:var(--creo-content-top, 57px)">
-    <div id="feed-content" class="space-y-4"></div>
+  <div id="feed-scroll" class="max-w-3xl mx-auto pb-20 px-4">
+    <div id="feed-content" class="space-y-4 mt-2"></div>
 
     <!-- Skeleton Loading -->
     <div id="feed-loading" class="space-y-4">
@@ -488,17 +545,17 @@
       const childReplies = replyMap[c.id] || [];
 
       return `<div class="space-y-2">
-        <div class="flex gap-2 group">
+        <div class="comment-card flex gap-2">
           ${avatar}
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
               <a href="${profileLink}" class="font-semibold text-xs text-creo-purple hover:underline">${esc(name)}</a>
               <span class="text-gray-500 text-xs">${timeAgo(c.created_at)}</span>
-              ${canDelete ? `<button onclick="editFeedComment('${c.id}','${postId}', this)" class="ml-auto text-gray-300 hover:text-blue-400 text-xs opacity-0 group-hover:opacity-100 transition">✎</button><button onclick="deleteComment('${c.id}','${postId}')" class="text-gray-300 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition">✕</button>` : ''}
+              ${canDelete ? `<span class="comment-actions ml-auto flex gap-1"><button onclick="editFeedComment('${c.id}','${postId}', this)" class="text-gray-300 hover:text-blue-400 text-xs transition">✎</button><button onclick="deleteComment('${c.id}','${postId}')" class="text-gray-300 hover:text-red-400 text-xs transition">✕</button></span>` : ''}
             </div>
             <p class="text-sm text-gray-900 leading-relaxed comment-body">${esc(c.body)}</p>
             <div class="flex items-center gap-4 mt-1">
-              <button onclick="toggleCommentLike('${c.id}')" class="flex items-center gap-1 text-xs ${isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'} transition">
+              <button id="cl-${c.id}" onclick="animateCommentLike(this);toggleCommentLike('${c.id}')" class="flex items-center gap-1 text-xs ${isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'} transition">
                 <svg class="w-3.5 h-3.5" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                 ${c.like_count > 0 ? c.like_count : ''}
               </button>
@@ -508,6 +565,11 @@
         </div>
         ${childReplies.length > 0 ? `<div class="ml-10 space-y-2 border-l border-gray-200 pl-3">${childReplies.map(r => renderReply(r, postId)).join('')}</div>` : ''}
       </div>`;
+    }
+
+    function animateCommentLike(btn) {
+      const svg = btn.querySelector('svg');
+      if (svg) { svg.classList.add('heart-burst'); setTimeout(() => svg.classList.remove('heart-burst'), 400); }
     }
 
     function renderReply(c, postId) {
@@ -520,16 +582,16 @@
       const canDelete = currentUser && currentUser.id === c.user_id;
       const isLiked = userCommentLikes.has(c.id);
 
-      return `<div class="flex gap-2 group">
+      return `<div class="comment-card flex gap-2">
         ${avatar}
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2">
             <a href="${profileLink}" class="font-semibold text-[11px] text-creo-purple hover:underline">${esc(name)}</a>
             <span class="text-gray-400 text-[10px]">${timeAgo(c.created_at)}</span>
-            ${canDelete ? `<button onclick="editFeedComment('${c.id}','${postId}', this)" class="ml-auto text-gray-300 hover:text-blue-400 text-[10px] opacity-0 group-hover:opacity-100 transition">✎</button><button onclick="deleteComment('${c.id}','${postId}')" class="text-gray-300 hover:text-red-400 text-[10px] opacity-0 group-hover:opacity-100 transition">✕</button>` : ''}
+            ${canDelete ? `<span class="comment-actions ml-auto flex gap-1"><button onclick="editFeedComment('${c.id}','${postId}', this)" class="text-gray-300 hover:text-blue-400 text-[10px] transition">✎</button><button onclick="deleteComment('${c.id}','${postId}')" class="text-gray-300 hover:text-red-400 text-[10px] transition">✕</button></span>` : ''}
           </div>
           <p class="text-xs text-gray-600 leading-relaxed comment-body">${esc(c.body)}</p>
-          <button onclick="toggleCommentLike('${c.id}')" class="flex items-center gap-1 mt-1 text-[10px] ${isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'} transition">
+          <button onclick="animateCommentLike(this);toggleCommentLike('${c.id}')" class="flex items-center gap-1 mt-1 text-[10px] ${isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'} transition">
             <svg class="w-3 h-3" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
             ${c.like_count > 0 ? c.like_count : ''}
           </button>
@@ -856,7 +918,25 @@
         card.innerHTML = `
           ${hasMedia ? `<div class="relative feed-media-wrap">
             <div class="w-full bg-black rounded-t-2xl overflow-hidden ${mediaClass}">${mediaHTML}</div>
-            ${hasVideo ? `<div class="absolute bottom-4 left-3 z-10"><button class="mute-toggle w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-white/70 hover:text-white transition" onclick="toggleMute(this)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg></button></div>` : ''}
+            ${hasVideo ? `<div class="feed-video-controls">
+              <input type="range" class="feed-seek-bar" min="0" max="100" value="0" oninput="seekVideo(this)">
+              <div class="feed-vc-row">
+                <button class="feed-vc-btn" onclick="togglePlayPause(this)"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg></button>
+                <button class="feed-vc-btn" onclick="toggleMute(this)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg></button>
+                <span class="feed-vc-time">0:00 / 0:00</span>
+                <span class="flex-1"></span>
+                <div class="relative">
+                  <button class="feed-vc-btn" onclick="toggleSpeedMenu(this)"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span style="font-size:10px;margin-left:2px;">1x</span></button>
+                  <div class="feed-speed-menu">
+                    <button class="feed-speed-opt" onclick="setSpeed(this,0.5)">0.5x</button>
+                    <button class="feed-speed-opt active" onclick="setSpeed(this,1)">1x</button>
+                    <button class="feed-speed-opt" onclick="setSpeed(this,1.5)">1.5x</button>
+                    <button class="feed-speed-opt" onclick="setSpeed(this,2)">2x</button>
+                  </div>
+                </div>
+                <button class="feed-vc-btn" onclick="toggleVideoFullscreen(this)"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg></button>
+              </div>
+            </div>` : ''}
             ${hasVideo ? `<div class="absolute bottom-4 left-0 right-0 z-10 px-3 pointer-events-none">
               <div class="flex items-center gap-2 pointer-events-auto">
                 <a href="profile.html?u=${esc(profile.username)}" class="flex-shrink-0">${avatarHTML.replace('border-2 border-creo-mint', 'border-2 border-white shadow-lg')}</a>
@@ -894,7 +974,7 @@
         container.appendChild(card);
 
         const video = card.querySelector('video.feed-video');
-        if (video) { allFeedVideos.add(video); feedVideoObserver.observe(video); }
+        if (video) { allFeedVideos.add(video); feedVideoObserver.observe(video); initVideoControls(video); }
       });
 
       // Preload next batch media
@@ -940,8 +1020,8 @@
     }
 
     function toggleMute(btn) {
-      const card = btn.closest('.feed-card');
-      const video = card.querySelector('video');
+      const wrap = btn.closest('.feed-media-wrap') || btn.closest('.feed-card');
+      const video = wrap?.querySelector('video');
       if (!video) return;
       video.muted = !video.muted;
       btn.innerHTML = video.muted
@@ -1408,6 +1488,114 @@
       });
     }, { threshold: [0, 0.5, 1] });
 
+    // ===== CUSTOM VIDEO CONTROLS =====
+    function togglePlayPause(btn) {
+      const video = btn.closest('.feed-media-wrap').querySelector('video');
+      if (!video) return;
+      if (video.paused) { video.play(); btn.innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>'; }
+      else { video.pause(); btn.innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg>'; }
+    }
+
+    function seekVideo(range) {
+      const video = range.closest('.feed-media-wrap').querySelector('video');
+      if (!video || !video.duration) return;
+      video.currentTime = (range.value / 100) * video.duration;
+    }
+
+    function toggleSpeedMenu(btn) {
+      const menu = btn.closest('.relative').querySelector('.feed-speed-menu');
+      document.querySelectorAll('.feed-speed-menu.open').forEach(m => { if (m !== menu) m.classList.remove('open'); });
+      menu.classList.toggle('open');
+    }
+
+    function setSpeed(opt, speed) {
+      const wrap = opt.closest('.feed-media-wrap');
+      const video = wrap.querySelector('video');
+      if (video) video.playbackRate = speed;
+      const menu = opt.closest('.feed-speed-menu');
+      menu.querySelectorAll('.feed-speed-opt').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      menu.classList.remove('open');
+      const label = opt.closest('.relative').querySelector('.feed-vc-btn span');
+      if (label) label.textContent = speed + 'x';
+    }
+
+    function toggleVideoFullscreen(btn) {
+      const video = btn.closest('.feed-media-wrap').querySelector('video');
+      if (!video) return;
+      if (document.fullscreenElement) document.exitFullscreen();
+      else video.requestFullscreen?.();
+    }
+
+    function fmtTime(s) {
+      if (!s || isNaN(s)) return '0:00';
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    function initVideoControls(video) {
+      const wrap = video.closest('.feed-media-wrap');
+      if (!wrap) return;
+      const seek = wrap.querySelector('.feed-seek-bar');
+      const timeEl = wrap.querySelector('.feed-vc-time');
+      const playBtn = wrap.querySelector('.feed-vc-btn');
+
+      video.addEventListener('timeupdate', () => {
+        if (!video.duration) return;
+        const pct = (video.currentTime / video.duration) * 100;
+        if (seek) seek.value = pct;
+        if (timeEl) timeEl.textContent = fmtTime(video.currentTime) + ' / ' + fmtTime(video.duration);
+      });
+
+      video.addEventListener('play', () => {
+        if (playBtn) playBtn.innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>';
+      });
+
+      video.addEventListener('pause', () => {
+        if (playBtn) playBtn.innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4l15 8-15 8V4z"/></svg>';
+      });
+    }
+
+    // ===== SUGGESTED CREATORS =====
+    async function loadSuggestedCreators() {
+      let query = sb.from('profiles')
+        .select('id, username, display_name, avatar_url, stripe_onboarded, identity_verified, account_type, email')
+        .eq('stripe_onboarded', true)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (currentUser) {
+        const followedIds = Array.from(userFollows);
+        if (followedIds.length > 0) {
+          query = query.not('id', 'in', `(${followedIds.join(',')})`);
+        }
+        query = query.neq('id', currentUser.id);
+      }
+
+      const { data: creators } = await query;
+      if (!creators || creators.length === 0) return;
+
+      const rail = document.getElementById('suggested-rail');
+      const list = document.getElementById('suggested-list');
+      rail.classList.remove('hidden');
+
+      list.innerHTML = creators.map(p => {
+        const badge = getVerifiedBadgeHTML(p);
+        const initial = (p.display_name || p.username || '?')[0].toUpperCase();
+        return `<a href="profile.html?u=${esc(p.username)}" class="suggested-bubble">
+          <div class="sb-avatar relative">
+            ${p.avatar_url
+              ? `<img src="${esc(p.avatar_url)}" alt="${esc(p.display_name || p.username)}">`
+              : `<div class="bg-creo-mint/20 flex items-center justify-center"><span class="text-creo-mint font-bold text-lg">${esc(initial)}</span></div>`
+            }
+            ${badge ? `<div class="sb-badge">${badge}</div>` : ''}
+          </div>
+          <span class="sb-name">${esc(p.display_name || p.username)}</span>
+        </a>`;
+      }).join('');
+    }
+
     // ===== OVERLAY MANAGER — history, gestures, blur =====
     const overlayStack = [];
 
@@ -1525,6 +1713,7 @@
       loadNotificationBell();
       handleOrientation();
       setupInfiniteScroll();
+      loadSuggestedCreators();
 
       // Enable swipe-to-dismiss on mobile
       enableSwipeDismiss(document.getElementById('comments-drawer'), closeComments);
