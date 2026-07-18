@@ -1687,7 +1687,7 @@ async function startCreoIdVerification() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { showToast(t('iniciaSesionPrimero'), 'error'); return; }
     const returnUrl = window.location.href.split('?')[0] + '?verification=complete';
-    const res = await fetch(SUPABASE_URL + '/functions/v1/create-identity-session', {
+    const res = await fetch(SUPABASE_URL + '/functions/v1/create-identity-verification', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
       body: JSON.stringify({ return_url: returnUrl })
@@ -2459,7 +2459,7 @@ window.startVerifyCreoId = async function(el) {
     if (el) el.textContent = t('iniciandoVerif');
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'index.html'; return; }
-    const res = await fetch(SUPABASE_URL + '/functions/v1/create-identity-session', {
+    const res = await fetch(SUPABASE_URL + '/functions/v1/create-identity-verification', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
       body: JSON.stringify({ return_url: window.location.href.split('?')[0] + '?verification=complete' })

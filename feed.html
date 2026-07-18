@@ -1172,6 +1172,8 @@
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             creator_connect_id: creoPopupProfile.stripe_connect_id || 'platform',
+            creator_id: creoPopupProfile.id,
+            creator_username: creoPopupProfile.username,
             amount_usd: amount,
             meta_id: metaId,
             success_url: window.location.href.split('?')[0] + '?status=meta_completed',
@@ -1196,6 +1198,7 @@
           body: JSON.stringify({
             creator_connect_id: creoPopupProfile.stripe_connect_id || 'platform',
             creator_id: creoPopupProfile.id,
+            creator_username: creoPopupProfile.username,
             amount_usd: amount,
             success_url: window.location.href.split('?')[0] + '?status=subscribed',
             cancel_url: window.location.href
