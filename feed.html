@@ -54,6 +54,10 @@
 
     .animate-slide-up { animation: slide-up 0.3s ease-out; }
 
+    /* Overlay drag handle for mobile */
+    .overlay-drag-handle { width: 36px; height: 4px; border-radius: 2px; background: rgba(0,0,0,0.15); margin: 8px auto 4px; flex-shrink: 0; }
+    @media(min-width:1024px) { .overlay-drag-handle { display: none; } }
+
     /* Skeleton loading */
     @keyframes skeleton-pulse {
       0%, 100% { opacity: 0.4; }
@@ -181,9 +185,10 @@
   </div>
 
   <!-- Comments Drawer -->
-  <div id="comments-drawer" class="fixed inset-0 z-[55] hidden">
-    <div class="absolute inset-0 bg-black/60" onclick="closeComments()"></div>
-    <div class="absolute bottom-0 left-0 right-0 max-w-3xl mx-auto rounded-t-2xl max-h-[70vh] flex flex-col animate-slide-up shadow-2xl glass">
+  <div id="comments-drawer" class="fixed inset-0 z-[55] hidden" style="transition:opacity 0.25s;">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeComments()"></div>
+    <div class="absolute bottom-0 left-0 right-0 lg:right-auto lg:left-[var(--creo-content-left,0)] lg:w-[50%] lg:top-0 lg:bottom-0 lg:max-h-none lg:rounded-none max-w-3xl mx-auto lg:mx-0 rounded-t-2xl max-h-[70vh] flex flex-col animate-slide-up shadow-2xl glass lg:border-l lg:border-gray-200">
+      <div class="overlay-drag-handle"></div>
       <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
         <h3 class="font-bold text-sm" id="comments-title">Comentarios</h3>
         <button onclick="closeComments()" class="text-gray-400 hover:text-gray-700 p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
@@ -203,11 +208,12 @@
   </div>
 
   <!-- CREO Support Popup — matches profile.html payment sections -->
-  <div id="creo-popup" class="fixed inset-0 z-[60] hidden">
-    <div class="absolute inset-0 bg-black/60" onclick="closeCreoPopup()"></div>
-    <div class="absolute bottom-0 left-0 right-0 max-w-lg mx-auto rounded-t-3xl max-h-[85vh] flex flex-col animate-slide-up shadow-2xl bg-white overflow-hidden">
+  <div id="creo-popup" class="fixed inset-0 z-[60] hidden" style="transition:opacity 0.25s;">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeCreoPopup()"></div>
+    <div class="absolute bottom-0 left-0 right-0 lg:right-auto lg:left-[var(--creo-content-left,0)] lg:w-[50%] lg:top-0 lg:bottom-0 lg:max-h-none lg:rounded-none max-w-lg mx-auto lg:mx-0 rounded-t-3xl max-h-[85vh] flex flex-col animate-slide-up shadow-2xl bg-white overflow-hidden lg:border-l lg:border-gray-200">
+      <div class="overlay-drag-handle"></div>
       <!-- Header with creator info -->
-      <div class="flex items-center justify-between px-5 pt-5 pb-3">
+      <div class="flex items-center justify-between px-5 pt-2 pb-3">
         <div class="flex items-center gap-3">
           <div id="creo-popup-avatar" class="relative w-12 h-12 rounded-full border-2 border-creo-mint overflow-visible flex-shrink-0"></div>
           <div>
@@ -1402,6 +1408,115 @@
       });
     }, { threshold: [0, 0.5, 1] });
 
+    // ===== OVERLAY MANAGER — history, gestures, blur =====
+    const overlayStack = [];
+
+    function pushOverlay(name, openFn, closeFn) {
+      overlayStack.push({ name, close: closeFn });
+      history.pushState({ overlay: name }, '');
+    }
+
+    function popOverlay() {
+      const top = overlayStack.pop();
+      if (top) top.close();
+    }
+
+    window.addEventListener('popstate', (e) => {
+      if (overlayStack.length > 0) {
+        const top = overlayStack.pop();
+        top.close();
+      }
+    });
+
+    // Swipe-down-to-dismiss for mobile overlays
+    function enableSwipeDismiss(el, closeFn) {
+      let startY = 0, currentY = 0, dragging = false;
+      const panel = el.querySelector('.animate-slide-up') || el.lastElementChild;
+      if (!panel) return;
+
+      panel.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        startY = touch.clientY;
+        currentY = startY;
+        dragging = true;
+        panel.style.transition = 'none';
+      }, { passive: true });
+
+      panel.addEventListener('touchmove', (e) => {
+        if (!dragging) return;
+        currentY = e.touches[0].clientY;
+        const dy = Math.max(0, currentY - startY);
+        panel.style.transform = `translateY(${dy}px)`;
+        const bg = el.querySelector('.backdrop-blur-sm') || el.firstElementChild;
+        if (bg) bg.style.opacity = Math.max(0.2, 1 - dy / 300);
+      }, { passive: true });
+
+      panel.addEventListener('touchend', () => {
+        if (!dragging) return;
+        dragging = false;
+        const dy = currentY - startY;
+        panel.style.transition = 'transform 0.25s ease';
+        if (dy > 120) {
+          panel.style.transform = `translateY(100%)`;
+          setTimeout(() => {
+            panel.style.transform = '';
+            panel.style.transition = '';
+            closeFn();
+            if (overlayStack.length > 0 && overlayStack[overlayStack.length - 1].name) history.back();
+          }, 250);
+        } else {
+          panel.style.transform = '';
+          setTimeout(() => { panel.style.transition = ''; }, 250);
+        }
+        const bg = el.querySelector('.backdrop-blur-sm') || el.firstElementChild;
+        if (bg) bg.style.opacity = '';
+      }, { passive: true });
+    }
+
+    // Patch open/close to use overlay manager
+    const _origOpenComments = openComments;
+    openComments = async function(postId) {
+      pushOverlay('comments', null, () => {
+        const drawer = document.getElementById('comments-drawer');
+        drawer.classList.add('hidden');
+        const nav = document.getElementById('bottom-nav');
+        if (nav) nav.style.display = '';
+        activeCommentsPostId = null;
+        cancelReply();
+      });
+      await _origOpenComments(postId);
+    };
+
+    const _origCloseComments = closeComments;
+    closeComments = function() {
+      if (overlayStack.length > 0 && overlayStack[overlayStack.length - 1].name === 'comments') {
+        overlayStack.pop();
+        history.back();
+      }
+      _origCloseComments();
+    };
+
+    const _origOpenCreoPopup = openCreoPopup;
+    openCreoPopup = async function(username) {
+      pushOverlay('creo', null, () => {
+        const popup = document.getElementById('creo-popup');
+        popup.classList.add('hidden');
+        const nav = document.getElementById('bottom-nav');
+        if (nav) nav.style.display = '';
+        creoPopupProfile = null;
+      });
+      await _origOpenCreoPopup(username);
+    };
+
+    const _origCloseCreoPopup = closeCreoPopup;
+    closeCreoPopup = function() {
+      if (overlayStack.length > 0 && overlayStack[overlayStack.length - 1].name === 'creo') {
+        overlayStack.pop();
+        history.back();
+      }
+      _origCloseCreoPopup();
+    };
+
     window.onload = async () => {
       await initAuth();
       loadFeed();
@@ -1410,6 +1525,10 @@
       loadNotificationBell();
       handleOrientation();
       setupInfiniteScroll();
+
+      // Enable swipe-to-dismiss on mobile
+      enableSwipeDismiss(document.getElementById('comments-drawer'), closeComments);
+      enableSwipeDismiss(document.getElementById('creo-popup'), closeCreoPopup);
     };
   </script>
 </body>
