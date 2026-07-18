@@ -9,6 +9,7 @@ const STATIC_ASSETS = [
   '/creo/brand-deals.html',
   '/creo/offline.html',
   '/creo/shared.js',
+  '/creo/tailwind.min.css',
   '/creo/assets/logo-icon.png',
   '/creo/manifest.json',
 ];
@@ -39,7 +40,7 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  if (url.origin === 'https://cdn.tailwindcss.com' || url.origin === 'https://cdn.jsdelivr.net') {
+  if (url.origin === 'https://cdn.jsdelivr.net') {
     e.respondWith(
       caches.match(e.request).then((cached) => {
         const fetched = fetch(e.request).then((res) => {

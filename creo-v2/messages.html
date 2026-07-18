@@ -7,13 +7,8 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a0a3e">
   <link rel="icon" href="assets/logo-icon.png" type="image/png">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../tailwind.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    tailwind.config = {
-      theme: { extend: { colors: { creo: { purple: '#1a0a3e', light: '#2d1b69', mint: '#33f0b0', mintDark: '#28c48e' } } } }
-    }
-  </script>
   <style>
     input, select, textarea { font-size: max(16px, 1em) !important; }
     .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }

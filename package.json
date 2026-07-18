@@ -1,0 +1,10 @@
+{
+  "name": "creo-frontend",
+  "private": true,
+  "scripts": {
+    "build:css": "npx tailwindcss -i ./src.css -o ./tailwind.min.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3"
+  }
+}

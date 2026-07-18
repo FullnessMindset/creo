@@ -7,7 +7,7 @@
   csp.httpEquiv = 'Content-Security-Policy';
   csp.content = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://js.stripe.com",
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "connect-src 'self' https://qddxoyjtoxtdcezwuvcq.supabase.co wss://qddxoyjtoxtdcezwuvcq.supabase.co https://api.giphy.com https://api.stripe.com https://js.stripe.com",
     "img-src 'self' data: blob: https: http:",
