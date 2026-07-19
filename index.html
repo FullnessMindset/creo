@@ -2817,6 +2817,11 @@
         } catch (_) {}
       }
 
+      // Fallback: if profile says stripe_onboarded but API returned not_started (platform account has no connect_id)
+      if ((!sr || sr.status === 'not_started') && profile.stripe_onboarded) {
+        sr = { status: 'complete', details_submitted: true, charges_enabled: true, payouts_enabled: true };
+      }
+
       const stripeBtn = document.getElementById('stripe-action-btn');
 
       if (sr && sr.status === 'complete') {
@@ -2828,7 +2833,7 @@
         statusStripe.className = 'flex items-center gap-3 p-4 rounded-xl border border-green-200 bg-green-50';
         stripeBtn.textContent = 'Mi Stripe';
         stripeBtn.className = 'text-xs px-3 py-1.5 rounded-lg font-semibold transition bg-creo-purple text-white hover:opacity-90';
-        stripeBtn.onclick = () => { window.open('https://connect.stripe.com/express_login', '_blank'); };
+        stripeBtn.onclick = () => { window.open('https://dashboard.stripe.com', '_blank'); };
         stripeBtn.classList.remove('hidden');
       } else if (sr && sr.status === 'incomplete') {
         stripeIcon.className = 'w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0';
@@ -2854,7 +2859,7 @@
         statusStripe.className = 'flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50';
         stripeBtn.textContent = 'Conectar';
         stripeBtn.className = 'text-xs px-3 py-1.5 rounded-lg font-semibold transition bg-creo-purple text-white hover:opacity-90';
-        stripeBtn.onclick = () => { showTab('stripe'); };
+        stripeBtn.onclick = () => { startStripeOnboarding(); };
         stripeBtn.classList.remove('hidden');
       }
 
@@ -2862,9 +2867,9 @@
       const readiness = document.getElementById('payment-readiness');
       readiness.classList.remove('hidden');
       const idOk = vStatus === 'approved' || idVerified;
-      const stripeOk = sr && sr.status === 'complete';
-      const chargesOk = sr && sr.charges_enabled;
-      const payoutsOk = sr && sr.payouts_enabled;
+      const stripeOk = (sr && sr.status === 'complete') || profile.stripe_onboarded;
+      const chargesOk = (sr && sr.charges_enabled) || profile.stripe_onboarded;
+      const payoutsOk = (sr && sr.payouts_enabled) || profile.stripe_onboarded;
       setCheck('check-id', idOk);
       setCheck('check-stripe', stripeOk || (sr && sr.status === 'incomplete'));
       setCheck('check-charges', chargesOk);
