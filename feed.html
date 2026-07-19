@@ -23,7 +23,6 @@
     #creo-stage { position: fixed; inset: 0; z-index: 1; }
     #creo-video-wrap { position: absolute; inset: 0; transition: all 0.35s cubic-bezier(0.4,0,0.2,1); }
     #creo-video-wrap video { width: 100%; height: 100%; object-fit: cover; }
-    #creo-video-wrap.split { top: 0; left: 0; width: 50%; height: 50%; border-radius: 0 0 12px 0; }
 
     /* ===== OVERLAY UI ===== */
     #creo-ui { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
@@ -31,7 +30,6 @@
 
     /* Right action column */
     .creo-actions { position: absolute; right: 16px; bottom: 80px; display: flex; flex-direction: column; align-items: center; gap: 20px; z-index: 15; }
-    .creo-actions.split-mode { right: 8px; bottom: 40px; gap: 12px; }
     .creo-act-btn { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); color: #fff; border: none; cursor: pointer; transition: all 0.2s; }
     .creo-act-btn:active { transform: scale(0.9); }
     .creo-act-btn.creo-tip { width: 56px; height: 56px; background: rgba(51,240,176,0.2); border: 2px solid #33f0b0; }
@@ -46,7 +44,6 @@
 
     /* Bottom-left creator info */
     .creo-creator-info { position: absolute; left: 16px; bottom: 80px; display: flex; align-items: flex-end; gap: 10px; z-index: 12; max-width: 50%; }
-    .creo-creator-info.split-mode { left: 8px; bottom: 40px; }
     .creo-creator-avatar { position: relative; flex-shrink: 0; }
     .creo-creator-avatar img, .creo-creator-avatar .av-placeholder { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #33f0b0; }
     .creo-creator-avatar .av-placeholder { display: flex; align-items: center; justify-content: center; background: rgba(51,240,176,0.2); }
@@ -75,26 +72,22 @@
     .creo-ctrl-btn:hover { color: #33f0b0; }
     .creo-time { font-size: 11px; color: rgba(255,255,255,0.6); font-variant-numeric: tabular-nums; }
 
-    /* ===== PANEL — desktop: top-right quadrant ===== */
-    #creo-panel { position: fixed; top: 0; right: 0; width: 50%; height: 50%; z-index: 20; background: #fff; color: #1a1a2e; display: none; overflow: hidden; border-radius: 0 0 0 12px; }
+    /* ===== PANEL — desktop: centered modal overlay ===== */
+    #creo-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; max-width: 95%; height: 70vh; max-height: 700px; z-index: 20; background: #fff; color: #1a1a2e; display: none; overflow: hidden; border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
     #creo-panel.active { display: flex; flex-direction: column; animation: fadeSlideIn 0.3s ease-out; }
-    #creo-panel.fullscreen { width: 100%; height: 100%; border-radius: 0; }
+    #creo-panel.fullscreen { width: 100%; height: 100%; max-width: 100%; max-height: 100%; border-radius: 0; top: 0; left: 0; transform: none; }
 
     /* ===== MOBILE BOTTOM SHEET ===== */
     #creo-sheet-overlay { position: fixed; inset: 0; z-index: 19; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1); }
     #creo-sheet-overlay.active { opacity: 1; pointer-events: auto; }
 
     @media (max-width: 768px) {
-      #creo-panel { top: auto; right: 0; bottom: 0; left: 0; width: 100%; height: 93vh; border-radius: 20px 20px 0 0; }
+      #creo-panel { top: auto; right: 0; bottom: 0; left: 0; width: 100%; height: 93vh; max-width: 100%; max-height: none; transform: none; border-radius: 20px 20px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.4); }
       #creo-panel.active { display: flex; flex-direction: column; animation: mobileSlideUp 0.3s cubic-bezier(0.4,0,0.2,1) forwards; }
       #creo-panel.fullscreen { height: 100vh; border-radius: 0; }
-      #creo-video-wrap.split { width: 100% !important; height: 100% !important; border-radius: 0 !important; }
-      .creo-actions.split-mode { right: 16px; bottom: 80px; gap: 20px; }
-      .creo-creator-info.split-mode { left: 16px; bottom: 80px; }
     }
     @keyframes mobileSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @media (min-width: 769px) {
-      #creo-sheet-overlay { display: none !important; }
       .creo-mini-video { display: none !important; }
       .creo-sheet-handle { display: none !important; }
     }
@@ -504,11 +497,6 @@
         lastTapTime = 0;
       } else {
         lastTapTime = now;
-        if (panelMode && !isMobile()) {
-          setTimeout(() => {
-            if (Date.now() - lastTapTime >= 350) closePanel();
-          }, 350);
-        }
       }
     });
 
@@ -831,22 +819,13 @@
       } catch (e) { showToast('Error de conexión', 'error'); }
     }
 
-    /* ===== SPLIT MODE (desktop) / BOTTOM SHEET (mobile) ===== */
+    /* ===== MODAL OVERLAY (both desktop & mobile) ===== */
     function enterSplitMode(mode) {
       panelMode = mode;
       const panel = document.getElementById('creo-panel');
-
-      if (isMobile()) {
-        document.getElementById('creo-sheet-overlay').classList.add('active');
-        panel.classList.add('active');
-        panel.classList.remove('fullscreen');
-      } else {
-        document.getElementById('creo-video-wrap').classList.add('split');
-        panel.classList.add('active');
-        panel.classList.remove('fullscreen');
-        document.getElementById('creo-actions').classList.add('split-mode');
-        document.getElementById('creo-creator-info').classList.add('split-mode');
-      }
+      document.getElementById('creo-sheet-overlay').classList.add('active');
+      panel.classList.add('active');
+      panel.classList.remove('fullscreen');
       history.pushState({ panel: mode }, '');
     }
 
@@ -854,16 +833,8 @@
       if (!panelMode) return;
       panelMode = null;
       const panel = document.getElementById('creo-panel');
-
-      if (isMobile()) {
-        panel.classList.remove('active', 'fullscreen');
-        document.getElementById('creo-sheet-overlay').classList.remove('active');
-      } else {
-        document.getElementById('creo-video-wrap').classList.remove('split');
-        panel.classList.remove('active', 'fullscreen');
-        document.getElementById('creo-actions').classList.remove('split-mode');
-        document.getElementById('creo-creator-info').classList.remove('split-mode');
-      }
+      panel.classList.remove('active', 'fullscreen');
+      document.getElementById('creo-sheet-overlay').classList.remove('active');
     }
 
     function togglePanelFullscreen() {
