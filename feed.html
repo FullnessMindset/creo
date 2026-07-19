@@ -21,11 +21,13 @@
 
     /* ===== FULLSCREEN VIDEO GRID ===== */
     #creo-stage { position: fixed; inset: 0; z-index: 1; }
+    @media (min-width: 1024px) { #creo-stage { left: 220px; } }
     #creo-video-wrap { position: absolute; inset: 0; transition: all 0.35s cubic-bezier(0.4,0,0.2,1); }
     #creo-video-wrap video { width: 100%; height: 100%; object-fit: cover; }
 
     /* ===== OVERLAY UI ===== */
     #creo-ui { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
+    @media (min-width: 1024px) { #creo-ui { left: 220px; } }
     #creo-ui > * { pointer-events: auto; }
 
     /* Right action column */
@@ -1010,10 +1012,6 @@
       showWelcome();
       preloadNextVideos();
 
-      const header = document.getElementById('creo-mobile-header');
-      const sidebar = document.getElementById('creo-sidebar');
-      if (header) header.style.display = 'none';
-      if (sidebar) sidebar.style.display = 'none';
       document.body.style.padding = '0';
       document.body.style.margin = '0';
 
