@@ -85,13 +85,14 @@
     #creo-sheet-overlay.active { opacity: 1; pointer-events: auto; }
 
     @media (max-width: 768px) {
-      #creo-panel { top: auto; right: 0; bottom: 0; left: 0; width: 100%; height: 93vh; border-radius: 20px 20px 0 0; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); display: flex !important; flex-direction: column; }
-      #creo-panel.active { transform: translateY(0); animation: none; }
+      #creo-panel { top: auto; right: 0; bottom: 0; left: 0; width: 100%; height: 93vh; border-radius: 20px 20px 0 0; }
+      #creo-panel.active { display: flex; flex-direction: column; animation: mobileSlideUp 0.3s cubic-bezier(0.4,0,0.2,1) forwards; }
       #creo-panel.fullscreen { height: 100vh; border-radius: 0; }
       #creo-video-wrap.split { width: 100% !important; height: 100% !important; border-radius: 0 !important; }
       .creo-actions.split-mode { right: 16px; bottom: 80px; gap: 20px; }
       .creo-creator-info.split-mode { left: 16px; bottom: 80px; }
     }
+    @keyframes mobileSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @media (min-width: 769px) {
       #creo-sheet-overlay { display: none !important; }
       .creo-mini-video { display: none !important; }
