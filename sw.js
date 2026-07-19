@@ -1,4 +1,4 @@
-const CACHE_NAME = 'creo-v1';
+const CACHE_NAME = 'creo-v2';
 const STATIC_ASSETS = [
   '/creo/',
   '/creo/explore.html',
