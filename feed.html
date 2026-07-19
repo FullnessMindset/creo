@@ -161,10 +161,14 @@
 
   <!-- Welcome Info Card (first visit) -->
   <div id="creo-welcome" class="creo-info-card" style="display:none;">
-    <h2>Bienvenido a la Experiencia Completa</h2>
-    <p>Gira tu teléfono para la mejor experiencia. En desktop ya estás listo.</p>
-    <p style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.5);">Desliza horizontal para ver más videos del mismo creador. Desliza vertical para descubrir otros creadores.</p>
-    <button onclick="dismissWelcome()">Empezar</button>
+    <h2>Bienvenido a Creadores</h2>
+    <p style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.6;">Este es tu feed de creadores. Aquí descubres contenido original y apoyas directamente a quienes admiras.</p>
+    <div style="text-align:left;margin-top:12px;padding:12px;background:rgba(51,240,176,0.08);border-radius:10px;border:1px solid rgba(51,240,176,0.2);">
+      <p style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:6px;"><strong style="color:#33f0b0;">↔ Horizontal</strong> — más videos del mismo creador</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:6px;"><strong style="color:#33f0b0;">↕ Vertical</strong> — descubrir nuevos creadores</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.7);"><strong style="color:#33f0b0;">💚 CREO</strong> — apoya sin crear cuenta</p>
+    </div>
+    <button onclick="dismissWelcome()">Explorar</button>
   </div>
 
   <!-- Mobile bottom sheet overlay -->
@@ -451,6 +455,7 @@
       currentPostIdx = 0;
       playCurrentPost();
       loadRecommended();
+      preloadNextVideos();
       if (panelMode === 'comments') openCreoComments();
     }
 
@@ -991,6 +996,39 @@
       return Math.floor(days / 30) + 'mes';
     }
 
+    /* ===== KEYBOARD-SAFE MODAL ===== */
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', () => {
+        if (!panelMode || !isMobile()) return;
+        const panel = document.getElementById('creo-panel');
+        const vvh = window.visualViewport.height;
+        const fullH = window.innerHeight;
+        if (vvh < fullH * 0.85) {
+          panel.style.height = vvh + 'px';
+          panel.style.bottom = (fullH - vvh) + 'px';
+        } else {
+          panel.style.height = '93vh';
+          panel.style.bottom = '0';
+        }
+      });
+    }
+
+    /* ===== LAZY-LOAD VIDEOS (preload next creator) ===== */
+    function preloadNextVideos() {
+      const nextIdx = currentCreatorIdx + 1;
+      if (nextIdx >= creatorGroups.length) return;
+      const nextGroup = creatorGroups[nextIdx];
+      if (!nextGroup || !nextGroup.posts.length) return;
+      const nextPost = nextGroup.posts[0];
+      if (nextPost.video_type === 'direct' && nextPost.video_url) {
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = nextPost.video_url;
+        link.as = 'video';
+        document.head.appendChild(link);
+      }
+    }
+
     /* ===== INIT ===== */
     window.onload = async () => {
       await initAuth();
@@ -999,6 +1037,7 @@
       updateNavAuth();
       loadNotificationBell();
       showWelcome();
+      preloadNextVideos();
 
       const header = document.getElementById('creo-mobile-header');
       const sidebar = document.getElementById('creo-sidebar');
