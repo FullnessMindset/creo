@@ -12,6 +12,31 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const FROM_EMAIL = Deno.env.get("FROM_EMAIL") || "CREO <noreply@creo.app>";
+
+async function sendTransactionalEmail(to: string, type: string, data: Record<string, string>) {
+  if (!RESEND_API_KEY || !to) return;
+  try {
+    const url = `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-email`;
+    await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Service-Key": Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      },
+      body: JSON.stringify({ type, to, data }),
+    });
+  } catch (e) {
+    console.error("Email send failed (non-blocking):", e);
+  }
+}
+
+async function getCreatorEmail(creatorId: string): Promise<string | null> {
+  const { data } = await supabase.from("profiles").select("email").eq("id", creatorId).single();
+  return data?.email || null;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { status: 200 });
@@ -130,6 +155,14 @@ serve(async (req) => {
             category: "payment",
             priority: "high",
           });
+
+          const creatorEmail = await getCreatorEmail(metadata.creator_id);
+          if (creatorEmail) {
+            sendTransactionalEmail(creatorEmail, "tip_received", {
+              amount: (baseCents / 100).toFixed(2),
+              supporter_name: session.customer_details?.name || "Alguien",
+            });
+          }
         }
       }
 
@@ -161,6 +194,14 @@ serve(async (req) => {
             category: "payment",
             priority: "high",
           });
+
+          const creatorEmail = await getCreatorEmail(metadata.creator_id);
+          if (creatorEmail) {
+            sendTransactionalEmail(creatorEmail, "subscription_started", {
+              amount: (baseCents / 100).toFixed(2),
+              supporter_name: session.customer_details?.name || "Alguien",
+            });
+          }
         }
       }
     }
@@ -265,11 +306,27 @@ serve(async (req) => {
       const subscription = event.data.object as unknown as Record<string, unknown>;
       const subId = subscription.id as string;
       if (subId) {
+        const { data: subRecord } = await supabase
+          .from("subscriptions")
+          .select("creator_id, subscriber_name, amount_cents")
+          .eq("stripe_subscription_id", subId)
+          .single();
+
         const { error } = await supabase
           .from("subscriptions")
           .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
           .eq("stripe_subscription_id", subId);
         if (error) console.error("Failed to mark subscription cancelled:", error);
+
+        if (subRecord?.creator_id) {
+          const creatorEmail = await getCreatorEmail(subRecord.creator_id);
+          if (creatorEmail) {
+            sendTransactionalEmail(creatorEmail, "subscription_cancelled", {
+              amount: ((subRecord.amount_cents || 0) / 100).toFixed(2),
+              supporter_name: subRecord.subscriber_name || "Un suscriptor",
+            });
+          }
+        }
       }
     }
 
