@@ -128,6 +128,7 @@
         <button onclick="showTab('stripe');closeHerramientas()" id="tab-stripe" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💳 <span data-i18n="tabStripe">Stripe</span></button>
         <button onclick="showTab('branding');closeHerramientas()" id="tab-branding" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎨 <span data-i18n="tabBranding">Mi Branding</span></button>
         <button onclick="showTab('sounds');closeHerramientas()" id="tab-sounds" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🔔 <span data-i18n="tabSonidos">Sonidos</span></button>
+        <button onclick="showTab('earnings');closeHerramientas()" id="tab-earnings" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💰 Ingresos</button>
         <button onclick="showTab('subscribers');closeHerramientas()" id="tab-subscribers" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">👥 Suscriptores</button>
         <button onclick="showTab('account');closeHerramientas()" id="tab-account" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">⚙️ Mi Cuenta</button>
       </div>
@@ -981,6 +982,46 @@
       </div>
 
       <!-- TAB: Account / Mi Cuenta -->
+      <!-- TAB: Earnings Dashboard -->
+      <div id="panel-earnings" class="tab-panel hidden space-y-4">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-4 rounded-xl">
+            <p class="text-xs opacity-80">Total Ganado</p>
+            <p class="text-xl font-bold" id="earnings-total">$0.00</p>
+            <p class="text-[10px] opacity-60 mt-1">Después de comisiones</p>
+          </div>
+          <div class="bg-gradient-to-br from-creo-purple to-indigo-700 text-white p-4 rounded-xl">
+            <p class="text-xs opacity-80">Este Mes</p>
+            <p class="text-xl font-bold" id="earnings-month">$0.00</p>
+            <p class="text-[10px] opacity-60 mt-1" id="earnings-month-label"></p>
+          </div>
+          <div class="bg-gradient-to-br from-amber-500 to-orange-600 text-white p-4 rounded-xl">
+            <p class="text-xs opacity-80">Tips Recibidos</p>
+            <p class="text-xl font-bold" id="earnings-tips-count">0</p>
+            <p class="text-[10px] opacity-60 mt-1" id="earnings-tips-total">$0.00 total</p>
+          </div>
+          <div class="bg-gradient-to-br from-pink-500 to-rose-600 text-white p-4 rounded-xl">
+            <p class="text-xs opacity-80">Metas Contribuidas</p>
+            <p class="text-xl font-bold" id="earnings-metas-count">0</p>
+            <p class="text-[10px] opacity-60 mt-1" id="earnings-metas-total">$0.00 total</p>
+          </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="bg-white p-5 rounded-xl shadow border border-gray-200 space-y-3">
+          <h3 class="font-bold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            Historial de Ingresos
+          </h3>
+          <div id="earnings-history" class="space-y-2 max-h-[400px] overflow-y-auto">
+            <div class="text-center py-8 text-gray-400">
+              <div class="animate-pulse">Cargando historial...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- TAB: Subscribers (creator view) -->
       <div id="panel-subscribers" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
@@ -1082,7 +1123,7 @@
       if (!e.target.closest('#tab-metas-group') && !e.target.closest('#metas-dropdown')) closeMetasDropdown();
     });
 
-    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'sounds', 'subscribers'];
+    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'sounds', 'earnings', 'subscribers'];
     const METAS_TABS = ['metas', 'mecenas-tip', 'mecenas-sub', 'my-subs'];
 
     function toggleMetasDropdown() {
@@ -1098,6 +1139,7 @@
       document.querySelectorAll('.flex.glass.rounded-xl > button[id^="tab-"]').forEach(t => { t.classList.remove('tab-active'); t.classList.add('text-gray-400'); });
       document.getElementById('panel-' + tab)?.classList.remove('hidden');
       const tabBtn = document.getElementById('tab-' + tab);
+      if (tab === 'earnings') loadEarnings();
       if (tab === 'subscribers') loadSubscribers();
       if (tab === 'my-subs') loadMySubscriptions();
       if (HERRAMIENTAS_TABS.includes(tab)) {
@@ -3546,6 +3588,92 @@
           </div>
         </div>`;
       }).join('');
+    }
+
+    // ===== EARNINGS DASHBOARD =====
+    async function loadEarnings() {
+      const historyContainer = document.getElementById('earnings-history');
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { historyContainer.innerHTML = '<p class="text-center text-gray-400 py-4">Inicia sesión para ver tus ingresos</p>'; return; }
+        const userId = session.user.id;
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const monthName = now.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+        document.getElementById('earnings-month-label').textContent = monthName;
+
+        const [tipsRes, subsRes, myMetasRes] = await Promise.all([
+          sb.from('tips').select('id, amount_cents, platform_fee_cents, stripe_surcharge_cents, tipper_name, created_at').eq('creator_id', userId).order('created_at', { ascending: false }),
+          sb.from('subscriptions').select('id, amount_cents, platform_fee_cents, stripe_surcharge_cents, subscriber_name, status, created_at').eq('creator_id', userId).order('created_at', { ascending: false }),
+          sb.from('metas').select('id').eq('creator_id', userId)
+        ]);
+
+        const tips = tipsRes.data || [];
+        const subs = subsRes.data || [];
+        const myMetaIds = (myMetasRes.data || []).map(m => m.id);
+
+        let metas = [];
+        if (myMetaIds.length > 0) {
+          const { data: metaContribs } = await sb.from('meta_contributions').select('id, amount_cents, platform_fee_cents, stripe_surcharge_cents, contributor_name, created_at, meta_id').in('meta_id', myMetaIds).order('created_at', { ascending: false });
+          metas = metaContribs || [];
+        }
+
+        const creatorAmount = (item) => {
+          const base = item.amount_cents || 0;
+          const fee = item.platform_fee_cents || Math.round(base * 0.05);
+          return base - fee;
+        };
+
+        const totalTips = tips.reduce((s, t) => s + creatorAmount(t), 0);
+        const totalSubs = subs.filter(s => s.status === 'active').reduce((s, t) => s + creatorAmount(t), 0);
+        const totalMetas = metas.reduce((s, t) => s + creatorAmount(t), 0);
+        const grandTotal = totalTips + totalSubs + totalMetas;
+
+        const thisMonthTips = tips.filter(t => t.created_at >= monthStart).reduce((s, t) => s + creatorAmount(t), 0);
+        const thisMonthSubs = subs.filter(s => s.created_at >= monthStart && s.status === 'active').reduce((s, t) => s + creatorAmount(t), 0);
+        const thisMonthMetas = metas.filter(m => m.created_at >= monthStart).reduce((s, t) => s + creatorAmount(t), 0);
+        const thisMonth = thisMonthTips + thisMonthSubs + thisMonthMetas;
+
+        document.getElementById('earnings-total').textContent = '$' + (grandTotal / 100).toFixed(2);
+        document.getElementById('earnings-month').textContent = '$' + (thisMonth / 100).toFixed(2);
+        document.getElementById('earnings-tips-count').textContent = tips.length;
+        document.getElementById('earnings-tips-total').textContent = '$' + (totalTips / 100).toFixed(2) + ' total';
+        document.getElementById('earnings-metas-count').textContent = metas.length;
+        document.getElementById('earnings-metas-total').textContent = '$' + (totalMetas / 100).toFixed(2) + ' total';
+
+        const allTransactions = [
+          ...tips.map(t => ({ type: 'tip', amount: creatorAmount(t), name: t.tipper_name || 'Anónimo', date: t.created_at })),
+          ...subs.map(s => ({ type: 'sub', amount: creatorAmount(s), name: s.subscriber_name || 'Anónimo', date: s.created_at, status: s.status })),
+          ...metas.map(m => ({ type: 'meta', amount: creatorAmount(m), name: m.contributor_name || 'Anónimo', date: m.created_at }))
+        ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 50);
+
+        if (allTransactions.length === 0) {
+          historyContainer.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">Aún no tienes ingresos</p><p class="text-xs text-gray-300 mt-1">Comparte tu perfil para comenzar a recibir apoyo</p></div>';
+          return;
+        }
+
+        const typeConfig = {
+          tip: { icon: '💚', label: 'Tip', color: 'bg-green-50 border-green-200' },
+          sub: { icon: '⭐', label: 'Suscripción', color: 'bg-purple-50 border-purple-200' },
+          meta: { icon: '🎯', label: 'Meta', color: 'bg-amber-50 border-amber-200' }
+        };
+
+        historyContainer.innerHTML = allTransactions.map(tx => {
+          const cfg = typeConfig[tx.type];
+          const date = new Date(tx.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+          return `<div class="flex items-center gap-3 p-3 rounded-xl border ${cfg.color}">
+            <span class="text-lg">${cfg.icon}</span>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 truncate">${escapeHtml(tx.name)}</p>
+              <p class="text-[10px] text-gray-500">${cfg.label} · ${date}</p>
+            </div>
+            <p class="font-bold text-sm text-green-700">+$${(tx.amount / 100).toFixed(2)}</p>
+          </div>`;
+        }).join('');
+      } catch (err) {
+        historyContainer.innerHTML = '<p class="text-center text-red-400 py-4">Error al cargar ingresos</p>';
+        console.error('loadEarnings error:', err);
+      }
     }
 
     // ===== SUBSCRIPTION MANAGEMENT =====
