@@ -3020,3 +3020,626 @@ async function requestDataExport() {
     showToast('Error de conexión', 'error');
   }
 }
+
+// ============================================================
+// MediaUploadService — Centralized media upload pipeline
+// ============================================================
+const MediaUploadService = (function() {
+  const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_RETRIES = 3;
+  const RETRY_BASE_DELAY = 1000;
+  const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
+  const UPLOAD_FN_URL = SUPABASE_URL + '/functions/v1/media-upload';
+
+  const BLOCKED_EXTENSIONS = new Set([
+    'exe','bat','cmd','com','msi','scr','pif','vbs','vbe',
+    'js','jse','ws','wsf','wsc','wsh','ps1','ps2','psc1',
+    'reg','inf','lnk','dll','sys','drv','cpl',
+  ]);
+
+  const MIME_ICONS = {
+    image: '📷', video: '🎥', audio: '🎤', document: '📄',
+    archive: '📦', code: '💻', file: '📎', other: '📎',
+  };
+
+  const CATEGORY_MAP = {
+    'image/': 'image', 'video/': 'video', 'audio/': 'audio',
+  };
+
+  const DOC_MIMES = new Set([
+    'application/pdf','application/msword','text/plain','text/csv',
+    'application/json','application/xml','text/html','text/markdown',
+  ]);
+  const ARCHIVE_MIMES = new Set([
+    'application/zip','application/x-rar-compressed','application/gzip',
+    'application/x-tar','application/x-7z-compressed',
+  ]);
+
+  function categorize(mime) {
+    for (const [prefix, cat] of Object.entries(CATEGORY_MAP)) {
+      if (mime.startsWith(prefix)) return cat;
+    }
+    if (DOC_MIMES.has(mime) || mime.includes('officedocument') || mime.includes('vnd.ms-')) return 'document';
+    if (ARCHIVE_MIMES.has(mime)) return 'archive';
+    return 'file';
+  }
+
+  function getIcon(category) { return MIME_ICONS[category] || '📎'; }
+
+  function sanitizeName(name) {
+    return name.replace(/[^\w.\-]/g, '_').replace(/\.{2,}/g, '.').replace(/^\./, '_').slice(-200);
+  }
+
+  function getExtension(name) {
+    const parts = name.split('.');
+    return parts.length > 1 ? parts.pop().toLowerCase() : '';
+  }
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+    return (bytes / 1073741824).toFixed(2) + ' GB';
+  }
+
+  function formatDuration(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return m + ':' + String(s).padStart(2, '0');
+  }
+
+  function formatSpeed(bytesPerSec) {
+    if (bytesPerSec < 1024) return Math.round(bytesPerSec) + ' B/s';
+    if (bytesPerSec < 1048576) return (bytesPerSec / 1024).toFixed(0) + ' KB/s';
+    return (bytesPerSec / 1048576).toFixed(1) + ' MB/s';
+  }
+
+  // Validate file before upload
+  function validate(file) {
+    if (!file) return { ok: false, error: 'No file selected' };
+    if (file.size === 0) return { ok: false, error: 'File is empty' };
+    if (file.size > MAX_FILE_SIZE) return { ok: false, error: 'File exceeds ' + formatSize(MAX_FILE_SIZE) + ' limit' };
+    const ext = getExtension(file.name);
+    if (BLOCKED_EXTENSIONS.has(ext)) return { ok: false, error: 'File type .' + ext + ' is not allowed' };
+    return { ok: true, category: categorize(file.type || 'application/octet-stream') };
+  }
+
+  // Generate image thumbnail as data URL
+  async function generateImageThumbnail(file, maxDim) {
+    maxDim = maxDim || 300;
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim) {
+          const ratio = Math.min(maxDim / w, maxDim / h);
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve({ url: canvas.toDataURL('image/jpeg', 0.7), width: img.width, height: img.height });
+      };
+      img.onerror = () => resolve(null);
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  // Extract video metadata
+  async function extractVideoMeta(file) {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.muted = true;
+      const timer = setTimeout(() => resolve(null), 8000);
+      video.onloadedmetadata = () => {
+        video.currentTime = Math.min(1, video.duration / 4);
+      };
+      video.onseeked = () => {
+        clearTimeout(timer);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.min(video.videoWidth, 400);
+        canvas.height = Math.round(canvas.width * (video.videoHeight / video.videoWidth));
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        resolve({
+          width: video.videoWidth, height: video.videoHeight,
+          duration: video.duration,
+          thumbnail: canvas.toDataURL('image/jpeg', 0.6),
+        });
+        URL.revokeObjectURL(video.src);
+      };
+      video.onerror = () => { clearTimeout(timer); resolve(null); };
+      video.src = URL.createObjectURL(file);
+    });
+  }
+
+  // Extract audio metadata
+  async function extractAudioMeta(file) {
+    return new Promise((resolve) => {
+      const audio = document.createElement('audio');
+      audio.preload = 'metadata';
+      const timer = setTimeout(() => resolve(null), 5000);
+      audio.onloadedmetadata = () => {
+        clearTimeout(timer);
+        resolve({ duration: audio.duration });
+        URL.revokeObjectURL(audio.src);
+      };
+      audio.onerror = () => { clearTimeout(timer); resolve(null); };
+      audio.src = URL.createObjectURL(file);
+    });
+  }
+
+  // Generate audio waveform (simplified)
+  async function generateWaveform(file) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const buf = await file.arrayBuffer();
+      const decoded = await ctx.decodeAudioData(buf);
+      const raw = decoded.getChannelData(0);
+      const samples = 50;
+      const blockSize = Math.floor(raw.length / samples);
+      const waveform = [];
+      for (let i = 0; i < samples; i++) {
+        let sum = 0;
+        for (let j = 0; j < blockSize; j++) sum += Math.abs(raw[i * blockSize + j]);
+        waveform.push(Math.round((sum / blockSize) * 100) / 100);
+      }
+      const max = Math.max(...waveform, 0.01);
+      ctx.close();
+      return waveform.map(v => Math.round((v / max) * 100) / 100);
+    } catch { return null; }
+  }
+
+  // Retry with exponential backoff
+  async function withRetry(fn, retries) {
+    retries = retries || MAX_RETRIES;
+    let lastErr;
+    for (let i = 0; i <= retries; i++) {
+      try { return await fn(); }
+      catch (e) {
+        lastErr = e;
+        if (i < retries) await new Promise(r => setTimeout(r, RETRY_BASE_DELAY * Math.pow(2, i)));
+      }
+    }
+    throw lastErr;
+  }
+
+  // Get auth token
+  async function getToken() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) throw new Error('Not authenticated');
+    return session.access_token;
+  }
+
+  // Call media-upload Edge Function
+  async function callUploadApi(action, payload) {
+    const token = await getToken();
+    const res = await fetch(UPLOAD_FN_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify({ action, ...payload }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload API error');
+    return data;
+  }
+
+  // Upload queue
+  const uploadQueue = [];
+  let activeUploads = 0;
+  const MAX_CONCURRENT = 3;
+
+  function processQueue() {
+    while (activeUploads < MAX_CONCURRENT && uploadQueue.length > 0) {
+      const job = uploadQueue.shift();
+      activeUploads++;
+      job.execute().finally(() => { activeUploads--; processQueue(); });
+    }
+  }
+
+  // ===== MAIN UPLOAD FUNCTION =====
+  async function upload(file, options) {
+    options = options || {};
+    const onProgress = options.onProgress || function() {};
+    const onStatus = options.onStatus || function() {};
+    const onComplete = options.onComplete || function() {};
+    const onError = options.onError || function() {};
+
+    const validation = validate(file);
+    if (!validation.ok) {
+      onError(validation.error);
+      return { ok: false, error: validation.error };
+    }
+
+    const uploadId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const category = validation.category;
+    const startTime = Date.now();
+    let cancelled = false;
+    let abortController = new AbortController();
+
+    const state = {
+      id: uploadId,
+      file: file,
+      category: category,
+      status: 'queued',
+      progress: 0,
+      speed: 0,
+      eta: 0,
+      error: null,
+      result: null,
+      cancel: function() {
+        cancelled = true;
+        abortController.abort();
+        state.status = 'cancelled';
+        onStatus('cancelled');
+      },
+      retry: null,
+    };
+
+    // Save to local storage for recovery
+    try {
+      const pending = JSON.parse(localStorage.getItem('creo_pending_uploads') || '[]');
+      pending.push({ id: uploadId, fileName: file.name, fileSize: file.size, category, timestamp: Date.now() });
+      if (pending.length > 20) pending.splice(0, pending.length - 20);
+      localStorage.setItem('creo_pending_uploads', JSON.stringify(pending));
+    } catch {}
+
+    const execute = async () => {
+      try {
+        state.status = 'initiating';
+        onStatus('initiating');
+
+        // 1. Initiate upload via Edge Function
+        const initResult = await withRetry(() => callUploadApi('initiate', {
+          file_name: file.name,
+          file_size: file.size,
+          mime_type: file.type,
+        }));
+
+        if (cancelled) return state;
+
+        const { attachment_id, storage_path, bucket } = initResult;
+
+        // 2. Upload file to storage
+        state.status = 'uploading';
+        onStatus('uploading');
+
+        let uploadedBytes = 0;
+        const totalBytes = file.size;
+
+        if (initResult.upload_mode === 'direct' || totalBytes <= CHUNK_SIZE) {
+          // Direct upload
+          await withRetry(async () => {
+            const { error } = await sb.storage.from(bucket).upload(storage_path, file, {
+              contentType: file.type || 'application/octet-stream',
+              upsert: true,
+            });
+            if (error) throw error;
+          });
+          uploadedBytes = totalBytes;
+          state.progress = 100;
+          onProgress(100, formatSpeed(totalBytes / ((Date.now() - startTime) / 1000)), '0s');
+        } else {
+          // Chunked upload — upload as single file with progress tracking via XMLHttpRequest
+          await new Promise((resolve, reject) => {
+            const token = sb.realtime?.accessToken || '';
+            const url = SUPABASE_URL + '/storage/v1/object/' + bucket + '/' + storage_path;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            xhr.setRequestHeader('x-upsert', 'true');
+
+            xhr.upload.onprogress = (e) => {
+              if (!e.lengthComputable) return;
+              uploadedBytes = e.loaded;
+              const pct = Math.round((e.loaded / e.total) * 100);
+              const elapsed = (Date.now() - startTime) / 1000;
+              const speed = e.loaded / elapsed;
+              const remaining = (e.total - e.loaded) / speed;
+              state.progress = pct;
+              state.speed = speed;
+              state.eta = remaining;
+              onProgress(pct, formatSpeed(speed), Math.ceil(remaining) + 's');
+            };
+
+            xhr.onload = () => {
+              if (xhr.status >= 200 && xhr.status < 300) resolve();
+              else reject(new Error('Upload failed: ' + xhr.status));
+            };
+            xhr.onerror = () => reject(new Error('Network error'));
+            xhr.onabort = () => reject(new Error('Upload cancelled'));
+
+            abortController.signal.addEventListener('abort', () => xhr.abort());
+            xhr.send(file);
+          });
+        }
+
+        if (cancelled) return state;
+
+        // 3. Extract metadata
+        state.status = 'processing';
+        onStatus('processing');
+
+        const meta = {};
+        if (category === 'image') {
+          const thumbData = await generateImageThumbnail(file);
+          if (thumbData) {
+            meta.width = thumbData.width;
+            meta.height = thumbData.height;
+            meta.thumbnail_url = thumbData.url;
+          }
+        } else if (category === 'video') {
+          const videoMeta = await extractVideoMeta(file);
+          if (videoMeta) {
+            meta.width = videoMeta.width;
+            meta.height = videoMeta.height;
+            meta.duration_seconds = videoMeta.duration;
+            meta.thumbnail_url = videoMeta.thumbnail;
+          }
+        } else if (category === 'audio') {
+          const audioMeta = await extractAudioMeta(file);
+          if (audioMeta) meta.duration_seconds = audioMeta.duration;
+          if (file.size < 20 * 1024 * 1024) {
+            const waveform = await generateWaveform(file);
+            if (waveform) meta.waveform_data = waveform;
+          }
+        }
+
+        if (cancelled) return state;
+
+        // 4. Complete upload
+        state.status = 'completing';
+        onStatus('completing');
+
+        const completeResult = await withRetry(() => callUploadApi('complete', {
+          attachment_id,
+          ...meta,
+        }));
+
+        // 5. Done
+        state.status = 'complete';
+        state.progress = 100;
+        state.result = {
+          attachment_id,
+          public_url: completeResult.public_url,
+          category: completeResult.category || category,
+          mime_type: completeResult.mime_type || file.type,
+          file_name: completeResult.file_name || file.name,
+          file_size: file.size,
+          ...meta,
+        };
+
+        onStatus('complete');
+        onComplete(state.result);
+
+        // Remove from pending
+        try {
+          const pending = JSON.parse(localStorage.getItem('creo_pending_uploads') || '[]');
+          const filtered = pending.filter(p => p.id !== uploadId);
+          localStorage.setItem('creo_pending_uploads', JSON.stringify(filtered));
+        } catch {}
+
+        return state;
+
+      } catch (err) {
+        if (cancelled) return state;
+        state.status = 'failed';
+        state.error = err.message || 'Upload failed';
+        onStatus('failed');
+        onError(state.error);
+
+        // Retry function
+        state.retry = () => {
+          cancelled = false;
+          abortController = new AbortController();
+          state.status = 'queued';
+          state.error = null;
+          onStatus('retrying');
+          return execute();
+        };
+
+        return state;
+      }
+    };
+
+    // Queue or execute immediately
+    if (activeUploads < MAX_CONCURRENT) {
+      activeUploads++;
+      execute().finally(() => { activeUploads--; processQueue(); });
+    } else {
+      state.status = 'queued';
+      onStatus('queued');
+      uploadQueue.push({ execute });
+    }
+
+    return state;
+  }
+
+  // Upload a Blob (for recorded audio/video)
+  async function uploadBlob(blob, fileName, options) {
+    const file = new File([blob], fileName, { type: blob.type });
+    return upload(file, options);
+  }
+
+  // Send a message with an attachment
+  async function sendMediaMessage(receiverId, attachmentResult, textBody) {
+    return callUploadApi('send', {
+      receiver_id: receiverId,
+      body: textBody || null,
+      attachment_id: attachmentResult.attachment_id,
+      media_url: attachmentResult.public_url,
+      media_type: attachmentResult.category,
+    });
+  }
+
+  // Send text-only message
+  async function sendTextMessage(receiverId, body) {
+    const { error } = await sb.from('messages').insert({
+      sender_id: (await sb.auth.getUser()).data.user.id,
+      receiver_id: receiverId,
+      body: body,
+    });
+    if (error) throw error;
+    await createNotification(receiverId, 'message', body.substring(0, 80), null, 'messages.html');
+  }
+
+  // Send GIF message
+  async function sendGifMessage(receiverId, gifUrl) {
+    const userId = (await sb.auth.getUser()).data.user.id;
+    await sb.from('messages').insert({
+      sender_id: userId,
+      receiver_id: receiverId,
+      media_url: gifUrl,
+      media_type: 'gif',
+    });
+    await createNotification(receiverId, 'message', '🎬 GIF', null, 'messages.html#chat-' + userId);
+  }
+
+  // Get pending uploads from localStorage
+  function getPendingUploads() {
+    try { return JSON.parse(localStorage.getItem('creo_pending_uploads') || '[]'); }
+    catch { return []; }
+  }
+
+  // Create upload progress UI element
+  function createProgressUI(file, container) {
+    const category = categorize(file.type || 'application/octet-stream');
+    const icon = getIcon(category);
+    const el = document.createElement('div');
+    el.className = 'upload-progress-item flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-2 mb-2 text-sm';
+    el.innerHTML =
+      '<span class="text-lg flex-shrink-0">' + icon + '</span>' +
+      '<div class="flex-1 min-w-0">' +
+        '<p class="font-medium text-gray-800 truncate text-xs">' + esc(file.name) + '</p>' +
+        '<div class="flex items-center gap-2 mt-1">' +
+          '<div class="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">' +
+            '<div class="upload-bar h-full bg-creo-purple rounded-full transition-all duration-300" style="width:0%"></div>' +
+          '</div>' +
+          '<span class="upload-pct text-[10px] text-gray-400 w-8 text-right">0%</span>' +
+        '</div>' +
+        '<p class="upload-status text-[10px] text-gray-400 mt-0.5">En cola...</p>' +
+      '</div>' +
+      '<button class="upload-cancel text-gray-300 hover:text-red-500 transition text-xs flex-shrink-0" title="Cancelar">✕</button>';
+
+    if (container) container.appendChild(el);
+
+    return {
+      el,
+      updateProgress(pct, speed, eta) {
+        const bar = el.querySelector('.upload-bar');
+        const pctEl = el.querySelector('.upload-pct');
+        if (bar) bar.style.width = pct + '%';
+        if (pctEl) pctEl.textContent = pct + '%';
+        const status = el.querySelector('.upload-status');
+        if (status && speed) status.textContent = speed + (eta ? ' · ' + eta + ' restante' : '');
+      },
+      updateStatus(status) {
+        const statusEl = el.querySelector('.upload-status');
+        if (!statusEl) return;
+        const map = {
+          queued: 'En cola...', initiating: 'Iniciando...', uploading: 'Subiendo...',
+          processing: 'Procesando...', completing: 'Completando...', complete: '✓ Completado',
+          failed: '✗ Error', cancelled: 'Cancelado', retrying: 'Reintentando...',
+        };
+        statusEl.textContent = map[status] || status;
+        if (status === 'complete') {
+          el.querySelector('.upload-bar')?.classList.replace('bg-creo-purple', 'bg-green-500');
+          el.querySelector('.upload-cancel')?.remove();
+          setTimeout(() => el.classList.add('opacity-50'), 2000);
+        } else if (status === 'failed') {
+          el.querySelector('.upload-bar')?.classList.replace('bg-creo-purple', 'bg-red-500');
+          const cancelBtn = el.querySelector('.upload-cancel');
+          if (cancelBtn) { cancelBtn.textContent = '↻'; cancelBtn.title = 'Reintentar'; }
+        }
+      },
+      remove() { el.remove(); },
+      setCancelHandler(fn) {
+        const btn = el.querySelector('.upload-cancel');
+        if (btn) btn.onclick = fn;
+      },
+    };
+  }
+
+  // ===== REALTIME SUBSCRIPTION =====
+  function subscribeToMessages(userId, onNewMessage) {
+    const channel = sb.channel('dm-realtime-' + userId)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: 'receiver_id=eq.' + userId,
+      }, (payload) => {
+        if (onNewMessage) onNewMessage(payload.new);
+      })
+      .subscribe();
+    return channel;
+  }
+
+  // ===== RENDER MEDIA IN MESSAGE =====
+  function renderAttachment(msg) {
+    const mt = msg.media_type;
+    const url = msg.media_url;
+    if (!mt || !url) return '';
+
+    if (mt === 'gif') {
+      return '<img src="' + esc(url) + '" class="max-w-[220px] rounded-xl" alt="GIF" loading="lazy">';
+    }
+    if (mt === 'image') {
+      return '<img src="' + esc(url) + '" class="max-w-[240px] rounded-xl cursor-pointer" alt="" loading="lazy" onclick="window.open(this.src,\'_blank\')">';
+    }
+    if (mt === 'video') {
+      return '<div class="relative max-w-[260px]">' +
+        '<video src="' + esc(url) + '" controls playsinline preload="metadata" class="w-full rounded-xl"></video>' +
+      '</div>';
+    }
+    if (mt === 'audio') {
+      return '<div class="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2 max-w-[260px]">' +
+        '<audio controls src="' + esc(url) + '" class="w-full" style="height:36px"></audio>' +
+      '</div>';
+    }
+    if (mt === 'document' || mt === 'file' || mt === 'archive' || mt === 'code' || mt === 'other') {
+      const icon = getIcon(mt);
+      const name = msg.file_name || url.split('/').pop() || 'Archivo';
+      const size = msg.file_size ? ' · ' + formatSize(msg.file_size) : '';
+      return '<a href="' + esc(url) + '" target="_blank" rel="noopener" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-xl px-3 py-2 transition max-w-[260px]">' +
+        '<span class="text-2xl flex-shrink-0">' + icon + '</span>' +
+        '<div class="min-w-0 flex-1">' +
+          '<p class="text-xs font-medium truncate">' + esc(name) + '</p>' +
+          '<p class="text-[10px] opacity-60">' + mt.charAt(0).toUpperCase() + mt.slice(1) + size + '</p>' +
+        '</div>' +
+        '<svg class="w-4 h-4 opacity-50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>' +
+      '</a>';
+    }
+    return '';
+  }
+
+  return {
+    upload,
+    uploadBlob,
+    validate,
+    categorize,
+    getIcon,
+    formatSize,
+    formatDuration,
+    formatSpeed,
+    sanitizeName,
+    sendMediaMessage,
+    sendTextMessage,
+    sendGifMessage,
+    getPendingUploads,
+    createProgressUI,
+    subscribeToMessages,
+    renderAttachment,
+    generateImageThumbnail,
+    extractVideoMeta,
+    extractAudioMeta,
+    generateWaveform,
+    MIME_ICONS,
+    MAX_FILE_SIZE,
+  };
+})();

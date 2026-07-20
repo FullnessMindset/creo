@@ -18,28 +18,25 @@
     .convo-item:hover { background: rgba(51,240,176,0.08); }
     .convo-item.active { background: rgba(108,58,237,0.08); border-left: 3px solid #6C3AED; }
     .search-result:hover { background: rgba(51,240,176,0.1); }
-    .video-circle { position: relative; border-radius: 50%; border: 3px solid #6C3AED; }
-    .video-circle video { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-    .video-circle .creo-badge { position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px; border-radius: 50%; background: white; padding: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 5; }
-    .video-circle .creo-badge img { width: 100%; height: 100%; border-radius: 50%; object-fit: contain; }
-    .audio-controls-bar { display: flex; align-items: center; gap: 8px; background: #f9fafb; border-radius: 12px; padding: 8px 12px; }
     @keyframes pulse-rec { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     .rec-pulse { animation: pulse-rec 1s infinite; }
+    .upload-drop-zone.drag-over { border-color: #6C3AED !important; background: rgba(108,58,237,0.05) !important; }
+    .waveform-bar { display: inline-block; width: 3px; margin: 0 1px; border-radius: 2px; background: currentColor; vertical-align: middle; transition: height 0.1s; }
   </style>
 </head>
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
   <script src="shared.js"></script>
 
-  <!-- DESKTOP LAYOUT: chat (center) + conversations sidebar (right) -->
+  <!-- DESKTOP LAYOUT -->
   <div class="hidden md:flex h-screen">
     <!-- Center Panel: active chat or empty state -->
     <div class="flex-1 flex flex-col bg-gray-50/50" id="desktop-chat-panel">
       <div id="desktop-empty-state" class="flex-1 flex flex-col items-center justify-center text-gray-300">
         <svg class="w-20 h-20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        <p class="text-lg font-semibold" data-i18n="seleccionaConversacion">Selecciona una conversación</p>
-        <p class="text-sm mt-1" data-i18n="buscaCreadorParaIniciar">o busca un creador para iniciar</p>
+        <p class="text-lg font-semibold">Selecciona una conversación</p>
+        <p class="text-sm mt-1">o busca un creador para iniciar</p>
       </div>
-      <!-- Desktop chat area (hidden until a chat is opened) -->
+      <!-- Desktop chat area -->
       <div id="desktop-chat-area" class="hidden flex-1 flex flex-col">
         <div class="px-4 py-3 border-b border-gray-200 flex items-center gap-3 bg-white">
           <a id="d-chat-profile-link" href="#" class="relative">
@@ -51,86 +48,79 @@
             <a id="d-chat-profile-link-name" href="#" class="font-bold text-sm text-gray-900 hover:text-creo-purple transition block truncate"><span id="d-chat-name"></span></a>
             <p id="d-chat-username" class="text-[10px] text-gray-400"></p>
           </div>
-          <a id="d-chat-view-btn" href="#" class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-creo-mint/20 transition" title="Ver perfil" data-i18n-title="verPerfil">
+          <a id="d-chat-view-btn" href="#" class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-creo-mint/20 transition" title="Ver perfil">
             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
           </a>
         </div>
         <div id="d-chat-messages" class="flex-1 overflow-y-auto px-4 py-3 space-y-2"></div>
-        <!-- Desktop input area -->
+        <!-- Upload progress area -->
+        <div id="d-upload-progress" class="px-3"></div>
+        <!-- Media preview area -->
+        <div id="d-media-preview" class="hidden px-3 pt-2">
+          <div class="flex flex-wrap gap-2 items-end" id="d-preview-items"></div>
+        </div>
+        <!-- Input area -->
         <div class="border-t border-gray-200 bg-white">
-          <div id="d-audio-preview" class="hidden px-4 pt-2 flex items-center gap-2 bg-gray-50">
-            <audio id="d-audio-player" controls class="flex-1 h-8"></audio>
-            <button onclick="sendAudioNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold hover:bg-creo-light transition" data-i18n="enviar">Enviar</button>
-            <button onclick="cancelAudio()" class="text-red-400 hover:text-red-600 text-xs font-semibold">✕</button>
-          </div>
-          <div id="d-video-preview" class="hidden px-4 pt-2">
-            <div class="relative inline-block">
-              <div class="video-circle w-[120px] h-[120px]"><video id="d-video-thumb" class="w-full h-full object-cover" playsinline muted loop></video><div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div></div>
-              <div class="flex gap-2 mt-2 justify-center">
-                <button onclick="sendVideoNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold" data-i18n="enviar">Enviar</button>
-                <button onclick="cancelVideo()" class="text-red-400 text-xs font-semibold">✕</button>
-              </div>
-            </div>
-          </div>
-          <div id="d-image-preview" class="hidden px-4 pt-2">
-            <div class="relative inline-block">
-              <img id="d-image-thumb" class="h-20 rounded-lg border border-gray-200" alt="">
-              <button onclick="cancelImage()" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">✕</button>
-            </div>
+          <div id="d-recording-indicator" class="hidden mx-3 mt-2 flex items-center gap-2 text-red-500 text-xs bg-red-50 rounded-xl px-3 py-2">
+            <span class="w-2 h-2 rounded-full bg-red-500 rec-pulse"></span> <span>Grabando...</span>
+            <span id="d-rec-timer" class="font-mono text-red-400">0:00</span>
+            <button onclick="stopAudioRecord()" class="ml-auto bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-semibold hover:bg-red-200 transition">Detener</button>
           </div>
           <div class="flex items-center gap-1.5 px-3 py-2.5">
-            <button onclick="startVideoRecord()" id="d-video-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Grabar video" data-i18n-title="grabarVideoMsg">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <!-- File attachment (all types) -->
+            <button onclick="document.getElementById('d-file-input').click()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Adjuntar archivo">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
             </button>
-            <button onclick="document.getElementById('d-image-input').click()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Enviar imagen" data-i18n-title="enviarImagen">
+            <input type="file" id="d-file-input" class="hidden" multiple onchange="handleFileSelect(this)">
+            <!-- Camera/Image -->
+            <button onclick="document.getElementById('d-image-input').click()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Foto">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </button>
-            <input type="file" id="d-image-input" accept="image/*" class="hidden" onchange="handleChatImage(this)">
-            <button onclick="toggleAudioRecord()" id="d-audio-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-red-500 transition" title="Grabar audio (tap)" data-i18n-title="grabarAudioMsg">
+            <input type="file" id="d-image-input" accept="image/*,video/*" class="hidden" capture="environment" onchange="handleFileSelect(this)">
+            <!-- Audio record -->
+            <button onclick="toggleAudioRecord()" id="d-audio-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-red-500 transition" title="Grabar audio">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
             </button>
+            <!-- Text input -->
             <div class="flex-1 relative flex items-center bg-gray-100 rounded-full border border-gray-200 focus-within:border-creo-mint/50 transition">
-              <input id="d-chat-input" type="text" placeholder="Aa" class="flex-1 bg-transparent rounded-full px-4 py-2 text-sm outline-none border-none !border-0" onkeydown="if(event.key==='Enter')sendMessage()">
+              <input id="d-chat-input" type="text" placeholder="Escribe un mensaje..." class="flex-1 bg-transparent rounded-full px-4 py-2 text-sm outline-none border-none !border-0" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendMessage()">
               <span id="d-emoji-btn" class="cursor-pointer text-lg hover:scale-110 transition pr-3">😊</span>
             </div>
+            <!-- GIF -->
             <button onclick="toggleChatGif()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition" title="GIF">
               <span class="text-xs font-black">GIF</span>
             </button>
-            <button onclick="sendMessage()" class="w-9 h-9 rounded-full bg-creo-purple flex items-center justify-center hover:bg-creo-light transition flex-shrink-0" title="Enviar" data-i18n-title="enviar">
+            <!-- Send -->
+            <button onclick="sendMessage()" class="w-9 h-9 rounded-full bg-creo-purple flex items-center justify-center hover:bg-creo-light transition flex-shrink-0" title="Enviar">
               <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
           </div>
           <div id="d-gif-picker" class="hidden mx-3 mb-2 bg-white border border-gray-200 rounded-xl p-2 max-h-52 overflow-y-auto shadow-lg">
-            <input id="d-gif-search" type="text" placeholder="Buscar GIF..." class="w-full bg-gray-100 rounded-lg px-3 py-2 text-xs mb-2 outline-none" data-i18n-placeholder="buscarGif" oninput="searchChatGifs(this.value)">
+            <input id="d-gif-search" type="text" placeholder="Buscar GIF..." class="w-full bg-gray-100 rounded-lg px-3 py-2 text-xs mb-2 outline-none" oninput="searchChatGifs(this.value)">
             <div id="d-gif-results" class="grid grid-cols-5 lg:grid-cols-6 gap-1"></div>
             <p class="text-[9px] text-gray-300 text-center mt-1">Powered by GIPHY</p>
-          </div>
-          <div id="d-recording-indicator" class="hidden mx-3 mb-2 flex items-center gap-2 text-red-500 text-xs bg-red-50 rounded-xl px-3 py-2">
-            <span class="w-2 h-2 rounded-full bg-red-500 rec-pulse"></span> <span data-i18n="grabando">Grabando...</span>
-            <span id="d-rec-timer" class="font-mono text-red-400">0:00</span>
-            <button onclick="stopAudioRecord()" class="ml-auto bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-semibold hover:bg-red-200 transition" data-i18n="detener">Detener</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Right Sidebar: conversations history -->
+    <!-- Right Sidebar: conversations -->
     <div class="w-72 lg:w-80 border-l border-gray-200 flex flex-col bg-white flex-shrink-0">
       <div class="px-4 pt-4 pb-3 border-b border-gray-100">
         <div class="flex items-center justify-between mb-3">
-          <h2 class="text-sm font-bold text-gray-700 tracking-wide" data-i18n="conversaciones">Conversaciones</h2>
-          <button onclick="openNewMessage()" class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center hover:bg-creo-purple/20 transition" title="Nuevo mensaje" data-i18n-title="nuevaConversacion">
+          <h2 class="text-sm font-bold text-gray-700 tracking-wide">Conversaciones</h2>
+          <button onclick="openNewMessage()" class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center hover:bg-creo-purple/20 transition" title="Nuevo mensaje">
             <svg class="w-4 h-4 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
           </button>
         </div>
         <div class="relative">
           <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <input id="search-creators" type="text" placeholder="Buscar creadores..." class="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2 text-xs outline-none focus:ring-2 focus:ring-creo-mint/50 focus:bg-white border border-transparent focus:border-creo-mint/30 transition" data-i18n-placeholder="buscarCreadores" oninput="searchCreators(this.value)">
+          <input id="search-creators" type="text" placeholder="Buscar creadores..." class="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2 text-xs outline-none focus:ring-2 focus:ring-creo-mint/50 focus:bg-white border border-transparent focus:border-creo-mint/30 transition" oninput="searchCreators(this.value)">
           <div id="search-results" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-200 max-h-64 overflow-y-auto z-30"></div>
         </div>
       </div>
       <div id="desktop-convos" class="flex-1 overflow-y-auto px-2 pt-1"></div>
-      <p id="no-messages-desktop" class="hidden text-center text-gray-400 text-sm py-8" data-i18n="sinMensajes">Sin mensajes</p>
+      <p id="no-messages-desktop" class="hidden text-center text-gray-400 text-sm py-8">Sin mensajes</p>
     </div>
   </div>
 
@@ -138,25 +128,25 @@
   <div class="md:hidden pb-24">
     <div class="sticky top-0 z-20 bg-white/95 backdrop-blur-lg border-b border-gray-100 px-4 pt-4 pb-3">
       <div class="flex items-center justify-between mb-3">
-        <h1 class="text-xl font-bold text-creo-purple tracking-wider" data-i18n="mensajes">Mensajes</h1>
+        <h1 class="text-xl font-bold text-creo-purple tracking-wider">Mensajes</h1>
         <button onclick="openNewMessage()" class="w-9 h-9 rounded-full bg-creo-purple/10 flex items-center justify-center hover:bg-creo-purple/20 transition">
           <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
         </button>
       </div>
       <div class="relative">
         <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input id="m-search-creators" type="text" placeholder="Buscar creadores..." class="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-creo-mint/50 transition" data-i18n-placeholder="buscarCreadores" oninput="searchCreators(this.value, 'm-')">
+        <input id="m-search-creators" type="text" placeholder="Buscar creadores..." class="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-creo-mint/50 transition" oninput="searchCreators(this.value, 'm-')">
         <div id="m-search-results" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-200 max-h-64 overflow-y-auto z-30"></div>
       </div>
     </div>
     <div id="auth-required" class="hidden px-4 pt-8">
       <div class="glass p-8 rounded-2xl text-center space-y-3">
-        <p class="text-gray-500 text-sm" data-i18n="iniciarSesionVerMensajes">Inicia sesión para ver tus mensajes</p>
-        <button onclick="signInWithGoogle()" class="bg-creo-purple text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-creo-light transition" data-i18n="iniciaSesion">Iniciar Sesión</button>
+        <p class="text-gray-500 text-sm">Inicia sesión para ver tus mensajes</p>
+        <button onclick="signInWithGoogle()" class="bg-creo-purple text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-creo-light transition">Iniciar Sesión</button>
       </div>
     </div>
     <div id="mobile-convos" class="px-2 pt-2"></div>
-    <p id="no-messages-mobile" class="hidden text-center text-gray-400 text-sm py-12">💬 <span data-i18n="noTienesMensajes">No tienes mensajes aún</span><br><span class="text-xs text-gray-300" data-i18n="buscaCreadorIniciar">Busca un creador para iniciar</span></p>
+    <p id="no-messages-mobile" class="hidden text-center text-gray-400 text-sm py-12">💬 No tienes mensajes aún<br><span class="text-xs text-gray-300">Busca un creador para iniciar</span></p>
   </div>
 
   <!-- MOBILE CHAT MODAL -->
@@ -175,44 +165,32 @@
         </div>
       </div>
       <div id="m-chat-messages" class="flex-1 overflow-y-auto px-4 py-3 space-y-2"></div>
+      <!-- Mobile upload progress -->
+      <div id="m-upload-progress" class="px-3"></div>
+      <!-- Mobile media preview -->
+      <div id="m-media-preview" class="hidden px-3 pt-2">
+        <div class="flex flex-wrap gap-2 items-end" id="m-preview-items"></div>
+      </div>
       <div class="border-t border-gray-200 bg-white pb-safe">
-        <div id="m-audio-preview" class="hidden px-4 pt-2">
-          <div class="audio-controls-bar">
-            <audio id="m-audio-player" controls class="flex-1 h-8"></audio>
-            <button onclick="sendAudioNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold" data-i18n="enviar">Enviar</button>
-            <button onclick="cancelAudio()" class="text-red-400 text-xs font-semibold">✕</button>
-          </div>
-        </div>
-        <div id="m-video-preview" class="hidden px-4 pt-2">
-          <div class="relative inline-block">
-            <div class="video-circle w-[100px] h-[100px]"><video id="m-video-thumb" class="w-full h-full object-cover" playsinline muted loop></video><div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div></div>
-            <div class="flex gap-2 mt-2 justify-center">
-              <button onclick="sendVideoNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold" data-i18n="enviar">Enviar</button>
-              <button onclick="cancelVideo()" class="text-red-400 text-xs font-semibold">✕</button>
-            </div>
-          </div>
-        </div>
-        <div id="m-image-preview" class="hidden px-4 pt-2">
-          <div class="relative inline-block">
-            <img id="m-image-thumb" class="h-20 rounded-lg border border-gray-200" alt="">
-            <button onclick="cancelImage()" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">✕</button>
-          </div>
+        <div id="m-recording-indicator" class="hidden mx-3 mt-2 flex items-center gap-2 text-red-500 text-xs bg-red-50 rounded-xl px-3 py-2">
+          <span class="w-2 h-2 rounded-full bg-red-500 rec-pulse"></span> <span>Grabando...</span>
+          <span id="m-rec-timer" class="font-mono text-red-400">0:00</span>
+          <span class="ml-auto text-gray-400 text-[10px]">Suelta para enviar</span>
         </div>
         <div class="flex items-center gap-1.5 px-3 py-2.5">
-          <button onclick="startVideoRecord()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Video" data-i18n-title="grabarVideoMsg">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          <button onclick="document.getElementById('m-file-input').click()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Adjuntar">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
           </button>
-          <button onclick="document.getElementById('m-image-input').click()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Imagen" data-i18n-title="enviarImagen">
+          <input type="file" id="m-file-input" class="hidden" multiple onchange="handleFileSelect(this)">
+          <button onclick="document.getElementById('m-image-input').click()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Foto">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           </button>
-          <input type="file" id="m-image-input" accept="image/*" class="hidden" onchange="handleChatImage(this)">
-          <!-- MOBILE: hold-to-record mic -->
-          <button id="m-audio-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition" title="Mantén para grabar" data-i18n-title="mantenParaGrabar">
+          <input type="file" id="m-image-input" accept="image/*,video/*" class="hidden" capture="environment" onchange="handleFileSelect(this)">
+          <button id="m-audio-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition" title="Mantén para grabar">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
           </button>
           <div class="flex-1 relative flex items-center bg-gray-100 rounded-full border border-gray-200 focus-within:border-creo-mint/50 transition">
             <input id="m-chat-input" type="text" placeholder="Aa" class="flex-1 bg-transparent rounded-full px-4 py-2 text-sm outline-none border-none !border-0" onkeydown="if(event.key==='Enter')sendMessage()">
-            <span id="m-emoji-btn" class="hidden">😊</span>
           </div>
           <button onclick="toggleChatGif()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition">
             <span class="text-xs font-black">GIF</span>
@@ -222,14 +200,9 @@
           </button>
         </div>
         <div id="m-gif-picker" class="hidden mx-3 mb-2 bg-white border border-gray-200 rounded-xl p-2 max-h-52 overflow-y-auto shadow-lg">
-          <input id="m-gif-search" type="text" placeholder="Buscar GIF..." class="w-full bg-gray-100 rounded-lg px-3 py-2 text-xs mb-2 outline-none" data-i18n-placeholder="buscarGif" oninput="searchChatGifs(this.value)">
+          <input id="m-gif-search" type="text" placeholder="Buscar GIF..." class="w-full bg-gray-100 rounded-lg px-3 py-2 text-xs mb-2 outline-none" oninput="searchChatGifs(this.value)">
           <div id="m-gif-results" class="grid grid-cols-3 gap-1"></div>
           <p class="text-[9px] text-gray-300 text-center mt-1">Powered by GIPHY</p>
-        </div>
-        <div id="m-recording-indicator" class="hidden mx-3 mb-2 flex items-center gap-2 text-red-500 text-xs bg-red-50 rounded-xl px-3 py-2">
-          <span class="w-2 h-2 rounded-full bg-red-500 rec-pulse"></span> <span data-i18n="grabando">Grabando...</span>
-          <span id="m-rec-timer" class="font-mono text-red-400">0:00</span>
-          <span class="ml-auto text-gray-400 text-[10px]" data-i18n="suelteParaEnviar">Suelta para enviar</span>
         </div>
       </div>
     </div>
@@ -240,7 +213,7 @@
     <div class="absolute inset-0 bg-black/40" onclick="closeNewMessage()"></div>
     <div class="absolute inset-x-0 bottom-0 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[420px] bg-white rounded-t-2xl md:rounded-2xl max-h-[80vh] flex flex-col shadow-2xl">
       <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-        <h3 class="font-bold text-gray-900" data-i18n="nuevoMensaje">Nuevo Mensaje</h3>
+        <h3 class="font-bold text-gray-900">Nuevo Mensaje</h3>
         <button onclick="closeNewMessage()" class="text-gray-400 hover:text-gray-600 transition">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -255,69 +228,63 @@
     </div>
   </div>
 
-  <!-- Video Record Modal -->
-  <div id="video-record-modal" class="fixed inset-0 z-[40] hidden bg-black/90 flex flex-col items-center justify-center">
-    <div class="relative">
-      <div class="video-circle w-[260px] h-[260px] md:w-[300px] md:h-[300px] mx-auto">
-        <video id="video-live-preview" autoplay playsinline muted class="w-full h-full object-cover" style="transform:scaleX(-1)"></video>
-        <div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div>
-      </div>
-      <p id="video-rec-status" class="text-white text-center mt-4 text-sm">Listo para grabar</p>
-      <p id="video-rec-timer" class="text-white/60 text-center text-xs font-mono mt-1">0:00</p>
-    </div>
-    <div class="flex gap-4 mt-6">
-      <button onclick="cancelVideoRecord()" class="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition">
-        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-      <button id="video-rec-btn" onclick="toggleVideoRecording()" class="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white hover:bg-red-600 transition border-4 border-white">
-        <div id="video-rec-icon" class="w-6 h-6 rounded-full bg-white"></div>
-      </button>
-    </div>
-  </div>
-
   <script>
     let currentUser = null;
     let activeChatUser = null;
     let chatPolling = null;
+    let realtimeChannel = null;
     let recorder = null;
     let audioBlob = null;
-    let pendingImageFile = null;
-    let pendingVideoBlob = null;
+    let pendingFiles = [];
     let searchTimer = null;
     let recTimerInterval = null;
     let recStartTime = 0;
-    let videoRecorder = null;
-    let videoStream = null;
     let isDesktop = window.innerWidth >= 768;
-    let holdTimer = null;
     let isHoldRecording = false;
     let reactionInProgress = false;
+    let isSending = false;
 
     function P(id) { return document.getElementById(id); }
-
     function getPrefix() { return isDesktop ? 'd-' : 'm-'; }
     function chatInput() { return P(getPrefix() + 'chat-input'); }
     function chatMsgList() { return P(getPrefix() + 'chat-messages'); }
-    function audioPreview() { return P(getPrefix() + 'audio-preview'); }
-    function audioPlayer() { return P(getPrefix() + 'audio-player'); }
-    function imagePreview() { return P(getPrefix() + 'image-preview'); }
-    function imageThumb() { return P(getPrefix() + 'image-thumb'); }
-    function videoPreview() { return P(getPrefix() + 'video-preview'); }
-    function videoThumb() { return P(getPrefix() + 'video-thumb'); }
-    function gifPicker() { return P(getPrefix() + 'gif-picker'); }
-    function gifResults() { return P(getPrefix() + 'gif-results'); }
     function recIndicator() { return P(getPrefix() + 'recording-indicator'); }
     function recTimer() { return P(getPrefix() + 'rec-timer'); }
+    function uploadProgressContainer() { return P(getPrefix() + 'upload-progress'); }
+    function mediaPreview() { return P(getPrefix() + 'media-preview'); }
+    function previewItems() { return P(getPrefix() + 'preview-items'); }
+    function gifPicker() { return P(getPrefix() + 'gif-picker'); }
+    function gifResults() { return P(getPrefix() + 'gif-results'); }
 
+    // ===== INIT =====
     async function init() {
       const { data: { user } } = await sb.auth.getUser();
-      if (!user) {
-        P('auth-required')?.classList.remove('hidden');
-        return;
-      }
+      if (!user) { P('auth-required')?.classList.remove('hidden'); return; }
       currentUser = user;
       loadConversations();
       setInterval(loadConversations, 10000);
+
+      // Realtime subscription for incoming messages
+      realtimeChannel = MediaUploadService.subscribeToMessages(user.id, (msg) => {
+        if (activeChatUser && msg.sender_id === activeChatUser.id) {
+          loadChatMessages();
+          playNotificationSound();
+        }
+        loadConversations();
+      });
+
+      // Drag and drop on chat area
+      ['desktop-chat-area', 'chat-modal'].forEach(id => {
+        const el = P(id);
+        if (!el) return;
+        el.addEventListener('dragover', (e) => { e.preventDefault(); el.classList.add('upload-drop-zone', 'drag-over'); });
+        el.addEventListener('dragleave', () => el.classList.remove('upload-drop-zone', 'drag-over'));
+        el.addEventListener('drop', (e) => {
+          e.preventDefault();
+          el.classList.remove('upload-drop-zone', 'drag-over');
+          if (e.dataTransfer.files.length) handleFiles(Array.from(e.dataTransfer.files));
+        });
+      });
     }
 
     // ===== SEARCH =====
@@ -336,8 +303,7 @@
           .limit(10);
         if (!profiles || profiles.length === 0) {
           container.innerHTML = '<p class="p-4 text-sm text-gray-400 text-center">No se encontraron creadores</p>';
-          container.classList.remove('hidden');
-          return;
+          container.classList.remove('hidden'); return;
         }
         const clearSrc = pfx ? `document.getElementById('${pfx}search-creators').value=''` : `document.getElementById('search-creators').value=''`;
         container.innerHTML = profiles.map(p => renderSearchResult(p, pfx + 'search-results', clearSrc)).join('');
@@ -351,13 +317,7 @@
       const avatar = p.avatar_url
         ? `<img src="${esc(p.avatar_url)}" class="w-10 h-10 rounded-full object-cover">`
         : `<div class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-creo-purple font-bold">${esc(name[0].toUpperCase())}</span></div>`;
-      return `<button onclick="openChat('${p.id}');document.getElementById('${containerId}').classList.add('hidden');${clearSrc}" class="w-full search-result flex items-center gap-3 p-3 rounded-xl transition text-left">
-        ${avatar}
-        <div class="min-w-0">
-          <p class="font-semibold text-sm text-gray-900 truncate">${esc(name)}${verified}</p>
-          <p class="text-xs text-gray-400 truncate">@${esc(p.username || '')}</p>
-        </div>
-      </button>`;
+      return `<button onclick="openChat('${p.id}');document.getElementById('${containerId}').classList.add('hidden');${clearSrc}" class="w-full search-result flex items-center gap-3 p-3 rounded-xl transition text-left">${avatar}<div class="min-w-0"><p class="font-semibold text-sm text-gray-900 truncate">${esc(name)}${verified}</p><p class="text-xs text-gray-400 truncate">@${esc(p.username || '')}</p></div></button>`;
     }
 
     async function searchNewMsgCreators(q) {
@@ -372,10 +332,7 @@
           .or(`username.ilike.%${term}%,display_name.ilike.%${term}%`)
           .neq('id', currentUser?.id || '')
           .limit(15);
-        if (!profiles || profiles.length === 0) {
-          container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">No se encontraron creadores</p>';
-          return;
-        }
+        if (!profiles || profiles.length === 0) { container.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">No se encontraron creadores</p>'; return; }
         container.innerHTML = profiles.map(p => {
           const name = p.display_name || p.username || 'Usuario';
           const avatar = p.avatar_url
@@ -386,17 +343,11 @@
       }, 300);
     }
 
-    function openNewMessage() {
-      P('new-msg-modal').classList.remove('hidden');
-      P('new-msg-results').innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Escribe al menos 2 caracteres</p>';
-      setTimeout(() => P('new-msg-search').focus(), 100);
-    }
+    function openNewMessage() { P('new-msg-modal').classList.remove('hidden'); P('new-msg-results').innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Escribe al menos 2 caracteres</p>'; setTimeout(() => P('new-msg-search').focus(), 100); }
     function closeNewMessage() { P('new-msg-modal').classList.add('hidden'); P('new-msg-search').value = ''; }
 
     document.addEventListener('click', e => {
-      ['search-results', 'm-search-results'].forEach(id => {
-        const sr = P(id); if (sr && !sr.contains(e.target)) sr.classList.add('hidden');
-      });
+      ['search-results', 'm-search-results'].forEach(id => { const sr = P(id); if (sr && !sr.contains(e.target)) sr.classList.add('hidden'); });
     });
 
     // ===== CONVERSATIONS =====
@@ -405,18 +356,12 @@
       const { data: msgs } = await sb.from('messages')
         .select('*, sender:sender_id(id, username, display_name, avatar_url), receiver:receiver_id(id, username, display_name, avatar_url)')
         .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
+        .is('deleted_at', null)
         .order('created_at', { ascending: false })
         .limit(500);
 
-      const noMsgD = P('no-messages-desktop');
-      const noMsgM = P('no-messages-mobile');
-      if (!msgs || msgs.length === 0) {
-        noMsgD?.classList.remove('hidden');
-        noMsgM?.classList.remove('hidden');
-        return;
-      }
-      noMsgD?.classList.add('hidden');
-      noMsgM?.classList.add('hidden');
+      if (!msgs || msgs.length === 0) { P('no-messages-desktop')?.classList.remove('hidden'); P('no-messages-mobile')?.classList.remove('hidden'); return; }
+      P('no-messages-desktop')?.classList.add('hidden'); P('no-messages-mobile')?.classList.add('hidden');
 
       const convos = {};
       msgs.forEach(m => {
@@ -432,14 +377,17 @@
         const avatar = c.user.avatar_url
           ? `<img src="${esc(c.user.avatar_url)}" class="w-full h-full object-cover">`
           : `<span class="text-creo-purple font-bold text-sm">${esc(name[0].toUpperCase())}</span>`;
-        const preview = c.lastMsg.body ? esc(c.lastMsg.body).slice(0, 40) : (c.lastMsg.media_type === 'gif' ? '🎬 GIF' : c.lastMsg.media_type === 'audio' ? '🎤 Audio' : c.lastMsg.media_type === 'image' ? '📷 Imagen' : c.lastMsg.media_type === 'video' ? '🎥 Video' : '📎 Media');
+        let preview = '';
+        if (c.lastMsg.body) preview = esc(c.lastMsg.body).slice(0, 40);
+        else if (c.lastMsg.media_type) {
+          const icons = { gif: '🎬 GIF', audio: '🎤 Audio', image: '📷 Imagen', video: '🎥 Video', document: '📄 Documento', archive: '📦 Archivo', file: '📎 Archivo' };
+          preview = icons[c.lastMsg.media_type] || '📎 Adjunto';
+        }
         const isMine = c.lastMsg.sender_id === currentUser.id;
         const hasUnread = c.unread > 0;
         const isActive = activeChatUser && activeChatUser.id === c.user.id;
         return `<button onclick="openChat('${c.user.id}')" class="w-full convo-item rounded-2xl p-3 flex items-center gap-3 text-left ${isActive ? 'active' : ''}">
-          <div class="relative flex-shrink-0">
-            <div class="w-12 h-12 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden">${avatar}</div>
-          </div>
+          <div class="relative flex-shrink-0"><div class="w-12 h-12 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden">${avatar}</div></div>
           <div class="flex-1 min-w-0">
             <div class="flex justify-between items-center">
               <p class="font-semibold text-sm ${hasUnread ? 'text-gray-900' : 'text-gray-700'} truncate">${esc(name)}</p>
@@ -451,8 +399,7 @@
         </button>`;
       }).join('');
 
-      const dc = P('desktop-convos');
-      const mc = P('mobile-convos');
+      const dc = P('desktop-convos'); const mc = P('mobile-convos');
       if (dc) dc.innerHTML = html;
       if (mc) mc.innerHTML = html;
     }
@@ -474,9 +421,7 @@
         P('d-chat-profile-link-name').href = profileUrl;
         P('d-chat-view-btn').href = profileUrl;
         const av = P('d-chat-avatar');
-        av.innerHTML = profile.avatar_url
-          ? `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">`
-          : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
+        av.innerHTML = profile.avatar_url ? `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
         createEmojiPicker('d-chat-input', 'd-emoji-btn');
       } else {
         P('chat-modal').classList.remove('hidden');
@@ -485,12 +430,10 @@
         P('m-chat-profile-link').href = profileUrl;
         P('m-chat-profile-link-name').href = profileUrl;
         const av = P('m-chat-avatar');
-        av.innerHTML = profile.avatar_url
-          ? `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">`
-          : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
-        // Emoji picker removed from mobile messages — users use native keyboard emoji
+        av.innerHTML = profile.avatar_url ? `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
       }
 
+      clearPendingFiles();
       if (chatPolling) clearInterval(chatPolling);
       loadChatMessages();
       chatPolling = setInterval(loadChatMessages, 4000);
@@ -501,7 +444,7 @@
       P('chat-modal').classList.add('hidden');
       if (chatPolling) { clearInterval(chatPolling); chatPolling = null; }
       activeChatUser = null;
-      cancelAudio(); cancelImage(); cancelVideo();
+      clearPendingFiles(); cancelAudio();
       loadConversations();
     }
 
@@ -511,6 +454,7 @@
       const { data: msgs } = await sb.from('messages')
         .select('*')
         .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${activeChatUser.id}),and(sender_id.eq.${activeChatUser.id},receiver_id.eq.${currentUser.id})`)
+        .is('deleted_at', null)
         .order('created_at', { ascending: true })
         .limit(200);
 
@@ -539,25 +483,20 @@
     function renderMessage(m) {
       const isMine = m.sender_id === currentUser.id;
       let content = '';
-      if (m.media_type === 'gif') {
-        content = `<img src="${esc(m.media_url)}" class="max-w-[200px] rounded-xl" alt="GIF" loading="lazy">`;
-      } else if (m.media_type === 'audio') {
-        content = `<audio controls src="${esc(m.media_url)}" class="w-[220px] max-w-full" style="height:40px"></audio>`;
-      } else if (m.media_type === 'image') {
-        content = `<img src="${esc(m.media_url)}" class="max-w-[200px] rounded-xl cursor-pointer" alt="" loading="lazy" onclick="window.open(this.src,'_blank')">`;
-      } else if (m.media_type === 'video') {
-        content = `<div class="video-circle w-[160px] h-[160px] cursor-pointer" onclick="this.querySelector('video').paused?this.querySelector('video').play():this.querySelector('video').pause()">
-          <video src="${esc(m.media_url)}" playsinline class="w-full h-full object-cover"></video>
-          <div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div>
-        </div>`;
-      }
+
+      // Render media via centralized service
+      const mediaHtml = MediaUploadService.renderAttachment(m);
+      if (mediaHtml) content += mediaHtml;
+
       if (m.body) content += `<p class="text-sm leading-relaxed">${esc(m.body)}</p>`;
+
       const reactions = m.reactions || {};
       const reactionHtml = Object.keys(reactions).length > 0
         ? `<div class="flex flex-wrap gap-1 ${isMine ? 'justify-end' : 'justify-start'} mt-0.5">${Object.entries(reactions).map(([emoji, users]) => {
             const my = users.includes(currentUser.id);
             return `<button onclick="toggleReaction('${m.id}','${emoji}')" class="text-xs px-1.5 py-0.5 rounded-full border transition ${my ? 'bg-creo-purple/20 border-creo-purple' : 'bg-gray-50 border-gray-200 hover:border-creo-mint'}">${emoji}${users.length>1?' '+users.length:''}</button>`;
           }).join('')}</div>` : '';
+
       return `<div class="flex ${isMine?'justify-end':'justify-start'} group" id="msg-${m.id}">
         <div class="max-w-[75%] relative">
           <div class="${isMine?'msg-mine':'msg-theirs'} px-3.5 py-2 space-y-1" ondblclick="showReactionPicker('${m.id}',${isMine})">
@@ -570,100 +509,168 @@
       </div>`;
     }
 
-    // ===== SEND MESSAGE =====
-    async function sendMessage() {
-      if (!currentUser || !activeChatUser) return;
-      const input = chatInput();
-      const body = input ? input.value.trim() : '';
-      if (!body && !audioBlob && !pendingImageFile && !pendingVideoBlob) return;
-      const msg = { sender_id: currentUser.id, receiver_id: activeChatUser.id, body: body || null, media_url: null, media_type: null };
-
-      if (pendingImageFile) {
-        const ext = pendingImageFile.name.split('.').pop() || 'jpg';
-        const fileName = `dm_img_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-        const { data, error } = await sb.storage.from('dm-media').upload(fileName, pendingImageFile, { contentType: pendingImageFile.type });
-        if (!error && data) {
-          const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
-          msg.media_url = u.publicUrl; msg.media_type = 'image';
-        } else if (error) { showToast('Error subiendo imagen: ' + error.message, 'error'); }
-        cancelImage();
-      }
-      if (pendingVideoBlob) {
-        const vext = pendingVideoBlob.type.includes('mp4') ? 'mp4' : 'webm';
-        const fileName = `dm_video_${Date.now()}.${vext}`;
-        const { data, error } = await sb.storage.from('dm-media').upload(fileName, pendingVideoBlob, { contentType: pendingVideoBlob.type });
-        if (!error && data) {
-          const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
-          msg.media_url = u.publicUrl; msg.media_type = 'video';
-        } else if (error) { showToast('Error subiendo video: ' + error.message, 'error'); }
-        cancelVideo();
-      }
-      if (audioBlob) {
-        const fileName = `dm_audio_${Date.now()}.webm`;
-        const { data, error } = await sb.storage.from('dm-media').upload(fileName, audioBlob, { contentType: 'audio/webm' });
-        if (!error && data) {
-          const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
-          msg.media_url = u.publicUrl; msg.media_type = 'audio';
-        } else if (error) { showToast('Error subiendo audio: ' + error.message, 'error'); }
-        cancelAudio();
-      }
-      if (input) input.value = '';
-      if (!msg.body && !msg.media_url) return;
-      const { error } = await sb.from('messages').insert(msg);
-      if (error) { showToast('Error al enviar', 'error'); console.error(error); return; }
-      const label = msg.media_type === 'video' ? '🎥 Video' : msg.media_type === 'image' ? '📷 Imagen' : msg.media_type === 'audio' ? '🎤 Audio' : body;
-      createNotification(activeChatUser.id, 'message', label, null, 'messages.html#chat-' + currentUser.id);
-      loadChatMessages();
-    }
-
-    async function sendAudioNow() {
-      if (!audioBlob) return;
-      const msg = { sender_id: currentUser.id, receiver_id: activeChatUser.id, body: null, media_url: null, media_type: null };
-      const fileName = `dm_audio_${Date.now()}.webm`;
-      const { data, error } = await sb.storage.from('dm-media').upload(fileName, audioBlob, { contentType: 'audio/webm' });
-      if (!error && data) {
-        const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
-        msg.media_url = u.publicUrl; msg.media_type = 'audio';
-      } else if (error) { showToast('Error subiendo audio: ' + error.message, 'error'); cancelAudio(); return; }
-      cancelAudio();
-      const { error: insErr } = await sb.from('messages').insert(msg);
-      if (insErr) { showToast('Error al enviar audio', 'error'); return; }
-      createNotification(activeChatUser.id, 'message', '🎤 Audio', null, 'messages.html#chat-' + currentUser.id);
-      loadChatMessages();
-    }
-
-    async function sendVideoNow() {
-      if (!pendingVideoBlob) return;
-      const msg = { sender_id: currentUser.id, receiver_id: activeChatUser.id, body: null, media_url: null, media_type: null };
-      const vext = pendingVideoBlob.type.includes('mp4') ? 'mp4' : 'webm';
-      const fileName = `dm_video_${Date.now()}.${vext}`;
-      const { data, error } = await sb.storage.from('dm-media').upload(fileName, pendingVideoBlob, { contentType: pendingVideoBlob.type });
-      if (!error && data) {
-        const { data: u } = sb.storage.from('dm-media').getPublicUrl(fileName);
-        msg.media_url = u.publicUrl; msg.media_type = 'video';
-      } else if (error) { showToast('Error subiendo video: ' + error.message, 'error'); cancelVideo(); return; }
-      cancelVideo();
-      const { error: insErr } = await sb.from('messages').insert(msg);
-      if (insErr) { showToast('Error al enviar video', 'error'); return; }
-      createNotification(activeChatUser.id, 'message', '🎥 Video', null, 'messages.html#chat-' + currentUser.id);
-      loadChatMessages();
-    }
-
-    // ===== IMAGE =====
-    function handleChatImage(input) {
-      const file = input.files[0];
-      if (!file) return;
-      if (file.size > 10 * 1024 * 1024) { showToast('Imagen máx 10MB', 'error'); return; }
-      pendingImageFile = file;
-      const thumb = imageThumb();
-      if (thumb) thumb.src = URL.createObjectURL(file);
-      imagePreview()?.classList.remove('hidden');
+    // ===== FILE HANDLING — Universal =====
+    function handleFileSelect(input) {
+      if (!input.files || !input.files.length) return;
+      handleFiles(Array.from(input.files));
       input.value = '';
     }
-    function cancelImage() {
-      pendingImageFile = null;
-      imagePreview()?.classList.add('hidden');
-      const t = imageThumb(); if (t) t.src = '';
+
+    function handleFiles(files) {
+      for (const file of files) {
+        const validation = MediaUploadService.validate(file);
+        if (!validation.ok) { showToast(validation.error, 'error'); continue; }
+        addPendingFile(file);
+      }
+    }
+
+    function addPendingFile(file) {
+      const category = MediaUploadService.categorize(file.type || 'application/octet-stream');
+      const icon = MediaUploadService.getIcon(category);
+      const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      const entry = { id, file, category };
+      pendingFiles.push(entry);
+      updatePreviewUI();
+    }
+
+    function removePendingFile(id) {
+      pendingFiles = pendingFiles.filter(f => f.id !== id);
+      updatePreviewUI();
+    }
+
+    function clearPendingFiles() {
+      pendingFiles = [];
+      updatePreviewUI();
+      audioBlob = null;
+    }
+
+    function updatePreviewUI() {
+      const container = previewItems();
+      const wrapper = mediaPreview();
+      if (!container || !wrapper) return;
+
+      if (pendingFiles.length === 0 && !audioBlob) {
+        wrapper.classList.add('hidden');
+        container.innerHTML = '';
+        return;
+      }
+
+      wrapper.classList.remove('hidden');
+      container.innerHTML = '';
+
+      // Audio preview
+      if (audioBlob) {
+        const div = document.createElement('div');
+        div.className = 'relative bg-gray-100 rounded-xl px-3 py-2 flex items-center gap-2';
+        const audioUrl = URL.createObjectURL(audioBlob);
+        div.innerHTML = `<span class="text-lg">🎤</span><audio controls src="${audioUrl}" class="h-8 flex-1" style="max-width:200px"></audio>
+          <button onclick="cancelAudio()" class="text-red-400 hover:text-red-600 text-xs font-bold">✕</button>`;
+        container.appendChild(div);
+      }
+
+      // File previews
+      pendingFiles.forEach(entry => {
+        const div = document.createElement('div');
+        div.className = 'relative';
+        if (entry.category === 'image') {
+          const url = URL.createObjectURL(entry.file);
+          div.innerHTML = `<img src="${url}" class="h-16 w-16 object-cover rounded-lg border border-gray-200">
+            <button onclick="removePendingFile('${entry.id}')" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">✕</button>`;
+        } else if (entry.category === 'video') {
+          const url = URL.createObjectURL(entry.file);
+          div.innerHTML = `<video src="${url}" class="h-16 w-16 object-cover rounded-lg border border-gray-200" muted></video>
+            <button onclick="removePendingFile('${entry.id}')" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">✕</button>`;
+        } else {
+          const icon = MediaUploadService.getIcon(entry.category);
+          div.innerHTML = `<div class="h-16 px-3 bg-gray-100 rounded-lg border border-gray-200 flex items-center gap-2">
+            <span class="text-xl">${icon}</span>
+            <div class="min-w-0"><p class="text-[10px] font-medium truncate max-w-[100px]">${esc(entry.file.name)}</p><p class="text-[9px] text-gray-400">${MediaUploadService.formatSize(entry.file.size)}</p></div>
+          </div>
+          <button onclick="removePendingFile('${entry.id}')" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">✕</button>`;
+        }
+        container.appendChild(div);
+      });
+    }
+
+    // ===== SEND MESSAGE =====
+    async function sendMessage() {
+      if (!currentUser || !activeChatUser || isSending) return;
+      const input = chatInput();
+      const body = input ? input.value.trim() : '';
+      if (!body && pendingFiles.length === 0 && !audioBlob) return;
+
+      isSending = true;
+      const sendBtn = document.querySelector('[onclick="sendMessage()"]');
+      if (sendBtn) sendBtn.disabled = true;
+
+      try {
+        // Upload audio blob if present
+        if (audioBlob) {
+          const fileName = `audio_${Date.now()}.webm`;
+          await uploadAndSend(new File([audioBlob], fileName, { type: 'audio/webm' }), null);
+          audioBlob = null;
+        }
+
+        // Upload each pending file
+        for (const entry of [...pendingFiles]) {
+          await uploadAndSend(entry.file, pendingFiles.length === 1 ? body : null);
+        }
+
+        // Send text-only if no files
+        if (pendingFiles.length === 0 && !audioBlob && body) {
+          await MediaUploadService.sendTextMessage(activeChatUser.id, body);
+        }
+
+        if (input) input.value = '';
+        clearPendingFiles();
+        loadChatMessages();
+      } catch (err) {
+        showToast('Error al enviar: ' + (err.message || err), 'error');
+        console.error('Send error:', err);
+      } finally {
+        isSending = false;
+        if (sendBtn) sendBtn.disabled = false;
+      }
+    }
+
+    async function uploadAndSend(file, textBody) {
+      const progressContainer = uploadProgressContainer();
+      const progressUI = MediaUploadService.createProgressUI(file, progressContainer);
+
+      return new Promise((resolve, reject) => {
+        const uploadState = MediaUploadService.upload(file, {
+          onProgress(pct, speed, eta) { progressUI.updateProgress(pct, speed, eta); },
+          onStatus(status) { progressUI.updateStatus(status); },
+          async onComplete(result) {
+            try {
+              await MediaUploadService.sendMediaMessage(activeChatUser.id, result, textBody);
+              progressUI.updateStatus('complete');
+              setTimeout(() => progressUI.remove(), 3000);
+              loadChatMessages();
+              resolve(result);
+            } catch (err) {
+              progressUI.updateStatus('failed');
+              reject(err);
+            }
+          },
+          onError(err) {
+            progressUI.updateStatus('failed');
+            progressUI.setCancelHandler(() => {
+              if (uploadState.retry) {
+                uploadState.retry();
+                progressUI.updateStatus('retrying');
+              }
+            });
+            reject(new Error(err));
+          },
+        });
+
+        progressUI.setCancelHandler(() => {
+          if (uploadState.cancel) uploadState.cancel();
+          progressUI.remove();
+          resolve(null);
+        });
+      });
     }
 
     // ===== GIF =====
@@ -686,15 +693,17 @@
         } catch(e) {}
       }, 300);
     }
+
     async function sendGif(url) {
       if (!currentUser || !activeChatUser) return;
-      await sb.from('messages').insert({ sender_id: currentUser.id, receiver_id: activeChatUser.id, body: null, media_url: url, media_type: 'gif' });
-      gifPicker()?.classList.add('hidden');
-      createNotification(activeChatUser.id, 'message', '🎬 GIF', null, 'messages.html#chat-' + currentUser.id);
-      loadChatMessages();
+      try {
+        await MediaUploadService.sendGifMessage(activeChatUser.id, url);
+        gifPicker()?.classList.add('hidden');
+        loadChatMessages();
+      } catch(e) { showToast('Error al enviar GIF', 'error'); }
     }
 
-    // ===== AUDIO — DESKTOP: tap to record / tap to stop =====
+    // ===== AUDIO RECORDING =====
     function startRecTimer() {
       recStartTime = Date.now();
       recTimerInterval = setInterval(() => {
@@ -714,12 +723,10 @@
         recorder.ondataavailable = e => chunks.push(e.data);
         recorder.onstop = () => {
           audioBlob = new Blob(chunks, { type: 'audio/webm' });
-          const ap = audioPlayer();
-          if (ap) ap.src = URL.createObjectURL(audioBlob);
-          audioPreview()?.classList.remove('hidden');
           recIndicator()?.classList.add('hidden');
           stopRecTimer();
           stream.getTracks().forEach(t => t.stop());
+          updatePreviewUI();
         };
         recorder.start();
         recIndicator()?.classList.remove('hidden');
@@ -729,13 +736,10 @@
       } catch(e) { showToast('No se pudo acceder al micrófono', 'error'); }
     }
 
-    function stopAudioRecord() {
-      if (recorder && recorder.state === 'recording') recorder.stop();
-    }
+    function stopAudioRecord() { if (recorder && recorder.state === 'recording') recorder.stop(); }
 
     function cancelAudio() {
       audioBlob = null;
-      audioPreview()?.classList.add('hidden');
       recIndicator()?.classList.add('hidden');
       stopRecTimer();
       const btn = P(getPrefix() + 'audio-btn') || P('d-audio-btn');
@@ -745,17 +749,16 @@
         recorder.stream?.getTracks().forEach(t => t.stop());
       }
       recorder = null;
+      updatePreviewUI();
     }
 
-    // ===== AUDIO — MOBILE: hold to record =====
+    // Mobile hold-to-record
     function setupMobileHoldToRecord() {
       const btn = P('m-audio-btn');
       if (!btn) return;
       let holdStream = null;
-
       async function startHold(e) {
-        e.preventDefault();
-        isHoldRecording = true;
+        e.preventDefault(); isHoldRecording = true;
         try {
           holdStream = await navigator.mediaDevices.getUserMedia({ audio: true });
           recorder = new MediaRecorder(holdStream);
@@ -763,12 +766,10 @@
           recorder.ondataavailable = e => chunks.push(e.data);
           recorder.onstop = () => {
             audioBlob = new Blob(chunks, { type: 'audio/webm' });
-            const ap = P('m-audio-player');
-            if (ap) ap.src = URL.createObjectURL(audioBlob);
-            P('m-audio-preview')?.classList.remove('hidden');
             P('m-recording-indicator')?.classList.add('hidden');
             stopRecTimer();
             holdStream?.getTracks().forEach(t => t.stop());
+            updatePreviewUI();
           };
           recorder.start();
           P('m-recording-indicator')?.classList.remove('hidden');
@@ -776,7 +777,6 @@
           startRecTimer();
         } catch(e) { showToast('No se pudo acceder al micrófono', 'error'); isHoldRecording = false; }
       }
-
       function endHold(e) {
         e.preventDefault();
         if (!isHoldRecording) return;
@@ -784,7 +784,6 @@
         btn.classList.remove('text-red-500');
         if (recorder && recorder.state === 'recording') recorder.stop();
       }
-
       btn.addEventListener('touchstart', startHold, { passive: false });
       btn.addEventListener('touchend', endHold, { passive: false });
       btn.addEventListener('touchcancel', endHold, { passive: false });
@@ -793,76 +792,11 @@
       btn.addEventListener('mouseleave', endHold);
     }
 
-    // ===== VIDEO RECORDING =====
-    async function startVideoRecord() {
-      const modal = P('video-record-modal');
-      modal.classList.remove('hidden');
-      P('video-rec-status').textContent = 'Listo para grabar';
-      P('video-rec-timer').textContent = '0:00';
-      P('video-rec-icon').className = 'w-6 h-6 rounded-full bg-white';
-      try {
-        videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
-        P('video-live-preview').srcObject = videoStream;
-      } catch(e) {
-        showToast('No se pudo acceder a la cámara', 'error');
-        modal.classList.add('hidden');
-      }
-    }
-
-    function toggleVideoRecording() {
-      if (videoRecorder && videoRecorder.state === 'recording') {
-        videoRecorder.stop();
-        P('video-rec-status').textContent = 'Procesando...';
-        P('video-rec-icon').className = 'w-6 h-6 rounded-full bg-white';
-        stopRecTimer();
-        return;
-      }
-      const chunks = [];
-      const vmime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : 'video/mp4';
-      videoRecorder = new MediaRecorder(videoStream, { mimeType: vmime });
-      videoRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-      videoRecorder.onstop = () => {
-        pendingVideoBlob = new Blob(chunks, { type: vmime });
-        videoStream?.getTracks().forEach(t => t.stop());
-        P('video-live-preview').srcObject = null;
-        P('video-record-modal').classList.add('hidden');
-        const vt = videoThumb();
-        if (vt) { vt.src = URL.createObjectURL(pendingVideoBlob); vt.play(); }
-        videoPreview()?.classList.remove('hidden');
-      };
-      videoRecorder.start();
-      P('video-rec-status').textContent = 'Grabando...';
-      P('video-rec-icon').className = 'w-5 h-5 rounded bg-white';
-      recStartTime = Date.now();
-      recTimerInterval = setInterval(() => {
-        const s = Math.floor((Date.now() - recStartTime) / 1000);
-        P('video-rec-timer').textContent = Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
-      }, 500);
-    }
-
-    function cancelVideoRecord() {
-      if (videoRecorder && videoRecorder.state === 'recording') videoRecorder.stop();
-      videoStream?.getTracks().forEach(t => t.stop());
-      P('video-live-preview').srcObject = null;
-      P('video-record-modal').classList.add('hidden');
-      stopRecTimer();
-      videoRecorder = null;
-    }
-
-    function cancelVideo() {
-      pendingVideoBlob = null;
-      videoPreview()?.classList.add('hidden');
-      const vt = videoThumb(); if (vt) vt.src = '';
-    }
-
     // ===== REACTIONS =====
     const QUICK_REACTIONS = ['❤️','😂','😮','😢','😡','👍','🔥','🙏','💯','✨'];
-
     function showReactionPicker(msgId, isMine) {
-      const existing = P('reaction-picker');
-      if (existing) existing.remove();
-      const msgEl = P('msg-' + msgId);
-      if (!msgEl) return;
+      const existing = P('reaction-picker'); if (existing) existing.remove();
+      const msgEl = P('msg-' + msgId); if (!msgEl) return;
       reactionInProgress = true;
       const picker = document.createElement('div');
       picker.id = 'reaction-picker';
@@ -876,23 +810,18 @@
 
     function closeReactionPicker(e) {
       const p = P('reaction-picker');
-      if (p && !p.contains(e?.target)) {
-        p.remove();
-        document.removeEventListener('click', closeReactionPicker);
-        reactionInProgress = false;
-      }
+      if (p && !p.contains(e?.target)) { p.remove(); document.removeEventListener('click', closeReactionPicker); reactionInProgress = false; }
     }
 
     async function toggleReaction(msgId, emoji) {
-      const existing = P('reaction-picker');
-      if (existing) existing.remove();
+      const existing = P('reaction-picker'); if (existing) existing.remove();
       document.removeEventListener('click', closeReactionPicker);
       reactionInProgress = true;
       try {
         const { data: msg } = await sb.from('messages').select('sender_id, receiver_id').eq('id', msgId).single();
         if (!msg) return;
         const { data: reactions, error: rpcErr } = await sb.rpc('toggle_message_reaction', { p_message_id: msgId, p_emoji: emoji });
-        if (rpcErr) { showToast('Error al reaccionar', 'error'); console.error(rpcErr); return; }
+        if (rpcErr) { showToast('Error al reaccionar', 'error'); return; }
         const msgEl = P('msg-' + msgId);
         if (msgEl) {
           const isMine = msg.sender_id === currentUser.id;
@@ -929,6 +858,24 @@
     }
 
     window.addEventListener('resize', () => { isDesktop = window.innerWidth >= 768; });
+
+    // ===== PASTE HANDLER — paste images/files directly =====
+    document.addEventListener('paste', (e) => {
+      if (!activeChatUser) return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      const files = [];
+      for (const item of items) {
+        if (item.kind === 'file') {
+          const file = item.getAsFile();
+          if (file) files.push(file);
+        }
+      }
+      if (files.length) {
+        e.preventDefault();
+        handleFiles(files);
+      }
+    });
 
     window.onload = async () => {
       await init();
