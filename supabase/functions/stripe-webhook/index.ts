@@ -112,6 +112,7 @@ serve(async (req) => {
           amount_cents: baseCents,
           platform_fee_cents: platformFeeCents,
           stripe_surcharge_cents: stripeSurchargeCents,
+          tipper_id: metadata.tipper_id || null,
           tipper_name: session.customer_details?.name || "Anónimo",
           tipper_email: session.customer_details?.email || null,
         });

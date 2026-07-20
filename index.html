@@ -121,6 +121,7 @@
         <button onclick="showTab('mecenas-sub');closeMetasDropdown()" id="tab-mecenas-sub" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">⭐ <span data-i18n="tabApoyoFull">Apoyo Full</span></button>
         <div class="border-t border-gray-100 my-1"></div>
         <button onclick="showTab('my-subs');closeMetasDropdown()" id="tab-my-subs" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💜 Mis Suscripciones</button>
+        <button onclick="showTab('my-payments');closeMetasDropdown()" id="tab-my-payments" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">📋 Mis Pagos</button>
       </div>
       <!-- Herramientas dropdown — outside the overflow container -->
       <div id="herramientas-menu" class="hidden bg-white rounded-xl shadow-xl border border-gray-200 z-50 py-1 text-[12px]">
@@ -1066,6 +1067,36 @@
         </div>
       </div>
 
+      <!-- TAB: My Payments (supporter payment history) -->
+      <div id="panel-my-payments" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+          <h3 class="font-bold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            Mis Pagos
+          </h3>
+          <p class="text-xs text-gray-500">Historial de todos tus apoyos a creadores</p>
+          <div id="my-payments-summary" class="grid grid-cols-3 gap-2 hidden">
+            <div class="bg-green-50 p-3 rounded-xl border border-green-200 text-center">
+              <p class="text-[10px] text-green-600 font-medium">Tips</p>
+              <p class="text-sm font-bold text-green-700" id="my-pay-tips">$0</p>
+            </div>
+            <div class="bg-purple-50 p-3 rounded-xl border border-purple-200 text-center">
+              <p class="text-[10px] text-purple-600 font-medium">Suscripciones</p>
+              <p class="text-sm font-bold text-purple-700" id="my-pay-subs">$0</p>
+            </div>
+            <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-center">
+              <p class="text-[10px] text-amber-600 font-medium">Metas</p>
+              <p class="text-sm font-bold text-amber-700" id="my-pay-metas">$0</p>
+            </div>
+          </div>
+          <div id="my-payments-list" class="space-y-2 max-h-[400px] overflow-y-auto">
+            <div class="text-center py-8 text-gray-400">
+              <div class="animate-pulse">Cargando historial de pagos...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="panel-account" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
           <h3 class="font-bold text-gray-900 flex items-center gap-2">
@@ -1124,7 +1155,7 @@
     });
 
     const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'sounds', 'earnings', 'subscribers'];
-    const METAS_TABS = ['metas', 'mecenas-tip', 'mecenas-sub', 'my-subs'];
+    const METAS_TABS = ['metas', 'mecenas-tip', 'mecenas-sub', 'my-subs', 'my-payments'];
 
     function toggleMetasDropdown() {
       closeHerramientas();
@@ -1142,6 +1173,7 @@
       if (tab === 'earnings') loadEarnings();
       if (tab === 'subscribers') loadSubscribers();
       if (tab === 'my-subs') loadMySubscriptions();
+      if (tab === 'my-payments') loadMyPayments();
       if (HERRAMIENTAS_TABS.includes(tab)) {
         const herrBtn = document.getElementById('tab-herramientas');
         herrBtn.classList.add('tab-active');
@@ -3770,6 +3802,68 @@
       } catch (err) {
         container.innerHTML = '<p class="text-center text-red-400 py-4">Error al cargar suscripciones</p>';
         console.error('loadMySubscriptions error:', err);
+      }
+    }
+
+    async function loadMyPayments() {
+      const container = document.getElementById('my-payments-list');
+      const summary = document.getElementById('my-payments-summary');
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { container.innerHTML = '<p class="text-center text-gray-400 py-4">Inicia sesión para ver tus pagos</p>'; return; }
+        const userId = session.user.id;
+        const userEmail = session.user.email;
+
+        const [tipsRes, subsRes] = await Promise.all([
+          sb.from('tips').select('id, amount_cents, creator_id, created_at, profiles!tips_creator_id_fkey(display_name, username, avatar_url)').or(`tipper_id.eq.${userId},tipper_email.eq.${userEmail}`).order('created_at', { ascending: false }).limit(50),
+          sb.from('subscriptions').select('id, amount_cents, status, created_at, cancelled_at, profiles!subscriptions_creator_id_fkey(display_name, username, avatar_url)').eq('subscriber_id', userId).order('created_at', { ascending: false }).limit(50)
+        ]);
+
+        const tips = tipsRes.data || [];
+        const subs = subsRes.data || [];
+
+        const totalTips = tips.reduce((s, t) => s + (t.amount_cents || 0), 0);
+        const totalSubs = subs.reduce((s, t) => s + (t.amount_cents || 0), 0);
+
+        const allPayments = [
+          ...tips.map(t => ({ type: 'tip', amount: t.amount_cents || 0, creator: t.profiles || {}, date: t.created_at })),
+          ...subs.map(s => ({ type: 'sub', amount: s.amount_cents || 0, creator: s.profiles || {}, date: s.created_at, status: s.status }))
+        ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        if (allPayments.length === 0) {
+          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">No tienes pagos registrados</p><p class="text-xs text-gray-300 mt-1">Apoya a un creador desde su perfil</p></div>';
+          summary.classList.add('hidden');
+          return;
+        }
+
+        document.getElementById('my-pay-tips').textContent = '$' + (totalTips / 100).toFixed(2);
+        document.getElementById('my-pay-subs').textContent = '$' + (totalSubs / 100).toFixed(2);
+        document.getElementById('my-pay-metas').textContent = '$0.00';
+        summary.classList.remove('hidden');
+
+        const typeConfig = {
+          tip: { icon: '💚', label: 'Tip', color: 'bg-green-50 border-green-200' },
+          sub: { icon: '⭐', label: 'Suscripción', color: 'bg-purple-50 border-purple-200' }
+        };
+
+        container.innerHTML = allPayments.map(p => {
+          const cfg = typeConfig[p.type];
+          const date = new Date(p.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+          const creatorName = p.creator.display_name || p.creator.username || 'Creador';
+          const avatarUrl = p.creator.avatar_url || 'assets/default-avatar.png';
+          const statusBadge = p.type === 'sub' ? `<span class="text-[10px] px-1.5 py-0.5 rounded-full ${p.status === 'active' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}">${p.status === 'active' ? 'Activa' : 'Cancelada'}</span>` : '';
+          return `<div class="flex items-center gap-3 p-3 rounded-xl border ${cfg.color}">
+            <img src="${escapeHtml(avatarUrl)}" alt="" class="w-9 h-9 rounded-full object-cover border border-gray-200">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 truncate">${escapeHtml(creatorName)}</p>
+              <p class="text-[10px] text-gray-500">${cfg.label} · ${date} ${statusBadge}</p>
+            </div>
+            <p class="font-bold text-sm text-gray-700">$${(p.amount / 100).toFixed(2)}</p>
+          </div>`;
+        }).join('');
+      } catch (err) {
+        container.innerHTML = '<p class="text-center text-red-400 py-4">Error al cargar pagos</p>';
+        console.error('loadMyPayments error:', err);
       }
     }
 

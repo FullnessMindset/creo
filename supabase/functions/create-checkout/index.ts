@@ -93,6 +93,7 @@ serve(async (req) => {
         creator_id,
         creator_username: profile.username || creator_username || "",
         creator_connect_id: connectId || "platform",
+        tipper_id: user?.id || "",
         base_amount_cents: String(baseCents),
         platform_fee_cents: String(platformFeeCents),
         stripe_surcharge_cents: String(stripeSurchargeCents),
