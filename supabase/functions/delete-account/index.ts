@@ -47,12 +47,11 @@ serve(async (req) => {
     if (allowed === false) return json({ error: "Too many requests" }, 429);
 
     if (confirm_immediate) {
-      // Immediate deletion — user confirmed after grace period or chose immediate
       await performDeletion(supabaseAdmin, user.id);
       return json({ success: true, message: "Account deleted immediately" });
     }
 
-    // Schedule deletion for 7 days from now (real grace period)
+    // Schedule deletion for 7 days from now (grace period)
     const deletionDate = new Date();
     deletionDate.setDate(deletionDate.getDate() + 7);
 
@@ -78,8 +77,13 @@ serve(async (req) => {
 });
 
 async function performDeletion(supabaseAdmin: ReturnType<typeof createClient>, userId: string) {
-  // Delete storage files across all buckets
-  const buckets = ["avatars", "post-media", "story-media", "meta-media", "deal-media", "message-media"];
+  // Delete storage files across all buckets the user may have uploaded to
+  const buckets = [
+    "avatars", "covers", "stories", "community-media", "meta-images",
+    "documents", "backgrounds", "post-videos", "business-images",
+    "dm-media", "videos", "meta-receipts", "meta-evidence",
+    "meta-final-proof", "brand-deals", "message-media",
+  ];
   for (const bucket of buckets) {
     try {
       const { data: files } = await supabaseAdmin.storage.from(bucket).list(userId);
@@ -91,13 +95,17 @@ async function performDeletion(supabaseAdmin: ReturnType<typeof createClient>, u
   }
 
   // Anonymize messages (keep conversation structure but remove content)
+  // messages table uses "body" column
   await supabaseAdmin.from("messages")
-    .update({ content: "[mensaje eliminado]", media_url: null })
+    .update({ body: "[mensaje eliminado]", media_url: null })
     .eq("sender_id", userId);
 
-  await supabaseAdmin.from("deal_messages")
-    .update({ content: "[mensaje eliminado]" })
-    .eq("sender_id", userId);
+  // deal_messages uses encrypted_content (BYTEA) — nullify it
+  try {
+    await supabaseAdmin.from("deal_messages")
+      .update({ encrypted_content: null })
+      .eq("sender_id", userId);
+  } catch { /* table may not exist */ }
 
   // Delete user content
   const contentTables = [
@@ -120,6 +128,8 @@ async function performDeletion(supabaseAdmin: ReturnType<typeof createClient>, u
     { table: "verification_documents", col: "user_id" },
     { table: "terms_acceptance", col: "user_id" },
     { table: "business_links", col: "creator_id" },
+    { table: "message_attachments", col: "uploader_id" },
+    { table: "upload_sessions", col: "uploader_id" },
   ];
 
   for (const { table, col } of contentTables) {
