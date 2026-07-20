@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /creo/admin.html
+Disallow: /creo/redirect.html
+Disallow: /creo/reset-password.html
+
+Sitemap: https://fullnessmindset.github.io/creo/sitemap.xml
