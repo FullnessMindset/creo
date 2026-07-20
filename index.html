@@ -119,6 +119,8 @@
         <p class="px-4 py-1 text-[10px] text-gray-400 font-semibold uppercase tracking-wider" data-i18n="tabMecenas">Mecenas</p>
         <button onclick="showTab('mecenas-tip');closeMetasDropdown()" id="tab-mecenas-tip" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💚 <span data-i18n="tabYoCreoEnTi">Yo Creo en Ti</span></button>
         <button onclick="showTab('mecenas-sub');closeMetasDropdown()" id="tab-mecenas-sub" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">⭐ <span data-i18n="tabApoyoFull">Apoyo Full</span></button>
+        <div class="border-t border-gray-100 my-1"></div>
+        <button onclick="showTab('my-subs');closeMetasDropdown()" id="tab-my-subs" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💜 Mis Suscripciones</button>
       </div>
       <!-- Herramientas dropdown — outside the overflow container -->
       <div id="herramientas-menu" class="hidden bg-white rounded-xl shadow-xl border border-gray-200 z-50 py-1 text-[12px]">
@@ -126,6 +128,7 @@
         <button onclick="showTab('stripe');closeHerramientas()" id="tab-stripe" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💳 <span data-i18n="tabStripe">Stripe</span></button>
         <button onclick="showTab('branding');closeHerramientas()" id="tab-branding" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎨 <span data-i18n="tabBranding">Mi Branding</span></button>
         <button onclick="showTab('sounds');closeHerramientas()" id="tab-sounds" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🔔 <span data-i18n="tabSonidos">Sonidos</span></button>
+        <button onclick="showTab('subscribers');closeHerramientas()" id="tab-subscribers" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">👥 Suscriptores</button>
         <button onclick="showTab('account');closeHerramientas()" id="tab-account" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">⚙️ Mi Cuenta</button>
       </div>
 
@@ -978,6 +981,50 @@
       </div>
 
       <!-- TAB: Account / Mi Cuenta -->
+      <!-- TAB: Subscribers (creator view) -->
+      <div id="panel-subscribers" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+          <h3 class="font-bold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Mis Suscriptores
+          </h3>
+          <p class="text-xs text-gray-500">Personas que te apoyan mensualmente con Apoyo Full</p>
+          <div id="subscribers-list" class="space-y-3">
+            <div class="text-center py-8 text-gray-400">
+              <div class="animate-pulse">Cargando suscriptores...</div>
+            </div>
+          </div>
+          <div id="subscribers-summary" class="hidden bg-gradient-to-r from-creo-purple to-indigo-700 text-white p-4 rounded-xl">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-xs opacity-80">Ingresos mensuales recurrentes</p>
+                <p class="text-2xl font-bold" id="subscribers-mrr">$0.00</p>
+              </div>
+              <div class="text-right">
+                <p class="text-xs opacity-80">Suscriptores activos</p>
+                <p class="text-2xl font-bold" id="subscribers-count">0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: My Subscriptions (supporter view) -->
+      <div id="panel-my-subs" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+          <h3 class="font-bold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            Mis Suscripciones
+          </h3>
+          <p class="text-xs text-gray-500">Creadores a los que apoyas mensualmente</p>
+          <div id="my-subs-list" class="space-y-3">
+            <div class="text-center py-8 text-gray-400">
+              <div class="animate-pulse">Cargando suscripciones...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="panel-account" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
           <h3 class="font-bold text-gray-900 flex items-center gap-2">
@@ -1035,8 +1082,8 @@
       if (!e.target.closest('#tab-metas-group') && !e.target.closest('#metas-dropdown')) closeMetasDropdown();
     });
 
-    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'sounds'];
-    const METAS_TABS = ['metas', 'mecenas-tip', 'mecenas-sub'];
+    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'sounds', 'subscribers'];
+    const METAS_TABS = ['metas', 'mecenas-tip', 'mecenas-sub', 'my-subs'];
 
     function toggleMetasDropdown() {
       closeHerramientas();
@@ -1051,6 +1098,8 @@
       document.querySelectorAll('.flex.glass.rounded-xl > button[id^="tab-"]').forEach(t => { t.classList.remove('tab-active'); t.classList.add('text-gray-400'); });
       document.getElementById('panel-' + tab)?.classList.remove('hidden');
       const tabBtn = document.getElementById('tab-' + tab);
+      if (tab === 'subscribers') loadSubscribers();
+      if (tab === 'my-subs') loadMySubscriptions();
       if (HERRAMIENTAS_TABS.includes(tab)) {
         const herrBtn = document.getElementById('tab-herramientas');
         herrBtn.classList.add('tab-active');
@@ -3497,6 +3546,139 @@
           </div>
         </div>`;
       }).join('');
+    }
+
+    // ===== SUBSCRIPTION MANAGEMENT =====
+    async function loadSubscribers() {
+      const container = document.getElementById('subscribers-list');
+      const summary = document.getElementById('subscribers-summary');
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { container.innerHTML = '<p class="text-center text-gray-400 py-4">Inicia sesión para ver tus suscriptores</p>'; return; }
+        const res = await fetch(SUPABASE_URL + '/functions/v1/manage-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({ action: 'list-supporters' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        const supporters = data.supporters || [];
+        if (supporters.length === 0) {
+          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">Aún no tienes suscriptores</p><p class="text-xs text-gray-300 mt-1">Cuando alguien se suscriba a tu Apoyo Full, aparecerá aquí</p></div>';
+          summary.classList.add('hidden');
+          return;
+        }
+        const active = supporters.filter(s => s.status === 'active');
+        const mrr = active.reduce((sum, s) => sum + (s.amount_cents || 0), 0);
+        document.getElementById('subscribers-mrr').textContent = '$' + (mrr / 100).toFixed(2);
+        document.getElementById('subscribers-count').textContent = active.length;
+        summary.classList.remove('hidden');
+        container.innerHTML = supporters.map(s => {
+          const statusColor = s.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500';
+          const statusText = s.status === 'active' ? 'Activa' : s.status === 'cancelled' ? 'Cancelada' : s.status;
+          const date = new Date(s.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+          return `<div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
+            <div>
+              <p class="font-semibold text-sm text-gray-900">${escapeHtml(s.subscriber_name || s.subscriber_email || 'Anónimo')}</p>
+              <p class="text-xs text-gray-500">${escapeHtml(s.subscriber_email || '')} · Desde ${date}</p>
+            </div>
+            <div class="text-right">
+              <p class="font-bold text-creo-purple">$${((s.amount_cents || 0) / 100).toFixed(2)}/mes</p>
+              <span class="text-[10px] px-2 py-0.5 rounded-full ${statusColor}">${statusText}</span>
+            </div>
+          </div>`;
+        }).join('');
+      } catch (err) {
+        container.innerHTML = '<p class="text-center text-red-400 py-4">Error al cargar suscriptores</p>';
+        console.error('loadSubscribers error:', err);
+      }
+    }
+
+    async function loadMySubscriptions() {
+      const container = document.getElementById('my-subs-list');
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { container.innerHTML = '<p class="text-center text-gray-400 py-4">Inicia sesión para ver tus suscripciones</p>'; return; }
+        const res = await fetch(SUPABASE_URL + '/functions/v1/manage-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({ action: 'list' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        const subs = data.subscriptions || [];
+        if (subs.length === 0) {
+          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">No tienes suscripciones activas</p><p class="text-xs text-gray-300 mt-1">Suscríbete a un creador desde su perfil con Apoyo Full</p></div>';
+          return;
+        }
+        container.innerHTML = subs.map(s => {
+          const creator = s.profiles || {};
+          const statusColor = s.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500';
+          const statusText = s.status === 'active' ? 'Activa' : s.status === 'cancelled' ? 'Cancelada' : s.status;
+          const date = new Date(s.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+          const avatarUrl = creator.avatar_url || 'assets/default-avatar.png';
+          const cancelledNote = s.cancelled_at ? `<p class="text-xs text-red-400 mt-1">Cancelada el ${new Date(s.cancelled_at).toLocaleDateString('es-ES')}</p>` : '';
+          const actions = s.status === 'active' ? `
+            <div class="flex gap-2 mt-2">
+              <button onclick="openBillingPortal('${s.id}')" class="text-xs bg-creo-purple text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition">Gestionar pago</button>
+              <button onclick="cancelSubscription('${s.id}')" class="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100 transition border border-red-200">Cancelar</button>
+            </div>` : '';
+          return `<div class="p-4 bg-gray-50 rounded-xl border border-gray-200">
+            <div class="flex items-center gap-3">
+              <img src="${escapeHtml(avatarUrl)}" alt="" class="w-10 h-10 rounded-full object-cover border-2 border-creo-mint">
+              <div class="flex-1">
+                <p class="font-semibold text-sm text-gray-900">${escapeHtml(creator.display_name || creator.username || 'Creador')}</p>
+                <p class="text-xs text-gray-500">@${escapeHtml(creator.username || '')} · Desde ${date}</p>
+              </div>
+              <div class="text-right">
+                <p class="font-bold text-creo-purple">$${((s.amount_cents || 0) / 100).toFixed(2)}/mes</p>
+                <span class="text-[10px] px-2 py-0.5 rounded-full ${statusColor}">${statusText}</span>
+              </div>
+            </div>
+            ${cancelledNote}
+            ${actions}
+          </div>`;
+        }).join('');
+      } catch (err) {
+        container.innerHTML = '<p class="text-center text-red-400 py-4">Error al cargar suscripciones</p>';
+        console.error('loadMySubscriptions error:', err);
+      }
+    }
+
+    async function openBillingPortal(subscriptionId) {
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { showToast('Inicia sesión primero', 'error'); return; }
+        const res = await fetch(SUPABASE_URL + '/functions/v1/manage-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({ action: 'portal', subscription_id: subscriptionId })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        window.location.href = data.url;
+      } catch (err) {
+        showToast('Error al abrir el portal de pagos: ' + err.message, 'error');
+      }
+    }
+
+    async function cancelSubscription(subscriptionId) {
+      if (!confirm('¿Estás seguro de que deseas cancelar esta suscripción? Se mantendrá activa hasta el final del período de facturación actual.')) return;
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { showToast('Inicia sesión primero', 'error'); return; }
+        const res = await fetch(SUPABASE_URL + '/functions/v1/manage-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({ action: 'cancel', subscription_id: subscriptionId })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        showToast('Suscripción cancelada. Se mantendrá activa hasta el final del período.', 'success');
+        loadMySubscriptions();
+      } catch (err) {
+        showToast('Error al cancelar: ' + err.message, 'error');
+      }
     }
 
     window.onload = () => {
