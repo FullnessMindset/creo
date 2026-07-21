@@ -618,10 +618,12 @@
         </div>
       </div>
 
-      <!-- TAB: Personalización -->
-      <div id="panel-branding" class="tab-panel hidden">
-        <!-- Split-screen: Preview (left) + Editor (right) on desktop -->
-        <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 lg:items-start">
+    </div><!-- /max-w-2xl wrapper — close so branding panel gets full width -->
+
+    <!-- TAB: Personalización — full-width for side-by-side preview + editor -->
+    <div id="panel-branding" class="tab-panel hidden px-4">
+      <!-- Split-screen: Preview (left) + Editor (right) on desktop -->
+      <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 lg:items-start max-w-5xl mx-auto">
 
           <!-- LIVE PREVIEW — sticky on desktop, collapsible on mobile -->
           <div class="lg:sticky lg:top-4 lg:w-[380px] lg:flex-shrink-0 order-2 lg:order-1">
@@ -1091,9 +1093,9 @@
         </div>
           </div><!-- /editor panel -->
         </div><!-- /split-screen flex -->
-      </div><!-- /panel-branding -->
+    </div><!-- /panel-branding -->
 
-
+    <div class="max-w-2xl mx-auto px-4 pb-24 space-y-6">
       <!-- TAB: Sounds -->
       <div id="panel-sounds" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
