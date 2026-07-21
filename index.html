@@ -1821,6 +1821,7 @@
         const container = doc.getElementById('profile-sections-container');
         if (container && personaLayout.sections) {
           const sorted = [...personaLayout.sections].sort((a, b) => a.order - b.order);
+          let coverVis = true;
           sorted.forEach((sec, i) => {
             const el = container.querySelector('[data-section="' + sec.id + '"]');
             if (!el) return;
@@ -1828,7 +1829,10 @@
             if (!sec.visible && el.style.display !== 'none') el.setAttribute('data-hidden-by-layout', '1');
             if (!sec.visible) el.style.display = 'none';
             if (sec.visible && el.getAttribute('data-hidden-by-layout')) { el.removeAttribute('data-hidden-by-layout'); el.style.display = ''; }
+            if (sec.id === 'cover' && !sec.visible) coverVis = false;
           });
+          const aw = doc.getElementById('avatar-wrapper');
+          if (aw) aw.style.marginTop = coverVis ? '-4rem' : '0';
         }
 
         // Background media
