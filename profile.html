@@ -82,6 +82,11 @@
     /* Branding transition */
     .brand-transition { transition: background-color 0.3s, color 0.3s; }
 
+    /* Meta media skeleton */
+    .meta-skeleton { border-radius: 0; }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    .meta-skeleton.animate-pulse { animation: none; background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+
     /* Yo Creo en Ellos — compact cards */
     #creo-en-ellos-scroll::-webkit-scrollbar { display: none; }
     .creo-ellos-card { flex-shrink: 0; cursor: pointer; }
@@ -91,15 +96,15 @@
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
   <script src="shared.js"></script>
 
-  <div class="max-w-2xl mx-auto px-4 pt-6 pb-24 space-y-6">
+  <div id="profile-sections-container" class="max-w-2xl mx-auto px-4 pt-6 pb-24 flex flex-col gap-6">
 
     <!-- Cover Image — social media ratio -->
-    <div id="cover-section" class="hidden rounded-2xl overflow-hidden bg-gradient-to-r from-creo-purple to-creo-light">
+    <div id="cover-section" data-section="cover" class="hidden rounded-2xl overflow-hidden bg-gradient-to-r from-creo-purple to-creo-light">
       <img id="cover-img" class="w-full h-full object-cover" alt="Cover">
     </div>
 
     <!-- Profile Header — Glassmorphism -->
-    <div class="glass p-6 rounded-2xl shadow-xl text-center space-y-4 transition-all" id="profile-header-card">
+    <div class="glass p-6 rounded-2xl shadow-xl text-center space-y-4 transition-all" id="profile-header-card" data-section="header">
       <!-- Avatar with verified badge -->
       <div class="relative mx-auto w-28 h-28 -mt-16 z-10">
         <div id="avatar-container" class="w-28 h-28 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
@@ -188,7 +193,7 @@
     </div>
 
     <!-- MI HISTORIA -->
-    <div id="story-section" class="hidden space-y-4">
+    <div id="story-section" data-section="story" class="hidden space-y-4">
       <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
         <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
         <span data-i18n="miHistoria">Mi Historia</span>
@@ -197,7 +202,7 @@
     </div>
 
     <!-- YO CREO EN ELLOS -->
-    <div id="creo-en-ellos-section" class="hidden space-y-2">
+    <div id="creo-en-ellos-section" data-section="creo-en-ellos" class="hidden space-y-2">
       <h2 class="section-title text-sm font-bold text-gray-900 flex items-center gap-2">
         <img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="CREO">
         <span data-i18n="yoCreoEnEllos">Yo Creo en Ellos</span>
@@ -206,13 +211,13 @@
     </div>
 
     <!-- MI META (standalone, used by metas rendering JS) -->
-    <div id="metas-section" class="hidden">
+    <div id="metas-section" data-section="metas" class="hidden">
       <div id="metas-container" class="space-y-4"></div>
       <div id="no-metas" class="hidden"></div>
     </div>
 
     <!-- COMPLETED METAS -->
-    <div id="completed-metas-inline" class="hidden space-y-4">
+    <div id="completed-metas-inline" data-section="completed-metas" class="hidden space-y-4">
       <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
         <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         <span data-i18n="metasAlcanzadas">Metas Alcanzadas</span>
@@ -221,7 +226,7 @@
     </div>
 
     <!-- CREATOR POSTS -->
-    <div id="posts-section" class="hidden space-y-3">
+    <div id="posts-section" data-section="posts" class="hidden space-y-3">
       <div class="flex items-center justify-between">
         <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
           <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -236,7 +241,7 @@
     </div>
 
     <!-- MIS CREACIONES -->
-    <div id="business-section" class="hidden space-y-4">
+    <div id="business-section" data-section="business" class="hidden space-y-4">
       <h2 class="section-title text-lg font-bold text-gray-900 flex items-center gap-2">
         <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
         <span data-i18n="misCreaciones">Mis Creaciones</span>
@@ -373,7 +378,7 @@
     </div>
 
     <!-- Payment Type Selector — Glassmorphism -->
-    <div id="payment-tabs" class="flex glass rounded-xl overflow-hidden">
+    <div id="payment-tabs" data-section="payments" class="flex glass rounded-xl overflow-hidden">
       <button onclick="showPayment('tip')" id="pay-tab-tip" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400" data-i18n="yoCreoEnTi">Yo Creo en Ti</button>
       <button onclick="showPayment('metas')" id="pay-tab-metas" class="flex-1 py-3 text-xs font-semibold text-center transition pay-tab-active" data-i18n="miMeta">Mi Meta</button>
       <button onclick="showPayment('sub')" id="pay-tab-sub" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400" data-i18n="apoyoFull">Apoyo Full</button>
@@ -672,8 +677,8 @@
         const hero = document.getElementById('mec-tip-hero');
         const isVid = /\.(mp4|webm|mov)$/i.test(tip.image_url);
         hero.innerHTML = isVid
-          ? `<video src="${esc(tip.image_url)}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
-          : `<img src="${esc(tip.image_url)}" class="w-full h-40 object-cover rounded-xl" alt="">`;
+          ? `<div class="relative"><div class="w-full h-40 bg-gray-200 rounded-xl animate-pulse"></div><video src="${esc(tip.image_url)}" class="w-full h-40 object-cover rounded-xl absolute inset-0" preload="metadata" autoplay muted loop playsinline onloadeddata="this.previousElementSibling.remove()" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm\\'>Media no disponible</div>'"></div>`
+          : `<div class="relative"><div class="w-full h-40 bg-gray-200 rounded-xl animate-pulse"></div><img src="${esc(tip.image_url)}" loading="lazy" class="w-full h-40 object-cover rounded-xl absolute inset-0" alt="" onload="this.previousElementSibling.remove();this.style.opacity=1" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm\\'>Imagen no disponible</div>'" style="opacity:0;transition:opacity .3s"></div>`;
         hero.classList.remove('hidden');
       }
       // Update tab label
@@ -692,8 +697,8 @@
         const hero = document.getElementById('mec-sub-hero');
         const isVid = /\.(mp4|webm|mov)$/i.test(sub.image_url);
         hero.innerHTML = isVid
-          ? `<video src="${esc(sub.image_url)}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
-          : `<img src="${esc(sub.image_url)}" class="w-full h-40 object-cover rounded-xl" alt="">`;
+          ? `<div class="relative"><div class="w-full h-40 bg-gray-200 rounded-xl animate-pulse"></div><video src="${esc(sub.image_url)}" class="w-full h-40 object-cover rounded-xl absolute inset-0" preload="metadata" autoplay muted loop playsinline onloadeddata="this.previousElementSibling.remove()" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm\\'>Media no disponible</div>'"></div>`
+          : `<div class="relative"><div class="w-full h-40 bg-gray-200 rounded-xl animate-pulse"></div><img src="${esc(sub.image_url)}" loading="lazy" class="w-full h-40 object-cover rounded-xl absolute inset-0" alt="" onload="this.previousElementSibling.remove();this.style.opacity=1" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm\\'>Imagen no disponible</div>'" style="opacity:0;transition:opacity .3s"></div>`;
         hero.classList.remove('hidden');
       }
       if (sub.title) document.getElementById('pay-tab-sub').textContent = sub.title;
@@ -718,8 +723,8 @@
         const hero = document.getElementById('mec-meta-hero');
         const isVid = /\.(mp4|webm|mov)$/i.test(meta.image_url);
         hero.innerHTML = isVid
-          ? `<video src="${esc(meta.image_url)}" class="w-full h-40 object-cover rounded-xl" autoplay muted loop playsinline></video>`
-          : `<img src="${esc(meta.image_url)}" class="w-full h-40 object-cover rounded-xl" alt="">`;
+          ? `<div class="relative"><div class="w-full h-40 bg-gray-200 rounded-xl animate-pulse"></div><video src="${esc(meta.image_url)}" class="w-full h-40 object-cover rounded-xl absolute inset-0" preload="metadata" autoplay muted loop playsinline onloadeddata="this.previousElementSibling.remove()" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm\\'>Media no disponible</div>'"></div>`
+          : `<div class="relative"><div class="w-full h-40 bg-gray-200 rounded-xl animate-pulse"></div><img src="${esc(meta.image_url)}" loading="lazy" class="w-full h-40 object-cover rounded-xl absolute inset-0" alt="" onload="this.previousElementSibling.remove();this.style.opacity=1" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm\\'>Imagen no disponible</div>'" style="opacity:0;transition:opacity .3s"></div>`;
         hero.classList.remove('hidden');
       }
     }
@@ -790,55 +795,6 @@
         else if (completed) statusBadge = '<span class="text-xs glass-mint text-green-700 px-2 py-0.5 rounded-full font-semibold">Completada</span>';
         else if (expired) statusBadge = '<span class="text-xs bg-red-100/80 text-red-600 px-2 py-0.5 rounded-full font-semibold">Expirada</span>';
 
-        // Media section with progress bar overlay
-        const mediaSection = images.length ? `
-          <div class="meta-media-card" id="meta-media-${m.id}">
-            <div class="meta-media-slider" onscroll="updateMetaDots('${m.id}')">
-              ${images.map((img, i) => {
-                const isVideo = /\.(mp4|webm|mov)$/i.test(img) || /youtube|tiktok|youtu\.be/i.test(img);
-                if (isVideo) {
-                  return `<div class="meta-slide relative aspect-video bg-gray-900 cursor-pointer" onclick="openMetaPost('${m.id}', ${i})">
-                    <video src="${img}" class="w-full h-full object-cover" autoplay muted loop playsinline></video>
-                    <div class="absolute inset-0 flex items-center justify-center bg-black/20"><svg class="w-12 h-12 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-                  </div>`;
-                }
-                return `<div class="meta-slide cursor-pointer" onclick="openMetaPost('${m.id}', ${i})"><img src="${img}" class="w-full aspect-video object-cover" alt=""></div>`;
-              }).join('')}
-            </div>
-            ${images.length > 1 ? `
-              <button class="slider-arrow left" onclick="slideMetaMedia('${m.id}',-1)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
-              <button class="slider-arrow right" onclick="slideMetaMedia('${m.id}',1)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
-              <div class="meta-dots" id="dots-${m.id}">${images.map((_, i) => `<span class="dot${i === 0 ? ' active' : ''}"></span>`).join('')}</div>
-            ` : ''}
-            <!-- Progress overlay on media -->
-            <div class="meta-progress-overlay p-3">
-              <div class="glass-dark rounded-xl p-3">
-                <div class="flex justify-between text-xs mb-1.5">
-                  <span class="font-bold text-creo-mint">$${raised}</span>
-                  <span class="text-white/70">de $${goal}</span>
-                </div>
-                <div class="w-full bg-white/20 rounded-full h-2 overflow-hidden">
-                  <div class="bg-gradient-to-r from-creo-mint to-creo-mintDark h-full rounded-full transition-all duration-700" style="width:${pct}%"></div>
-                </div>
-                <p class="text-[10px] text-white/60 mt-1 text-right">${pct}%</p>
-              </div>
-            </div>
-          </div>` : `
-          <!-- No media — show plain progress -->
-          <div>
-            <div class="flex justify-between text-sm mb-2">
-              <span class="font-bold text-creo-purple">$${raised}</span>
-              <span class="text-gray-500">de $${goal}</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-              <div class="bg-gradient-to-r from-creo-purple to-creo-mint h-full rounded-full transition-all duration-700" style="width:${pct}%"></div>
-            </div>
-            <div class="flex justify-between text-xs text-gray-400 mt-2">
-              <span>${pct}% alcanzado</span>
-              <span>${m.start_date} — ${m.end_date}</span>
-            </div>
-          </div>`;
-
         const linkSection = productLinks.length ? `
           <div class="space-y-1">
             ${productLinks.map(l => `<a href="${esc(l.url)}" target="_blank" class="flex items-center gap-2 text-xs text-creo-purple hover:underline">
@@ -869,16 +825,20 @@
                 const isVideo = /\.(mp4|webm|mov)$/i.test(img) || /youtube|tiktok|youtu\.be/i.test(img);
                 if (isVideo) {
                   return `<div class="meta-slide relative aspect-[4/5] bg-gray-900 cursor-pointer" onclick="openMetaPost('${m.id}', ${i})">
-                    <video src="${img}" class="w-full h-full object-cover" autoplay muted loop playsinline></video>
-                    <div class="absolute inset-0 flex items-center justify-center bg-black/20"><svg class="w-14 h-14 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                    <div class="meta-skeleton absolute inset-0 bg-gray-800 animate-pulse"></div>
+                    <video src="${esc(img)}" class="w-full h-full object-cover relative z-[1]" preload="metadata" autoplay muted loop playsinline onloadeddata="this.previousElementSibling.remove()" onerror="this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-full bg-gray-800 text-gray-400 text-sm\\'>Video no disponible</div>'"></video>
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/20 z-[2] pointer-events-none"><svg class="w-14 h-14 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                   </div>`;
                 }
-                return `<div class="meta-slide cursor-pointer" onclick="openMetaPost('${m.id}', ${i})"><img src="${img}" class="w-full aspect-[4/5] object-cover" alt=""></div>`;
+                return `<div class="meta-slide cursor-pointer" onclick="openMetaPost('${m.id}', ${i})">
+                  <div class="meta-skeleton aspect-[4/5] bg-gray-200 animate-pulse"></div>
+                  <img src="${esc(img)}" loading="lazy" class="w-full aspect-[4/5] object-cover" alt="${esc(m.title)}" onload="this.previousElementSibling.remove();this.style.opacity=1" onerror="this.previousElementSibling.innerHTML='<div class=\\'flex items-center justify-center h-full text-gray-400 text-sm\\'>Imagen no disponible</div>';this.remove()" style="opacity:0;transition:opacity .3s">
+                </div>`;
               }).join('')}
             </div>
             ${images.length > 1 ? `
-              <button class="slider-arrow left" onclick="slideMetaMedia('${m.id}',-1)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
-              <button class="slider-arrow right" onclick="slideMetaMedia('${m.id}',1)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+              <button class="slider-arrow left" onclick="event.stopPropagation();slideMetaMedia('${m.id}',-1)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
+              <button class="slider-arrow right" onclick="event.stopPropagation();slideMetaMedia('${m.id}',1)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
               <div class="meta-dots" id="dots-${m.id}">${images.map((_, i) => `<span class="dot${i === 0 ? ' active' : ''}"></span>`).join('')}</div>
             ` : ''}
             <!-- Progress overlay on media -->
@@ -2953,6 +2913,115 @@
       if (footer && isDark) footer.style.color = '#a0a0b8';
     }
 
+    // ===== LAYOUT & THEME ENGINE =====
+    function applyLayout(profile) {
+      const layout = profile.profile_layout;
+      const theme = profile.profile_theme || {};
+      if (!layout) return;
+
+      const container = document.getElementById('profile-sections-container');
+
+      // Section ordering via CSS order + visibility
+      if (layout.sections && Array.isArray(layout.sections)) {
+        const sorted = [...layout.sections].sort((a, b) => a.order - b.order);
+        sorted.forEach((sec, i) => {
+          const el = container.querySelector('[data-section="' + sec.id + '"]');
+          if (!el) return;
+          el.style.order = i;
+          if (!sec.visible) el.style.display = 'none';
+          // Pay panels follow their tabs
+          if (sec.id === 'payments') {
+            document.querySelectorAll('.pay-panel').forEach(p => { p.style.order = i; if (!sec.visible) p.style.display = 'none'; });
+          }
+        });
+      }
+
+      // Profile image size & shape
+      if (layout.profileImage) {
+        const avatarContainer = document.getElementById('avatar-container');
+        if (avatarContainer) {
+          const sizeMap = { sm: '5rem', md: '7rem', lg: '9rem', xl: '11rem' };
+          const sz = sizeMap[layout.profileImage.size] || '7rem';
+          avatarContainer.style.width = sz;
+          avatarContainer.style.height = sz;
+          const parent = avatarContainer.parentElement;
+          if (parent) { parent.style.width = sz; parent.style.height = sz; }
+
+          const shapeMap = { round: '50%', square: '0.5rem', rounded: '1.5rem' };
+          avatarContainer.style.borderRadius = shapeMap[layout.profileImage.shape] || '50%';
+        }
+      }
+
+      // Card styles
+      if (layout.cardStyle) {
+        const radiusMap = { none: '0', md: '0.75rem', xl: '1rem', '2xl': '1.5rem' };
+        const shadowMap = { none: 'none', md: '0 4px 6px rgba(0,0,0,0.1)', lg: '0 10px 25px rgba(0,0,0,0.15)' };
+        const r = radiusMap[layout.cardStyle.radius] || '1rem';
+        const s = shadowMap[layout.cardStyle.shadow] || 'none';
+        const border = layout.cardStyle.border ? '1px solid var(--brand-border-color, #e5e7eb)' : '';
+
+        document.querySelectorAll('.glass, .glass-dark, #profile-header-card, .pay-panel > div, .meta-media-card').forEach(el => {
+          el.style.borderRadius = r;
+          el.style.boxShadow = s;
+          if (border) el.style.border = border;
+          if (layout.cardStyle.glass) {
+            el.style.backdropFilter = 'blur(16px)';
+            el.style.webkitBackdropFilter = 'blur(16px)';
+          } else {
+            el.style.backdropFilter = 'none';
+            el.style.webkitBackdropFilter = 'none';
+          }
+        });
+      }
+
+      // Button styles
+      if (layout.buttonStyle) {
+        const shapeMap = { rounded: '0.75rem', pill: '9999px', square: '0.25rem' };
+        const br = shapeMap[layout.buttonStyle.shape] || '0.75rem';
+        const bShadow = layout.buttonStyle.shadow ? '0 4px 12px rgba(0,0,0,0.2)' : 'none';
+
+        document.querySelectorAll('#tip-btn, #sub-btn, #meta-support-btn, [id^="meta-btn-"], .creamos-btn').forEach(btn => {
+          btn.style.borderRadius = br;
+          btn.style.boxShadow = bShadow;
+          if (layout.buttonStyle.animation === 'lift') {
+            btn.addEventListener('mouseenter', function() { this.style.transform = 'translateY(-2px)'; this.style.boxShadow = '0 6px 20px rgba(0,0,0,0.25)'; });
+            btn.addEventListener('mouseleave', function() { this.style.transform = ''; this.style.boxShadow = bShadow; });
+          } else if (layout.buttonStyle.animation === 'glow') {
+            btn.addEventListener('mouseenter', function() { this.style.boxShadow = '0 0 20px rgba(26,10,62,0.4)'; });
+            btn.addEventListener('mouseleave', function() { this.style.boxShadow = bShadow; });
+          }
+        });
+      }
+
+      // Extended theme colors
+      if (theme.accentColor) document.documentElement.style.setProperty('--brand-accent-color', theme.accentColor);
+      if (theme.linkColor) {
+        document.documentElement.style.setProperty('--brand-link-color', theme.linkColor);
+        document.querySelectorAll('a.text-creo-purple, .text-creo-purple').forEach(el => {
+          if (!el.closest('button') && !el.closest('[id^="pay-tab"]')) el.style.color = theme.linkColor;
+        });
+      }
+      if (theme.borderColor) {
+        document.documentElement.style.setProperty('--brand-border-color', theme.borderColor);
+      }
+
+      // Heading font
+      if (theme.headingFont) {
+        const fontUrl = 'https://fonts.googleapis.com/css2?family=' + theme.headingFont.replace(/ /g, '+') + ':wght@400;600;700&display=swap';
+        let link = document.getElementById('brand-heading-font-link');
+        if (!link) {
+          link = document.createElement('link');
+          link.id = 'brand-heading-font-link';
+          link.rel = 'stylesheet';
+          document.head.appendChild(link);
+        }
+        link.href = fontUrl;
+        document.querySelectorAll('.section-title, #profile-name, h1, h2, h3').forEach(el => {
+          el.style.fontFamily = theme.headingFont + ', sans-serif';
+        });
+      }
+    }
+
     // ===== YO CREO EN ELLOS =====
     const DUMMY_CREATORS = [];
 
@@ -3104,6 +3173,7 @@
         loadCompletedMetas(creatorProfile.id);
         loadCreoEnEllos(creatorProfile.id);
         applyBranding(creatorProfile.profile_colors);
+        applyLayout(creatorProfile);
         setupAdminImpersonation();
       }
       translatePage();

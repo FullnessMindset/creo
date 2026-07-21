@@ -127,7 +127,7 @@
       <div id="herramientas-menu" class="hidden bg-white rounded-xl shadow-xl border border-gray-200 z-50 py-1 text-[12px]">
         <button onclick="showTab('verify');closeHerramientas()" id="tab-verify" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">✅ <span data-i18n="tabVerificacion">Verificación</span></button>
         <button onclick="showTab('stripe');closeHerramientas()" id="tab-stripe" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💳 <span data-i18n="tabStripe">Stripe</span></button>
-        <button onclick="showTab('branding');closeHerramientas()" id="tab-branding" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎨 <span data-i18n="tabBranding">Mi Branding</span></button>
+        <button onclick="showTab('branding');closeHerramientas()" id="tab-branding" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎨 <span data-i18n="tabBranding">Personalización</span></button>
         <button onclick="showTab('sounds');closeHerramientas()" id="tab-sounds" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🔔 <span data-i18n="tabSonidos">Sonidos</span></button>
         <button onclick="showTab('earnings');closeHerramientas()" id="tab-earnings" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💰 Ingresos</button>
         <button onclick="showTab('subscribers');closeHerramientas()" id="tab-subscribers" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">👥 Suscriptores</button>
@@ -618,16 +618,42 @@
         </div>
       </div>
 
-      <!-- TAB: Mi Branding -->
+      <!-- TAB: Personalización -->
       <div id="panel-branding" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
           <div>
             <h3 class="font-bold text-gray-900 flex items-center gap-2">
               <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
-              Mi Branding
+              Personalización
             </h3>
-            <p class="text-xs text-gray-500 mt-1">Personaliza cómo los visitantes ven tu perfil.</p>
+            <p class="text-xs text-gray-500 mt-1">Tu mini editor de perfil. Personaliza colores, secciones, tarjetas y más.</p>
           </div>
+
+          <!-- Sub-navigation tabs -->
+          <div class="flex gap-1 bg-gray-50 rounded-xl p-1 overflow-x-auto no-scrollbar text-[11px]">
+            <button onclick="switchPersonaTab('images')" id="persona-tab-images" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition bg-creo-purple text-white">Imágenes</button>
+            <button onclick="switchPersonaTab('sections')" id="persona-tab-sections" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Secciones</button>
+            <button onclick="switchPersonaTab('colors')" id="persona-tab-colors" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Colores</button>
+            <button onclick="switchPersonaTab('typography')" id="persona-tab-typography" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Tipografía</button>
+            <button onclick="switchPersonaTab('cards')" id="persona-tab-cards" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Tarjetas</button>
+            <button onclick="switchPersonaTab('buttons')" id="persona-tab-buttons" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Botones</button>
+          </div>
+
+          <!-- Undo / Redo -->
+          <div class="flex items-center justify-between">
+            <div class="flex gap-1">
+              <button onclick="personaUndo()" id="persona-undo-btn" class="p-1.5 rounded-lg bg-gray-100 text-gray-400 hover:text-gray-700 transition disabled:opacity-30" disabled title="Deshacer">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a4 4 0 010 8H9m-6-8l4-4m-4 4l4 4"/></svg>
+              </button>
+              <button onclick="personaRedo()" id="persona-redo-btn" class="p-1.5 rounded-lg bg-gray-100 text-gray-400 hover:text-gray-700 transition disabled:opacity-30" disabled title="Rehacer">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a4 4 0 000 8h4m6-8l-4-4m4 4l-4 4"/></svg>
+              </button>
+            </div>
+            <span id="persona-autosave-status" class="text-[10px] text-gray-400"></span>
+          </div>
+
+          <!-- ========== SUB-PANEL: Images ========== -->
+          <div id="persona-panel-images" class="persona-sub">
 
           <!-- Profile & Cover Images -->
           <div class="space-y-4 pb-4 border-b border-gray-200">
@@ -653,7 +679,57 @@
                 </label>
               </div>
             </div>
+
+            <!-- Profile Image Size & Shape -->
+            <div class="pt-3 border-t border-gray-100 space-y-3">
+              <h4 class="text-xs font-semibold text-gray-700">Forma y tamaño del avatar</h4>
+              <div class="flex gap-2">
+                <button onclick="setProfileShape('round')" id="pshape-round" class="flex-1 py-2 rounded-lg text-xs font-semibold border-2 border-creo-purple text-creo-purple transition text-center">Redondo</button>
+                <button onclick="setProfileShape('square')" id="pshape-square" class="flex-1 py-2 rounded-lg text-xs font-semibold border-2 border-gray-200 text-gray-500 transition text-center">Cuadrado</button>
+                <button onclick="setProfileShape('rounded')" id="pshape-rounded" class="flex-1 py-2 rounded-lg text-xs font-semibold border-2 border-gray-200 text-gray-500 transition text-center">Redondeado</button>
+              </div>
+              <div>
+                <label class="text-[10px] text-gray-500">Tamaño: <span id="psize-label">Mediano</span></label>
+                <input type="range" id="psize-range" min="0" max="3" value="1" step="1" class="w-full accent-creo-mint" oninput="setProfileSize(['sm','md','lg','xl'][this.value])">
+                <div class="flex justify-between text-[9px] text-gray-400"><span>Pequeño</span><span>Mediano</span><span>Grande</span></div>
+              </div>
+            </div>
           </div>
+
+          <!-- Background image/video -->
+          <div class="space-y-3">
+            <label class="text-xs font-semibold text-gray-700 block">Imagen o video de fondo</label>
+            <input type="file" id="brand-bg-media-file" accept="image/*,video/mp4,video/webm" onchange="uploadBrandBgMedia()" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
+            <p class="text-[10px] text-gray-400">O pega un enlace directo:</p>
+            <input type="url" id="brand-bg-media" placeholder="https://ejemplo.com/mi-fondo.jpg" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-xl text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple" oninput="updateBrandingPreview()">
+            <div>
+              <label class="text-[10px] text-gray-500">Opacidad del fondo: <span id="bg-opacity-label">20</span>%</label>
+              <input type="range" id="bg-opacity-range" min="5" max="50" value="20" step="5" class="w-full accent-creo-mint" oninput="document.getElementById('bg-opacity-label').textContent=this.value;personaTrack()">
+            </div>
+          </div>
+
+          </div><!-- /persona-panel-images -->
+
+          <!-- ========== SUB-PANEL: Sections (drag-and-drop reorder + visibility) ========== -->
+          <div id="persona-panel-sections" class="persona-sub hidden space-y-4">
+            <div>
+              <h4 class="text-xs font-semibold text-gray-700">Orden y visibilidad de secciones</h4>
+              <p class="text-[10px] text-gray-400 mt-1">Arrastra para reordenar. Usa el toggle para mostrar u ocultar.</p>
+            </div>
+            <div id="section-sortable" class="space-y-2"></div>
+            <!-- Gallery Layout -->
+            <div class="pt-3 border-t border-gray-100 space-y-3">
+              <h4 class="text-xs font-semibold text-gray-700">Layout de galería (Posts)</h4>
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="setGalleryLayout('grid')" id="gallery-grid" class="py-2.5 rounded-lg text-[10px] font-semibold border-2 border-creo-purple text-creo-purple transition text-center">Grid</button>
+                <button onclick="setGalleryLayout('carousel')" id="gallery-carousel" class="py-2.5 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition text-center">Carrusel</button>
+                <button onclick="setGalleryLayout('masonry')" id="gallery-masonry" class="py-2.5 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition text-center">Masonry</button>
+              </div>
+            </div>
+          </div><!-- /persona-panel-sections -->
+
+          <!-- ========== SUB-PANEL: Colors ========== -->
+          <div id="persona-panel-colors" class="persona-sub hidden">
 
           <!-- Theme toggle -->
           <div>
@@ -716,32 +792,27 @@
                 <span class="text-[10px] text-gray-400 font-mono" id="brand-bg-hex">#f9fafb</span>
               </div>
             </div>
-          </div>
-
-          <!-- Font selector -->
-          <div>
-            <label class="text-xs font-semibold text-gray-700 block mb-2">Tipografía</label>
-            <select id="brand-font" onchange="updateBrandingPreview()" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-xl text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
-              <option value="Inter" style="font-family:Inter,sans-serif">Inter (Default)</option>
-              <option value="Poppins" style="font-family:Poppins,sans-serif">Poppins</option>
-              <option value="Montserrat" style="font-family:Montserrat,sans-serif">Montserrat</option>
-              <option value="Roboto" style="font-family:Roboto,sans-serif">Roboto</option>
-              <option value="Open Sans" style="font-family:'Open Sans',sans-serif">Open Sans</option>
-              <option value="Lato" style="font-family:Lato,sans-serif">Lato</option>
-              <option value="Playfair Display" style="font-family:'Playfair Display',serif">Playfair Display</option>
-              <option value="Merriweather" style="font-family:Merriweather,serif">Merriweather</option>
-              <option value="Raleway" style="font-family:Raleway,sans-serif">Raleway</option>
-              <option value="Oswald" style="font-family:Oswald,sans-serif">Oswald</option>
-            </select>
-            <p id="brand-font-preview" class="text-sm text-gray-600 mt-2 p-3 bg-gray-50 rounded-lg">Vista previa de la tipografía seleccionada</p>
-          </div>
-
-          <!-- Background image/video -->
-          <div>
-            <label class="text-xs font-semibold text-gray-700 block mb-2">Imagen o video de fondo</label>
-            <input type="file" id="brand-bg-media-file" accept="image/*,video/mp4,video/webm" onchange="uploadBrandBgMedia()" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
-            <p class="text-[10px] text-gray-400 mt-1">O pega un enlace directo:</p>
-            <input type="url" id="brand-bg-media" placeholder="https://ejemplo.com/mi-fondo.jpg" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-xl text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple mt-1" oninput="updateBrandingPreview()">
+            <div>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Color de acento</label>
+              <div class="flex items-center gap-2">
+                <div class="brand-swatch"><input type="color" id="brand-accent-color" value="#33f0b0" oninput="updateBrandingPreview()"></div>
+                <span class="text-[10px] text-gray-400 font-mono" id="brand-accent-hex">#33f0b0</span>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Color de enlaces</label>
+              <div class="flex items-center gap-2">
+                <div class="brand-swatch"><input type="color" id="brand-link-color" value="#6C3AED" oninput="updateBrandingPreview()"></div>
+                <span class="text-[10px] text-gray-400 font-mono" id="brand-link-hex">#6C3AED</span>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Bordes</label>
+              <div class="flex items-center gap-2">
+                <div class="brand-swatch"><input type="color" id="brand-border-color" value="#e5e7eb" oninput="updateBrandingPreview()"></div>
+                <span class="text-[10px] text-gray-400 font-mono" id="brand-border-hex">#e5e7eb</span>
+              </div>
+            </div>
           </div>
 
           <!-- Preview -->
@@ -758,10 +829,124 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div><!-- /persona-panel-colors -->
 
-          <!-- Section: Metas Branding -->
-          <div class="pt-4 border-t border-gray-200 space-y-4">
+          <!-- ========== SUB-PANEL: Typography ========== -->
+          <div id="persona-panel-typography" class="persona-sub hidden space-y-4">
+            <div>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Fuente principal</label>
+              <select id="brand-font" onchange="updateBrandingPreview();updateTypographyPreview();personaTrack()" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-xl text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+                <option value="Inter">Inter (Default)</option>
+                <option value="Poppins">Poppins</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Open Sans">Open Sans</option>
+                <option value="Lato">Lato</option>
+                <option value="Playfair Display">Playfair Display</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="Raleway">Raleway</option>
+                <option value="Oswald">Oswald</option>
+                <option value="DM Sans">DM Sans</option>
+                <option value="Nunito">Nunito</option>
+                <option value="Quicksand">Quicksand</option>
+                <option value="Comfortaa">Comfortaa</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Fuente de títulos</label>
+              <select id="brand-heading-font" onchange="updateTypographyPreview();personaTrack()" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-xl text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+                <option value="">(Misma que principal)</option>
+                <option value="Playfair Display">Playfair Display</option>
+                <option value="Merriweather">Merriweather</option>
+                <option value="Oswald">Oswald</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Poppins">Poppins</option>
+                <option value="Raleway">Raleway</option>
+                <option value="DM Serif Display">DM Serif Display</option>
+                <option value="Libre Baskerville">Libre Baskerville</option>
+              </select>
+            </div>
+            <p id="brand-font-preview" class="text-sm text-gray-600 p-4 bg-gray-50 rounded-lg border border-gray-100">
+              <span class="block text-lg font-bold mb-1" id="brand-heading-preview">Vista previa de títulos</span>
+              Vista previa del texto del cuerpo con la tipografía seleccionada
+            </p>
+          </div><!-- /persona-panel-typography -->
+
+          <!-- ========== SUB-PANEL: Cards ========== -->
+          <div id="persona-panel-cards" class="persona-sub hidden space-y-4">
+            <div>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Esquinas de tarjetas</label>
+              <div class="grid grid-cols-4 gap-2">
+                <button onclick="setCardRadius('none')" id="crad-none" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Ninguno</button>
+                <button onclick="setCardRadius('md')" id="crad-md" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Medio</button>
+                <button onclick="setCardRadius('xl')" id="crad-xl" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-creo-purple text-creo-purple transition">Grande</button>
+                <button onclick="setCardRadius('2xl')" id="crad-2xl" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">XL</button>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Sombra</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="setCardShadow('none')" id="cshad-none" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Ninguna</button>
+                <button onclick="setCardShadow('md')" id="cshad-md" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Media</button>
+                <button onclick="setCardShadow('lg')" id="cshad-lg" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-creo-purple text-creo-purple transition">Grande</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-gray-700">Efecto glass</label>
+              <button onclick="toggleCardGlass()" id="card-glass-toggle" class="relative w-11 h-6 rounded-full transition-colors bg-creo-mint">
+                <span id="card-glass-dot" class="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform" style="left:0.5px;transform:translateX(20px)"></span>
+              </button>
+            </div>
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-gray-700">Borde visible</label>
+              <button onclick="toggleCardBorder()" id="card-border-toggle" class="relative w-11 h-6 rounded-full transition-colors bg-gray-300">
+                <span id="card-border-dot" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"></span>
+              </button>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Vista previa</label>
+              <div id="card-style-preview" class="glass p-5 rounded-2xl shadow-xl space-y-2 transition-all">
+                <h4 class="font-bold text-gray-900 text-sm">Sección de ejemplo</h4>
+                <p class="text-xs text-gray-500">Así se verán las tarjetas de tu perfil público.</p>
+              </div>
+            </div>
+          </div><!-- /persona-panel-cards -->
+
+          <!-- ========== SUB-PANEL: Buttons ========== -->
+          <div id="persona-panel-buttons" class="persona-sub hidden space-y-4">
+            <div>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Forma de botones</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="setButtonShape('rounded')" id="bshape-rounded" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-creo-purple text-creo-purple transition">Redondeado</button>
+                <button onclick="setButtonShape('pill')" id="bshape-pill" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Pastilla</button>
+                <button onclick="setButtonShape('square')" id="bshape-square" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Cuadrado</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-gray-700">Sombra en botones</label>
+              <button onclick="toggleBtnShadow()" id="btn-shadow-toggle" class="relative w-11 h-6 rounded-full transition-colors bg-gray-300">
+                <span id="btn-shadow-dot" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"></span>
+              </button>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Animación al hover</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="setButtonAnim('none')" id="banim-none" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-creo-purple text-creo-purple transition">Ninguna</button>
+                <button onclick="setButtonAnim('lift')" id="banim-lift" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Elevar</button>
+                <button onclick="setButtonAnim('glow')" id="banim-glow" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Brillo</button>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Vista previa</label>
+              <div class="flex gap-3 justify-center py-4 bg-gray-50 rounded-xl">
+                <button id="btn-preview-primary" class="bg-creo-purple text-white px-5 py-2.5 font-semibold text-sm transition-all rounded-xl">Contribuir</button>
+                <button id="btn-preview-secondary" class="bg-creo-mint/20 text-creo-purple px-5 py-2.5 font-semibold text-sm transition-all rounded-xl">Seguir</button>
+              </div>
+            </div>
+          </div><!-- /persona-panel-buttons -->
+
+          <!-- Section: Metas Branding (visible in all sub-tabs) -->
+          <div class="pt-4 border-t border-gray-200 space-y-4 persona-sub" id="persona-panel-mecenas-inline" style="display:none">
             <div class="flex items-center gap-2">
               <span class="text-lg">🎯</span>
               <div>
@@ -813,9 +998,9 @@
           </div>
 
           <!-- Save All Branding -->
-          <button onclick="saveBrandingFromPanel()" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
+          <button onclick="savePersonalizacion()" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
             <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-            Guardar Branding General
+            Guardar Personalización
           </button>
         </div>
       </div>
@@ -1189,7 +1374,7 @@
       }
       if (tab === 'story') loadMyStories();
       if (tab === 'business') loadMyBusinessLinks();
-      if (tab === 'branding') { loadBrandingPanel(); loadMecenasPanel('mecenas-meta'); }
+      if (tab === 'branding') { loadBrandingPanel(); loadPersonalizacion(); loadMecenasPanel('mecenas-meta'); }
       if (tab === 'creoellos') loadCreoEllosPanel();
       if (tab === 'sounds') renderSoundSettings();
     }
@@ -1412,6 +1597,439 @@
       if (error) { showToast('Error al guardar', 'error'); return; }
       currentProfile.profile_colors = colors;
       showToast('Branding guardado. Visita tu perfil para verlo.', 'success');
+    }
+
+    // ===== PERSONALIZACIÓN EDITOR =====
+    let personaLayout = {
+      sections: [
+        {id:'cover',visible:true,order:0},{id:'header',visible:true,order:1},
+        {id:'story',visible:true,order:2},{id:'creo-en-ellos',visible:true,order:3},
+        {id:'metas',visible:true,order:4},{id:'completed-metas',visible:true,order:5},
+        {id:'posts',visible:true,order:6},{id:'business',visible:true,order:7},
+        {id:'payments',visible:true,order:8}
+      ],
+      profileImage:{size:'md',shape:'round'},
+      banner:{type:'gradient',value:''},
+      cardStyle:{radius:'xl',shadow:'lg',glass:true,border:false},
+      buttonStyle:{shape:'rounded',shadow:false,animation:'none'},
+      galleryLayout:'grid'
+    };
+    let personaTheme = {};
+    let personaHistory = [];
+    let personaHistoryIdx = -1;
+    let personaAutosaveTimer = null;
+
+    const sectionLabels = {
+      'cover':'Portada','header':'Encabezado','story':'Historia',
+      'creo-en-ellos':'Creo en Ellos','metas':'Metas Activas',
+      'completed-metas':'Metas Completadas','posts':'Publicaciones',
+      'business':'Negocio','payments':'Pagos'
+    };
+
+    function switchPersonaTab(tab) {
+      document.querySelectorAll('.persona-sub').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('[id^="persona-tab-"]').forEach(btn => {
+        btn.classList.remove('bg-creo-purple','text-white');
+        btn.classList.add('text-gray-500');
+      });
+      const panel = document.getElementById('persona-panel-' + tab);
+      const tabBtn = document.getElementById('persona-tab-' + tab);
+      if (panel) { panel.classList.remove('hidden'); panel.style.display = ''; }
+      if (tabBtn) { tabBtn.classList.add('bg-creo-purple','text-white'); tabBtn.classList.remove('text-gray-500'); }
+      if (tab === 'colors') {
+        document.getElementById('persona-panel-mecenas-inline').style.display = '';
+        document.getElementById('persona-panel-mecenas-inline').classList.remove('hidden');
+      }
+    }
+
+    function personaTrack() {
+      const snapshot = JSON.stringify({ layout: personaLayout, theme: personaTheme, brandState });
+      if (personaHistory.length > 0 && personaHistory[personaHistoryIdx] === snapshot) return;
+      personaHistory = personaHistory.slice(0, personaHistoryIdx + 1);
+      personaHistory.push(snapshot);
+      if (personaHistory.length > 50) personaHistory.shift();
+      personaHistoryIdx = personaHistory.length - 1;
+      updateUndoRedoBtns();
+      personaAutosave();
+    }
+
+    function personaUndo() {
+      if (personaHistoryIdx <= 0) return;
+      personaHistoryIdx--;
+      applyPersonaSnapshot(JSON.parse(personaHistory[personaHistoryIdx]));
+      updateUndoRedoBtns();
+    }
+
+    function personaRedo() {
+      if (personaHistoryIdx >= personaHistory.length - 1) return;
+      personaHistoryIdx++;
+      applyPersonaSnapshot(JSON.parse(personaHistory[personaHistoryIdx]));
+      updateUndoRedoBtns();
+    }
+
+    function updateUndoRedoBtns() {
+      const undo = document.getElementById('persona-undo-btn');
+      const redo = document.getElementById('persona-redo-btn');
+      if (undo) undo.disabled = personaHistoryIdx <= 0;
+      if (redo) redo.disabled = personaHistoryIdx >= personaHistory.length - 1;
+    }
+
+    function applyPersonaSnapshot(snap) {
+      personaLayout = snap.layout;
+      personaTheme = snap.theme;
+      Object.assign(brandState, snap.brandState);
+      refreshPersonaUI();
+    }
+
+    function personaAutosave() {
+      clearTimeout(personaAutosaveTimer);
+      const status = document.getElementById('persona-autosave-status');
+      if (status) status.textContent = 'Sin guardar';
+      personaAutosaveTimer = setTimeout(async () => {
+        await savePersonalizacion(true);
+      }, 3000);
+    }
+
+    function setProfileShape(shape) {
+      personaLayout.profileImage.shape = shape;
+      ['round','square','rounded'].forEach(s => {
+        const btn = document.getElementById('pshape-' + s);
+        if (btn) {
+          btn.classList.toggle('border-creo-purple', s === shape);
+          btn.classList.toggle('text-creo-purple', s === shape);
+          btn.classList.toggle('border-gray-200', s !== shape);
+          btn.classList.toggle('text-gray-500', s !== shape);
+        }
+      });
+      personaTrack();
+    }
+
+    function setProfileSize(val) {
+      personaLayout.profileImage.size = val;
+      const label = document.getElementById('psize-label');
+      const labels = { sm: 'Pequeño', md: 'Mediano', lg: 'Grande', xl: 'Extra Grande' };
+      if (label) label.textContent = labels[val] || val;
+      personaTrack();
+    }
+
+    function setGalleryLayout(layout) {
+      personaLayout.galleryLayout = layout;
+      ['grid','carousel','masonry'].forEach(l => {
+        const btn = document.getElementById('gallery-' + l);
+        if (btn) {
+          btn.classList.toggle('border-creo-purple', l === layout);
+          btn.classList.toggle('text-creo-purple', l === layout);
+          btn.classList.toggle('border-gray-200', l !== layout);
+          btn.classList.toggle('text-gray-500', l !== layout);
+        }
+      });
+      personaTrack();
+    }
+
+    function setCardRadius(val) {
+      personaLayout.cardStyle.radius = val;
+      ['none','md','xl','2xl'].forEach(v => {
+        const btn = document.getElementById('crad-' + v);
+        if (btn) {
+          btn.classList.toggle('border-creo-purple', v === val);
+          btn.classList.toggle('text-creo-purple', v === val);
+          btn.classList.toggle('border-gray-200', v !== val);
+          btn.classList.toggle('text-gray-500', v !== val);
+        }
+      });
+      updateCardPreview();
+      personaTrack();
+    }
+
+    function setCardShadow(val) {
+      personaLayout.cardStyle.shadow = val;
+      ['none','md','lg'].forEach(v => {
+        const btn = document.getElementById('cshad-' + v);
+        if (btn) {
+          btn.classList.toggle('border-creo-purple', v === val);
+          btn.classList.toggle('text-creo-purple', v === val);
+          btn.classList.toggle('border-gray-200', v !== val);
+          btn.classList.toggle('text-gray-500', v !== val);
+        }
+      });
+      updateCardPreview();
+      personaTrack();
+    }
+
+    function toggleCardGlass() {
+      personaLayout.cardStyle.glass = !personaLayout.cardStyle.glass;
+      const toggle = document.getElementById('card-glass-toggle');
+      const dot = document.getElementById('card-glass-dot');
+      if (toggle) toggle.classList.toggle('bg-creo-mint', personaLayout.cardStyle.glass);
+      if (toggle) toggle.classList.toggle('bg-gray-300', !personaLayout.cardStyle.glass);
+      if (dot) dot.style.transform = personaLayout.cardStyle.glass ? 'translateX(20px)' : 'translateX(0)';
+      updateCardPreview();
+      personaTrack();
+    }
+
+    function toggleCardBorder() {
+      personaLayout.cardStyle.border = !personaLayout.cardStyle.border;
+      const toggle = document.getElementById('card-border-toggle');
+      const dot = document.getElementById('card-border-dot');
+      if (toggle) toggle.classList.toggle('bg-creo-mint', personaLayout.cardStyle.border);
+      if (toggle) toggle.classList.toggle('bg-gray-300', !personaLayout.cardStyle.border);
+      if (dot) dot.style.transform = personaLayout.cardStyle.border ? 'translateX(20px)' : 'translateX(0)';
+      updateCardPreview();
+      personaTrack();
+    }
+
+    function updateCardPreview() {
+      const el = document.getElementById('card-style-preview');
+      if (!el) return;
+      const r = { none: '0', md: '0.75rem', xl: '1rem', '2xl': '1.5rem' };
+      const s = { none: 'none', md: '0 4px 6px rgba(0,0,0,0.1)', lg: '0 10px 25px rgba(0,0,0,0.15)' };
+      el.style.borderRadius = r[personaLayout.cardStyle.radius] || '1rem';
+      el.style.boxShadow = s[personaLayout.cardStyle.shadow] || 'none';
+      el.style.border = personaLayout.cardStyle.border ? '1px solid #e5e7eb' : 'none';
+      if (personaLayout.cardStyle.glass) {
+        el.style.background = 'rgba(255,255,255,0.7)';
+        el.style.backdropFilter = 'blur(12px)';
+      } else {
+        el.style.background = '#ffffff';
+        el.style.backdropFilter = 'none';
+      }
+    }
+
+    function setButtonShape(shape) {
+      personaLayout.buttonStyle.shape = shape;
+      ['rounded','pill','square'].forEach(s => {
+        const btn = document.getElementById('bshape-' + s);
+        if (btn) {
+          btn.classList.toggle('border-creo-purple', s === shape);
+          btn.classList.toggle('text-creo-purple', s === shape);
+          btn.classList.toggle('border-gray-200', s !== shape);
+          btn.classList.toggle('text-gray-500', s !== shape);
+        }
+      });
+      updateButtonPreview();
+      personaTrack();
+    }
+
+    function toggleBtnShadow() {
+      personaLayout.buttonStyle.shadow = !personaLayout.buttonStyle.shadow;
+      const toggle = document.getElementById('btn-shadow-toggle');
+      const dot = document.getElementById('btn-shadow-dot');
+      if (toggle) toggle.classList.toggle('bg-creo-mint', personaLayout.buttonStyle.shadow);
+      if (toggle) toggle.classList.toggle('bg-gray-300', !personaLayout.buttonStyle.shadow);
+      if (dot) dot.style.transform = personaLayout.buttonStyle.shadow ? 'translateX(20px)' : 'translateX(0)';
+      updateButtonPreview();
+      personaTrack();
+    }
+
+    function setButtonAnim(anim) {
+      personaLayout.buttonStyle.animation = anim;
+      ['none','lift','glow'].forEach(a => {
+        const btn = document.getElementById('banim-' + a);
+        if (btn) {
+          btn.classList.toggle('border-creo-purple', a === anim);
+          btn.classList.toggle('text-creo-purple', a === anim);
+          btn.classList.toggle('border-gray-200', a !== anim);
+          btn.classList.toggle('text-gray-500', a !== anim);
+        }
+      });
+      updateButtonPreview();
+      personaTrack();
+    }
+
+    function updateButtonPreview() {
+      const primary = document.getElementById('btn-preview-primary');
+      const secondary = document.getElementById('btn-preview-secondary');
+      if (!primary || !secondary) return;
+      const rMap = { rounded: '0.75rem', pill: '9999px', square: '0.25rem' };
+      const r = rMap[personaLayout.buttonStyle.shape] || '0.75rem';
+      [primary, secondary].forEach(b => {
+        b.style.borderRadius = r;
+        b.style.boxShadow = personaLayout.buttonStyle.shadow ? '0 4px 12px rgba(0,0,0,0.2)' : 'none';
+        b.style.transition = 'all 0.2s';
+      });
+      [primary, secondary].forEach(b => {
+        b.onmouseenter = b.onmouseleave = null;
+        if (personaLayout.buttonStyle.animation === 'lift') {
+          b.onmouseenter = () => { b.style.transform = 'translateY(-2px)'; b.style.boxShadow = '0 6px 20px rgba(0,0,0,0.25)'; };
+          b.onmouseleave = () => { b.style.transform = ''; b.style.boxShadow = personaLayout.buttonStyle.shadow ? '0 4px 12px rgba(0,0,0,0.2)' : 'none'; };
+        } else if (personaLayout.buttonStyle.animation === 'glow') {
+          b.onmouseenter = () => { b.style.boxShadow = '0 0 20px rgba(26,10,62,0.4)'; };
+          b.onmouseleave = () => { b.style.boxShadow = personaLayout.buttonStyle.shadow ? '0 4px 12px rgba(0,0,0,0.2)' : 'none'; };
+        }
+      });
+    }
+
+    function initSectionSortable() {
+      const container = document.getElementById('section-sortable');
+      if (!container) return;
+      const sorted = [...personaLayout.sections].sort((a, b) => a.order - b.order);
+      container.innerHTML = sorted.map(s => `
+        <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 shadow-sm cursor-grab active:cursor-grabbing" draggable="true" data-section-id="${s.id}">
+          <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
+          <span class="text-sm font-medium text-gray-800 flex-1">${esc(sectionLabels[s.id] || s.id)}</span>
+          <button onclick="toggleSectionVisibility('${s.id}')" class="text-xs px-2 py-1 rounded-lg transition ${s.visible ? 'bg-creo-mint/20 text-creo-purple' : 'bg-gray-100 text-gray-400'}">
+            ${s.visible ? '👁 Visible' : '👁‍🗨 Oculto'}
+          </button>
+        </div>
+      `).join('');
+
+      let dragEl = null;
+      container.addEventListener('dragstart', e => {
+        dragEl = e.target.closest('[data-section-id]');
+        if (dragEl) dragEl.style.opacity = '0.5';
+      });
+      container.addEventListener('dragend', e => {
+        if (dragEl) dragEl.style.opacity = '1';
+        dragEl = null;
+      });
+      container.addEventListener('dragover', e => {
+        e.preventDefault();
+        const target = e.target.closest('[data-section-id]');
+        if (target && target !== dragEl) {
+          const rect = target.getBoundingClientRect();
+          const mid = rect.top + rect.height / 2;
+          if (e.clientY < mid) container.insertBefore(dragEl, target);
+          else container.insertBefore(dragEl, target.nextSibling);
+        }
+      });
+      container.addEventListener('drop', e => {
+        e.preventDefault();
+        const items = container.querySelectorAll('[data-section-id]');
+        items.forEach((el, i) => {
+          const sid = el.dataset.sectionId;
+          const sec = personaLayout.sections.find(s => s.id === sid);
+          if (sec) sec.order = i;
+        });
+        personaTrack();
+      });
+    }
+
+    function toggleSectionVisibility(id) {
+      const sec = personaLayout.sections.find(s => s.id === id);
+      if (sec) {
+        sec.visible = !sec.visible;
+        initSectionSortable();
+        personaTrack();
+      }
+    }
+
+    function loadPersonalizacion() {
+      if (!currentProfile) return;
+      const layout = currentProfile.profile_layout || {};
+      if (layout.sections) personaLayout.sections = layout.sections;
+      if (layout.profileImage) personaLayout.profileImage = layout.profileImage;
+      if (layout.banner) personaLayout.banner = layout.banner;
+      if (layout.cardStyle) personaLayout.cardStyle = layout.cardStyle;
+      if (layout.buttonStyle) personaLayout.buttonStyle = layout.buttonStyle;
+      if (layout.galleryLayout) personaLayout.galleryLayout = layout.galleryLayout;
+      personaTheme = currentProfile.profile_theme || {};
+
+      // Populate extended color pickers
+      const el = (id) => document.getElementById(id);
+      if (el('brand-accent-color')) el('brand-accent-color').value = personaTheme.accentColor || '#33f0b0';
+      if (el('brand-link-color')) el('brand-link-color').value = personaTheme.linkColor || '#6C3AED';
+      if (el('brand-border-color')) el('brand-border-color').value = personaTheme.borderColor || '#e5e7eb';
+
+      // Profile image controls
+      setProfileShape(personaLayout.profileImage.shape);
+      const sizeMap = { sm: 0, md: 1, lg: 2, xl: 3 };
+      const sizeRange = el('psize-range');
+      if (sizeRange) sizeRange.value = sizeMap[personaLayout.profileImage.size] ?? 1;
+      setProfileSize(personaLayout.profileImage.size);
+
+      // Gallery layout
+      setGalleryLayout(personaLayout.galleryLayout);
+
+      // Card style
+      setCardRadius(personaLayout.cardStyle.radius);
+      setCardShadow(personaLayout.cardStyle.shadow);
+      if (personaLayout.cardStyle.glass) {
+        const gt = el('card-glass-toggle'); const gd = el('card-glass-dot');
+        if (gt) { gt.classList.add('bg-creo-mint'); gt.classList.remove('bg-gray-300'); }
+        if (gd) gd.style.transform = 'translateX(20px)';
+      }
+      if (personaLayout.cardStyle.border) {
+        const bt = el('card-border-toggle'); const bd = el('card-border-dot');
+        if (bt) { bt.classList.add('bg-creo-mint'); bt.classList.remove('bg-gray-300'); }
+        if (bd) bd.style.transform = 'translateX(20px)';
+      }
+      updateCardPreview();
+
+      // Button style
+      setButtonShape(personaLayout.buttonStyle.shape);
+      if (personaLayout.buttonStyle.shadow) {
+        const st = el('btn-shadow-toggle'); const sd = el('btn-shadow-dot');
+        if (st) { st.classList.add('bg-creo-mint'); st.classList.remove('bg-gray-300'); }
+        if (sd) sd.style.transform = 'translateX(20px)';
+      }
+      setButtonAnim(personaLayout.buttonStyle.animation);
+      updateButtonPreview();
+
+      // Heading font
+      if (el('brand-heading-font')) el('brand-heading-font').value = personaTheme.headingFont || '';
+      updateTypographyPreview();
+
+      // Init section sortable
+      initSectionSortable();
+
+      // Init undo history
+      personaHistory = [JSON.stringify({ layout: personaLayout, theme: personaTheme, brandState })];
+      personaHistoryIdx = 0;
+      updateUndoRedoBtns();
+
+      switchPersonaTab('images');
+    }
+
+    function updateTypographyPreview() {
+      const headingFont = document.getElementById('brand-heading-font')?.value || '';
+      const bodyFont = document.getElementById('brand-font')?.value || 'Inter';
+      const preview = document.getElementById('brand-font-preview');
+      const headingPreview = document.getElementById('brand-heading-preview');
+      if (preview) preview.style.fontFamily = bodyFont + ', sans-serif';
+      if (headingPreview) headingPreview.style.fontFamily = (headingFont || bodyFont) + ', sans-serif';
+    }
+
+    function refreshPersonaUI() {
+      loadBrandingPanel();
+      loadPersonalizacion();
+    }
+
+    async function savePersonalizacion(isAutosave) {
+      if (!currentProfile) return;
+      const status = document.getElementById('persona-autosave-status');
+
+      // Gather extended theme
+      personaTheme.accentColor = document.getElementById('brand-accent-color')?.value || '#33f0b0';
+      personaTheme.linkColor = document.getElementById('brand-link-color')?.value || '#6C3AED';
+      personaTheme.borderColor = document.getElementById('brand-border-color')?.value || '#e5e7eb';
+      personaTheme.headingFont = document.getElementById('brand-heading-font')?.value || '';
+
+      // Save branding colors
+      const { textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, theme } = brandState;
+      if (getContrast(textColor, sectionBg) < 3) {
+        if (!isAutosave) showToast('El texto no es visible sobre el fondo de secciones. Ajusta los colores.', 'error');
+        return;
+      }
+      const colors = { theme, textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia };
+
+      const { error } = await sb.from('profiles').update({
+        profile_colors: colors,
+        profile_layout: personaLayout,
+        profile_theme: personaTheme
+      }).eq('id', currentProfile.id);
+
+      if (error) {
+        if (!isAutosave) showToast('Error al guardar personalización', 'error');
+        if (status) status.textContent = 'Error';
+        return;
+      }
+
+      currentProfile.profile_colors = colors;
+      currentProfile.profile_layout = personaLayout;
+      currentProfile.profile_theme = personaTheme;
+
+      if (status) status.textContent = 'Guardado ✓';
+      if (!isAutosave) showToast('Personalización guardada. Visita tu perfil para verlo.', 'success');
     }
 
     // ===== MECENAS SETTINGS =====
