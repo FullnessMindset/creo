@@ -1811,10 +1811,14 @@
         const avatarC = doc.getElementById('avatar-container');
         if (avatarC) {
           const sizeMap = { sm: '5rem', md: '7rem', lg: '9rem', xl: '11rem' };
+          const szPxMap = { sm: 80, md: 112, lg: 144, xl: 176 };
           const sz = sizeMap[pi.size] || '7rem';
+          const szPx = szPxMap[pi.size] || 112;
           avatarC.style.width = sz; avatarC.style.height = sz;
-          const parent = avatarC.parentElement;
-          if (parent) { parent.style.width = sz; parent.style.height = sz; }
+          const aw = doc.getElementById('avatar-wrapper');
+          if (aw) { aw.style.width = sz; aw.style.height = sz; }
+          const hc = doc.getElementById('profile-header-card');
+          if (hc) hc.style.paddingTop = (szPx * 0.4 + 12) + 'px';
           const shapeMap = { round: '50%', square: '0.5rem', rounded: '1.5rem' };
           avatarC.style.borderRadius = shapeMap[pi.shape] || '50%';
         }
@@ -1834,7 +1838,11 @@
             if (sec.id === 'cover' && !sec.visible) coverVis = false;
           });
           const aw = doc.getElementById('avatar-wrapper');
-          if (aw) aw.style.marginTop = coverVis ? '-4rem' : '0';
+          const hc = doc.getElementById('profile-header-card');
+          if (aw && hc) {
+            const avatarH = parseFloat(aw.style.height) || 112;
+            hc.style.paddingTop = (avatarH * 0.4 + 12) + 'px';
+          }
         }
 
         // Background media
@@ -2172,6 +2180,9 @@
       });
     }
 
+    let _sortDragEl = null;
+    let _sortListenersAttached = false;
+
     function initSectionSortable() {
       const container = document.getElementById('section-sortable');
       if (!container) return;
@@ -2186,23 +2197,26 @@
         </div>
       `).join('');
 
-      let dragEl = null;
+      if (_sortListenersAttached) return;
+      _sortListenersAttached = true;
+
       container.addEventListener('dragstart', e => {
-        dragEl = e.target.closest('[data-section-id]');
-        if (dragEl) dragEl.style.opacity = '0.5';
+        _sortDragEl = e.target.closest('[data-section-id]');
+        if (_sortDragEl) _sortDragEl.style.opacity = '0.5';
       });
-      container.addEventListener('dragend', e => {
-        if (dragEl) dragEl.style.opacity = '1';
-        dragEl = null;
+      container.addEventListener('dragend', () => {
+        if (_sortDragEl) _sortDragEl.style.opacity = '1';
+        _sortDragEl = null;
       });
       container.addEventListener('dragover', e => {
         e.preventDefault();
+        if (!_sortDragEl) return;
         const target = e.target.closest('[data-section-id]');
-        if (target && target !== dragEl) {
+        if (target && target !== _sortDragEl) {
           const rect = target.getBoundingClientRect();
           const mid = rect.top + rect.height / 2;
-          if (e.clientY < mid) container.insertBefore(dragEl, target);
-          else container.insertBefore(dragEl, target.nextSibling);
+          if (e.clientY < mid) container.insertBefore(_sortDragEl, target);
+          else container.insertBefore(_sortDragEl, target.nextSibling);
         }
       });
       container.addEventListener('drop', e => {
