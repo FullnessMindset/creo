@@ -2387,6 +2387,32 @@ function updateNavAuth() { updateSidebarAuth(); }
 
 // ========== ANNOUNCEMENT BUBBLE ==========
 let _annBubbleTimer = null;
+const ANN_MAX_VIEWS = 3;
+
+function getAnnTracker() {
+  try { return JSON.parse(localStorage.getItem('creo_ann_tracker') || '{}'); } catch { return {}; }
+}
+function saveAnnTracker(tracker) {
+  localStorage.setItem('creo_ann_tracker', JSON.stringify(tracker));
+}
+function shouldShowAnn(id) {
+  const tracker = getAnnTracker();
+  const entry = tracker[id];
+  if (!entry) return true;
+  if (entry.views >= ANN_MAX_VIEWS) return false;
+  const today = new Date().toDateString();
+  if (entry.lastShown === today) return false;
+  return true;
+}
+function recordAnnView(id) {
+  const tracker = getAnnTracker();
+  const today = new Date().toDateString();
+  if (!tracker[id]) tracker[id] = { views: 0, lastShown: '' };
+  tracker[id].views += 1;
+  tracker[id].lastShown = today;
+  saveAnnTracker(tracker);
+}
+
 async function loadAnnouncementBar() {
   try {
     const user = await getCachedUser();
@@ -2394,9 +2420,8 @@ async function loadAnnouncementBar() {
     if (!anns || !anns.length) return;
     let profile = null;
     if (user) profile = await getCachedProfile(user.id);
-    const dismissed = JSON.parse(localStorage.getItem('creo_dismissed_anns') || '[]');
     const matching = anns.filter(a => {
-      if (dismissed.includes(a.id)) return false;
+      if (!shouldShowAnn(a.id)) return false;
       if (a.target_type === 'global') return true;
       if (a.target_type === 'user') return user && a.target_user_id === user.id;
       if (!profile) return false;
@@ -2455,6 +2480,7 @@ function showAnnouncementBubble(a, user) {
     if (bar) bar.style.width = '0%';
   });
 
+  recordAnnView(a.id);
   _annBubbleTimer = setTimeout(() => dismissAnnouncement(a.id), 10000);
 }
 
@@ -2471,23 +2497,25 @@ async function dismissAnnouncement(id) {
   bubble.style.animation = 'annBubbleOut 0.25s ease-in forwards';
   setTimeout(() => bubble.remove(), 250);
 
-  const dismissed = JSON.parse(localStorage.getItem('creo_dismissed_anns') || '[]');
-  if (!dismissed.includes(id)) dismissed.push(id);
-  localStorage.setItem('creo_dismissed_anns', JSON.stringify(dismissed));
+  // Save as message only on the final (3rd) view
+  const tracker = getAnnTracker();
+  const entry = tracker[id];
+  const isFinalView = entry && entry.views >= ANN_MAX_VIEWS;
 
-  // Save as a message conversation with admin
-  try {
-    const user = await getCachedUser();
-    if (user && creatorId && creatorId !== user.id && message) {
-      const prefix = annIcon ? annIcon + ' ' : '';
-      await sb.from('messages').insert({
-        sender_id: creatorId,
-        receiver_id: user.id,
-        body: prefix + message,
-        is_read: true
-      });
-    }
-  } catch(e) { console.log('Save announcement to messages:', e); }
+  if (isFinalView) {
+    try {
+      const user = await getCachedUser();
+      if (user && creatorId && creatorId !== user.id && message) {
+        const prefix = annIcon ? annIcon + ' ' : '';
+        await sb.from('messages').insert({
+          sender_id: creatorId,
+          receiver_id: user.id,
+          body: prefix + message,
+          is_read: true
+        });
+      }
+    } catch(e) { console.log('Save announcement to messages:', e); }
+  }
 }
 setTimeout(loadAnnouncementBar, 1500);
 
