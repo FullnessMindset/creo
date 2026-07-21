@@ -105,27 +105,26 @@
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
   <script src="shared.js"></script>
 
-  <div id="profile-sections-container" class="mx-auto px-4 pb-24 flex flex-col gap-6" style="max-width:480px; padding-top: 5rem;">
+  <div id="profile-sections-container" class="mx-auto px-4 pt-6 pb-24 flex flex-col gap-6" style="max-width:480px">
 
     <!-- Cover Image — social media ratio -->
     <div id="cover-section" data-section="cover" class="hidden rounded-2xl overflow-hidden bg-gradient-to-r from-creo-purple to-creo-light">
       <img id="cover-img" class="w-full h-full object-cover" alt="Cover">
     </div>
 
-    <!-- Floating Avatar — always on top, overlaps first section -->
-    <div id="avatar-wrapper" class="relative mx-auto z-50" style="width:7rem; height:7rem; margin-bottom:-2.8rem;">
-      <div id="avatar-container" class="w-28 h-28 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
-        <svg id="avatar-placeholder" class="w-14 h-14 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-        <img id="avatar-img" class="w-full h-full object-cover hidden" alt="Avatar">
-      </div>
-      <!-- CREO Verified Badge — small, no animation -->
-      <div id="verified-badge" class="hidden absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center ring-1 ring-creo-mint" title="Creador Verificado">
-        <img src="assets/logo-icon.png" alt="Verified" class="w-3.5 h-3.5 rounded-full object-contain">
-      </div>
-    </div>
-
     <!-- Profile Header — Glassmorphism -->
-    <div class="glass p-6 rounded-2xl shadow-xl text-center space-y-4 transition-all" id="profile-header-card" data-section="header" style="padding-top:3.5rem;">
+    <div class="glass rounded-2xl shadow-xl text-center space-y-4 transition-all overflow-visible" id="profile-header-card" data-section="header" style="padding: 1.5rem; padding-top: 3.5rem; position: relative;">
+      <!-- Avatar — floats above the card, 60% on top / 40% inside -->
+      <div id="avatar-wrapper" class="absolute left-1/2 z-50" style="width:7rem; height:7rem; top:0; transform: translate(-50%, -60%);">
+        <div id="avatar-container" class="w-full h-full rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
+          <svg id="avatar-placeholder" class="w-14 h-14 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          <img id="avatar-img" class="w-full h-full object-cover hidden" alt="Avatar">
+        </div>
+        <!-- CREO Verified Badge — small, no animation -->
+        <div id="verified-badge" class="hidden absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center ring-1 ring-creo-mint" title="Creador Verificado">
+          <img src="assets/logo-icon.png" alt="Verified" class="w-3.5 h-3.5 rounded-full object-contain">
+        </div>
+      </div>
 
       <!-- Social Links — right below avatar -->
       <div id="social-links" class="flex justify-center gap-3 hidden">
@@ -794,7 +793,8 @@
         const goal = (m.goal_amount_cents / 100).toFixed(2);
         const expired = m.end_date < today;
         const completed = pct >= 100;
-        const images = m.images || [];
+        let images = m.images || [];
+        if (!images.length && m.image_url) images = [m.image_url];
         const productLinks = m.product_links || [];
 
         let statusBadge = '';
@@ -2933,7 +2933,17 @@
 
       // Section ordering via CSS order + visibility
       if (layout.sections && Array.isArray(layout.sections)) {
-        const sorted = [...layout.sections].sort((a, b) => a.order - b.order);
+        const defaultSections = [
+          {id:'cover',visible:true,order:0},{id:'header',visible:true,order:1},
+          {id:'story',visible:true,order:2},{id:'creo-en-ellos',visible:true,order:3},
+          {id:'metas',visible:true,order:4},{id:'completed-metas',visible:true,order:5},
+          {id:'posts',visible:true,order:6},{id:'business',visible:true,order:7},
+          {id:'payments',visible:true,order:8}
+        ];
+        const saved = layout.sections;
+        const merged = defaultSections.map(def => saved.find(x => x.id === def.id) || def);
+        saved.forEach(s => { if (!merged.find(x => x.id === s.id)) merged.push(s); });
+        const sorted = [...merged].sort((a, b) => a.order - b.order);
         let coverVisible = true;
         sorted.forEach((sec, i) => {
           const el = container.querySelector('[data-section="' + sec.id + '"]');
@@ -2946,9 +2956,10 @@
           }
         });
         const aw = document.getElementById('avatar-wrapper');
-        if (aw) {
+        const hc = document.getElementById('profile-header-card');
+        if (aw && hc) {
           const avatarH = parseFloat(getComputedStyle(aw).height) || 112;
-          aw.style.marginBottom = '-' + (avatarH * 0.4) + 'px';
+          hc.style.paddingTop = (avatarH * 0.4 + 12) + 'px';
         }
       }
 
@@ -2956,6 +2967,7 @@
       if (layout.profileImage) {
         const avatarContainer = document.getElementById('avatar-container');
         const avatarWrapper = document.getElementById('avatar-wrapper');
+        const headerCard = document.getElementById('profile-header-card');
         if (avatarContainer) {
           const sizeMap = { sm: '5rem', md: '7rem', lg: '9rem', xl: '11rem' };
           const szPxMap = { sm: 80, md: 112, lg: 144, xl: 176 };
@@ -2966,9 +2978,7 @@
           if (avatarWrapper) {
             avatarWrapper.style.width = sz;
             avatarWrapper.style.height = sz;
-            avatarWrapper.style.marginBottom = '-' + (szPx * 0.4) + 'px';
           }
-          const headerCard = document.getElementById('profile-header-card');
           if (headerCard) headerCard.style.paddingTop = (szPx * 0.4 + 12) + 'px';
 
           const shapeMap = { round: '50%', square: '0.5rem', rounded: '1.5rem' };

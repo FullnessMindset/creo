@@ -2229,7 +2229,22 @@
     function loadPersonalizacion() {
       if (!currentProfile) return;
       const layout = currentProfile.profile_layout || {};
-      if (layout.sections) personaLayout.sections = layout.sections;
+      if (layout.sections) {
+        const defaultSections = [
+          {id:'cover',visible:true,order:0},{id:'header',visible:true,order:1},
+          {id:'story',visible:true,order:2},{id:'creo-en-ellos',visible:true,order:3},
+          {id:'metas',visible:true,order:4},{id:'completed-metas',visible:true,order:5},
+          {id:'posts',visible:true,order:6},{id:'business',visible:true,order:7},
+          {id:'payments',visible:true,order:8}
+        ];
+        const saved = layout.sections;
+        const merged = defaultSections.map(def => {
+          const s = saved.find(x => x.id === def.id);
+          return s || def;
+        });
+        saved.forEach(s => { if (!merged.find(x => x.id === s.id)) merged.push(s); });
+        personaLayout.sections = merged;
+      }
       if (layout.profileImage) personaLayout.profileImage = layout.profileImage;
       if (layout.banner) personaLayout.banner = layout.banner;
       if (layout.cardStyle) personaLayout.cardStyle = layout.cardStyle;
