@@ -25,6 +25,15 @@
   <link rel="stylesheet" href="tailwind.min.css?v=20260719">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    /* Overflow protection — nothing escapes the viewport */
+    html, body { overflow-x: hidden; max-width: 100vw; }
+    * { box-sizing: border-box; }
+    #profile-sections-container { max-width: 100%; overflow-x: hidden; }
+    #profile-sections-container > * { max-width: 100%; overflow-wrap: break-word; word-break: break-word; }
+    img, video, iframe, embed, object { max-width: 100%; height: auto; }
+    #profile-header-card, .glass, .pay-panel, .meta-media-card { max-width: 100%; overflow: hidden; }
+    #avatar-container { max-width: 90vw; max-height: 90vw; }
+
     input, select, textarea { font-size: max(16px, 1em) !important; }
     .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
     .glass-dark { background: rgba(26,10,62,0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); }

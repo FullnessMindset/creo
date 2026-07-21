@@ -619,14 +619,58 @@
       </div>
 
       <!-- TAB: Personalización -->
-      <div id="panel-branding" class="tab-panel hidden space-y-4">
-        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
+      <div id="panel-branding" class="tab-panel hidden">
+        <!-- Split-screen: Preview (left) + Editor (right) on desktop -->
+        <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 lg:items-start">
+
+          <!-- LIVE PREVIEW — sticky on desktop, collapsible on mobile -->
+          <div class="lg:sticky lg:top-4 lg:w-[380px] lg:flex-shrink-0 order-2 lg:order-1">
+            <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+              <div class="flex items-center justify-between px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
+                </div>
+                <span class="text-[10px] text-gray-400 font-mono truncate max-w-[180px]" id="preview-url-bar">creo/profile.html</span>
+                <div class="flex items-center gap-1">
+                  <button onclick="setPreviewDevice('mobile')" id="preview-dev-mobile" class="p-1 rounded text-gray-400 hover:text-creo-purple transition" title="Móvil">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                  </button>
+                  <button onclick="setPreviewDevice('desktop')" id="preview-dev-desktop" class="p-1 rounded text-creo-purple transition" title="Escritorio">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                  </button>
+                  <button onclick="refreshPreview()" class="p-1 rounded text-gray-400 hover:text-creo-purple transition" title="Recargar">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div id="preview-frame-wrapper" class="relative bg-gray-100 transition-all" style="height:580px">
+                <iframe id="persona-preview-iframe" class="w-full h-full border-0 transition-transform origin-top-left" sandbox="allow-scripts allow-same-origin" style="pointer-events:none"></iframe>
+                <div id="preview-loading" class="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                  <div class="text-center space-y-2">
+                    <div class="w-8 h-8 border-2 border-creo-purple border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <p class="text-xs text-gray-400">Cargando vista previa...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Toggle preview on mobile -->
+            <button onclick="toggleMobilePreview()" id="mobile-preview-toggle" class="lg:hidden w-full mt-2 py-2.5 rounded-xl bg-creo-purple/10 text-creo-purple text-xs font-semibold flex items-center justify-center gap-2 transition hover:bg-creo-purple/20">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              <span id="mobile-preview-text">Ocultar vista previa</span>
+            </button>
+          </div>
+
+          <!-- EDITOR PANEL -->
+          <div class="flex-1 order-1 lg:order-2 space-y-4 min-w-0">
+        <div class="bg-white p-5 rounded-xl shadow border border-gray-200 space-y-5">
           <div>
             <h3 class="font-bold text-gray-900 flex items-center gap-2">
               <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
               Personalización
             </h3>
-            <p class="text-xs text-gray-500 mt-1">Tu mini editor de perfil. Personaliza colores, secciones, tarjetas y más.</p>
+            <p class="text-xs text-gray-500 mt-1">Edita tu perfil en tiempo real. Los cambios se reflejan al instante.</p>
           </div>
 
           <!-- Sub-navigation tabs -->
@@ -654,6 +698,15 @@
 
           <!-- ========== SUB-PANEL: Images ========== -->
           <div id="persona-panel-images" class="persona-sub">
+
+          <!-- Info card -->
+          <div class="flex gap-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
+            <svg class="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div>
+              <p class="text-[11px] font-semibold text-blue-800">Imágenes de perfil</p>
+              <p class="text-[10px] text-blue-600 mt-0.5">Sube tu foto de perfil y portada. Puedes ajustar la forma (redondo, cuadrado) y el tamaño del avatar. Formatos: JPG, PNG, GIF. Máx 5MB.</p>
+            </div>
+          </div>
 
           <!-- Profile & Cover Images -->
           <div class="space-y-4 pb-4 border-b border-gray-200">
@@ -712,9 +765,12 @@
 
           <!-- ========== SUB-PANEL: Sections (drag-and-drop reorder + visibility) ========== -->
           <div id="persona-panel-sections" class="persona-sub hidden space-y-4">
-            <div>
-              <h4 class="text-xs font-semibold text-gray-700">Orden y visibilidad de secciones</h4>
-              <p class="text-[10px] text-gray-400 mt-1">Arrastra para reordenar. Usa el toggle para mostrar u ocultar.</p>
+            <div class="flex gap-3 p-3 bg-amber-50 rounded-xl border border-amber-100">
+              <svg class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+              <div>
+                <p class="text-[11px] font-semibold text-amber-800">Orden de secciones</p>
+                <p class="text-[10px] text-amber-600 mt-0.5">Arrastra las secciones para reordenar tu perfil. Toca el botón de visibilidad para ocultar secciones que no quieras mostrar. Los visitantes verán el orden que configures aquí.</p>
+              </div>
             </div>
             <div id="section-sortable" class="space-y-2"></div>
             <!-- Gallery Layout -->
@@ -730,6 +786,15 @@
 
           <!-- ========== SUB-PANEL: Colors ========== -->
           <div id="persona-panel-colors" class="persona-sub hidden">
+
+          <!-- Info card -->
+          <div class="flex gap-3 p-3 bg-purple-50 rounded-xl border border-purple-100 mb-4">
+            <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+            <div>
+              <p class="text-[11px] font-semibold text-purple-800">Colores y tema</p>
+              <p class="text-[10px] text-purple-600 mt-0.5">Cada color que cambies se refleja al instante en la vista previa. Elige tema claro u oscuro como base, luego ajusta cada color individualmente. Asegúrate de que el texto sea legible sobre el fondo.</p>
+            </div>
+          </div>
 
           <!-- Theme toggle -->
           <div>
@@ -833,6 +898,13 @@
 
           <!-- ========== SUB-PANEL: Typography ========== -->
           <div id="persona-panel-typography" class="persona-sub hidden space-y-4">
+            <div class="flex gap-3 p-3 bg-green-50 rounded-xl border border-green-100">
+              <svg class="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+              <div>
+                <p class="text-[11px] font-semibold text-green-800">Tipografía</p>
+                <p class="text-[10px] text-green-600 mt-0.5">Elige la fuente principal para el texto del cuerpo y opcionalmente una fuente diferente para los títulos. La vista previa de abajo muestra cómo se verá en tu perfil.</p>
+              </div>
+            </div>
             <div>
               <label class="text-xs font-semibold text-gray-700 block mb-2">Fuente principal</label>
               <select id="brand-font" onchange="updateBrandingPreview();updateTypographyPreview();personaTrack()" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-xl text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
@@ -874,6 +946,13 @@
 
           <!-- ========== SUB-PANEL: Cards ========== -->
           <div id="persona-panel-cards" class="persona-sub hidden space-y-4">
+            <div class="flex gap-3 p-3 bg-rose-50 rounded-xl border border-rose-100">
+              <svg class="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              <div>
+                <p class="text-[11px] font-semibold text-rose-800">Estilo de tarjetas</p>
+                <p class="text-[10px] text-rose-600 mt-0.5">Controla las esquinas, sombras, efecto glass y bordes de todas las tarjetas de tu perfil. La vista previa de abajo muestra el resultado exacto.</p>
+              </div>
+            </div>
             <div>
               <label class="text-xs font-semibold text-gray-700 block mb-2">Esquinas de tarjetas</label>
               <div class="grid grid-cols-4 gap-2">
@@ -914,6 +993,13 @@
 
           <!-- ========== SUB-PANEL: Buttons ========== -->
           <div id="persona-panel-buttons" class="persona-sub hidden space-y-4">
+            <div class="flex gap-3 p-3 bg-cyan-50 rounded-xl border border-cyan-100">
+              <svg class="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
+              <div>
+                <p class="text-[11px] font-semibold text-cyan-800">Estilo de botones</p>
+                <p class="text-[10px] text-cyan-600 mt-0.5">Personaliza la forma, sombra y animación hover de los botones de tu perfil. Prueba pasar el mouse sobre la vista previa para ver las animaciones.</p>
+              </div>
+            </div>
             <div>
               <label class="text-xs font-semibold text-gray-700 block mb-2">Forma de botones</label>
               <div class="grid grid-cols-3 gap-2">
@@ -1003,7 +1089,9 @@
             Guardar Personalización
           </button>
         </div>
-      </div>
+          </div><!-- /editor panel -->
+        </div><!-- /split-screen flex -->
+      </div><!-- /panel-branding -->
 
 
       <!-- TAB: Sounds -->
@@ -1374,7 +1462,7 @@
       }
       if (tab === 'story') loadMyStories();
       if (tab === 'business') loadMyBusinessLinks();
-      if (tab === 'branding') { loadBrandingPanel(); loadPersonalizacion(); loadMecenasPanel('mecenas-meta'); }
+      if (tab === 'branding') { loadBrandingPanel(); loadPersonalizacion(); loadMecenasPanel('mecenas-meta'); initPersonaPreview(); }
       if (tab === 'creoellos') loadCreoEllosPanel();
       if (tab === 'sounds') renderSoundSettings();
     }
@@ -1580,6 +1668,16 @@
       subBtn.style.backgroundColor = buttonColor;
       subBtn.style.color = btnTextColor;
       subBtn.style.opacity = '0.85';
+
+      // Update extended color hex displays
+      const accentEl = document.getElementById('brand-accent-hex');
+      const linkEl = document.getElementById('brand-link-hex');
+      const borderEl = document.getElementById('brand-border-hex');
+      if (accentEl) accentEl.textContent = document.getElementById('brand-accent-color')?.value || '#33f0b0';
+      if (linkEl) linkEl.textContent = document.getElementById('brand-link-color')?.value || '#6C3AED';
+      if (borderEl) borderEl.textContent = document.getElementById('brand-border-color')?.value || '#e5e7eb';
+
+      schedulePreviewUpdate();
     }
 
     async function saveBrandingFromPanel() {
@@ -1597,6 +1695,214 @@
       if (error) { showToast('Error al guardar', 'error'); return; }
       currentProfile.profile_colors = colors;
       showToast('Branding guardado. Visita tu perfil para verlo.', 'success');
+    }
+
+    // ===== LIVE PREVIEW ENGINE =====
+    let previewReady = false;
+    let previewDebounce = null;
+
+    function initPersonaPreview() {
+      const iframe = document.getElementById('persona-preview-iframe');
+      if (!iframe || !currentProfile) return;
+      const username = currentProfile.username;
+      if (!username) return;
+      const url = 'profile.html?u=' + encodeURIComponent(username);
+      document.getElementById('preview-url-bar').textContent = 'creo/' + username;
+      iframe.onload = function() {
+        previewReady = true;
+        document.getElementById('preview-loading').classList.add('hidden');
+        pushStylesToPreview();
+      };
+      iframe.src = url;
+    }
+
+    function pushStylesToPreview() {
+      const iframe = document.getElementById('persona-preview-iframe');
+      if (!iframe || !previewReady) return;
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!doc || !doc.body) return;
+
+        const { textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, theme } = brandState;
+        const isDark = theme === 'dark';
+
+        // Page background
+        doc.body.style.backgroundColor = bgColor;
+        doc.body.style.color = textColor;
+
+        // Font
+        if (font !== 'Inter') {
+          let fLink = doc.getElementById('brand-font-link');
+          const fUrl = 'https://fonts.googleapis.com/css2?family=' + font.replace(/ /g, '+') + ':wght@400;600;700&display=swap';
+          if (!fLink) { fLink = doc.createElement('link'); fLink.id = 'brand-font-link'; fLink.rel = 'stylesheet'; doc.head.appendChild(fLink); }
+          fLink.href = fUrl;
+        }
+        doc.body.style.fontFamily = font + ', sans-serif';
+
+        // Heading font
+        const headingFont = document.getElementById('brand-heading-font')?.value || '';
+        if (headingFont) {
+          let hLink = doc.getElementById('brand-heading-font-link');
+          const hUrl = 'https://fonts.googleapis.com/css2?family=' + headingFont.replace(/ /g, '+') + ':wght@400;600;700&display=swap';
+          if (!hLink) { hLink = doc.createElement('link'); hLink.id = 'brand-heading-font-link'; hLink.rel = 'stylesheet'; doc.head.appendChild(hLink); }
+          hLink.href = hUrl;
+          doc.querySelectorAll('.section-title, #profile-name, h1, h2, h3').forEach(el => { el.style.fontFamily = headingFont + ', sans-serif'; });
+        }
+
+        // CSS custom properties
+        doc.documentElement.style.setProperty('--brand-section-bg', sectionBg);
+        doc.documentElement.style.setProperty('--brand-text-color', textColor);
+        doc.documentElement.style.setProperty('--brand-button-color', buttonColor);
+        doc.documentElement.style.setProperty('--brand-btn-text-color', btnTextColor);
+
+        // Extended theme colors
+        const accentColor = document.getElementById('brand-accent-color')?.value || '#33f0b0';
+        const linkColor = document.getElementById('brand-link-color')?.value || '#6C3AED';
+        const borderColor = document.getElementById('brand-border-color')?.value || '#e5e7eb';
+        doc.documentElement.style.setProperty('--brand-accent-color', accentColor);
+        doc.documentElement.style.setProperty('--brand-link-color', linkColor);
+        doc.documentElement.style.setProperty('--brand-border-color', borderColor);
+
+        // Section cards
+        doc.querySelectorAll('.glass, .glass-dark, #profile-header-card, .pay-panel > div, #payment-tabs').forEach(el => {
+          el.style.background = sectionBg;
+          el.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '';
+        });
+
+        // Titles
+        doc.querySelectorAll('.section-title, #profile-name, .meta-media-card h3, h3.text-lg, h2.section-title').forEach(el => { el.style.color = titleColor; });
+
+        // Text
+        doc.querySelectorAll('#profile-bio, #profile-username, .text-gray-900, .text-gray-700').forEach(el => { el.style.color = textColor; });
+
+        // Buttons
+        doc.querySelectorAll('#tip-btn, #sub-btn, #meta-support-btn, [id^="meta-btn-"], .creamos-btn').forEach(el => {
+          if (!el.disabled) { el.style.backgroundColor = buttonColor; el.style.color = btnTextColor; }
+        });
+
+        // Link colors
+        doc.querySelectorAll('a.text-creo-purple, .text-creo-purple').forEach(el => {
+          if (!el.closest('button') && !el.closest('[id^="pay-tab"]')) el.style.color = linkColor;
+        });
+
+        // Card styles
+        const cs = personaLayout.cardStyle;
+        const radiusMap = { none: '0', md: '0.75rem', xl: '1rem', '2xl': '1.5rem' };
+        const shadowMap = { none: 'none', md: '0 4px 6px rgba(0,0,0,0.1)', lg: '0 10px 25px rgba(0,0,0,0.15)' };
+        doc.querySelectorAll('.glass, .glass-dark, #profile-header-card, .pay-panel > div, .meta-media-card').forEach(el => {
+          el.style.borderRadius = radiusMap[cs.radius] || '1rem';
+          el.style.boxShadow = shadowMap[cs.shadow] || 'none';
+          if (cs.border) el.style.border = '1px solid ' + borderColor;
+          el.style.backdropFilter = cs.glass ? 'blur(16px)' : 'none';
+        });
+
+        // Button styles
+        const bs = personaLayout.buttonStyle;
+        const bShapeMap = { rounded: '0.75rem', pill: '9999px', square: '0.25rem' };
+        doc.querySelectorAll('#tip-btn, #sub-btn, #meta-support-btn, [id^="meta-btn-"], .creamos-btn').forEach(btn => {
+          btn.style.borderRadius = bShapeMap[bs.shape] || '0.75rem';
+          btn.style.boxShadow = bs.shadow ? '0 4px 12px rgba(0,0,0,0.2)' : 'none';
+        });
+
+        // Profile image
+        const pi = personaLayout.profileImage;
+        const avatarC = doc.getElementById('avatar-container');
+        if (avatarC) {
+          const sizeMap = { sm: '5rem', md: '7rem', lg: '9rem', xl: '11rem' };
+          const sz = sizeMap[pi.size] || '7rem';
+          avatarC.style.width = sz; avatarC.style.height = sz;
+          const parent = avatarC.parentElement;
+          if (parent) { parent.style.width = sz; parent.style.height = sz; }
+          const shapeMap = { round: '50%', square: '0.5rem', rounded: '1.5rem' };
+          avatarC.style.borderRadius = shapeMap[pi.shape] || '50%';
+        }
+
+        // Section visibility + order
+        const container = doc.getElementById('profile-sections-container');
+        if (container && personaLayout.sections) {
+          const sorted = [...personaLayout.sections].sort((a, b) => a.order - b.order);
+          sorted.forEach((sec, i) => {
+            const el = container.querySelector('[data-section="' + sec.id + '"]');
+            if (!el) return;
+            el.style.order = i;
+            if (!sec.visible && el.style.display !== 'none') el.setAttribute('data-hidden-by-layout', '1');
+            if (!sec.visible) el.style.display = 'none';
+            if (sec.visible && el.getAttribute('data-hidden-by-layout')) { el.removeAttribute('data-hidden-by-layout'); el.style.display = ''; }
+          });
+        }
+
+        // Background media
+        let bgC = doc.getElementById('brand-bg-media-container');
+        if (bgMedia && /^https?:\/\//i.test(bgMedia)) {
+          if (!bgC) { bgC = doc.createElement('div'); bgC.id = 'brand-bg-media-container'; bgC.style.cssText = 'position:fixed;inset:0;z-index:-1;overflow:hidden;'; doc.body.prepend(bgC); }
+          const opacity = (document.getElementById('bg-opacity-range')?.value || 20) / 100;
+          bgC.innerHTML = '';
+          const isVid = /\.(mp4|webm|ogg)(\?|$)/i.test(bgMedia);
+          if (isVid) {
+            const v = doc.createElement('video'); v.src = bgMedia; v.autoplay = true; v.muted = true; v.loop = true; v.playsInline = true;
+            v.style.cssText = 'width:100%;height:100%;object-fit:cover;opacity:' + opacity; bgC.appendChild(v);
+          } else {
+            const img = doc.createElement('img'); img.src = bgMedia;
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;opacity:' + opacity; bgC.appendChild(img);
+          }
+        } else if (bgC) { bgC.remove(); }
+
+        // Secondary text in dark
+        if (isDark) {
+          doc.querySelectorAll('.text-gray-400, .text-gray-500').forEach(el => { el.style.color = '#a0a0b8'; });
+          doc.querySelectorAll('input[type="number"], select').forEach(el => {
+            el.style.backgroundColor = '#2a2a2a'; el.style.color = textColor; el.style.borderColor = 'rgba(255,255,255,0.15)';
+          });
+        }
+      } catch(e) { /* cross-origin or not ready */ }
+    }
+
+    function schedulePreviewUpdate() {
+      clearTimeout(previewDebounce);
+      previewDebounce = setTimeout(pushStylesToPreview, 80);
+    }
+
+    function setPreviewDevice(device) {
+      const wrapper = document.getElementById('preview-frame-wrapper');
+      const iframe = document.getElementById('persona-preview-iframe');
+      const mBtn = document.getElementById('preview-dev-mobile');
+      const dBtn = document.getElementById('preview-dev-desktop');
+      if (!wrapper || !iframe) return;
+      if (device === 'mobile') {
+        wrapper.style.width = '375px';
+        wrapper.style.height = '667px';
+        wrapper.style.margin = '0 auto';
+        iframe.style.transform = 'none';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        mBtn.classList.add('text-creo-purple'); mBtn.classList.remove('text-gray-400');
+        dBtn.classList.remove('text-creo-purple'); dBtn.classList.add('text-gray-400');
+      } else {
+        wrapper.style.width = '100%';
+        wrapper.style.height = '580px';
+        wrapper.style.margin = '0';
+        iframe.style.transform = 'none';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        dBtn.classList.add('text-creo-purple'); dBtn.classList.remove('text-gray-400');
+        mBtn.classList.remove('text-creo-purple'); mBtn.classList.add('text-gray-400');
+      }
+    }
+
+    function refreshPreview() {
+      previewReady = false;
+      document.getElementById('preview-loading').classList.remove('hidden');
+      const iframe = document.getElementById('persona-preview-iframe');
+      if (iframe) iframe.src = iframe.src;
+    }
+
+    function toggleMobilePreview() {
+      const wrapper = document.getElementById('preview-frame-wrapper');
+      const text = document.getElementById('mobile-preview-text');
+      if (!wrapper) return;
+      const hidden = wrapper.style.display === 'none';
+      wrapper.style.display = hidden ? '' : 'none';
+      if (text) text.textContent = hidden ? 'Ocultar vista previa' : 'Mostrar vista previa';
     }
 
     // ===== PERSONALIZACIÓN EDITOR =====
@@ -1651,6 +1957,7 @@
       personaHistoryIdx = personaHistory.length - 1;
       updateUndoRedoBtns();
       personaAutosave();
+      schedulePreviewUpdate();
     }
 
     function personaUndo() {
