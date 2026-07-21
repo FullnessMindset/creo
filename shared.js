@@ -2072,6 +2072,7 @@ function getNotifDefaultLink(n) {
   if (n.type === 'payment') return 'index.html#stripe';
   if (n.type === 'approval') return 'index.html#verify';
   if (n.type === 'rejection') return 'index.html#verify';
+  if (n.type === 'message') return 'messages.html' + (n.link ? '#chat-' + n.link : '');
   return null;
 }
 
@@ -2103,7 +2104,7 @@ function createEmojiPicker(inputId, btnId) {
     panel.id = 'emoji-picker-panel';
     panel.className = 'absolute z-[200] rounded-2xl shadow-2xl p-3 bg-white border border-gray-200';
     panel.style.cssText = 'bottom:100%;left:0;margin-bottom:8px;width:min(320px,calc(100vw - 32px));max-height:320px;';
-    let activeCategory = 'Frecuentes';
+    let activeCategory = Object.keys(EMOJI_CATEGORIES)[0];
     function renderPicker() {
       const tabs = Object.keys(EMOJI_CATEGORIES).map(cat =>
         `<button class="px-2 py-1 text-xs rounded-lg whitespace-nowrap ${cat === activeCategory ? 'bg-creo-purple text-white' : 'text-gray-500 hover:bg-gray-100'}" data-cat="${cat}">${cat}</button>`
@@ -3357,14 +3358,14 @@ const MediaUploadService = (function() {
           state.progress = 100;
           onProgress(100, formatSpeed(totalBytes / ((Date.now() - startTime) / 1000)), '0s');
         } else {
-          // Chunked upload — upload as single file with progress tracking via XMLHttpRequest
+          // Large file upload with progress tracking via XMLHttpRequest
+          const xhrToken = await getToken();
           await new Promise((resolve, reject) => {
-            const token = sb.realtime?.accessToken || '';
             const url = SUPABASE_URL + '/storage/v1/object/' + bucket + '/' + storage_path;
 
             const xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
-            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + xhrToken);
             xhr.setRequestHeader('x-upsert', 'true');
 
             xhr.upload.onprogress = (e) => {

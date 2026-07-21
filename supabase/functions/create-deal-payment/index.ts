@@ -113,15 +113,18 @@ serve(async (req) => {
       cancel_url: validCancelUrl,
     });
 
-    // Record payment message in deal chat (direct insert — service_role has no auth.uid() for the RPC)
-    await supabase.from("deal_messages").insert({
-      conversation_id,
-      sender_id: user.id,
-      content: `Pago de $${amount_usd.toFixed(2)} — ${description || "Colaboración"}`,
-      message_type: "payment",
-      payment_amount_cents: baseCents,
-      payment_status: "pending",
-      stripe_session_id: session.id,
+    // Record payment message in deal chat with encryption
+    const encKey = Deno.env.get("DEAL_ENCRYPTION_KEY") || "creo_deal_default_key";
+    const msgText = `Pago de $${amount_usd.toFixed(2)} — ${description || "Colaboración"}`;
+    await supabase.rpc("insert_deal_message_encrypted", {
+      p_conversation_id: conversation_id,
+      p_sender_id: user.id,
+      p_content: msgText,
+      p_enc_key: encKey,
+      p_message_type: "payment",
+      p_payment_amount_cents: baseCents,
+      p_payment_status: "pending",
+      p_stripe_session_id: session.id,
     });
 
     await supabase.from("deal_conversations")

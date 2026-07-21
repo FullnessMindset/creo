@@ -100,10 +100,10 @@ async function performDeletion(supabaseAdmin: ReturnType<typeof createClient>, u
     .update({ body: "[mensaje eliminado]", media_url: null })
     .eq("sender_id", userId);
 
-  // deal_messages uses encrypted_content (BYTEA) — nullify it
+  // deal_messages — wipe both encrypted and plaintext content
   try {
     await supabaseAdmin.from("deal_messages")
-      .update({ encrypted_content: null })
+      .update({ encrypted_content: null, content: "[mensaje eliminado]" })
       .eq("sender_id", userId);
   } catch { /* table may not exist */ }
 

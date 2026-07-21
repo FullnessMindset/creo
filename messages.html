@@ -176,7 +176,7 @@
         <div id="m-recording-indicator" class="hidden mx-3 mt-2 flex items-center gap-2 text-red-500 text-xs bg-red-50 rounded-xl px-3 py-2">
           <span class="w-2 h-2 rounded-full bg-red-500 rec-pulse"></span> <span>Grabando...</span>
           <span id="m-rec-timer" class="font-mono text-red-400">0:00</span>
-          <span class="ml-auto text-gray-400 text-[10px]">Suelta para enviar</span>
+          <span class="ml-auto text-gray-400 text-[10px]">Suelta para previsualizar</span>
         </div>
         <div class="flex items-center gap-1.5 px-3 py-2.5">
           <button onclick="document.getElementById('m-file-input').click()" class="w-9 h-9 rounded-full flex items-center justify-center text-creo-purple hover:bg-creo-purple/10 transition" title="Adjuntar">
@@ -192,6 +192,7 @@
           </button>
           <div class="flex-1 relative flex items-center bg-gray-100 rounded-full border border-gray-200 focus-within:border-creo-mint/50 transition">
             <input id="m-chat-input" type="text" placeholder="Aa" class="flex-1 bg-transparent rounded-full px-4 py-2 text-sm outline-none border-none !border-0" onkeydown="if(event.key==='Enter')sendMessage()">
+            <button id="m-emoji-btn" type="button" class="p-1.5 mr-1 text-gray-400 hover:text-yellow-500 transition rounded-lg" title="Emojis">😊</button>
           </div>
           <button onclick="toggleChatGif()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition">
             <span class="text-xs font-black">GIF</span>
@@ -354,13 +355,14 @@
     // ===== CONVERSATIONS =====
     async function loadConversations() {
       if (!currentUser) return;
-      const { data: msgs } = await sb.from('messages')
+      const { data: msgs, error: convoErr } = await sb.from('messages')
         .select('*, sender:sender_id(id, username, display_name, avatar_url), receiver:receiver_id(id, username, display_name, avatar_url)')
         .or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
         .is('deleted_at', null)
         .order('created_at', { ascending: false })
         .limit(500);
 
+      if (convoErr) { console.error('Load conversations error:', convoErr); return; }
       if (!msgs || msgs.length === 0) { P('no-messages-desktop')?.classList.remove('hidden'); P('no-messages-mobile')?.classList.remove('hidden'); return; }
       P('no-messages-desktop')?.classList.add('hidden'); P('no-messages-mobile')?.classList.add('hidden');
 
@@ -432,6 +434,7 @@
         P('m-chat-profile-link-name').href = profileUrl;
         const av = P('m-chat-avatar');
         av.innerHTML = profile.avatar_url ? `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
+        createEmojiPicker('m-chat-input', 'm-emoji-btn');
       }
 
       clearPendingFiles();
@@ -613,12 +616,13 @@
         }
 
         // Upload each pending file
+        const fileCount = pendingFiles.length;
         for (const entry of [...pendingFiles]) {
-          await uploadAndSend(entry.file, pendingFiles.length === 1 ? body : null);
+          await uploadAndSend(entry.file, fileCount === 1 ? body : null);
         }
 
-        // Send text-only if no files
-        if (pendingFiles.length === 0 && !audioBlob && body) {
+        // Send text separately if multiple files, or text-only if no files
+        if (body && fileCount !== 1) {
           await MediaUploadService.sendTextMessage(activeChatUser.id, body);
         }
 

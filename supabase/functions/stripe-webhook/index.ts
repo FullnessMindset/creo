@@ -114,7 +114,10 @@ serve(async (req) => {
           .from("deal_messages")
           .update({ payment_status: "completed" })
           .eq("stripe_session_id", session.id);
-        if (error) console.error("Failed to update deal payment status:", error);
+        if (error) {
+          console.error("Failed to update deal payment status:", error);
+          return new Response(JSON.stringify({ error: "DB update failed" }), { status: 500 });
+        }
 
         // Notify the creator
         if (metadata.creator_id) {
