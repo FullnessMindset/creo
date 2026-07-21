@@ -2416,28 +2416,30 @@ function showAnnouncementBubble(a, user) {
   if (existing) existing.remove();
   if (_annBubbleTimer) { clearTimeout(_annBubbleTimer); _annBubbleTimer = null; }
 
-  const icons = { info: '📢', success: '✅', warning: '⚠️', error: '🚨' };
-  const bgColors = { info: '#1a0a3e', success: '#166534', warning: '#854d0e', error: '#991b1b' };
-  const bg = bgColors[a.style] || bgColors.info;
-  const icon = icons[a.style] || icons.info;
+  const borderColors = { info: '#4f46e5', success: '#33f0b0', warning: '#facc15', error: '#ef4444' };
+  const progressColors = { info: '#4f46e5', success: '#33f0b0', warning: '#facc15', error: '#ef4444' };
+  const borderColor = borderColors[a.style] || borderColors.info;
+  const progressColor = progressColors[a.style] || progressColors.info;
+  const icon = a.icon || '';
 
   const bubble = document.createElement('div');
   bubble.id = 'announcement-bubble';
   bubble.setAttribute('data-ann-id', a.id);
   bubble.setAttribute('data-ann-creator', a.created_by || '');
   bubble.setAttribute('data-ann-message', a.message || '');
-  bubble.style.cssText = `position:fixed;bottom:80px;right:16px;z-index:9999;max-width:340px;width:calc(100% - 32px);background:${bg};color:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.25);animation:annBubbleIn 0.35s ease-out;font-family:inherit;`;
+  bubble.setAttribute('data-ann-icon', a.icon || '');
+  bubble.style.cssText = `position:fixed;bottom:80px;right:16px;z-index:9999;max-width:340px;width:calc(100% - 32px);background:rgba(255,255,255,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:#1a0a3e;border-radius:16px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.06);border:2px solid ${borderColor};animation:annBubbleIn 0.35s ease-out;font-family:inherit;`;
   bubble.innerHTML = `
     <div style="display:flex;align-items:flex-start;gap:10px;">
-      <span style="font-size:20px;flex-shrink:0;margin-top:1px;">${icon}</span>
+      ${icon ? `<span style="font-size:20px;flex-shrink:0;margin-top:1px;">${icon}</span>` : ''}
       <div style="flex:1;min-width:0;">
-        <p style="font-size:11px;opacity:0.7;margin:0 0 3px;font-weight:600;letter-spacing:0.05em;">CREO Admin</p>
-        <p style="font-size:14px;line-height:1.4;margin:0;word-wrap:break-word;">${esc(a.message)}</p>
+        <p style="font-size:11px;color:#6b7280;margin:0 0 3px;font-weight:600;letter-spacing:0.05em;">CREO</p>
+        <p style="font-size:14px;line-height:1.4;margin:0;word-wrap:break-word;color:#1f2937;">${esc(a.message)}</p>
       </div>
-      <button onclick="dismissAnnouncement('${esc(a.id)}')" style="flex-shrink:0;background:rgba(255,255,255,0.15);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:-2px;" aria-label="Close">&times;</button>
+      <button onclick="dismissAnnouncement('${esc(a.id)}')" style="flex-shrink:0;background:rgba(0,0,0,0.06);border:none;color:#9ca3af;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:-2px;transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.12)'" onmouseout="this.style.background='rgba(0,0,0,0.06)'" aria-label="Close">&times;</button>
     </div>
-    <div style="margin-top:8px;height:3px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;">
-      <div id="ann-bubble-progress" style="height:100%;background:rgba(255,255,255,0.5);border-radius:2px;width:100%;transition:width 10s linear;"></div>
+    <div style="margin-top:8px;height:3px;background:rgba(0,0,0,0.06);border-radius:2px;overflow:hidden;">
+      <div id="ann-bubble-progress" style="height:100%;background:${progressColor};border-radius:2px;width:100%;transition:width 10s linear;"></div>
     </div>`;
   document.body.appendChild(bubble);
 
@@ -2464,6 +2466,7 @@ async function dismissAnnouncement(id) {
   const annId = bubble.getAttribute('data-ann-id');
   const creatorId = bubble.getAttribute('data-ann-creator');
   const message = bubble.getAttribute('data-ann-message');
+  const annIcon = bubble.getAttribute('data-ann-icon') || '';
 
   bubble.style.animation = 'annBubbleOut 0.25s ease-in forwards';
   setTimeout(() => bubble.remove(), 250);
@@ -2476,10 +2479,11 @@ async function dismissAnnouncement(id) {
   try {
     const user = await getCachedUser();
     if (user && creatorId && creatorId !== user.id && message) {
+      const prefix = annIcon ? annIcon + ' ' : '';
       await sb.from('messages').insert({
         sender_id: creatorId,
         receiver_id: user.id,
-        body: '📢 ' + message,
+        body: prefix + message,
         is_read: true
       });
     }
