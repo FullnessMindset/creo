@@ -622,11 +622,11 @@
 
     <!-- TAB: Personalización — full-width for side-by-side preview + editor -->
     <div id="panel-branding" class="tab-panel hidden px-4">
-      <!-- Split-screen: Preview (left) + Editor (right) on desktop -->
+      <!-- Split-screen: Editor (left) + Preview (right) on desktop -->
       <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 lg:items-start max-w-5xl mx-auto">
 
           <!-- LIVE PREVIEW — sticky on desktop, collapsible on mobile -->
-          <div class="lg:sticky lg:top-4 lg:w-[380px] lg:flex-shrink-0 order-2 lg:order-1">
+          <div class="lg:sticky lg:top-4 lg:w-[380px] lg:flex-shrink-0 order-2 lg:order-2">
             <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
               <div class="flex items-center justify-between px-4 py-2.5 bg-gray-50 border-b border-gray-100">
                 <div class="flex items-center gap-2">
@@ -665,7 +665,7 @@
           </div>
 
           <!-- EDITOR PANEL -->
-          <div class="flex-1 order-1 lg:order-2 space-y-4 min-w-0">
+          <div class="flex-1 order-1 lg:order-1 space-y-4 min-w-0">
         <div class="bg-white p-5 rounded-xl shadow border border-gray-200 space-y-5">
           <div>
             <h3 class="font-bold text-gray-900 flex items-center gap-2">
@@ -683,6 +683,7 @@
             <button onclick="switchPersonaTab('typography')" id="persona-tab-typography" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Tipografía</button>
             <button onclick="switchPersonaTab('cards')" id="persona-tab-cards" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Tarjetas</button>
             <button onclick="switchPersonaTab('buttons')" id="persona-tab-buttons" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Botones</button>
+            <button onclick="switchPersonaTab('mecenas-inline')" id="persona-tab-mecenas-inline" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Mecenas</button>
           </div>
 
           <!-- Undo / Redo -->
@@ -759,7 +760,7 @@
             <input type="url" id="brand-bg-media" placeholder="https://ejemplo.com/mi-fondo.jpg" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-xl text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple" oninput="updateBrandingPreview()">
             <div>
               <label class="text-[10px] text-gray-500">Opacidad del fondo: <span id="bg-opacity-label">20</span>%</label>
-              <input type="range" id="bg-opacity-range" min="5" max="50" value="20" step="5" class="w-full accent-creo-mint" oninput="document.getElementById('bg-opacity-label').textContent=this.value;personaTrack()">
+              <input type="range" id="bg-opacity-range" min="5" max="50" value="20" step="5" class="w-full accent-creo-mint" oninput="document.getElementById('bg-opacity-label').textContent=this.value;updateBrandingPreview();personaTrack()">
             </div>
           </div>
 
@@ -775,15 +776,6 @@
               </div>
             </div>
             <div id="section-sortable" class="space-y-2"></div>
-            <!-- Gallery Layout -->
-            <div class="pt-3 border-t border-gray-100 space-y-3">
-              <h4 class="text-xs font-semibold text-gray-700">Layout de galería (Posts)</h4>
-              <div class="grid grid-cols-3 gap-2">
-                <button onclick="setGalleryLayout('grid')" id="gallery-grid" class="py-2.5 rounded-lg text-[10px] font-semibold border-2 border-creo-purple text-creo-purple transition text-center">Grid</button>
-                <button onclick="setGalleryLayout('carousel')" id="gallery-carousel" class="py-2.5 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition text-center">Carrusel</button>
-                <button onclick="setGalleryLayout('masonry')" id="gallery-masonry" class="py-2.5 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition text-center">Masonry</button>
-              </div>
-            </div>
           </div><!-- /persona-panel-sections -->
 
           <!-- ========== SUB-PANEL: Colors ========== -->
@@ -1034,7 +1026,7 @@
           </div><!-- /persona-panel-buttons -->
 
           <!-- Section: Metas Branding (visible in all sub-tabs) -->
-          <div class="pt-4 border-t border-gray-200 space-y-4 persona-sub" id="persona-panel-mecenas-inline" style="display:none">
+          <div class="pt-4 border-t border-gray-200 space-y-4 persona-sub hidden" id="persona-panel-mecenas-inline">
             <div class="flex items-center gap-2">
               <span class="text-lg">🎯</span>
               <div>
@@ -1520,7 +1512,7 @@
     }
 
     // ===== BRANDING PANEL =====
-    let brandState = { theme: 'light', textColor: '#1f2937', titleColor: '#111827', btnTextColor: '#ffffff', sectionBg: '#ffffff', buttonColor: '#1a0a3e', bgColor: '#f9fafb', font: 'Inter', bgMedia: '' };
+    let brandState = { theme: 'light', textColor: '#1f2937', titleColor: '#111827', btnTextColor: '#ffffff', sectionBg: '#ffffff', buttonColor: '#1a0a3e', bgColor: '#f9fafb', font: 'Inter', bgMedia: '', bgOpacity: 20 };
 
     function getLuminance(hex) {
       const r = parseInt(hex.slice(1,3), 16) / 255;
@@ -1552,6 +1544,7 @@
       brandState.bgColor = c.bgColor || (isDark ? '#121212' : '#f9fafb');
       brandState.font = c.font || 'Inter';
       brandState.bgMedia = c.bgMedia || '';
+      brandState.bgOpacity = c.bgOpacity != null ? c.bgOpacity : 20;
 
       document.getElementById('brand-text-color').value = brandState.textColor;
       document.getElementById('brand-title-color').value = brandState.titleColor;
@@ -1561,6 +1554,8 @@
       document.getElementById('brand-bg-color').value = brandState.bgColor;
       document.getElementById('brand-font').value = brandState.font;
       document.getElementById('brand-bg-media').value = brandState.bgMedia;
+      const opRange = document.getElementById('bg-opacity-range');
+      if (opRange) { opRange.value = brandState.bgOpacity; document.getElementById('bg-opacity-label').textContent = brandState.bgOpacity; }
       updateThemeButtons();
       updateBrandingPreview();
       loadBrandImagePreviews();
@@ -1600,8 +1595,9 @@
       const bgColor = document.getElementById('brand-bg-color').value;
       const font = document.getElementById('brand-font').value;
       const bgMedia = document.getElementById('brand-bg-media').value.trim();
+      const bgOpacity = parseInt(document.getElementById('bg-opacity-range')?.value || '20', 10);
 
-      brandState = { ...brandState, textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia };
+      brandState = { ...brandState, textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, bgOpacity };
 
       // Update hex displays
       document.getElementById('brand-text-hex').textContent = textColor;
@@ -1943,8 +1939,7 @@
       profileImage:{size:'md',shape:'round'},
       banner:{type:'gradient',value:''},
       cardStyle:{radius:'xl',shadow:'lg',glass:true,border:false},
-      buttonStyle:{shape:'rounded',shadow:false,animation:'none'},
-      galleryLayout:'grid'
+      buttonStyle:{shape:'rounded',shadow:false,animation:'none'}
     };
     let personaTheme = {};
     let personaHistory = [];
@@ -1968,9 +1963,8 @@
       const tabBtn = document.getElementById('persona-tab-' + tab);
       if (panel) { panel.classList.remove('hidden'); panel.style.display = ''; }
       if (tabBtn) { tabBtn.classList.add('bg-creo-purple','text-white'); tabBtn.classList.remove('text-gray-500'); }
-      if (tab === 'colors') {
-        document.getElementById('persona-panel-mecenas-inline').style.display = '';
-        document.getElementById('persona-panel-mecenas-inline').classList.remove('hidden');
+      if (tab === 'mecenas-inline') {
+        loadMecenasPanel('mecenas-meta');
       }
     }
 
@@ -2042,20 +2036,6 @@
       const label = document.getElementById('psize-label');
       const labels = { sm: 'Pequeño', md: 'Mediano', lg: 'Grande', xl: 'Extra Grande' };
       if (label) label.textContent = labels[val] || val;
-      personaTrack();
-    }
-
-    function setGalleryLayout(layout) {
-      personaLayout.galleryLayout = layout;
-      ['grid','carousel','masonry'].forEach(l => {
-        const btn = document.getElementById('gallery-' + l);
-        if (btn) {
-          btn.classList.toggle('border-creo-purple', l === layout);
-          btn.classList.toggle('text-creo-purple', l === layout);
-          btn.classList.toggle('border-gray-200', l !== layout);
-          btn.classList.toggle('text-gray-500', l !== layout);
-        }
-      });
       personaTrack();
     }
 
@@ -2337,7 +2317,7 @@
       if (layout.banner) personaLayout.banner = layout.banner;
       if (layout.cardStyle) personaLayout.cardStyle = layout.cardStyle;
       if (layout.buttonStyle) personaLayout.buttonStyle = layout.buttonStyle;
-      if (layout.galleryLayout) personaLayout.galleryLayout = layout.galleryLayout;
+
       personaTheme = currentProfile.profile_theme || {};
 
       // Populate extended color pickers
@@ -2352,9 +2332,6 @@
       const sizeRange = el('psize-range');
       if (sizeRange) sizeRange.value = sizeMap[personaLayout.profileImage.size] ?? 1;
       setProfileSize(personaLayout.profileImage.size);
-
-      // Gallery layout
-      setGalleryLayout(personaLayout.galleryLayout);
 
       // Card style
       setCardRadius(personaLayout.cardStyle.radius);
@@ -2421,14 +2398,14 @@
       personaTheme.headingFont = document.getElementById('brand-heading-font')?.value || '';
 
       // Save branding colors
-      const { textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, theme } = brandState;
+      const { textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, bgOpacity, theme } = brandState;
       if (getContrast(textColor, sectionBg) < 3) {
         if (!isAutosave) {
           showToast('El texto no es visible sobre el fondo de secciones. Ajusta los colores.', 'error');
           return;
         }
       }
-      const colors = { theme, textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia };
+      const colors = { theme, textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, bgOpacity };
 
       const { error } = await sb.from('profiles').update({
         profile_colors: colors,
