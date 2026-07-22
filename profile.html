@@ -2979,7 +2979,11 @@
             avatarWrapper.style.width = sz;
             avatarWrapper.style.height = sz;
           }
-          if (headerCard) headerCard.style.paddingTop = (szPx * 0.4 + 12) + 'px';
+          if (headerCard) {
+            const insidePx = szPx * 0.4 + 12;
+            headerCard.style.paddingTop = insidePx + 'px';
+            headerCard.style.marginTop = (szPx * 0.6) + 'px';
+          }
 
           const shapeMap = { round: '50%', square: '0.5rem', rounded: '1.5rem' };
           avatarContainer.style.borderRadius = shapeMap[layout.profileImage.shape] || '50%';

@@ -1818,7 +1818,10 @@
           const aw = doc.getElementById('avatar-wrapper');
           if (aw) { aw.style.width = sz; aw.style.height = sz; }
           const hc = doc.getElementById('profile-header-card');
-          if (hc) hc.style.paddingTop = (szPx * 0.4 + 12) + 'px';
+          if (hc) {
+            hc.style.paddingTop = (szPx * 0.4 + 12) + 'px';
+            hc.style.marginTop = (szPx * 0.6) + 'px';
+          }
           const shapeMap = { round: '50%', square: '0.5rem', rounded: '1.5rem' };
           avatarC.style.borderRadius = shapeMap[pi.shape] || '50%';
         }
