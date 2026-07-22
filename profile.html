@@ -649,7 +649,7 @@
       if (data.cover_url) {
         document.getElementById('cover-img').src = data.cover_url;
         document.getElementById('cover-section').classList.remove('hidden');
-        document.getElementById('profile-header-card').classList.add('-mt-8');
+        window._coverAboveHeader = true;
       }
 
       // Branding colors are applied after all sections load via applyBranding()
@@ -2980,12 +2980,13 @@
             document.querySelectorAll('.pay-panel').forEach(p => { container.appendChild(p); if (!sec.visible) p.style.display = 'none'; });
           }
         });
-        const aw = document.getElementById('avatar-wrapper');
-        const hc = document.getElementById('profile-header-card');
-        if (aw && hc) {
-          const avatarH = parseFloat(getComputedStyle(aw).height) || 112;
-          hc.style.paddingTop = (avatarH * 0.4 + 12) + 'px';
-        }
+
+        // Determine if cover is directly above header (both visible)
+        const visibleOrder = sorted.filter(s => s.visible);
+        const headerIdx = visibleOrder.findIndex(s => s.id === 'header');
+        const coverIdx = visibleOrder.findIndex(s => s.id === 'cover');
+        window._coverAboveHeader = coverVisible && headerIdx > 0 && coverIdx === headerIdx - 1;
+        window._headerIsFirst = headerIdx === 0;
       }
 
       // Profile image size & shape
@@ -3007,11 +3008,28 @@
           if (headerCard) {
             const insidePx = szPx * 0.4 + 12;
             headerCard.style.paddingTop = insidePx + 'px';
-            headerCard.style.marginTop = (szPx * 0.6) + 'px';
+            if (window._coverAboveHeader) {
+              headerCard.style.marginTop = -(szPx * 0.35) + 'px';
+            } else if (window._headerIsFirst) {
+              headerCard.style.marginTop = (szPx * 0.6) + 'px';
+            } else {
+              headerCard.style.marginTop = (szPx * 0.6) + 'px';
+            }
           }
 
           const shapeMap = { round: '50%', square: '0.5rem', rounded: '1.5rem' };
           avatarContainer.style.borderRadius = shapeMap[layout.profileImage.shape] || '50%';
+        }
+      } else {
+        // No profileImage setting — apply default margin based on position
+        const hc = document.getElementById('profile-header-card');
+        if (hc) {
+          const defSz = 112;
+          if (window._coverAboveHeader) {
+            hc.style.marginTop = -(defSz * 0.35) + 'px';
+          } else {
+            hc.style.marginTop = (defSz * 0.6) + 'px';
+          }
         }
       }
 
@@ -3237,6 +3255,13 @@
         loadCreoEnEllos(creatorProfile.id);
         applyBranding(creatorProfile.profile_colors);
         applyLayout(creatorProfile);
+        // Fallback margin for profiles without layout settings
+        const hcFallback = document.getElementById('profile-header-card');
+        if (hcFallback && !hcFallback.style.marginTop) {
+          const defSz = 112;
+          hcFallback.style.marginTop = window._coverAboveHeader ? -(defSz * 0.35) + 'px' : (defSz * 0.6) + 'px';
+          hcFallback.style.paddingTop = (defSz * 0.4 + 12) + 'px';
+        }
         setupAdminImpersonation();
       }
       translatePage();

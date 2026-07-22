@@ -1820,7 +1820,8 @@
           const hc = doc.getElementById('profile-header-card');
           if (hc) {
             hc.style.paddingTop = (szPx * 0.4 + 12) + 'px';
-            hc.style.marginTop = (szPx * 0.6) + 'px';
+            // marginTop set after section ordering below
+            hc.dataset.szPx = szPx;
           }
           const shapeMap = { round: '50%', square: '0.5rem', rounded: '1.5rem' };
           avatarC.style.borderRadius = shapeMap[pi.shape] || '50%';
@@ -1843,11 +1844,16 @@
               doc.querySelectorAll('.pay-panel').forEach(p => container.appendChild(p));
             }
           });
-          const aw = doc.getElementById('avatar-wrapper');
-          const hc = doc.getElementById('profile-header-card');
-          if (aw && hc) {
-            const avatarH = parseFloat(aw.style.height) || 112;
-            hc.style.paddingTop = (avatarH * 0.4 + 12) + 'px';
+          // Determine cover/header position and set marginTop
+          const visOrder = sorted.filter(s => s.visible);
+          const hIdx = visOrder.findIndex(s => s.id === 'header');
+          const cIdx = visOrder.findIndex(s => s.id === 'cover');
+          const coverAbove = coverVis && hIdx > 0 && cIdx === hIdx - 1;
+          const hc2 = doc.getElementById('profile-header-card');
+          if (hc2) {
+            const szPx2 = parseFloat(hc2.dataset.szPx) || 112;
+            hc2.style.paddingTop = (szPx2 * 0.4 + 12) + 'px';
+            hc2.style.marginTop = coverAbove ? -(szPx2 * 0.35) + 'px' : (szPx2 * 0.6) + 'px';
           }
         }
 
