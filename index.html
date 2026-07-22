@@ -2183,14 +2183,53 @@
     let _sortDragEl = null;
     let _sortListenersAttached = false;
 
+    function _readSortOrder() {
+      const container = document.getElementById('section-sortable');
+      if (!container) return;
+      const items = container.querySelectorAll('[data-section-id]');
+      items.forEach((el, i) => {
+        const sec = personaLayout.sections.find(s => s.id === el.dataset.sectionId);
+        if (sec) sec.order = i;
+      });
+      personaTrack();
+    }
+
+    function moveSectionUp(id) {
+      const sorted = [...personaLayout.sections].sort((a, b) => a.order - b.order);
+      const idx = sorted.findIndex(s => s.id === id);
+      if (idx <= 0) return;
+      const prevOrder = sorted[idx - 1].order;
+      sorted[idx - 1].order = sorted[idx].order;
+      sorted[idx].order = prevOrder;
+      initSectionSortable();
+      personaTrack();
+    }
+
+    function moveSectionDown(id) {
+      const sorted = [...personaLayout.sections].sort((a, b) => a.order - b.order);
+      const idx = sorted.findIndex(s => s.id === id);
+      if (idx < 0 || idx >= sorted.length - 1) return;
+      const nextOrder = sorted[idx + 1].order;
+      sorted[idx + 1].order = sorted[idx].order;
+      sorted[idx].order = nextOrder;
+      initSectionSortable();
+      personaTrack();
+    }
+
     function initSectionSortable() {
       const container = document.getElementById('section-sortable');
       if (!container) return;
       const sorted = [...personaLayout.sections].sort((a, b) => a.order - b.order);
-      container.innerHTML = sorted.map(s => `
-        <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 shadow-sm cursor-grab active:cursor-grabbing" draggable="true" data-section-id="${s.id}">
+      container.innerHTML = sorted.map((s, i) => `
+        <div class="flex items-center gap-2 p-3 bg-white rounded-xl border border-gray-200 shadow-sm cursor-grab active:cursor-grabbing" draggable="true" data-section-id="${s.id}">
           <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
           <span class="text-sm font-medium text-gray-800 flex-1">${esc(sectionLabels[s.id] || s.id)}</span>
+          <button onclick="moveSectionUp('${s.id}')" class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition ${i === 0 ? 'opacity-30 pointer-events-none' : ''}" title="Subir">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+          </button>
+          <button onclick="moveSectionDown('${s.id}')" class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition ${i === sorted.length - 1 ? 'opacity-30 pointer-events-none' : ''}" title="Bajar">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
           <button onclick="toggleSectionVisibility('${s.id}')" class="text-xs px-2 py-1 rounded-lg transition ${s.visible ? 'bg-creo-mint/20 text-creo-purple' : 'bg-gray-100 text-gray-400'}">
             ${s.visible ? '👁 Visible' : '👁‍🗨 Oculto'}
           </button>
@@ -2207,6 +2246,7 @@
       container.addEventListener('dragend', () => {
         if (_sortDragEl) _sortDragEl.style.opacity = '1';
         _sortDragEl = null;
+        _readSortOrder();
       });
       container.addEventListener('dragover', e => {
         e.preventDefault();
@@ -2221,13 +2261,6 @@
       });
       container.addEventListener('drop', e => {
         e.preventDefault();
-        const items = container.querySelectorAll('[data-section-id]');
-        items.forEach((el, i) => {
-          const sid = el.dataset.sectionId;
-          const sec = personaLayout.sections.find(s => s.id === sid);
-          if (sec) sec.order = i;
-        });
-        personaTrack();
       });
     }
 
