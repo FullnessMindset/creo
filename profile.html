@@ -768,6 +768,8 @@
 
       if (!data || data.length === 0) { noMetas.classList.remove('hidden'); return; }
 
+      document.getElementById('metas-section').classList.remove('hidden');
+
       // Cache metas for the post modal
       data.forEach(m => { metasCache[m.id] = m; });
 
@@ -2932,7 +2934,7 @@
 
       const container = document.getElementById('profile-sections-container');
 
-      // Section ordering via CSS order + visibility
+      // Section ordering via DOM reorder + visibility
       if (layout.sections && Array.isArray(layout.sections)) {
         const defaultSections = [
           {id:'cover',visible:true,order:0},{id:'header',visible:true,order:1},
@@ -2946,14 +2948,14 @@
         saved.forEach(s => { if (!merged.find(x => x.id === s.id)) merged.push(s); });
         const sorted = [...merged].sort((a, b) => a.order - b.order);
         let coverVisible = true;
-        sorted.forEach((sec, i) => {
+        sorted.forEach((sec) => {
           const el = container.querySelector('[data-section="' + sec.id + '"]');
           if (!el) return;
-          el.style.order = i;
+          container.appendChild(el);
           if (!sec.visible) el.style.display = 'none';
           if (sec.id === 'cover' && !sec.visible) coverVisible = false;
           if (sec.id === 'payments') {
-            document.querySelectorAll('.pay-panel').forEach(p => { p.style.order = i; if (!sec.visible) p.style.display = 'none'; });
+            document.querySelectorAll('.pay-panel').forEach(p => { container.appendChild(p); if (!sec.visible) p.style.display = 'none'; });
           }
         });
         const aw = document.getElementById('avatar-wrapper');
