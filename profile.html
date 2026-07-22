@@ -768,8 +768,6 @@
 
       if (!data || data.length === 0) { noMetas.classList.remove('hidden'); return; }
 
-      document.getElementById('metas-section').classList.remove('hidden');
-
       // Cache metas for the post modal
       data.forEach(m => { metasCache[m.id] = m; });
 
@@ -975,29 +973,44 @@
           const pct = Math.min(100, Math.round(m.raised_cents / m.goal_amount_cents * 100));
           const raised = (m.raised_cents / 100).toFixed(2);
           const goal = (m.goal_amount_cents / 100).toFixed(2);
-          return `<div class="border border-gray-100 rounded-xl p-4 space-y-3">
-            <h4 class="text-sm font-bold text-gray-900">${esc(m.title)}</h4>
-            ${m.description ? `<p class="text-xs text-gray-500">${esc(m.description)}</p>` : ''}
-            <div>
-              <div class="flex justify-between text-sm mb-1.5">
-                <span class="font-bold text-creo-purple">$${raised}</span>
-                <span class="text-gray-400">de $${goal}</span>
+          let images = m.images || [];
+          if (!images.length && m.image_url) images = [m.image_url];
+          const firstMedia = images[0] || '';
+          const isVideo = firstMedia && (/\.(mp4|webm|mov)$/i.test(firstMedia) || /youtube|tiktok|youtu\.be/i.test(firstMedia));
+          const mediaHtml = firstMedia ? (isVideo
+            ? `<div class="relative rounded-xl overflow-hidden bg-gray-900 cursor-pointer" style="max-height:200px" onclick="openMetaPost('${m.id}', 0)">
+                <video src="${esc(firstMedia)}" class="w-full object-cover" style="max-height:200px" preload="metadata" muted playsinline></video>
+                <div class="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none"><svg class="w-10 h-10 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+              </div>`
+            : `<div class="rounded-xl overflow-hidden cursor-pointer" style="max-height:200px" onclick="openMetaPost('${m.id}', 0)">
+                <img src="${esc(firstMedia)}" class="w-full object-cover" style="max-height:200px" alt="${esc(m.title)}" loading="lazy">
+              </div>`) : '';
+          return `<div class="border border-gray-100 rounded-xl overflow-hidden">
+            ${mediaHtml}
+            <div class="p-4 space-y-3">
+              <h4 class="text-sm font-bold text-gray-900">${esc(m.title)}</h4>
+              ${m.description ? `<p class="text-xs text-gray-500 line-clamp-2">${esc(m.description)}</p>` : ''}
+              <div>
+                <div class="flex justify-between text-sm mb-1.5">
+                  <span class="font-bold text-creo-purple">$${raised}</span>
+                  <span class="text-gray-400">de $${goal}</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                  <div class="bg-gradient-to-r from-creo-purple to-creo-mint h-full rounded-full transition-all duration-700" style="width:${pct}%"></div>
+                </div>
+                <p class="text-[10px] text-gray-400 mt-1 text-right">${pct}%</p>
               </div>
-              <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                <div class="bg-gradient-to-r from-creo-purple to-creo-mint h-full rounded-full transition-all duration-700" style="width:${pct}%"></div>
-              </div>
-              <p class="text-[10px] text-gray-400 mt-1 text-right">${pct}%</p>
+              ${canPay ? `<div class="flex gap-2">
+                <div class="relative flex-1">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-bold">$</span>
+                  <input type="number" id="pay-meta-tab-amount-${m.id}" min="1" value="10" step="1" class="w-full pl-7 pr-3 py-2.5 border border-gray-200 bg-white/50 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+                </div>
+                <button onclick="contributeMetaFromTab('${m.id}')" class="bg-creo-purple hover:bg-creo-light text-white font-bold py-2.5 px-5 rounded-lg transition text-sm flex items-center gap-1.5">
+                  <img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="">
+                  <span data-i18n="contribuir">Contribuir</span>
+                </button>
+              </div>` : ''}
             </div>
-            ${canPay ? `<div class="flex gap-2">
-              <div class="relative flex-1">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-bold">$</span>
-                <input type="number" id="pay-meta-tab-amount-${m.id}" min="1" value="10" step="1" class="w-full pl-7 pr-3 py-2.5 border border-gray-200 bg-white/50 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
-              </div>
-              <button onclick="contributeMetaFromTab('${m.id}')" class="bg-creo-purple hover:bg-creo-light text-white font-bold py-2.5 px-5 rounded-lg transition text-sm flex items-center gap-1.5">
-                <img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="">
-                <span data-i18n="contribuir">Contribuir</span>
-              </button>
-            </div>` : ''}
           </div>`;
         }).join('');
       }
