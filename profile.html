@@ -2873,8 +2873,12 @@
       });
 
       // Titles — white in dark mode
-      document.querySelectorAll('.section-title, #profile-name, .meta-media-card h3, h3.text-lg, h2.section-title').forEach(el => {
+      document.querySelectorAll('.section-title, #profile-name, h3.text-lg, h2.section-title').forEach(el => {
         el.style.color = titleColor;
+      });
+      // Meta media card titles sit on gradient overlay — always white
+      document.querySelectorAll('.meta-media-card h3').forEach(el => {
+        el.style.color = '#ffffff';
       });
 
       // Regular text — apply in both light and dark mode
