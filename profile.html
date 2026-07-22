@@ -396,35 +396,40 @@
     </div>
 
     <!-- PAYMENT: Yo Creo en Ti -->
-    <div id="pay-tip" class="pay-panel hidden glass p-6 rounded-2xl shadow-xl space-y-4">
-      <div id="mec-tip-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
-      <div class="text-center">
-        <h3 id="mec-tip-heading" class="text-lg font-bold text-gray-900" data-i18n="yoCreoEnTi">Yo Creo en Ti</h3>
-        <p id="mec-tip-subtext" class="text-xs text-gray-500 mt-1" data-i18n="enviaApoyoUnico">Envía un apoyo único al creador</p>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="cantidadUsd">Cantidad (USD)</label>
-        <div class="relative">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</span>
-          <input type="number" id="tip-amount" min="1" value="5.00" step="0.50" class="w-full pl-8 pr-4 py-3 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-lg font-bold outline-none focus:ring-2 focus:ring-creo-purple">
+    <div id="pay-tip" class="pay-panel hidden">
+      <div class="glass rounded-2xl shadow-xl overflow-hidden">
+        <div id="mec-tip-hero" class="hidden"></div>
+        <div class="p-6 space-y-4">
+          <div class="text-center">
+            <h3 id="mec-tip-heading" class="text-lg font-bold text-gray-900" data-i18n="yoCreoEnTi">Yo Creo en Ti</h3>
+            <p id="mec-tip-subtext" class="text-xs text-gray-500 mt-1" data-i18n="enviaApoyoUnico">Envía un apoyo único al creador</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="cantidadUsd">Cantidad (USD)</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</span>
+              <input type="number" id="tip-amount" min="1" value="5.00" step="0.50" class="w-full pl-8 pr-4 py-3 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-lg font-bold outline-none focus:ring-2 focus:ring-creo-purple">
+            </div>
+            <div class="flex gap-2 mt-3">
+              <button onclick="document.getElementById('tip-amount').value='5'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$5</button>
+              <button onclick="document.getElementById('tip-amount').value='10'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$10</button>
+              <button onclick="document.getElementById('tip-amount').value='25'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$25</button>
+              <button onclick="document.getElementById('tip-amount').value='50'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$50</button>
+            </div>
+          </div>
+          <button onclick="processTip()" id="tip-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
+            <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
+            <span data-i18n="apoyarCreador">Apoyar Creador</span>
+          </button>
         </div>
-        <div class="flex gap-2 mt-3">
-          <button onclick="document.getElementById('tip-amount').value='5'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$5</button>
-          <button onclick="document.getElementById('tip-amount').value='10'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$10</button>
-          <button onclick="document.getElementById('tip-amount').value='25'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$25</button>
-          <button onclick="document.getElementById('tip-amount').value='50'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$50</button>
-        </div>
       </div>
-      <button onclick="processTip()" id="tip-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
-        <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-        <span data-i18n="apoyarCreador">Apoyar Creador</span>
-      </button>
     </div>
 
     <!-- PAYMENT: Mi Meta — shows creator's active metas (DEFAULT TAB) -->
     <div id="pay-metas" class="pay-panel">
-      <div class="glass p-6 rounded-2xl shadow-xl space-y-4">
-        <div id="mec-meta-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
+      <div class="glass rounded-2xl shadow-xl overflow-hidden">
+        <div id="mec-meta-hero" class="hidden"></div>
+        <div class="p-6 space-y-4">
         <div class="text-center">
           <h3 id="mec-meta-heading" class="text-lg font-bold text-gray-900" data-i18n="miMeta">Mi Meta</h3>
           <p id="mec-meta-subtext" class="text-xs text-gray-500 mt-1" data-i18n="miMetaSub">Apoya las metas del creador</p>
@@ -440,6 +445,7 @@
           <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasOwner">Aún no has publicado ninguna meta</p>
           <p class="text-xs text-gray-400" data-i18n="noMetasOwnerSub">Comparte tu meta con la comunidad de CREO y recibe apoyo</p>
           <a href="index.html?panel=1" onclick="localStorage.setItem('creo-open-tab','metas')" class="inline-block mt-2 px-6 py-2.5 bg-creo-purple hover:bg-creo-light text-white text-sm font-bold rounded-xl transition" data-i18n="crearPrimeraMeta">Crear mi primera Meta</a>
+        </div>
         </div>
       </div>
     </div>
@@ -472,29 +478,31 @@
 
     <!-- PAYMENT: Apoyo Full -->
     <div id="pay-sub" class="pay-panel hidden">
-      <div class="glass p-6 rounded-2xl shadow-xl space-y-4">
-        <div id="mec-sub-hero" class="hidden rounded-xl overflow-hidden mb-2"></div>
-        <div class="text-center">
-          <h3 id="mec-sub-heading" class="text-lg font-bold text-gray-900" data-i18n="apoyoFullHeading">Apoyo Full</h3>
-          <p id="mec-sub-subtext" class="text-xs text-gray-500 mt-1" data-i18n="apoyoFullSub">Apoya mensualmente con una cantidad que tú elijas</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="cantidadMensual">Cantidad Mensual (USD)</label>
-          <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</span>
-            <input type="number" id="sub-amount" min="3" value="10.00" step="1" class="w-full pl-8 pr-4 py-3 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-lg font-bold outline-none focus:ring-2 focus:ring-creo-purple">
+      <div class="glass rounded-2xl shadow-xl overflow-hidden">
+        <div id="mec-sub-hero" class="hidden"></div>
+        <div class="p-6 space-y-4">
+          <div class="text-center">
+            <h3 id="mec-sub-heading" class="text-lg font-bold text-gray-900" data-i18n="apoyoFullHeading">Apoyo Full</h3>
+            <p id="mec-sub-subtext" class="text-xs text-gray-500 mt-1" data-i18n="apoyoFullSub">Apoya mensualmente con una cantidad que tú elijas</p>
           </div>
-          <div class="flex gap-2 mt-3">
-            <button onclick="document.getElementById('sub-amount').value='5'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$5/<span data-i18n="porMes">mes</span></button>
-            <button onclick="document.getElementById('sub-amount').value='10'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$10/<span data-i18n="porMes">mes</span></button>
-            <button onclick="document.getElementById('sub-amount').value='25'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$25/<span data-i18n="porMes">mes</span></button>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="cantidadMensual">Cantidad Mensual (USD)</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</span>
+              <input type="number" id="sub-amount" min="3" value="10.00" step="1" class="w-full pl-8 pr-4 py-3 border border-gray-200 bg-white/50 rounded-xl text-gray-900 text-lg font-bold outline-none focus:ring-2 focus:ring-creo-purple">
+            </div>
+            <div class="flex gap-2 mt-3">
+              <button onclick="document.getElementById('sub-amount').value='5'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$5/<span data-i18n="porMes">mes</span></button>
+              <button onclick="document.getElementById('sub-amount').value='10'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$10/<span data-i18n="porMes">mes</span></button>
+              <button onclick="document.getElementById('sub-amount').value='25'" class="flex-1 py-2 text-xs font-semibold rounded-lg glass hover:bg-creo-mint/20 transition">$25/<span data-i18n="porMes">mes</span></button>
+            </div>
           </div>
+          <button onclick="processSubscription()" id="sub-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
+            <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
+            <span data-i18n="suscribirme">Suscribirme Mensualmente</span>
+          </button>
+          <p class="text-xs text-gray-400 text-center" data-i18n="cancelarEnCualquier">Puedes cancelar en cualquier momento</p>
         </div>
-        <button onclick="processSubscription()" id="sub-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
-          <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-          <span data-i18n="suscribirme">Suscribirme Mensualmente</span>
-        </button>
-        <p class="text-xs text-gray-400 text-center" data-i18n="cancelarEnCualquier">Puedes cancelar en cualquier momento</p>
       </div>
     </div>
   </div>
@@ -682,13 +690,13 @@
       if (tip.title) document.getElementById('mec-tip-heading').textContent = tip.title;
       if (tip.description) document.getElementById('mec-tip-subtext').textContent = tip.description;
       if (tip.button_color) document.getElementById('tip-btn').style.background = tip.button_color;
-      if (tip.card_color) document.getElementById('pay-tip').style.background = tip.card_color;
+      if (tip.card_color) { const c = document.getElementById('pay-tip').querySelector('.glass'); if (c) c.style.background = tip.card_color; }
       if (tip.image_url) {
         const hero = document.getElementById('mec-tip-hero');
         const isVid = /\.(mp4|webm|mov)$/i.test(tip.image_url);
         hero.innerHTML = isVid
-          ? `<div class="relative"><div class="w-full h-40 bg-gray-200 rounded-xl animate-pulse"></div><video src="${esc(tip.image_url)}" class="w-full h-40 object-cover rounded-xl absolute inset-0" preload="metadata" autoplay muted loop playsinline onloadeddata="this.previousElementSibling.remove()" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm\\'>Media no disponible</div>'"></div>`
-          : `<div class="relative"><div class="w-full h-40 bg-gray-200 rounded-xl animate-pulse"></div><img src="${esc(tip.image_url)}" loading="lazy" class="w-full h-40 object-cover rounded-xl absolute inset-0" alt="" onload="this.previousElementSibling.remove();this.style.opacity=1" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm\\'>Imagen no disponible</div>'" style="opacity:0;transition:opacity .3s"></div>`;
+          ? `<video src="${esc(tip.image_url)}" class="w-full object-cover" style="max-height:200px" preload="metadata" autoplay muted loop playsinline></video>`
+          : `<img src="${esc(tip.image_url)}" loading="lazy" class="w-full object-cover" style="max-height:200px" alt="">`;
         hero.classList.remove('hidden');
       }
       // Update tab label
@@ -699,16 +707,13 @@
       if (sub.title) document.getElementById('mec-sub-heading').textContent = sub.title;
       if (sub.description) document.getElementById('mec-sub-subtext').textContent = sub.description;
       if (sub.button_color) document.getElementById('sub-btn').style.background = sub.button_color;
-      if (sub.card_color) {
-        const paySubCard = document.getElementById('pay-sub').querySelector('.glass');
-        if (paySubCard) paySubCard.style.background = sub.card_color;
-      }
+      if (sub.card_color) { const c = document.getElementById('pay-sub').querySelector('.glass'); if (c) c.style.background = sub.card_color; }
       if (sub.image_url) {
         const hero = document.getElementById('mec-sub-hero');
         const isVid = /\.(mp4|webm|mov)$/i.test(sub.image_url);
         hero.innerHTML = isVid
-          ? `<div class="relative"><div class="w-full h-40 bg-gray-200 rounded-xl animate-pulse"></div><video src="${esc(sub.image_url)}" class="w-full h-40 object-cover rounded-xl absolute inset-0" preload="metadata" autoplay muted loop playsinline onloadeddata="this.previousElementSibling.remove()" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm\\'>Media no disponible</div>'"></div>`
-          : `<div class="relative"><div class="w-full h-40 bg-gray-200 rounded-xl animate-pulse"></div><img src="${esc(sub.image_url)}" loading="lazy" class="w-full h-40 object-cover rounded-xl absolute inset-0" alt="" onload="this.previousElementSibling.remove();this.style.opacity=1" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm\\'>Imagen no disponible</div>'" style="opacity:0;transition:opacity .3s"></div>`;
+          ? `<video src="${esc(sub.image_url)}" class="w-full object-cover" style="max-height:200px" preload="metadata" autoplay muted loop playsinline></video>`
+          : `<img src="${esc(sub.image_url)}" loading="lazy" class="w-full object-cover" style="max-height:200px" alt="">`;
         hero.classList.remove('hidden');
       }
       if (sub.title) document.getElementById('pay-tab-sub').textContent = sub.title;
@@ -733,8 +738,8 @@
         const hero = document.getElementById('mec-meta-hero');
         const isVid = /\.(mp4|webm|mov)$/i.test(meta.image_url);
         hero.innerHTML = isVid
-          ? `<div class="relative"><div class="w-full h-40 bg-gray-200 rounded-xl animate-pulse"></div><video src="${esc(meta.image_url)}" class="w-full h-40 object-cover rounded-xl absolute inset-0" preload="metadata" autoplay muted loop playsinline onloadeddata="this.previousElementSibling.remove()" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm\\'>Media no disponible</div>'"></div>`
-          : `<div class="relative"><div class="w-full h-40 bg-gray-200 rounded-xl animate-pulse"></div><img src="${esc(meta.image_url)}" loading="lazy" class="w-full h-40 object-cover rounded-xl absolute inset-0" alt="" onload="this.previousElementSibling.remove();this.style.opacity=1" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-40 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm\\'>Imagen no disponible</div>'" style="opacity:0;transition:opacity .3s"></div>`;
+          ? `<video src="${esc(meta.image_url)}" class="w-full object-cover" style="max-height:200px" preload="metadata" autoplay muted loop playsinline></video>`
+          : `<img src="${esc(meta.image_url)}" loading="lazy" class="w-full object-cover" style="max-height:200px" alt="">`;
         hero.classList.remove('hidden');
       }
     }
