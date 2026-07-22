@@ -1841,7 +1841,7 @@
             if (sec.visible && el.getAttribute('data-hidden-by-layout')) { el.removeAttribute('data-hidden-by-layout'); el.style.display = ''; }
             if (sec.id === 'cover' && !sec.visible) coverVis = false;
             if (sec.id === 'payments') {
-              doc.querySelectorAll('.pay-panel').forEach(p => container.appendChild(p));
+              doc.querySelectorAll('.pay-panel').forEach(p => { container.appendChild(p); if (!sec.visible) p.style.display = 'none'; else p.style.display = ''; });
             }
           });
           // Determine cover/header position and set marginTop
@@ -2203,6 +2203,7 @@
         const sec = personaLayout.sections.find(s => s.id === el.dataset.sectionId);
         if (sec) sec.order = i;
       });
+      initSectionSortable();
       personaTrack();
     }
 
@@ -2273,6 +2274,34 @@
       });
       container.addEventListener('drop', e => {
         e.preventDefault();
+      });
+
+      // Touch support for mobile drag-and-drop
+      container.addEventListener('touchstart', e => {
+        const item = e.target.closest('[data-section-id]');
+        if (!item || e.target.closest('button')) return;
+        _sortDragEl = item;
+        _sortDragEl.style.opacity = '0.5';
+        _sortDragEl._touchY = e.touches[0].clientY;
+      }, { passive: true });
+      container.addEventListener('touchmove', e => {
+        if (!_sortDragEl) return;
+        e.preventDefault();
+        const y = e.touches[0].clientY;
+        const target = document.elementFromPoint(e.touches[0].clientX, y)?.closest('[data-section-id]');
+        if (target && target !== _sortDragEl) {
+          const rect = target.getBoundingClientRect();
+          const mid = rect.top + rect.height / 2;
+          if (y < mid) container.insertBefore(_sortDragEl, target);
+          else container.insertBefore(_sortDragEl, target.nextSibling);
+        }
+      }, { passive: false });
+      container.addEventListener('touchend', () => {
+        if (_sortDragEl) {
+          _sortDragEl.style.opacity = '1';
+          _sortDragEl = null;
+          _readSortOrder();
+        }
       });
     }
 
@@ -2394,8 +2423,10 @@
       // Save branding colors
       const { textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, theme } = brandState;
       if (getContrast(textColor, sectionBg) < 3) {
-        if (!isAutosave) showToast('El texto no es visible sobre el fondo de secciones. Ajusta los colores.', 'error');
-        return;
+        if (!isAutosave) {
+          showToast('El texto no es visible sobre el fondo de secciones. Ajusta los colores.', 'error');
+          return;
+        }
       }
       const colors = { theme, textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia };
 
