@@ -116,48 +116,48 @@
       <!-- Stats Row -->
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('creators')">
-          <p class="text-gray-500 text-xs uppercase tracking-wider">Total Creators</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="personas">👥</span> Total Creators</p>
           <p id="stat-total" class="text-3xl font-bold text-gray-900 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('verification')">
-          <p class="text-gray-500 text-xs uppercase tracking-wider">Pending Review</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="reloj">⏳</span> Pending Review</p>
           <p id="stat-pending-review" class="text-3xl font-bold text-yellow-600 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('verification')">
-          <p class="text-gray-500 text-xs uppercase tracking-wider">Verified</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="verificado">✅</span> Verified</p>
           <p id="stat-verified" class="text-3xl font-bold text-green-600 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('reports')">
-          <p class="text-gray-500 text-xs uppercase tracking-wider">Open Reports</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="alerta">⚠️</span> Open Reports</p>
           <p id="stat-reports" class="text-3xl font-bold text-red-500 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
-          <p class="text-gray-500 text-xs uppercase tracking-wider">Platform Revenue</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="grafico">📈</span> Platform Revenue</p>
           <p id="stat-revenue" class="text-3xl font-bold text-emerald-600 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
-          <p class="text-gray-500 text-xs uppercase tracking-wider">Available Balance</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="billetera">💰</span> Available Balance</p>
           <p id="stat-balance" class="text-3xl font-bold text-creo-purple mt-1">-</p>
         </div>
       </div>
 
       <!-- Tabs -->
       <div class="flex space-x-1 bg-gray-100 p-1 rounded-xl border border-gray-200 transition-colors overflow-x-auto max-w-full sticky top-[57px] z-[5]" style="scrollbar-width:thin;-webkit-overflow-scrolling:touch">
-        <button onclick="showTab('verification')" id="tab-verification" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-creo-purple text-white transition relative">Verification<span id="badge-verification" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('creators')" id="tab-creators" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">Creators</button>
-        <button onclick="showTab('transactions')" id="tab-transactions" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">Transactions</button>
+        <button onclick="showTab('verification')" id="tab-verification" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-creo-purple text-white transition relative">🛡️ Verification<span id="badge-verification" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('creators')" id="tab-creators" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">👥 Creators</button>
+        <button onclick="showTab('transactions')" id="tab-transactions" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">💳 Transactions</button>
         <button onclick="showTab('accounts')" id="tab-accounts" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">Stripe Accounts</button>
-        <button onclick="showTab('links')" id="tab-links" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">Quick Links</button>
-        <button onclick="showTab('allusers')" id="tab-allusers" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">All Users</button>
-        <button onclick="showTab('metareviews')" id="tab-metareviews" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">Meta Reviews<span id="badge-metareviews" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('dealpayouts')" id="tab-dealpayouts" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">Deal Payouts<span id="badge-dealpayouts" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('reports')" id="tab-reports" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">Reports<span id="badge-reports" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('announcements')" id="tab-announcements" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">Announcements</button>
-        <button onclick="showTab('moderation')" id="tab-moderation" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">Moderation<span id="badge-moderation" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('manipulation')" id="tab-manipulation" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">Anti-Abuse<span id="badge-manipulation" class="hidden absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('fairness')" id="tab-fairness" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">Fairness</button>
-        <button onclick="showTab('featureflags')" id="tab-featureflags" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">Feature Flags</button>
-        <button onclick="showTab('monitoring')" id="tab-monitoring" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">Monitoring</button>
+        <button onclick="showTab('links')" id="tab-links" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">🔗 Quick Links</button>
+        <button onclick="showTab('allusers')" id="tab-allusers" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">👤 All Users</button>
+        <button onclick="showTab('metareviews')" id="tab-metareviews" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">🎯 Meta Reviews<span id="badge-metareviews" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('dealpayouts')" id="tab-dealpayouts" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">💰 Deal Payouts<span id="badge-dealpayouts" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('reports')" id="tab-reports" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">🚩 Reports<span id="badge-reports" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('announcements')" id="tab-announcements" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">📢 Announcements</button>
+        <button onclick="showTab('moderation')" id="tab-moderation" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">⚖️ Moderation<span id="badge-moderation" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('manipulation')" id="tab-manipulation" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">🛡️ Anti-Abuse<span id="badge-manipulation" class="hidden absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('fairness')" id="tab-fairness" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">⚖️ Fairness</button>
+        <button onclick="showTab('featureflags')" id="tab-featureflags" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">🚩 Feature Flags</button>
+        <button onclick="showTab('monitoring')" id="tab-monitoring" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">📊 Monitoring</button>
         <button onclick="showTab('stripe')" id="tab-stripe" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
           Stripe

@@ -55,13 +55,13 @@
 
   <!-- Deals grid: 3 cols desktop, 1 col mobile -->
   <div id="deals-grid" class="px-4 pb-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-    <div class="text-center text-gray-400 py-12 col-span-full" data-i18n="cargando">Cargando deals...</div>
+    <div class="text-center text-gray-400 py-12 col-span-full" data-i18n="cargando"><span aria-label="cargando">⏳</span> Cargando deals...</div>
   </div>
 
   <!-- Empty state -->
   <div id="no-deals" class="hidden text-center py-16 px-4">
     <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-    <p class="text-gray-500 font-semibold" data-i18n="todosDeals">No hay deals disponibles</p>
+    <p class="text-gray-500 font-semibold" data-i18n="todosDeals"><span aria-label="maletin">💼</span> No hay deals disponibles</p>
     <p class="text-gray-400 text-sm mt-1">Las marcas publicarán oportunidades pronto</p>
   </div>
 
@@ -71,7 +71,7 @@
     <div class="absolute inset-x-0 bottom-0 top-4 md:top-10 bg-white rounded-t-3xl overflow-y-auto shadow-2xl">
       <div class="max-w-2xl mx-auto p-5 pb-8">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-bold text-creo-purple" data-i18n="publicarDeal">Publicar Brand Deal</h2>
+          <h2 class="text-xl font-bold text-creo-purple" data-i18n="publicarDeal"><span aria-label="deal">🤝</span> Publicar Brand Deal</h2>
           <button onclick="closePostDeal()" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
@@ -358,7 +358,7 @@
         </div>
         <div class="flex items-center gap-1 text-xs text-creo-mint font-semibold">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-          <span data-i18n="chat">Encriptado</span>
+          <span data-i18n="chat">🔒 Encriptado</span>
         </div>
       </div>
 
@@ -384,7 +384,7 @@
       <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         <div class="text-center text-xs text-gray-400 py-4">
           <svg class="w-8 h-8 mx-auto mb-2 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-          <span data-i18n="chat">Mensajes encriptados. Solo tú y la otra parte pueden leerlos.</span>
+          <span data-i18n="chat">🔐 Mensajes encriptados. Solo tú y la otra parte pueden leerlos.</span>
         </div>
       </div>
 
@@ -407,7 +407,7 @@
         </div>
         <button onclick="sendTratoHecho()" class="w-full bg-gradient-to-r from-creo-mint to-creo-mintDark text-creo-purple py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
           <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-          <span data-i18n="tratoHecho">Trato Hecho</span>
+          <span data-i18n="tratoHecho">🤝 Trato Hecho</span>
         </button>
         <p class="text-[11px] text-gray-400 mt-1.5 text-center">5% comisión de plataforma. El creador recibe el 95%.</p>
       </div>

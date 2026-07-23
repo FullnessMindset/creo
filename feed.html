@@ -163,7 +163,7 @@
 
   <!-- Welcome Info Card (first visit) -->
   <div id="creo-welcome" class="creo-info-card" style="display:none;">
-    <h2>Bienvenido a Creadores</h2>
+    <h2><span aria-label="bienvenido">👋</span> Bienvenido a Creadores</h2>
     <p style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.6;">Este es tu feed de creadores. Aquí descubres contenido original y apoyas directamente a quienes admiras.</p>
     <div style="text-align:left;margin-top:12px;padding:12px;background:rgba(51,240,176,0.08);border-radius:10px;border:1px solid rgba(51,240,176,0.2);">
       <p style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:6px;"><strong style="color:#33f0b0;">↔ Horizontal</strong> — más videos del mismo creador</p>
@@ -566,7 +566,7 @@
       const post = getCurrentPost();
       if (!post) return;
       enterSplitMode('comments');
-      document.getElementById('creo-panel-title').textContent = 'Comentarios';
+      document.getElementById('creo-panel-title').textContent = '💬 Comentarios';
 
       const body = document.getElementById('creo-panel-body');
       body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="width:24px;height:24px;border:3px solid #33f0b0;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
@@ -581,7 +581,7 @@
       body.innerHTML = `
         <div style="display:flex;flex-direction:column;height:100%;">
           <div class="creo-comments-scroll" id="creo-comments-scroll">
-            ${comments.length === 0 ? '<div style="flex:0 0 280px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px;">Sin comentarios aún. ¡Sé el primero!</div>' : ''}
+            ${comments.length === 0 ? '<div style="flex:0 0 280px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px;">💬 Sin comentarios aún. ¡Sé el primero!</div>' : ''}
             ${comments.map(c => renderCreoComment(c, post.id)).join('')}
           </div>
           <div style="padding:8px 12px;border-top:1px solid #e5e7eb;display:flex;gap:8px;flex-shrink:0;">
@@ -743,7 +743,7 @@
       const list = document.getElementById('tp-metas-list');
       if (!list) return;
       if (!metas || metas.length === 0) {
-        list.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:12px;padding:20px;">No hay metas publicadas aún</p>';
+        list.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:12px;padding:20px;">📭 No hay metas publicadas aún</p>';
         return;
       }
       const isPlatform = creator.id === '67133679-4e5f-49aa-8a22-43af41b917ee';

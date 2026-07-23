@@ -41,7 +41,7 @@
   <div class="fixed top-[60px] lg:top-0 left-0 lg:left-[220px] right-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-200 dark-aware-header">
     <div class="max-w-2xl mx-auto px-4 py-3 space-y-3">
       <div class="flex items-center justify-between">
-        <h1 class="text-lg font-bold tracking-[0.15em] text-creo-purple" data-i18n="explorarHeader">EXPLORAR</h1>
+        <h1 class="text-lg font-bold tracking-[0.15em] text-creo-purple" data-i18n="explorarHeader"><span aria-label="brujula">🧭</span> EXPLORAR</h1>
       </div>
       <!-- Search -->
       <div class="relative">
@@ -58,13 +58,13 @@
     <div id="stories-loading" class="text-center py-8">
       <div class="inline-block w-6 h-6 border-2 border-creo-mint border-t-transparent rounded-full animate-spin"></div>
     </div>
-    <p id="no-stories" class="hidden text-center text-gray-400 text-xs py-8" data-i18n="sinHistoriasPublicadas">Aún no hay historias publicadas</p>
+    <p id="no-stories" class="hidden text-center text-gray-400 text-xs py-8" data-i18n="sinHistoriasPublicadas"><span aria-label="libro">📖</span> Aún no hay historias publicadas</p>
 
     <!-- Search results -->
     <div id="search-results" class="hidden px-4 space-y-3">
       <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3" data-i18n="resultados">Resultados</h2>
       <div id="search-results-list" class="space-y-3"></div>
-      <p id="no-search" class="hidden text-center text-gray-400 text-xs py-8" data-i18n="sinResultadosBusqueda">No se encontraron resultados</p>
+      <p id="no-search" class="hidden text-center text-gray-400 text-xs py-8" data-i18n="sinResultadosBusqueda"><span aria-label="buscar">🔍</span> No se encontraron resultados</p>
     </div>
   </div>
 
@@ -78,7 +78,7 @@
     <div id="story-comments-panel" class="fixed bottom-0 left-0 right-0 z-[110] hidden transform translate-y-full transition-transform duration-300" style="max-height:60vh">
       <div class="bg-gray-900 rounded-t-2xl border-t border-gray-700 flex flex-col" style="max-height:60vh">
         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-          <h3 class="text-white font-bold text-sm" data-i18n="comentarios">Comentarios</h3>
+          <h3 class="text-white font-bold text-sm" data-i18n="comentarios"><span aria-label="comentarios">💬</span> Comentarios</h3>
           <button onclick="closeStoryComments()" class="text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
         <div id="story-comments-list" class="flex-1 overflow-y-auto px-4 py-3 space-y-3" style="max-height:40vh"></div>

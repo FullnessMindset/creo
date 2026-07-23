@@ -198,7 +198,7 @@
 
     <!-- Not Verified Banner -->
     <div id="not-verified-banner" class="hidden glass-mint p-4 rounded-xl text-center">
-      <p class="text-sm text-amber-800 font-semibold" data-i18n="noVerificadoTitulo">Este creador aún no ha sido verificado</p>
+      <p class="text-sm text-amber-800 font-semibold" data-i18n="noVerificadoTitulo"><span aria-label="advertencia">⚠️</span> Este creador aún no ha sido verificado</p>
       <p class="text-xs text-amber-700 mt-1" data-i18n="noVerificadoSubtext">Los pagos estarán disponibles una vez sea aprobado.</p>
     </div>
 
@@ -282,7 +282,7 @@
       <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeReport()"></div>
       <div class="absolute inset-0 flex items-end sm:items-center justify-center p-4">
         <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl p-6 space-y-4 animate-slide-up">
-          <h3 class="text-lg font-bold text-gray-900 text-center" data-i18n="reportarCreador">Reportar Creador</h3>
+          <h3 class="text-lg font-bold text-gray-900 text-center" data-i18n="reportarCreador"><span aria-label="bandera">🚩</span> Reportar Creador</h3>
           <p class="text-xs text-gray-500 text-center" data-i18n="reportarSubtext">Ayúdanos a mantener la comunidad segura. Tu reporte es confidencial.</p>
           <select id="report-reason" class="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900">
             <option value="" data-i18n="seleccionaMotivo">Selecciona un motivo</option>
@@ -389,9 +389,9 @@
 
     <!-- Payment Type Selector — Glassmorphism -->
     <div id="payment-tabs" data-section="payments" class="flex glass rounded-xl overflow-hidden">
-      <button onclick="showPayment('tip')" id="pay-tab-tip" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400" data-i18n="yoCreoEnTi">Yo Creo en Ti</button>
-      <button onclick="showPayment('metas')" id="pay-tab-metas" class="flex-1 py-3 text-xs font-semibold text-center transition pay-tab-active" data-i18n="miMeta">Mi Meta</button>
-      <button onclick="showPayment('sub')" id="pay-tab-sub" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400" data-i18n="apoyoFull">Apoyo Full</button>
+      <button onclick="showPayment('tip')" id="pay-tab-tip" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400" data-i18n="yoCreoEnTi"><span aria-label="corazon">💚</span> Yo Creo en Ti</button>
+      <button onclick="showPayment('metas')" id="pay-tab-metas" class="flex-1 py-3 text-xs font-semibold text-center transition pay-tab-active" data-i18n="miMeta"><span aria-label="meta">🎯</span> Mi Meta</button>
+      <button onclick="showPayment('sub')" id="pay-tab-sub" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400" data-i18n="apoyoFull"><span aria-label="estrella">⭐</span> Apoyo Full</button>
       <button onclick="showPayment('meta-support')" id="pay-tab-meta-support" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400 hidden" data-i18n="desdeMeta">🎯 Desde Meta</button>
     </div>
 
@@ -437,12 +437,12 @@
         <div id="pay-metas-list" class="space-y-4"></div>
         <div id="pay-metas-empty-visitor" class="hidden text-center space-y-2 py-4">
           <svg class="w-12 h-12 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasPublicadas">No hay metas publicadas aún</p>
+          <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasPublicadas"><span aria-label="vacio">📭</span> No hay metas publicadas aún</p>
           <p id="pay-metas-encourage" class="text-xs text-gray-400"></p>
         </div>
         <div id="pay-metas-empty-owner" class="hidden text-center space-y-3 py-4">
           <svg class="w-12 h-12 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasOwner">Aún no has publicado ninguna meta</p>
+          <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasOwner"><span aria-label="vacio">📭</span> Aún no has publicado ninguna meta</p>
           <p class="text-xs text-gray-400" data-i18n="noMetasOwnerSub">Comparte tu meta con la comunidad de CREO y recibe apoyo</p>
           <a href="index.html?panel=1" onclick="localStorage.setItem('creo-open-tab','metas')" class="inline-block mt-2 px-6 py-2.5 bg-creo-purple hover:bg-creo-light text-white text-sm font-bold rounded-xl transition" data-i18n="crearPrimeraMeta">Crear mi primera Meta</a>
         </div>
@@ -499,7 +499,7 @@
           </div>
           <button onclick="processSubscription()" id="sub-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
             <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-            <span data-i18n="suscribirme">Suscribirme Mensualmente</span>
+            <span data-i18n="suscribirme"><span aria-label="calendario">📅</span> Suscribirme Mensualmente</span>
           </button>
           <p class="text-xs text-gray-400 text-center" data-i18n="cancelarEnCualquier">Puedes cancelar en cualquier momento</p>
         </div>

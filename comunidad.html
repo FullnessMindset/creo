@@ -60,12 +60,12 @@
 
     <!-- Category tabs -->
     <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-      <button onclick="setCategory('general')" id="cat-general" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-creo-purple text-white" data-i18n="muro">Muro</button>
-      <button onclick="setCategory('cine_local')" id="cat-cine_local" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="cineLocal">Cine Local</button>
-      <button onclick="setCategory('galeria')" id="cat-galeria" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="galeria">Galería</button>
-      <button onclick="setCategory('biblioteca')" id="cat-biblioteca" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="biblioteca">Biblioteca</button>
-      <button onclick="setCategory('musica')" id="cat-musica" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="musica">Música</button>
-      <button onclick="setCategory('eventos')" id="cat-eventos" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="eventos">Eventos</button>
+      <button onclick="setCategory('general')" id="cat-general" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-creo-purple text-white" data-i18n="muro"><span aria-label="muro">📌</span> Muro</button>
+      <button onclick="setCategory('cine_local')" id="cat-cine_local" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="cineLocal"><span aria-label="cine">🎬</span> Cine Local</button>
+      <button onclick="setCategory('galeria')" id="cat-galeria" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="galeria"><span aria-label="galeria">🖼️</span> Galería</button>
+      <button onclick="setCategory('biblioteca')" id="cat-biblioteca" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="biblioteca"><span aria-label="biblioteca">📚</span> Biblioteca</button>
+      <button onclick="setCategory('musica')" id="cat-musica" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="musica"><span aria-label="musica">🎵</span> Música</button>
+      <button onclick="setCategory('eventos')" id="cat-eventos" class="cat-pill flex-shrink-0 px-4 py-2 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-i18n="eventos"><span aria-label="eventos">📅</span> Eventos</button>
     </div>
 
     <!-- Compose box (auth only) -->
@@ -187,8 +187,8 @@
         Cargando...
       </div>
     </div>
-    <p id="feed-empty" class="hidden text-center text-gray-400 text-sm py-12">Aún no hay publicaciones. ¡Sé el primero en compartir!</p>
-    <div id="feed-end" class="hidden text-center text-gray-300 text-xs py-6">— Has visto todo —</div>
+    <p id="feed-empty" class="hidden text-center text-gray-400 text-sm py-12"><span aria-label="megafono">📢</span> Aún no hay publicaciones. ¡Sé el primero en compartir!</p>
+    <div id="feed-end" class="hidden text-center text-gray-300 text-xs py-6">— <span aria-label="listo">✅</span> Has visto todo —</div>
   </div>
 
   <!-- Compose Modal -->
@@ -197,7 +197,7 @@
     <div class="fixed inset-x-0 bottom-0 z-[91] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl max-h-[85vh] overflow-y-auto" id="compose-panel">
       <div class="p-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
         <button onclick="closeCompose()" class="text-gray-400 hover:text-gray-600 text-sm" data-i18n="cancelar">Cancelar</button>
-        <span class="font-bold text-sm text-gray-900" data-i18n="publicar">Nueva publicación</span>
+        <span class="font-bold text-sm text-gray-900" data-i18n="publicar"><span aria-label="escribir">✏️</span> Nueva publicación</span>
         <button onclick="submitPost()" id="compose-submit" class="bg-creo-purple text-white font-bold px-5 py-2 rounded-full text-sm hover:bg-creo-light transition disabled:opacity-50" disabled data-i18n="publicar">Publicar</button>
       </div>
       <div class="p-4 space-y-4">
@@ -272,7 +272,7 @@
     <div class="compose-overlay" onclick="closeComments()"></div>
     <div class="fixed inset-x-0 bottom-0 z-[96] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col">
       <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-        <span class="font-bold text-sm text-gray-900" data-i18n="comentar">Comentarios</span>
+        <span class="font-bold text-sm text-gray-900" data-i18n="comentar"><span aria-label="comentarios">💬</span> Comentarios</span>
         <button onclick="closeComments()" class="text-gray-400 hover:text-gray-600">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -293,7 +293,7 @@
     <div class="compose-overlay" onclick="closeShareModal()"></div>
     <div class="fixed inset-x-0 bottom-0 z-[96] max-w-2xl mx-auto bg-white rounded-t-2xl shadow-2xl p-4 space-y-3">
       <div class="flex items-center justify-between">
-        <span class="font-bold text-sm text-gray-900" data-i18n="compartir">Compartir publicación</span>
+        <span class="font-bold text-sm text-gray-900" data-i18n="compartir"><span aria-label="compartir">🔗</span> Compartir publicación</span>
         <button onclick="closeShareModal()" class="text-gray-400 hover:text-gray-600">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>

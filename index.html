@@ -1134,8 +1134,8 @@
             <h4 class="text-sm font-semibold text-gray-700 mb-3">Creadores destacados (<span id="creoellos-count">0</span>/10)</h4>
             <div id="creoellos-selected" class="space-y-2"></div>
             <div id="creoellos-empty" class="text-center py-6">
-              <p class="text-xs text-gray-400">No has seleccionado ningún creador aún.</p>
-              <p class="text-xs text-gray-400 mt-1">Busca arriba para agregar creadores a tu sección.</p>
+              <p class="text-xs text-gray-400">🤝 No has seleccionado ningún creador aún.</p>
+              <p class="text-xs text-gray-400 mt-1">🔍 Busca arriba para agregar creadores a tu sección.</p>
             </div>
           </div>
         </div>
@@ -3636,7 +3636,7 @@
       const list = document.getElementById('posts-list');
       if (!data || data.length === 0) {
         myPostsCache = [];
-        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Aún no tienes publicaciones</p>';
+        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">📭 Aún no tienes publicaciones</p>';
         return;
       }
       myPostsCache = data;
@@ -4078,7 +4078,7 @@
       const list = document.getElementById('my-stories-list');
       const countEl = document.getElementById('stories-count');
       if (!data || data.length === 0) {
-        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-6">Aún no has publicado historias</p>';
+        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-6">📖 Aún no has publicado historias</p>';
         if (countEl) countEl.textContent = '';
         myStoriesCache = [];
         return;
@@ -4220,7 +4220,7 @@
       if (!currentUser) return;
       const { data } = await sb.from('business_links').select('*').eq('creator_id', currentUser.id).order('sort_order', { ascending: true });
       const list = document.getElementById('my-biz-list');
-      if (!data || data.length === 0) { myBizLinksCache = []; list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">No tienes enlaces de negocio aún.</p>'; return; }
+      if (!data || data.length === 0) { myBizLinksCache = []; list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">🔗 No tienes enlaces de negocio aún.</p>'; return; }
       myBizLinksCache = data;
       list.innerHTML = data.map((l, i) => `<div class="bg-white p-4 rounded-xl border border-gray-200 flex gap-3 items-center">
         ${l.image_url ? `<img src="${esc(l.image_url)}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0">` : `<div class="w-12 h-12 rounded-lg bg-creo-purple/10 flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/></svg></div>`}
@@ -4693,7 +4693,7 @@
         ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 50);
 
         if (allTransactions.length === 0) {
-          historyContainer.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">Aún no tienes ingresos</p><p class="text-xs text-gray-300 mt-1">Comparte tu perfil para comenzar a recibir apoyo</p></div>';
+          historyContainer.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">💰 Aún no tienes ingresos</p><p class="text-xs text-gray-300 mt-1">Comparte tu perfil para comenzar a recibir apoyo</p></div>';
           return;
         }
 
@@ -4737,7 +4737,7 @@
         if (!res.ok) throw new Error(data.error);
         const supporters = data.supporters || [];
         if (supporters.length === 0) {
-          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">Aún no tienes suscriptores</p><p class="text-xs text-gray-300 mt-1">Cuando alguien se suscriba a tu Apoyo Full, aparecerá aquí</p></div>';
+          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">👥 Aún no tienes suscriptores</p><p class="text-xs text-gray-300 mt-1">Cuando alguien se suscriba a tu Apoyo Full, aparecerá aquí</p></div>';
           summary.classList.add('hidden');
           return;
         }
@@ -4781,7 +4781,7 @@
         if (!res.ok) throw new Error(data.error);
         const subs = data.subscriptions || [];
         if (subs.length === 0) {
-          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">No tienes suscripciones activas</p><p class="text-xs text-gray-300 mt-1">Suscríbete a un creador desde su perfil con Apoyo Full</p></div>';
+          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">💜 No tienes suscripciones activas</p><p class="text-xs text-gray-300 mt-1">Suscríbete a un creador desde su perfil con Apoyo Full</p></div>';
           return;
         }
         container.innerHTML = subs.map(s => {
@@ -4844,7 +4844,7 @@
         ].sort((a, b) => new Date(b.date) - new Date(a.date));
 
         if (allPayments.length === 0) {
-          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">No tienes pagos registrados</p><p class="text-xs text-gray-300 mt-1">Apoya a un creador desde su perfil</p></div>';
+          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">📋 No tienes pagos registrados</p><p class="text-xs text-gray-300 mt-1">Apoya a un creador desde su perfil</p></div>';
           summary.classList.add('hidden');
           return;
         }

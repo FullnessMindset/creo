@@ -1783,11 +1783,15 @@ function getEmbedHTML(url, type, aspectClass) {
 function showToast(message, type) {
   const existing = document.getElementById('creo-toast');
   if (existing) existing.remove();
-  const colors = { success: 'bg-green-600', error: 'bg-red-600', info: 'bg-creo-purple' };
+  const colors = { success: 'bg-green-600', error: 'bg-red-600', info: 'bg-creo-purple', warning: 'bg-amber-600' };
+  const emojis = { success: '✅ ', error: '❌ ', info: 'ℹ️ ', warning: '⚠️ ' };
+  const prefix = emojis[type] || '';
   const toast = document.createElement('div');
   toast.id = 'creo-toast';
   toast.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[500] px-6 py-3 rounded-xl text-white text-sm font-semibold shadow-xl transition-all duration-300 ${colors[type] || colors.info}`;
-  toast.textContent = message;
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+  toast.textContent = prefix + message;
   document.body.appendChild(toast);
   setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
 }
