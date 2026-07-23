@@ -132,6 +132,8 @@
         <button onclick="showTab('earnings');closeHerramientas()" id="tab-earnings" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💰 Ingresos</button>
         <button onclick="showTab('subscribers');closeHerramientas()" id="tab-subscribers" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">👥 Suscriptores</button>
         <button onclick="showTab('account');closeHerramientas()" id="tab-account" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">⚙️ Mi Cuenta</button>
+        <div class="border-t border-gray-100 my-1"></div>
+        <button onclick="showTab('cfh');closeHerramientas()" id="tab-cfh" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">⚡ Creo Futuro Hoy</button>
       </div>
 
       <!-- TAB: Profile -->
@@ -1364,6 +1366,210 @@
         </div>
       </div>
 
+      <!-- TAB: Creo Futuro Hoy Content Manager -->
+      <div id="panel-cfh" class="tab-panel hidden space-y-4">
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+              <span class="text-xl">⚡</span> Creo Futuro Hoy
+            </h3>
+            <button onclick="showCfhForm()" class="bg-creo-purple hover:bg-creo-light text-white text-xs font-bold px-4 py-2 rounded-lg transition flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Nuevo Contenido
+            </button>
+          </div>
+
+          <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-[11px]">
+            <button onclick="cfhFilterCat(null)" data-cfhcat="" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-creo-purple text-white font-semibold whitespace-nowrap">Todos</button>
+            <button onclick="cfhFilterCat('music')" data-cfhcat="music" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">🎵 Music</button>
+            <button onclick="cfhFilterCat('books')" data-cfhcat="books" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">📚 Books</button>
+            <button onclick="cfhFilterCat('food')" data-cfhcat="food" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">🍽️ Food</button>
+            <button onclick="cfhFilterCat('health')" data-cfhcat="health" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">🏥 Health</button>
+            <button onclick="cfhFilterCat('fitness')" data-cfhcat="fitness" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">💪 Fitness</button>
+            <button onclick="cfhFilterCat('education')" data-cfhcat="education" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">🎓 Education</button>
+            <button onclick="cfhFilterCat('faith')" data-cfhcat="faith" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">✝️ Fe</button>
+          </div>
+
+          <div id="cfh-stats" class="grid grid-cols-3 gap-2 text-center">
+            <div class="bg-gray-50 rounded-lg p-2"><p class="text-lg font-black text-creo-purple" id="cfh-stat-total">0</p><p class="text-[10px] text-gray-400">Total</p></div>
+            <div class="bg-gray-50 rounded-lg p-2"><p class="text-lg font-black text-creo-purple" id="cfh-stat-views">0</p><p class="text-[10px] text-gray-400">Vistas</p></div>
+            <div class="bg-gray-50 rounded-lg p-2"><p class="text-lg font-black text-creo-purple" id="cfh-stat-likes">0</p><p class="text-[10px] text-gray-400">Likes</p></div>
+          </div>
+
+          <div id="cfh-my-content-list" class="space-y-3">
+            <p class="text-gray-400 text-sm text-center py-6">Cargando...</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-gray-900 text-sm flex items-center gap-2">📂 Mis Subcategorías</h4>
+            <button onclick="showCfhSubcatForm()" class="text-xs text-creo-purple font-semibold hover:underline">+ Agregar</button>
+          </div>
+          <div id="cfh-my-subcats" class="space-y-2">
+            <p class="text-gray-400 text-xs text-center py-4">Sin subcategorías</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CFH Create/Edit Form Modal -->
+      <div id="cfh-form-modal" class="fixed inset-0 z-[80] hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCfhForm()"></div>
+        <div class="absolute inset-x-2 top-4 bottom-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-xl bg-white rounded-2xl shadow-2xl overflow-y-auto z-10">
+          <div class="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10">
+            <h3 id="cfh-form-title" class="font-bold text-gray-900">Nuevo Contenido</h3>
+            <button onclick="closeCfhForm()" class="p-2 hover:bg-gray-100 rounded-lg transition">
+              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="p-4 space-y-4">
+            <input type="hidden" id="cfh-edit-id" value="">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Categoría <span class="text-red-500">*</span></label>
+                <select id="cfh-category" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" onchange="loadCfhSubcatsForForm()">
+                  <option value="music">🎵 Music</option>
+                  <option value="books">📚 Books</option>
+                  <option value="food">🍽️ Food</option>
+                  <option value="health">🏥 Health</option>
+                  <option value="fitness">💪 Fitness</option>
+                  <option value="education">🎓 Education</option>
+                  <option value="faith">✝️ Fe</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Tipo <span class="text-red-500">*</span></label>
+                <select id="cfh-content-type" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" onchange="toggleCfhTypeFields()">
+                  <option value="video">▶️ Video</option>
+                  <option value="book">📖 Libro</option>
+                  <option value="recipe">🍳 Receta</option>
+                  <option value="course">🎓 Curso</option>
+                  <option value="article">📝 Artículo</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Subcategoría</label>
+              <select id="cfh-subcategory" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+                <option value="">— Sin subcategoría —</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Título <span class="text-red-500">*</span></label>
+              <input id="cfh-title" type="text" placeholder="Título del contenido" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
+              <textarea id="cfh-description" rows="3" placeholder="Describe tu contenido..." class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple"></textarea>
+            </div>
+            <div id="cfh-video-fields" class="space-y-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">URL del Video</label>
+                <input id="cfh-video-url" type="url" placeholder="https://youtube.com/watch?v=..." class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1">Tipo de Video</label>
+                  <select id="cfh-video-type" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+                    <option value="youtube">YouTube</option>
+                    <option value="direct">Directo (MP4)</option>
+                    <option value="vimeo">Vimeo</option>
+                    <option value="tiktok">TikTok</option>
+                    <option value="instagram">Instagram</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1">Duración (seg)</label>
+                  <input id="cfh-duration" type="number" placeholder="120" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+                </div>
+              </div>
+            </div>
+            <div id="cfh-book-fields" class="hidden space-y-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">URL del Archivo (PDF/EPUB)</label>
+                <input id="cfh-book-url" type="url" placeholder="https://..." class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+                <p class="text-[10px] text-gray-400 mt-1">Sube tu archivo al bucket cfh-content en Supabase Storage</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Formato</label>
+                <select id="cfh-book-format" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+                  <option value="pdf">PDF</option>
+                  <option value="epub">EPUB</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">URL de Miniatura</label>
+              <input id="cfh-thumbnail" type="url" placeholder="https://..." class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+            </div>
+            <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-3">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="cfh-access" id="cfh-free" value="true" checked class="accent-creo-purple">
+                <span class="text-sm text-gray-700">🆓 Gratis</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="cfh-access" id="cfh-paid" value="false" class="accent-creo-purple">
+                <span class="text-sm text-gray-700">⭐ Premium (Apoyo Full)</span>
+              </label>
+            </div>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="cfh-allow-download" class="accent-creo-purple">
+              <span class="text-sm text-gray-700">📥 Permitir descarga</span>
+            </label>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Tags (separados por coma)</label>
+              <input id="cfh-tags" type="text" placeholder="guitarra, tutorial, básico" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Materiales Descargables</label>
+              <div id="cfh-materials-inputs" class="space-y-2"></div>
+              <button onclick="addCfhMaterialInput()" type="button" class="mt-2 text-xs text-creo-purple font-semibold hover:underline">+ Agregar material</button>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Estado</label>
+              <select id="cfh-status" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+                <option value="published">✅ Publicado</option>
+                <option value="draft">📝 Borrador</option>
+                <option value="archived">📦 Archivado</option>
+              </select>
+            </div>
+            <button onclick="saveCfhContent()" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 rounded-xl transition text-sm">
+              💾 Guardar Contenido
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CFH Subcategory Form Modal -->
+      <div id="cfh-subcat-modal" class="fixed inset-0 z-[80] hidden">
+        <div class="absolute inset-0 bg-black/50" onclick="closeCfhSubcatForm()"></div>
+        <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 max-w-md mx-auto bg-white rounded-2xl shadow-2xl p-6 space-y-4 z-10">
+          <h3 class="font-bold text-gray-900">Nueva Subcategoría</h3>
+          <input type="hidden" id="cfh-subcat-edit-id" value="">
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
+            <select id="cfh-subcat-category" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+              <option value="music">🎵 Music</option>
+              <option value="books">📚 Books</option>
+              <option value="food">🍽️ Food</option>
+              <option value="health">🏥 Health</option>
+              <option value="fitness">💪 Fitness</option>
+              <option value="education">🎓 Education</option>
+              <option value="faith">✝️ Fe</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Nombre</label>
+            <input id="cfh-subcat-name" type="text" placeholder="Ej: Recetas Veganas" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripción (opcional)</label>
+            <input id="cfh-subcat-desc" type="text" placeholder="Breve descripción" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+          </div>
+          <button onclick="saveCfhSubcat()" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 rounded-xl transition text-sm">💾 Guardar</button>
+        </div>
+      </div>
+
       <div id="panel-account" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
           <h3 class="font-bold text-gray-900 flex items-center gap-2">
@@ -1421,7 +1627,7 @@
       if (!e.target.closest('#tab-metas-group') && !e.target.closest('#metas-dropdown')) closeMetasDropdown();
     });
 
-    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'sounds', 'earnings', 'subscribers'];
+    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'sounds', 'earnings', 'subscribers', 'cfh'];
     const METAS_TABS = ['metas', 'mecenas-tip', 'mecenas-sub', 'my-subs', 'my-payments'];
 
     function toggleMetasDropdown() {
@@ -1459,6 +1665,7 @@
       if (tab === 'branding') { loadBrandingPanel(); loadPersonalizacion(); loadMecenasPanel('mecenas-meta'); initPersonaPreview(); }
       if (tab === 'creoellos') loadCreoEllosPanel();
       if (tab === 'sounds') renderSoundSettings();
+      if (tab === 'cfh') loadCfhPanel();
     }
 
     // ===== SOUND SETTINGS =====
@@ -4913,6 +5120,323 @@
         loadMySubscriptions();
       } catch (err) {
         showToast('Error al cancelar: ' + err.message, 'error');
+      }
+    }
+
+    // ===== CREO FUTURO HOY CONTENT MANAGEMENT =====
+    let cfhMyContent = [];
+    let cfhFilterCategory = null;
+
+    async function loadCfhPanel() {
+      const session = (await sb.auth.getSession()).data.session;
+      if (!session) return;
+      const headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token };
+      try {
+        const body = { action: 'my-content' };
+        if (cfhFilterCategory) body.category = cfhFilterCategory;
+        const res = await fetch(SUPABASE_FN_URL + '/cfh-content', { method: 'POST', headers, body: JSON.stringify(body) });
+        const { data, total } = await res.json();
+        cfhMyContent = data || [];
+
+        document.getElementById('cfh-stat-total').textContent = total || cfhMyContent.length;
+        document.getElementById('cfh-stat-views').textContent = cfhMyContent.reduce((s, c) => s + (c.view_count || 0), 0);
+        document.getElementById('cfh-stat-likes').textContent = cfhMyContent.reduce((s, c) => s + (c.like_count || 0), 0);
+
+        renderCfhContentList(cfhMyContent);
+        loadCfhMySubcats(headers);
+      } catch (e) {
+        document.getElementById('cfh-my-content-list').innerHTML = '<p class="text-red-400 text-sm text-center py-4">Error al cargar</p>';
+      }
+    }
+
+    function cfhFilterCat(cat) {
+      cfhFilterCategory = cat;
+      document.querySelectorAll('.cfh-cat-btn').forEach(b => {
+        const match = cat ? b.dataset.cfhcat === cat : !b.dataset.cfhcat;
+        b.classList.toggle('bg-creo-purple', match);
+        b.classList.toggle('text-white', match);
+        b.classList.toggle('bg-gray-100', !match);
+        b.classList.toggle('text-gray-600', !match);
+      });
+      loadCfhPanel();
+    }
+
+    const CFH_TYPE_ICONS = { video: '▶️', book: '📖', recipe: '🍳', course: '🎓', article: '📝' };
+    const CFH_STATUS_BADGES = {
+      published: '<span class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Publicado</span>',
+      draft: '<span class="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">Borrador</span>',
+      archived: '<span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">Archivado</span>',
+      flagged: '<span class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full">Reportado</span>'
+    };
+
+    function renderCfhContentList(items) {
+      const list = document.getElementById('cfh-my-content-list');
+      if (!items.length) {
+        list.innerHTML = '<div class="text-center py-8"><p class="text-3xl mb-2">🌱</p><p class="text-gray-400 text-sm">Sin contenido aún</p><p class="text-gray-500 text-xs mt-1">Publica tu primer contenido en Creo Futuro Hoy</p></div>';
+        return;
+      }
+      list.innerHTML = items.map(item => {
+        const icon = CFH_TYPE_ICONS[item.content_type] || '📁';
+        const badge = CFH_STATUS_BADGES[item.status] || '';
+        const freeBadge = item.is_free ? '<span class="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">Gratis</span>' : '<span class="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded">Premium</span>';
+        const subName = item.subcategory?.name ? `<span class="text-[10px] text-gray-400">/ ${escapeHtml(item.subcategory.name)}</span>` : '';
+        const date = new Date(item.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: '2-digit' });
+        return `<div class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+          <div class="w-16 h-12 rounded-lg bg-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center text-xl">
+            ${item.thumbnail_url ? `<img src="${escapeHtml(item.thumbnail_url)}" class="w-full h-full object-cover" alt="">` : icon}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-sm text-gray-900 truncate">${escapeHtml(item.title)}</p>
+            <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+              ${badge} ${freeBadge} ${subName}
+            </div>
+            <div class="flex items-center gap-3 mt-1 text-[10px] text-gray-400">
+              <span>${icon} ${item.content_type}</span>
+              <span>👁 ${item.view_count || 0}</span>
+              <span>❤️ ${item.like_count || 0}</span>
+              <span>💬 ${item.comment_count || 0}</span>
+              <span>${date}</span>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1 flex-shrink-0">
+            <button onclick="editCfhContent('${item.id}')" class="text-[10px] text-creo-purple font-semibold hover:underline">Editar</button>
+            <button onclick="deleteCfhContent('${item.id}','${escapeHtml(item.title).replace(/'/g, "\\'")}')" class="text-[10px] text-red-500 font-semibold hover:underline">Eliminar</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    async function loadCfhMySubcats(headers) {
+      if (!headers) {
+        const session = (await sb.auth.getSession()).data.session;
+        if (!session) return;
+        headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token };
+      }
+      try {
+        const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST', headers,
+          body: JSON.stringify({ action: 'list-subcategories', creator_id: currentUser.id })
+        });
+        const { data } = await res.json();
+        const container = document.getElementById('cfh-my-subcats');
+        if (!data || data.length === 0) {
+          container.innerHTML = '<p class="text-gray-400 text-xs text-center py-4">Sin subcategorías</p>';
+          return;
+        }
+        const CAT_ICONS = { music: '🎵', books: '📚', food: '🍽️', health: '🏥', fitness: '💪', education: '🎓', faith: '✝️' };
+        container.innerHTML = data.map(sc => `<div class="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+          <div>
+            <span class="text-xs font-semibold text-gray-700">${CAT_ICONS[sc.category] || '📂'} ${escapeHtml(sc.name)}</span>
+            ${sc.description ? `<span class="text-[10px] text-gray-400 ml-2">${escapeHtml(sc.description)}</span>` : ''}
+          </div>
+          <button onclick="deleteCfhSubcat('${sc.id}')" class="text-[10px] text-red-500 hover:underline">Eliminar</button>
+        </div>`).join('');
+      } catch (e) {}
+    }
+
+    // Form management
+    function showCfhForm(editItem) {
+      document.getElementById('cfh-edit-id').value = editItem?.id || '';
+      document.getElementById('cfh-form-title').textContent = editItem ? 'Editar Contenido' : 'Nuevo Contenido';
+      document.getElementById('cfh-category').value = editItem?.category || 'music';
+      document.getElementById('cfh-content-type').value = editItem?.content_type || 'video';
+      document.getElementById('cfh-title').value = editItem?.title || '';
+      document.getElementById('cfh-description').value = editItem?.description || '';
+      document.getElementById('cfh-video-url').value = editItem?.video_url || '';
+      document.getElementById('cfh-video-type').value = editItem?.video_type || 'youtube';
+      document.getElementById('cfh-duration').value = editItem?.duration_seconds || '';
+      document.getElementById('cfh-book-url').value = editItem?.book_file_url || '';
+      document.getElementById('cfh-book-format').value = editItem?.book_format || 'pdf';
+      document.getElementById('cfh-thumbnail').value = editItem?.thumbnail_url || '';
+      document.getElementById('cfh-free').checked = editItem ? editItem.is_free : true;
+      document.getElementById('cfh-paid').checked = editItem ? !editItem.is_free : false;
+      document.getElementById('cfh-allow-download').checked = editItem?.allow_download || false;
+      document.getElementById('cfh-tags').value = (editItem?.tags || []).join(', ');
+      document.getElementById('cfh-status').value = editItem?.status || 'published';
+      document.getElementById('cfh-materials-inputs').innerHTML = '';
+      if (editItem?.downloadable_urls?.length) {
+        editItem.downloadable_urls.forEach(m => addCfhMaterialInput(m.name, m.url));
+      }
+      toggleCfhTypeFields();
+      loadCfhSubcatsForForm();
+      if (editItem?.subcategory_id) {
+        setTimeout(() => { document.getElementById('cfh-subcategory').value = editItem.subcategory_id; }, 300);
+      }
+      document.getElementById('cfh-form-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCfhForm() {
+      document.getElementById('cfh-form-modal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function toggleCfhTypeFields() {
+      const type = document.getElementById('cfh-content-type').value;
+      document.getElementById('cfh-video-fields').classList.toggle('hidden', type === 'book');
+      document.getElementById('cfh-book-fields').classList.toggle('hidden', type !== 'book');
+    }
+
+    async function loadCfhSubcatsForForm() {
+      const cat = document.getElementById('cfh-category').value;
+      const select = document.getElementById('cfh-subcategory');
+      select.innerHTML = '<option value="">— Sin subcategoría —</option>';
+      try {
+        const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'list-subcategories', category: cat, creator_id: currentUser?.id })
+        });
+        const { data } = await res.json();
+        (data || []).forEach(sc => {
+          const opt = document.createElement('option');
+          opt.value = sc.id;
+          opt.textContent = sc.name;
+          select.appendChild(opt);
+        });
+      } catch (e) {}
+    }
+
+    let cfhMaterialCounter = 0;
+    function addCfhMaterialInput(name = '', url = '') {
+      cfhMaterialCounter++;
+      const id = cfhMaterialCounter;
+      const container = document.getElementById('cfh-materials-inputs');
+      const div = document.createElement('div');
+      div.className = 'flex gap-2 items-center';
+      div.id = 'cfh-mat-' + id;
+      div.innerHTML = `
+        <input type="text" placeholder="Nombre" value="${escapeHtml(name)}" class="cfh-mat-name flex-1 border border-gray-300 bg-gray-50 p-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-creo-purple">
+        <input type="url" placeholder="URL" value="${escapeHtml(url)}" class="cfh-mat-url flex-1 border border-gray-300 bg-gray-50 p-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-creo-purple">
+        <button onclick="document.getElementById('cfh-mat-${id}').remove()" class="text-red-400 hover:text-red-600 text-sm">✕</button>`;
+      container.appendChild(div);
+    }
+
+    async function saveCfhContent() {
+      const session = (await sb.auth.getSession()).data.session;
+      if (!session) { showToast('Inicia sesión', 'error'); return; }
+
+      const title = document.getElementById('cfh-title').value.trim();
+      if (!title) { showToast('El título es obligatorio', 'error'); return; }
+
+      const contentType = document.getElementById('cfh-content-type').value;
+      const materials = [];
+      document.querySelectorAll('#cfh-materials-inputs > div').forEach(div => {
+        const name = div.querySelector('.cfh-mat-name')?.value?.trim();
+        const url = div.querySelector('.cfh-mat-url')?.value?.trim();
+        if (name && url) materials.push({ name, url });
+      });
+
+      const tags = document.getElementById('cfh-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+      const editId = document.getElementById('cfh-edit-id').value;
+      const payload = {
+        action: editId ? 'update' : 'create',
+        category: document.getElementById('cfh-category').value,
+        subcategory_id: document.getElementById('cfh-subcategory').value || null,
+        title,
+        description: document.getElementById('cfh-description').value.trim(),
+        content_type: contentType,
+        video_url: contentType !== 'book' ? document.getElementById('cfh-video-url').value.trim() || null : null,
+        video_type: contentType !== 'book' ? document.getElementById('cfh-video-type').value : null,
+        duration_seconds: contentType !== 'book' ? parseInt(document.getElementById('cfh-duration').value) || null : null,
+        book_file_url: contentType === 'book' ? document.getElementById('cfh-book-url').value.trim() || null : null,
+        book_format: contentType === 'book' ? document.getElementById('cfh-book-format').value : null,
+        thumbnail_url: document.getElementById('cfh-thumbnail').value.trim() || null,
+        is_free: document.getElementById('cfh-free').checked,
+        allow_download: document.getElementById('cfh-allow-download').checked,
+        tags,
+        downloadable_urls: materials,
+        status: document.getElementById('cfh-status').value,
+      };
+      if (editId) payload.id = editId;
+
+      try {
+        const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.error) { showToast(result.error, 'error'); return; }
+        showToast(editId ? 'Contenido actualizado' : 'Contenido creado', 'success');
+        closeCfhForm();
+        loadCfhPanel();
+      } catch (e) {
+        showToast('Error al guardar', 'error');
+      }
+    }
+
+    async function editCfhContent(id) {
+      const item = cfhMyContent.find(c => c.id === id);
+      if (item) showCfhForm(item);
+    }
+
+    async function deleteCfhContent(id, title) {
+      if (!confirm('¿Eliminar "' + title + '"?')) return;
+      const session = (await sb.auth.getSession()).data.session;
+      if (!session) return;
+      try {
+        await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({ action: 'delete', id })
+        });
+        showToast('Contenido eliminado', 'success');
+        loadCfhPanel();
+      } catch (e) {
+        showToast('Error al eliminar', 'error');
+      }
+    }
+
+    // Subcategory management
+    function showCfhSubcatForm() {
+      document.getElementById('cfh-subcat-edit-id').value = '';
+      document.getElementById('cfh-subcat-name').value = '';
+      document.getElementById('cfh-subcat-desc').value = '';
+      document.getElementById('cfh-subcat-modal').classList.remove('hidden');
+    }
+    function closeCfhSubcatForm() {
+      document.getElementById('cfh-subcat-modal').classList.add('hidden');
+    }
+
+    async function saveCfhSubcat() {
+      const session = (await sb.auth.getSession()).data.session;
+      if (!session) { showToast('Inicia sesión', 'error'); return; }
+      const name = document.getElementById('cfh-subcat-name').value.trim();
+      if (!name) { showToast('El nombre es obligatorio', 'error'); return; }
+      try {
+        await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({
+            action: 'create-subcategory',
+            category: document.getElementById('cfh-subcat-category').value,
+            name,
+            description: document.getElementById('cfh-subcat-desc').value.trim() || null
+          })
+        });
+        showToast('Subcategoría creada', 'success');
+        closeCfhSubcatForm();
+        loadCfhPanel();
+      } catch (e) {
+        showToast('Error al crear subcategoría', 'error');
+      }
+    }
+
+    async function deleteCfhSubcat(id) {
+      if (!confirm('¿Eliminar esta subcategoría?')) return;
+      const session = (await sb.auth.getSession()).data.session;
+      if (!session) return;
+      try {
+        await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({ action: 'delete-subcategory', id })
+        });
+        showToast('Subcategoría eliminada', 'success');
+        loadCfhPanel();
+      } catch (e) {
+        showToast('Error al eliminar', 'error');
       }
     }
 
