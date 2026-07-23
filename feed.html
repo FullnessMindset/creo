@@ -106,9 +106,7 @@
   </div>
 
   <script>
-    const SUPABASE_URL = 'https://qddxoyjtoxtdcezwuvcq.supabase.co';
     const SUPABASE_FN_URL = SUPABASE_URL + '/functions/v1';
-    const sb = supabase.createClient(SUPABASE_URL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZHhveWp0b3h0ZGNlend1dmNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNTMxMzMsImV4cCI6MjA2NDgyOTEzM30.se1wNVfrmj-NzGGdOIhazLOvxQgMCdDHwwSCdGheqUk');
 
     let currentUser = null;
     let userLikes = new Set();
@@ -170,10 +168,10 @@
         metasMap[m.creator_id].push(m);
       });
 
-      // Load free CFH content for each creator
+      // Load free CFH content for each creator (parallel)
       const cfhMap = {};
       try {
-        for (const g of creatorGroups.slice(0, 20)) {
+        const cfhPromises = creatorGroups.slice(0, 20).map(async (g) => {
           const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -181,7 +179,8 @@
           });
           const { data } = await res.json();
           if (data?.length) cfhMap[g.creator.id] = data;
-        }
+        });
+        await Promise.allSettled(cfhPromises);
       } catch (e) {}
 
       // Get recommended small creators (for section between video and meta)

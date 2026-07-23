@@ -219,9 +219,7 @@
   </div>
 
   <script>
-    const SUPABASE_URL = 'https://qddxoyjtoxtdcezwuvcq.supabase.co';
     const SUPABASE_FN_URL = SUPABASE_URL + '/functions/v1';
-    const sb = supabase.createClient(SUPABASE_URL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZHhveWp0b3h0ZGNlend1dmNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNTMxMzMsImV4cCI6MjA2NDgyOTEzM30.se1wNVfrmj-NzGGdOIhazLOvxQgMCdDHwwSCdGheqUk');
 
     let currentUser = null;
     let activeCategory = 'music';
@@ -736,11 +734,14 @@
 
       try {
         const session = (await sb.auth.getSession()).data.session;
+        const creatorId = modal.dataset.creatorId;
         const res = await fetch(SUPABASE_FN_URL + '/create-subscription-checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
           body: JSON.stringify({
             creator_connect_id: connectId,
+            creator_id: creatorId,
+            subscriber_id: currentUser.id,
             amount_usd: 5,
             success_url: window.location.href,
             cancel_url: window.location.href

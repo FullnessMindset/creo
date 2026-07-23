@@ -12,7 +12,7 @@
     "connect-src 'self' https://qddxoyjtoxtdcezwuvcq.supabase.co wss://qddxoyjtoxtdcezwuvcq.supabase.co https://api.giphy.com https://api.stripe.com https://js.stripe.com",
     "img-src 'self' data: blob: https: http:",
     "media-src 'self' blob: https://qddxoyjtoxtdcezwuvcq.supabase.co",
-    "frame-src https://checkout.stripe.com https://connect.stripe.com https://js.stripe.com",
+    "frame-src https://checkout.stripe.com https://connect.stripe.com https://js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.tiktok.com",
     "font-src 'self' data: https://fonts.gstatic.com",
   ].join('; ');
   document.head.prepend(csp);
