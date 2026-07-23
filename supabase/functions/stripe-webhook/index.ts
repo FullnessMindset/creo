@@ -205,6 +205,14 @@ serve(async (req) => {
               supporter_name: session.customer_details?.name || "Alguien",
             });
           }
+
+          // Grant CFH content access for Apoyo Full subscriber
+          if (metadata.subscriber_id) {
+            await supabase.rpc("cfh_grant_subscriber_access", {
+              p_user_id: metadata.subscriber_id,
+              p_creator_id: metadata.creator_id,
+            });
+          }
         }
       }
     }
@@ -327,6 +335,19 @@ serve(async (req) => {
             sendTransactionalEmail(creatorEmail, "subscription_cancelled", {
               amount: ((subRecord.amount_cents || 0) / 100).toFixed(2),
               supporter_name: subRecord.subscriber_name || "Un suscriptor",
+            });
+          }
+
+          // Revoke CFH streaming access, keep downloads only
+          const { data: subData } = await supabase
+            .from("subscriptions")
+            .select("subscriber_id")
+            .eq("stripe_subscription_id", subId)
+            .single();
+          if (subData?.subscriber_id) {
+            await supabase.rpc("cfh_revoke_streaming_access", {
+              p_user_id: subData.subscriber_id,
+              p_creator_id: subRecord.creator_id,
             });
           }
         }
