@@ -2120,6 +2120,7 @@ function createEmojiPicker(inputId, btnId) {
     }
     renderPicker();
     panel.addEventListener('click', (ev) => {
+      ev.stopPropagation();
       const catBtn = ev.target.closest('[data-cat]');
       if (catBtn) { activeCategory = catBtn.dataset.cat; renderPicker(); return; }
       const emojiBtn = ev.target.closest('[data-emoji]');
