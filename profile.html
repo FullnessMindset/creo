@@ -1,20 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CREO — Perfil de Creador</title>
+  <title>CREO â€” Perfil de Creador</title>
   <link rel="manifest" href="manifest.json">
   <link rel="canonical" href="https://fullnessmindset.github.io/creo/profile.html">
   <meta name="theme-color" content="#1a0a3e">
-  <meta name="description" content="CREO — Apoya a este creador con tips, metas y suscripciones mensuales">
-  <meta property="og:title" content="CREO — Perfil de Creador">
+  <meta name="description" content="CREO â€” Apoya a este creador con tips, metas y suscripciones mensuales">
+  <meta property="og:title" content="CREO â€” Perfil de Creador">
   <meta property="og:description" content="Apoya a este creador con tips, metas y suscripciones mensuales">
   <meta property="og:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
   <meta property="og:url" content="https://fullnessmindset.github.io/creo/profile.html">
   <meta property="og:type" content="profile">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="CREO — Perfil de Creador">
+  <meta name="twitter:title" content="CREO â€” Perfil de Creador">
   <meta name="twitter:description" content="Apoya a este creador con tips, metas y suscripciones mensuales">
   <meta name="twitter:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="tailwind.min.css?v=20260719">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* Overflow protection — nothing escapes the viewport */
+    /* Overflow protection â€” nothing escapes the viewport */
     html, body { overflow-x: hidden; max-width: 100vw; }
     * { box-sizing: border-box; }
     #profile-sections-container { max-width: 100%; overflow-x: hidden; }
@@ -64,7 +64,7 @@
     .story-media-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
     .story-media-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
 
-    /* Cover image — social media ratio */
+    /* Cover image â€” social media ratio */
     #cover-section { height: 200px; }
     @media (min-width: 640px) { #cover-section { height: 280px; } }
     @media (min-width: 1024px) { #cover-section { height: 320px; } }
@@ -97,37 +97,37 @@
     @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     .meta-skeleton.animate-pulse { animation: none; background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
 
-    /* Yo Creo en Ellos — compact cards */
+    /* Yo Creo en Ellos â€” compact cards */
     #creo-en-ellos-scroll::-webkit-scrollbar { display: none; }
     .creo-ellos-card { flex-shrink: 0; cursor: pointer; }
     #creo-popup .animate-slide-up { animation: slide-up 0.2s ease-out; }
   </style>
 </head>
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
-  <script src="shared.js"></script>
+  <script src="shared.js?v=2"></script>
 
   <div id="profile-sections-container" class="mx-auto px-4 pt-6 pb-24 flex flex-col gap-6" style="max-width:480px">
 
-    <!-- Cover Image — social media ratio -->
+    <!-- Cover Image â€” social media ratio -->
     <div id="cover-section" data-section="cover" class="hidden rounded-2xl overflow-hidden bg-gradient-to-r from-creo-purple to-creo-light">
       <img id="cover-img" class="w-full h-full object-cover" alt="Cover">
     </div>
 
-    <!-- Profile Header — Glassmorphism -->
+    <!-- Profile Header â€” Glassmorphism -->
     <div class="glass rounded-2xl shadow-xl text-center space-y-4 transition-all overflow-visible" id="profile-header-card" data-section="header" style="padding: 1.5rem; padding-top: 3.5rem; position: relative; z-index: 10;">
-      <!-- Avatar — floats above the card, 60% on top / 40% inside -->
+      <!-- Avatar â€” floats above the card, 60% on top / 40% inside -->
       <div id="avatar-wrapper" class="absolute left-1/2" style="width:7rem; height:7rem; top:0; transform: translate(-50%, -60%); z-index: 9999;">
         <div id="avatar-container" class="w-full h-full rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
           <svg id="avatar-placeholder" class="w-14 h-14 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
           <img id="avatar-img" class="w-full h-full object-cover hidden" alt="Avatar">
         </div>
-        <!-- CREO Verified Badge — small, no animation -->
+        <!-- CREO Verified Badge â€” small, no animation -->
         <div id="verified-badge" class="hidden absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center ring-1 ring-creo-mint" title="Creador Verificado">
           <img src="assets/logo-icon.png" alt="Verified" class="w-3.5 h-3.5 rounded-full object-contain">
         </div>
       </div>
 
-      <!-- Social Links — below avatar with spacing -->
+      <!-- Social Links â€” below avatar with spacing -->
       <div id="social-links" class="flex justify-center gap-3 mt-4 hidden">
         <a id="link-instagram" href="#" target="_blank" class="w-9 h-9 rounded-full glass flex items-center justify-center text-gray-500 hover:text-pink-500 hover:shadow-md transition-all hidden"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
         <a id="link-tiktok" href="#" target="_blank" class="w-9 h-9 rounded-full glass flex items-center justify-center text-gray-500 hover:text-black hover:shadow-md transition-all hidden"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.51a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.48V12.4a8.26 8.26 0 005.58 2.17V11.1a4.84 4.84 0 01-3.58-1.59V6.69h3.58z"/></svg></a>
@@ -198,8 +198,8 @@
 
     <!-- Not Verified Banner -->
     <div id="not-verified-banner" class="hidden glass-mint p-4 rounded-xl text-center">
-      <p class="text-sm text-amber-800 font-semibold" data-i18n="noVerificadoTitulo"><span aria-label="advertencia">⚠️</span> Este creador aún no ha sido verificado</p>
-      <p class="text-xs text-amber-700 mt-1" data-i18n="noVerificadoSubtext">Los pagos estarán disponibles una vez sea aprobado.</p>
+      <p class="text-sm text-amber-800 font-semibold" data-i18n="noVerificadoTitulo"><span aria-label="advertencia">âš ï¸</span> Este creador aÃºn no ha sido verificado</p>
+      <p class="text-xs text-amber-700 mt-1" data-i18n="noVerificadoSubtext">Los pagos estarÃ¡n disponibles una vez sea aprobado.</p>
     </div>
 
     <!-- MI HISTORIA -->
@@ -272,7 +272,7 @@
           <p id="creo-popup-username" class="text-[10px] text-gray-400"></p>
           <p id="creo-popup-bio" class="text-[11px] text-gray-600 mt-1 line-clamp-3"></p>
           <div id="creo-popup-story" class="hidden mt-2 text-[11px] text-gray-500 italic line-clamp-2 border-t border-gray-100 pt-2"></div>
-          <a id="creo-popup-link" href="#" class="mt-2 inline-block text-[10px] font-semibold text-creo-purple hover:text-creo-light transition" data-i18n="verPerfilFlecha">Ver perfil →</a>
+          <a id="creo-popup-link" href="#" class="mt-2 inline-block text-[10px] font-semibold text-creo-purple hover:text-creo-light transition" data-i18n="verPerfilFlecha">Ver perfil â†’</a>
         </div>
       </div>
     </div>
@@ -282,15 +282,15 @@
       <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeReport()"></div>
       <div class="absolute inset-0 flex items-end sm:items-center justify-center p-4">
         <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl p-6 space-y-4 animate-slide-up">
-          <h3 class="text-lg font-bold text-gray-900 text-center" data-i18n="reportarCreador"><span aria-label="bandera">🚩</span> Reportar Creador</h3>
-          <p class="text-xs text-gray-500 text-center" data-i18n="reportarSubtext">Ayúdanos a mantener la comunidad segura. Tu reporte es confidencial.</p>
+          <h3 class="text-lg font-bold text-gray-900 text-center" data-i18n="reportarCreador"><span aria-label="bandera">ðŸš©</span> Reportar Creador</h3>
+          <p class="text-xs text-gray-500 text-center" data-i18n="reportarSubtext">AyÃºdanos a mantener la comunidad segura. Tu reporte es confidencial.</p>
           <select id="report-reason" class="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900">
             <option value="" data-i18n="seleccionaMotivo">Selecciona un motivo</option>
-            <option value="sexual" data-i18n="motivoSexual">Contenido con insinuación sexual</option>
-            <option value="drugs" data-i18n="motivoDrogas">Uso o promoción de drogas</option>
-            <option value="violence" data-i18n="motivoViolencia">Incitación a la violencia</option>
+            <option value="sexual" data-i18n="motivoSexual">Contenido con insinuaciÃ³n sexual</option>
+            <option value="drugs" data-i18n="motivoDrogas">Uso o promociÃ³n de drogas</option>
+            <option value="violence" data-i18n="motivoViolencia">IncitaciÃ³n a la violencia</option>
             <option value="language" data-i18n="motivoLenguaje">Palabras soeces / lenguaje ofensivo</option>
-            <option value="discrimination" data-i18n="motivoDiscriminacion">Discriminación</option>
+            <option value="discrimination" data-i18n="motivoDiscriminacion">DiscriminaciÃ³n</option>
             <option value="spam" data-i18n="motivoSpam">Spam o estafa</option>
             <option value="other" data-i18n="motivoOtro">Otro</option>
           </select>
@@ -329,13 +329,13 @@
             <!-- Audio preview -->
             <div id="dm-audio-preview" class="hidden px-4 pt-2 flex items-center gap-2 bg-gray-50">
               <audio id="dm-audio-player" controls class="flex-1 h-8"></audio>
-              <button onclick="cancelAudioDM()" class="text-red-400 hover:text-red-600 text-xs font-semibold">✕</button>
+              <button onclick="cancelAudioDM()" class="text-red-400 hover:text-red-600 text-xs font-semibold">âœ•</button>
             </div>
             <!-- Image preview -->
             <div id="dm-image-preview" class="hidden px-4 pt-2">
               <div class="relative inline-block">
                 <img id="dm-image-thumb" class="h-20 rounded-lg border border-gray-200" alt="">
-                <button onclick="cancelImageDM()" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">✕</button>
+                <button onclick="cancelImageDM()" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">âœ•</button>
               </div>
             </div>
             <!-- Video preview -->
@@ -344,7 +344,7 @@
                 <div class="video-circle w-[100px] h-[100px]"><video id="dm-video-thumb" class="w-full h-full object-cover" playsinline muted loop></video><div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div></div>
                 <div class="flex gap-2 mt-2 justify-center">
                   <button onclick="sendDMVideoNow()" class="bg-creo-purple text-white px-3 py-1 rounded-full text-xs font-semibold" data-i18n="enviarVideo">Enviar</button>
-                  <button onclick="cancelVideoDM()" class="text-red-400 text-xs font-semibold">✕</button>
+                  <button onclick="cancelVideoDM()" class="text-red-400 text-xs font-semibold">âœ•</button>
                 </div>
               </div>
             </div>
@@ -362,7 +362,7 @@
               </button>
               <div class="flex-1 relative flex items-center bg-gray-100 rounded-full border border-gray-200 focus-within:border-creo-mint/50 transition">
                 <input id="dm-input" type="text" placeholder="Aa" class="flex-1 bg-transparent rounded-full px-4 py-2 text-sm outline-none border-none !border-0">
-                <span id="dm-emoji-btn" class="cursor-pointer text-lg hover:scale-110 transition pr-3">😊</span>
+                <span id="dm-emoji-btn" class="cursor-pointer text-lg hover:scale-110 transition pr-3">ðŸ˜Š</span>
               </div>
               <button onclick="toggleGifPicker()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition" data-i18n-title="enviarGif" title="Enviar GIF">
                 <span class="text-xs font-black">GIF</span>
@@ -387,12 +387,12 @@
       </div>
     </div>
 
-    <!-- Payment Type Selector — Glassmorphism -->
+    <!-- Payment Type Selector â€” Glassmorphism -->
     <div id="payment-tabs" data-section="payments" class="flex glass rounded-xl overflow-hidden">
-      <button onclick="showPayment('tip')" id="pay-tab-tip" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400" data-i18n="yoCreoEnTi"><span aria-label="corazon">💚</span> Yo Creo en Ti</button>
-      <button onclick="showPayment('metas')" id="pay-tab-metas" class="flex-1 py-3 text-xs font-semibold text-center transition pay-tab-active" data-i18n="miMeta"><span aria-label="meta">🎯</span> Mi Meta</button>
-      <button onclick="showPayment('sub')" id="pay-tab-sub" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400" data-i18n="apoyoFull"><span aria-label="estrella">⭐</span> Apoyo Full</button>
-      <button onclick="showPayment('meta-support')" id="pay-tab-meta-support" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400 hidden" data-i18n="desdeMeta">🎯 Desde Meta</button>
+      <button onclick="showPayment('tip')" id="pay-tab-tip" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400" data-i18n="yoCreoEnTi"><span aria-label="corazon">ðŸ’š</span> Yo Creo en Ti</button>
+      <button onclick="showPayment('metas')" id="pay-tab-metas" class="flex-1 py-3 text-xs font-semibold text-center transition pay-tab-active" data-i18n="miMeta"><span aria-label="meta">ðŸŽ¯</span> Mi Meta</button>
+      <button onclick="showPayment('sub')" id="pay-tab-sub" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400" data-i18n="apoyoFull"><span aria-label="estrella">â­</span> Apoyo Full</button>
+      <button onclick="showPayment('meta-support')" id="pay-tab-meta-support" class="flex-1 py-3 text-xs font-semibold text-center transition text-gray-400 hidden" data-i18n="desdeMeta">ðŸŽ¯ Desde Meta</button>
     </div>
 
     <!-- PAYMENT: Yo Creo en Ti -->
@@ -402,7 +402,7 @@
         <div class="p-6 space-y-4">
           <div class="text-center">
             <h3 id="mec-tip-heading" class="text-lg font-bold text-gray-900" data-i18n="yoCreoEnTi">Yo Creo en Ti</h3>
-            <p id="mec-tip-subtext" class="text-xs text-gray-500 mt-1" data-i18n="enviaApoyoUnico">Envía un apoyo único al creador</p>
+            <p id="mec-tip-subtext" class="text-xs text-gray-500 mt-1" data-i18n="enviaApoyoUnico">EnvÃ­a un apoyo Ãºnico al creador</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="cantidadUsd">Cantidad (USD)</label>
@@ -425,7 +425,7 @@
       </div>
     </div>
 
-    <!-- PAYMENT: Mi Meta — shows creator's active metas (DEFAULT TAB) -->
+    <!-- PAYMENT: Mi Meta â€” shows creator's active metas (DEFAULT TAB) -->
     <div id="pay-metas" class="pay-panel">
       <div class="glass rounded-2xl shadow-xl overflow-hidden">
         <div id="mec-meta-hero" class="hidden"></div>
@@ -437,12 +437,12 @@
         <div id="pay-metas-list" class="space-y-4"></div>
         <div id="pay-metas-empty-visitor" class="hidden text-center space-y-2 py-4">
           <svg class="w-12 h-12 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasPublicadas"><span aria-label="vacio">📭</span> No hay metas publicadas aún</p>
+          <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasPublicadas"><span aria-label="vacio">ðŸ“­</span> No hay metas publicadas aÃºn</p>
           <p id="pay-metas-encourage" class="text-xs text-gray-400"></p>
         </div>
         <div id="pay-metas-empty-owner" class="hidden text-center space-y-3 py-4">
           <svg class="w-12 h-12 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasOwner"><span aria-label="vacio">📭</span> Aún no has publicado ninguna meta</p>
+          <p class="text-sm font-semibold text-gray-500" data-i18n="noMetasOwner"><span aria-label="vacio">ðŸ“­</span> AÃºn no has publicado ninguna meta</p>
           <p class="text-xs text-gray-400" data-i18n="noMetasOwnerSub">Comparte tu meta con la comunidad de CREO y recibe apoyo</p>
           <a href="index.html?panel=1" onclick="localStorage.setItem('creo-open-tab','metas')" class="inline-block mt-2 px-6 py-2.5 bg-creo-purple hover:bg-creo-light text-white text-sm font-bold rounded-xl transition" data-i18n="crearPrimeraMeta">Crear mi primera Meta</a>
         </div>
@@ -454,7 +454,7 @@
     <div id="pay-meta-support" class="pay-panel hidden">
       <div class="glass p-6 rounded-2xl shadow-xl space-y-4">
         <div class="text-center">
-          <h3 class="text-lg font-bold text-gray-900" data-i18n="apoyarDesdeMeta">🎯 Apoyar desde mi Meta</h3>
+          <h3 class="text-lg font-bold text-gray-900" data-i18n="apoyarDesdeMeta">ðŸŽ¯ Apoyar desde mi Meta</h3>
           <p class="text-xs text-gray-500 mt-1" data-i18n="apoyarDesdeMetaSub">Comparte fondos de tu meta activa con este creador</p>
         </div>
         <div>
@@ -469,7 +469,7 @@
           </div>
         </div>
         <button onclick="processMetaSupport()" id="meta-support-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
-          <span>🎯</span>
+          <span>ðŸŽ¯</span>
           <span data-i18n="enviarDesdeMeta">Enviar desde mi Meta</span>
         </button>
         <p class="text-xs text-gray-400 text-center" data-i18n="fondosTransferencia">Los fondos se transfieren directamente de tu meta al creador</p>
@@ -483,7 +483,7 @@
         <div class="p-6 space-y-4">
           <div class="text-center">
             <h3 id="mec-sub-heading" class="text-lg font-bold text-gray-900" data-i18n="apoyoFullHeading">Apoyo Full</h3>
-            <p id="mec-sub-subtext" class="text-xs text-gray-500 mt-1" data-i18n="apoyoFullSub">Apoya mensualmente con una cantidad que tú elijas</p>
+            <p id="mec-sub-subtext" class="text-xs text-gray-500 mt-1" data-i18n="apoyoFullSub">Apoya mensualmente con una cantidad que tÃº elijas</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="cantidadMensual">Cantidad Mensual (USD)</label>
@@ -499,7 +499,7 @@
           </div>
           <button onclick="processSubscription()" id="sub-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
             <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-            <span data-i18n="suscribirme"><span aria-label="calendario">📅</span> Suscribirme Mensualmente</span>
+            <span data-i18n="suscribirme"><span aria-label="calendario">ðŸ“…</span> Suscribirme Mensualmente</span>
           </button>
           <p class="text-xs text-gray-400 text-center" data-i18n="cancelarEnCualquier">Puedes cancelar en cualquier momento</p>
         </div>
@@ -575,7 +575,7 @@
         <input id="creamos-username" type="text" data-i18n-placeholder="creamosPlaceholder" placeholder="Username del creador (ej: mi_amigo)" class="w-full bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-creo-mint">
         <button onclick="sendCreamosInvite()" id="creamos-send-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-          <span data-i18n="enviarInvitacion">Enviar Invitación</span>
+          <span data-i18n="enviarInvitacion">Enviar InvitaciÃ³n</span>
         </button>
         <button onclick="closeCreamos()" class="w-full text-gray-400 text-sm hover:text-gray-600 transition py-2" data-i18n="cancelar">Cancelar</button>
       </div>
@@ -589,13 +589,13 @@
 
   <!-- Completed Metas History -->
   <footer class="mx-auto px-4 pb-24 text-center text-xs text-gray-400 leading-relaxed space-y-2" style="max-width:480px">
-    <p><span class="font-semibold text-creo-purple tracking-wider">CREO</span> — <span data-i18n="footerDisclaimer">Los pagos son voluntarios, no reembolsables y no deducibles de impuestos. Los creadores son responsables de sus propios impuestos.</span></p>
+    <p><span class="font-semibold text-creo-purple tracking-wider">CREO</span> â€” <span data-i18n="footerDisclaimer">Los pagos son voluntarios, no reembolsables y no deducibles de impuestos. Los creadores son responsables de sus propios impuestos.</span></p>
     <p class="space-x-3">
-      <a href="terminos.html" class="hover:text-creo-purple underline" data-i18n="terminos">Términos</a>
+      <a href="terminos.html" class="hover:text-creo-purple underline" data-i18n="terminos">TÃ©rminos</a>
       <a href="privacidad.html" class="hover:text-creo-purple underline" data-i18n="privacidad">Privacidad</a>
       <a href="mailto:osvaldo@fullnessmindset.com" class="hover:text-creo-purple underline" data-i18n="contacto">Contacto</a>
     </p>
-    <p class="text-[10px]">© 2026 Fullness Mindset LLC — Florida, US</p>
+    <p class="text-[10px]">Â© 2026 Fullness Mindset LLC â€” Florida, US</p>
   </footer>
 
   <script>
@@ -804,10 +804,10 @@
         const productLinks = m.product_links || [];
 
         let statusBadge = '';
-        if (m.completion_badge === 'legitimate') statusBadge = '<span class="text-xs bg-green-600 text-white px-2.5 py-0.5 rounded-full font-bold shadow">✅ Meta Completada Legítimamente</span>';
-        else if (m.completion_badge === 'early_complete') statusBadge = '<span class="text-xs bg-blue-500 text-white px-2.5 py-0.5 rounded-full font-bold shadow">✅ Completada Antes de lo Esperado</span>';
-        else if (m.fund_status === 'fraud_banned') statusBadge = '<span class="text-xs bg-red-600 text-white px-2.5 py-0.5 rounded-full font-bold shadow">🚫 Cancelada</span>';
-        else if (m.fund_status && m.fund_status.includes('review')) statusBadge = '<span class="text-xs bg-yellow-500 text-white px-2.5 py-0.5 rounded-full font-bold shadow animate-pulse">⏳ En Review</span>';
+        if (m.completion_badge === 'legitimate') statusBadge = '<span class="text-xs bg-green-600 text-white px-2.5 py-0.5 rounded-full font-bold shadow">âœ… Meta Completada LegÃ­timamente</span>';
+        else if (m.completion_badge === 'early_complete') statusBadge = '<span class="text-xs bg-blue-500 text-white px-2.5 py-0.5 rounded-full font-bold shadow">âœ… Completada Antes de lo Esperado</span>';
+        else if (m.fund_status === 'fraud_banned') statusBadge = '<span class="text-xs bg-red-600 text-white px-2.5 py-0.5 rounded-full font-bold shadow">ðŸš« Cancelada</span>';
+        else if (m.fund_status && m.fund_status.includes('review')) statusBadge = '<span class="text-xs bg-yellow-500 text-white px-2.5 py-0.5 rounded-full font-bold shadow animate-pulse">â³ En Review</span>';
         else if (completed) statusBadge = '<span class="text-xs glass-mint text-green-700 px-2 py-0.5 rounded-full font-semibold">Completada</span>';
         else if (expired) statusBadge = '<span class="text-xs bg-red-100/80 text-red-600 px-2 py-0.5 rounded-full font-semibold">Expirada</span>';
 
@@ -823,7 +823,7 @@
         const descId = 'meta-desc-' + m.id;
         const needsVerMas = descText.length > 120;
         const descHtml = needsVerMas
-          ? `<p id="${descId}" class="text-sm text-gray-600 mt-2 line-clamp-2">${descText}</p><button onclick="toggleMetaDesc('${m.id}')" id="btn-${descId}" class="text-xs font-semibold text-creo-purple hover:text-creo-light transition mt-1">Ver más</button>`
+          ? `<p id="${descId}" class="text-sm text-gray-600 mt-2 line-clamp-2">${descText}</p><button onclick="toggleMetaDesc('${m.id}')" id="btn-${descId}" class="text-xs font-semibold text-creo-purple hover:text-creo-light transition mt-1">Ver mÃ¡s</button>`
           : (descText ? `<p class="text-sm text-gray-600 mt-2">${descText}</p>` : '');
 
         return `<div class="glass rounded-2xl shadow-xl overflow-hidden">
@@ -872,7 +872,7 @@
             </div>
           </div>
           ` : `
-          <!-- No media — title + plain progress -->
+          <!-- No media â€” title + plain progress -->
           <div class="p-5 space-y-3">
             <div class="flex justify-between items-start">
               <h3 class="text-lg font-bold text-gray-900">${esc(m.title)}</h3>
@@ -888,7 +888,7 @@
               </div>
               <div class="flex justify-between text-xs text-gray-400 mt-2">
                 <span>${pct}% alcanzado</span>
-                <span>${m.start_date} — ${m.end_date}</span>
+                <span>${m.start_date} â€” ${m.end_date}</span>
               </div>
             </div>
           </div>
@@ -1023,7 +1023,7 @@
 
     async function processTip() {
       const amount = parseFloat(document.getElementById('tip-amount').value);
-      if (amount < 1 || isNaN(amount)) return showToast('Monto mínimo: $1.00', 'error');
+      if (amount < 1 || isNaN(amount)) return showToast('Monto mÃ­nimo: $1.00', 'error');
       const btn = document.getElementById('tip-btn');
       showCreoLoading();
       btn.disabled = true;
@@ -1035,14 +1035,14 @@
         const data = await response.json();
         if (data.url) window.location.href = data.url;
         else { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Apoyar Creador</span>'; btn.disabled = false; }
-      } catch (e) { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Apoyar Creador</span>'; btn.disabled = false; }
+      } catch (e) { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error de conexiÃ³n', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Apoyar Creador</span>'; btn.disabled = false; }
     }
 
     async function contributeMetaFromTab(metaId) {
       const input = document.getElementById('pay-meta-tab-amount-' + metaId);
       if (!input) return;
       const amount = parseFloat(input.value);
-      if (amount < 1 || isNaN(amount)) return showToast('Monto mínimo: $1.00', 'error');
+      if (amount < 1 || isNaN(amount)) return showToast('Monto mÃ­nimo: $1.00', 'error');
       showCreoLoading();
       try {
         const response = await fetch(`${SUPABASE_URL}/functions/v1/create-meta-checkout`, {
@@ -1052,12 +1052,12 @@
         const data = await response.json();
         if (data.url) window.location.href = data.url;
         else { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error: ' + (data.error || 'Unknown'), 'error'); }
-      } catch (e) { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error de conexión', 'error'); }
+      } catch (e) { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error de conexiÃ³n', 'error'); }
     }
 
     async function contributeMeta(metaId) {
       const amount = parseFloat(document.getElementById('meta-amount-' + metaId).value);
-      if (amount < 1 || isNaN(amount)) return showToast('Monto mínimo: $1.00', 'error');
+      if (amount < 1 || isNaN(amount)) return showToast('Monto mÃ­nimo: $1.00', 'error');
       const btn = document.getElementById('meta-btn-' + metaId);
       showCreoLoading();
       btn.disabled = true;
@@ -1069,12 +1069,12 @@
         const data = await response.json();
         if (data.url) window.location.href = data.url;
         else { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="">Contribuir'; btn.disabled = false; }
-      } catch (e) { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="">Contribuir'; btn.disabled = false; }
+      } catch (e) { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error de conexiÃ³n', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="">Contribuir'; btn.disabled = false; }
     }
 
     async function processSubscription() {
       const amount = parseFloat(document.getElementById('sub-amount').value);
-      if (amount < 3 || isNaN(amount)) return showToast('Monto mínimo mensual: $3.00', 'error');
+      if (amount < 3 || isNaN(amount)) return showToast('Monto mÃ­nimo mensual: $3.00', 'error');
       const btn = document.getElementById('sub-btn');
       showCreoLoading();
       btn.disabled = true;
@@ -1086,7 +1086,7 @@
         const data = await response.json();
         if (data.url) window.location.href = data.url;
         else { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Suscribirme Mensualmente</span>'; btn.disabled = false; }
-      } catch (e) { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error de conexión', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Suscribirme Mensualmente</span>'; btn.disabled = false; }
+      } catch (e) { document.getElementById('creo-loading').classList.add('hidden'); showToast('Error de conexiÃ³n', 'error'); btn.innerHTML = '<img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt=""><span>Suscribirme Mensualmente</span>'; btn.disabled = false; }
     }
 
     // Meta-to-creator support
@@ -1099,7 +1099,7 @@
       document.getElementById('pay-tab-meta-support').classList.remove('hidden');
       const sel = document.getElementById('meta-support-select');
       sel.innerHTML = funded.map(m =>
-        `<option value="${m.id}" data-max="${m.raised_cents}">$${(m.raised_cents / 100).toFixed(2)} disponible — ${esc(m.title)}</option>`
+        `<option value="${m.id}" data-max="${m.raised_cents}">$${(m.raised_cents / 100).toFixed(2)} disponible â€” ${esc(m.title)}</option>`
       ).join('');
       // If arrived from feed with from_meta param, auto-show
       const fromMeta = urlParams.get('from_meta');
@@ -1115,7 +1115,7 @@
       const metaId = document.getElementById('meta-support-select').value;
       const amount = parseFloat(document.getElementById('meta-support-amount').value);
       if (!metaId) return showToast('Selecciona una meta', 'error');
-      if (isNaN(amount) || amount < 1) return showToast('Monto mínimo: $1', 'error');
+      if (isNaN(amount) || amount < 1) return showToast('Monto mÃ­nimo: $1', 'error');
       const option = document.querySelector(`#meta-support-select option[value="${metaId}"]`);
       const maxCents = parseInt(option?.dataset?.max || '0');
       if (amount * 100 > maxCents) return showToast(`Solo tienes $${(maxCents / 100).toFixed(2)} disponibles en esa meta`, 'error');
@@ -1124,7 +1124,7 @@
       const amountCents = Math.round(amount * 100);
       // Deduct from sender's meta
       const { error: deductErr } = await sb.rpc('increment_meta_raised', { p_meta_id: metaId, p_amount: -amountCents });
-      if (deductErr) { btn.innerHTML = '<span>🎯</span><span>Enviar desde mi Meta</span>'; btn.disabled = false; return showToast('Error: ' + deductErr.message, 'error'); }
+      if (deductErr) { btn.innerHTML = '<span>ðŸŽ¯</span><span>Enviar desde mi Meta</span>'; btn.disabled = false; return showToast('Error: ' + deductErr.message, 'error'); }
       // Find an active meta of the recipient to credit, or create a tip record
       const { data: recipientMetas } = await sb.from('metas').select('id').eq('creator_id', creatorProfile.id).eq('is_active', true).limit(1);
       if (recipientMetas && recipientMetas.length > 0) {
@@ -1133,9 +1133,9 @@
       const { data: { user } } = await sb.auth.getUser();
       const { data: senderProfile } = await sb.from('profiles').select('display_name, username').eq('id', user.id).single();
       const senderName = senderProfile?.display_name || senderProfile?.username || 'Un creador';
-      createNotification(creatorProfile.id, 'payment', `${senderName} te apoyó con $${amount.toFixed(2)}`, null, 'profile.html?u=' + creatorProfile.username + '#metas-section');
-      btn.innerHTML = '<span>🎯</span><span>Enviar desde mi Meta</span>'; btn.disabled = false;
-      showToast(`¡Enviaste $${amount.toFixed(2)} a ${creatorProfile.display_name || creatorProfile.username}!`, 'success');
+      createNotification(creatorProfile.id, 'payment', `${senderName} te apoyÃ³ con $${amount.toFixed(2)}`, null, 'profile.html?u=' + creatorProfile.username + '#metas-section');
+      btn.innerHTML = '<span>ðŸŽ¯</span><span>Enviar desde mi Meta</span>'; btn.disabled = false;
+      showToast(`Â¡Enviaste $${amount.toFixed(2)} a ${creatorProfile.display_name || creatorProfile.username}!`, 'success');
     }
 
     // Show Creamos buttons for meta owner
@@ -1216,14 +1216,14 @@
     async function toggleMetaLike() {
       if (!activeMetaId) return;
       const { data: { user } } = await sb.auth.getUser();
-      if (!user) { showToast('Inicia sesión para dar like', 'error'); return; }
+      if (!user) { showToast('Inicia sesiÃ³n para dar like', 'error'); return; }
       const { data, error } = await sb.rpc('toggle_meta_like', { p_meta_id: activeMetaId });
       if (error) { showToast('Error', 'error'); return; }
       if (data.liked) {
         metaLikesSet.add(activeMetaId);
         document.getElementById('meta-like-icon').setAttribute('fill', '#ef4444');
         document.getElementById('meta-like-icon').setAttribute('stroke', '#ef4444');
-        if (creatorProfile) createNotification(creatorProfile.id, 'meta_like', 'A alguien le gustó tu meta', metasCache[activeMetaId]?.title, 'profile.html?u=' + creatorProfile.username + '#meta-' + activeMetaId);
+        if (creatorProfile) createNotification(creatorProfile.id, 'meta_like', 'A alguien le gustÃ³ tu meta', metasCache[activeMetaId]?.title, 'profile.html?u=' + creatorProfile.username + '#meta-' + activeMetaId);
       } else {
         metaLikesSet.delete(activeMetaId);
         document.getElementById('meta-like-icon').setAttribute('fill', 'none');
@@ -1244,18 +1244,18 @@
         btn.textContent = 'Ver menos';
       } else {
         el.classList.add('line-clamp-2');
-        btn.textContent = 'Ver más';
+        btn.textContent = 'Ver mÃ¡s';
       }
     }
 
     async function toggleMetaLikeInline(metaId) {
       const { data: { user } } = await sb.auth.getUser();
-      if (!user) { showToast('Inicia sesión para dar like', 'error'); return; }
+      if (!user) { showToast('Inicia sesiÃ³n para dar like', 'error'); return; }
       const { data, error } = await sb.rpc('toggle_meta_like', { p_meta_id: metaId });
       if (error) { showToast('Error', 'error'); return; }
       if (data.liked) {
         metaLikesSet.add(metaId);
-        if (creatorProfile) createNotification(creatorProfile.id, 'meta_like', 'A alguien le gustó tu meta', metasCache[metaId]?.title, 'profile.html?u=' + creatorProfile.username + '#meta-' + metaId);
+        if (creatorProfile) createNotification(creatorProfile.id, 'meta_like', 'A alguien le gustÃ³ tu meta', metasCache[metaId]?.title, 'profile.html?u=' + creatorProfile.username + '#meta-' + metaId);
       } else {
         metaLikesSet.delete(metaId);
       }
@@ -1267,7 +1267,7 @@
       const { data } = await sb.from('meta_comments').select('*, profiles:user_id(username, display_name, avatar_url)').eq('meta_id', metaId).order('created_at', { ascending: true });
       const list = document.getElementById('meta-comments-list');
       if (!data || data.length === 0) {
-        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Sin comentarios aún</p>';
+        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Sin comentarios aÃºn</p>';
         return;
       }
       list.innerHTML = data.map(c => {
@@ -1294,7 +1294,7 @@
     async function submitMetaComment() {
       if (!activeMetaId) return;
       const { data: { user } } = await sb.auth.getUser();
-      if (!user) { showToast('Inicia sesión para comentar', 'error'); return; }
+      if (!user) { showToast('Inicia sesiÃ³n para comentar', 'error'); return; }
       const input = document.getElementById('meta-comment-input');
       const body = input.value.trim();
       if (!body) return;
@@ -1311,24 +1311,24 @@
       if (!activeMetaId || !creatorProfile) return;
       const url = 'https://fullnessmindset.github.io/creo/profile.html?u=' + creatorProfile.username;
       if (navigator.share) {
-        navigator.share({ title: 'CREO — ' + (metasCache[activeMetaId]?.title || 'Meta'), url });
+        navigator.share({ title: 'CREO â€” ' + (metasCache[activeMetaId]?.title || 'Meta'), url });
       } else {
         navigator.clipboard.writeText(url);
         showToast('Enlace copiado', 'success');
       }
-      createNotification(creatorProfile.id, 'share', 'Alguien compartió tu meta', metasCache[activeMetaId]?.title, 'profile.html?u=' + creatorProfile.username + '#meta-' + activeMetaId);
+      createNotification(creatorProfile.id, 'share', 'Alguien compartiÃ³ tu meta', metasCache[activeMetaId]?.title, 'profile.html?u=' + creatorProfile.username + '#meta-' + activeMetaId);
     }
 
     function shareMetaById(metaId) {
       if (!creatorProfile) return;
       const url = 'https://fullnessmindset.github.io/creo/profile.html?u=' + creatorProfile.username;
       if (navigator.share) {
-        navigator.share({ title: 'CREO — ' + (metasCache[metaId]?.title || 'Meta'), url });
+        navigator.share({ title: 'CREO â€” ' + (metasCache[metaId]?.title || 'Meta'), url });
       } else {
         navigator.clipboard.writeText(url);
         showToast('Enlace copiado', 'success');
       }
-      createNotification(creatorProfile.id, 'share', 'Alguien compartió tu meta', metasCache[metaId]?.title, 'profile.html?u=' + creatorProfile.username + '#meta-' + metaId);
+      createNotification(creatorProfile.id, 'share', 'Alguien compartiÃ³ tu meta', metasCache[metaId]?.title, 'profile.html?u=' + creatorProfile.username + '#meta-' + metaId);
     }
 
     function timeAgo(dateStr) {
@@ -1366,9 +1366,9 @@
       btn.innerHTML = '<span>Enviando...</span>';
       const { data, error } = await sb.rpc('send_meta_invite', { p_meta_id: creamosMetaId, p_invitee_username: usernameInput });
       btn.disabled = false;
-      btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg><span>Enviar Invitación</span>';
+      btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg><span>Enviar InvitaciÃ³n</span>';
       if (error) { showToast(error.message || 'Error al invitar', 'error'); return; }
-      showToast('Invitación enviada a @' + usernameInput, 'success');
+      showToast('InvitaciÃ³n enviada a @' + usernameInput, 'success');
       closeCreamos();
     }
 
@@ -1442,7 +1442,7 @@
     }
     async function submitReport() {
       const { data: { user } } = await sb.auth.getUser();
-      if (!user) { showToast('Inicia sesión para reportar', 'error'); return; }
+      if (!user) { showToast('Inicia sesiÃ³n para reportar', 'error'); return; }
       const reason = document.getElementById('report-reason').value;
       if (!reason) { showToast('Selecciona un motivo', 'error'); return; }
       const details = document.getElementById('report-details').value.trim();
@@ -1506,7 +1506,7 @@
         .limit(100);
       const list = document.getElementById('dm-messages');
       if (!msgs || msgs.length === 0) {
-        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-8">Inicia la conversación</p>';
+        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-8">Inicia la conversaciÃ³n</p>';
         return;
       }
       list.innerHTML = msgs.map(m => {
@@ -1551,7 +1551,7 @@
 
     async function sendDM() {
       const { data: { user } } = await sb.auth.getUser();
-      if (!user) { showToast('Inicia sesión para enviar mensajes', 'error'); return; }
+      if (!user) { showToast('Inicia sesiÃ³n para enviar mensajes', 'error'); return; }
       const input = document.getElementById('dm-input');
       const body = input.value.trim();
       if (!body && !dmAudioBlob && !dmPendingImageFile && !dmPendingVideoBlob) return;
@@ -1597,7 +1597,7 @@
       const { error } = await sb.from('messages').insert(msg);
       if (error) { showToast('Error al enviar mensaje', 'error'); return; }
       loadDMHistory();
-      const label = msg.media_type === 'video' ? '🎥 Video' : msg.media_type === 'image' ? '📷 Imagen' : msg.media_type === 'audio' ? '🎤 Audio' : body;
+      const label = msg.media_type === 'video' ? 'ðŸŽ¥ Video' : msg.media_type === 'image' ? 'ðŸ“· Imagen' : msg.media_type === 'audio' ? 'ðŸŽ¤ Audio' : body;
       createNotification(creatorProfile.id, 'message', label, null, 'messages.html#chat-' + user.id);
     }
 
@@ -1661,7 +1661,7 @@
         document.getElementById('dm-recording-indicator').classList.remove('hidden');
         document.getElementById('dm-audio-btn').classList.add('text-red-500');
       } catch(e) {
-        showToast('No se pudo acceder al micrófono', 'error');
+        showToast('No se pudo acceder al micrÃ³fono', 'error');
       }
     }
     function stopAudioRecordDM() {
@@ -1682,7 +1682,7 @@
     function handleDMImage(input) {
       const file = input.files[0];
       if (!file) return;
-      if (file.size > 10 * 1024 * 1024) { showToast('Imagen máx 10MB', 'error'); return; }
+      if (file.size > 10 * 1024 * 1024) { showToast('Imagen mÃ¡x 10MB', 'error'); return; }
       dmPendingImageFile = file;
       document.getElementById('dm-image-thumb').src = URL.createObjectURL(file);
       document.getElementById('dm-image-preview').classList.remove('hidden');
@@ -1722,7 +1722,7 @@
         document.body.appendChild(modal);
         document.getElementById('dm-video-live').srcObject = dmVideoStream;
       } catch(e) {
-        showToast('No se pudo acceder a la cámara', 'error');
+        showToast('No se pudo acceder a la cÃ¡mara', 'error');
       }
     }
 
@@ -1778,11 +1778,11 @@
       });
       if (insErr) { showToast('Error al enviar video', 'error'); return; }
       loadDMHistory();
-      createNotification(creatorProfile.id, 'message', '🎥 Video', null, 'messages.html#chat-' + user.id);
+      createNotification(creatorProfile.id, 'message', 'ðŸŽ¥ Video', null, 'messages.html#chat-' + user.id);
     }
 
     // ===== DM REACTIONS =====
-    const DM_QUICK_REACTIONS = ['❤️','😂','😮','😢','😡','👍','🔥','🙏','💯','✨'];
+    const DM_QUICK_REACTIONS = ['â¤ï¸','ðŸ˜‚','ðŸ˜®','ðŸ˜¢','ðŸ˜¡','ðŸ‘','ðŸ”¥','ðŸ™','ðŸ’¯','âœ¨'];
 
     function showDMReactionPicker(msgId, isMine) {
       const existing = document.getElementById('dm-reaction-picker');
@@ -1827,7 +1827,7 @@
         const { error: rErr } = await sb.from('messages').update({ reactions }).eq('id', msgId);
         if (rErr) { showToast('Error al reaccionar', 'error'); return; }
         const other = msg.sender_id === user.id ? msg.receiver_id : msg.sender_id;
-        if (idx < 0) createNotification(other, 'message', `Reacción ${emoji}`, null, 'messages.html#chat-' + user.id);
+        if (idx < 0) createNotification(other, 'message', `ReacciÃ³n ${emoji}`, null, 'messages.html#chat-' + user.id);
       } finally {
         dmReactionPause = false;
         loadDMHistory();
@@ -1868,13 +1868,13 @@
               </div>
             </button>
             <div class="absolute bottom-3 left-3 glass-dark rounded-lg px-2 py-1">
-              <p class="text-[10px] text-white/80">📹 Max 5 min</p>
+              <p class="text-[10px] text-white/80">ðŸ“¹ Max 5 min</p>
             </div>
           </div>` : '';
 
         const suppMediaHTML = mediaArr.length ? `
           <div class="space-y-2">
-            <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">📎 Archivos adjuntos</p>
+            <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-wider">ðŸ“Ž Archivos adjuntos</p>
             <div class="story-media-grid ${mediaArr.length >= 3 ? 'cols-3' : mediaArr.length === 2 ? 'cols-2' : ''}">
               ${mediaArr.map(url => {
                 const isAudio = /\.(mp3|wav|ogg|webm|m4a)$/i.test(url);
@@ -1992,7 +1992,7 @@
 
     async function toggleStoryLike(storyId) {
       const { data: { user } } = await sb.auth.getUser();
-      if (!user) { showToast('Inicia sesión', 'error'); return; }
+      if (!user) { showToast('Inicia sesiÃ³n', 'error'); return; }
       const { data, error } = await sb.rpc('toggle_story_like', { p_story_id: storyId });
       if (error) { showToast('Error', 'error'); return; }
       const liked = data?.liked;
@@ -2010,7 +2010,7 @@
     async function shareStory(storyId, title) {
       const url = window.location.origin + window.location.pathname + '?u=' + encodeURIComponent(creatorProfile.username) + '#story-card-' + storyId;
       const name = creatorProfile.display_name || creatorProfile.username || 'este creador';
-      const text = title ? `${title} — por ${name} en CREO` : `Historia de ${name} en CREO`;
+      const text = title ? `${title} â€” por ${name} en CREO` : `Historia de ${name} en CREO`;
       if (navigator.share) {
         try { await navigator.share({ title: text, url }); } catch (e) { if (e.name !== 'AbortError') copyToClipboard(url); }
       } else {
@@ -2041,9 +2041,9 @@
         .order('created_at', { ascending: true });
       const list = document.getElementById('story-comments-list-' + storyId);
       if (!list) return;
-      if (!comments || comments.length === 0) { list.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">Sin comentarios aún</p>'; return; }
+      if (!comments || comments.length === 0) { list.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">Sin comentarios aÃºn</p>'; return; }
       list.innerHTML = comments.map(c => {
-        const name = c.profiles?.display_name || c.profiles?.username || 'Anónimo';
+        const name = c.profiles?.display_name || c.profiles?.username || 'AnÃ³nimo';
         const profileLink = c.profiles?.username ? `profile.html?u=${encodeURIComponent(c.profiles.username)}` : '#';
         return `<div class="flex gap-2">
           <a href="${profileLink}" class="w-6 h-6 rounded-full bg-creo-purple/10 flex items-center justify-center flex-shrink-0 overflow-hidden hover:ring-2 hover:ring-creo-mint transition">
@@ -2060,7 +2060,7 @@
 
     async function submitStoryComment(storyId) {
       const { data: { user } } = await sb.auth.getUser();
-      if (!user) { showToast('Inicia sesión para comentar', 'error'); return; }
+      if (!user) { showToast('Inicia sesiÃ³n para comentar', 'error'); return; }
       const input = document.getElementById('story-comment-input-' + storyId);
       const body = input.value.trim();
       if (!body) return;
@@ -2103,13 +2103,13 @@
             </div>
             <div>
               <label class="text-xs font-semibold text-gray-600">Resumen para "Yo Creo en Ti"</label>
-              <p class="text-[10px] text-gray-400 mb-1">Este texto aparece cuando alguien te destaca en su sección "Yo Creo en Ellos". Escribe algo breve que inspire a otros a apoyarte.</p>
-              <textarea id="edit-story-description" rows="3" placeholder="Ej: Soy músico independiente creando mi primer álbum..." class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">${esc(s.description || '')}</textarea>
+              <p class="text-[10px] text-gray-400 mb-1">Este texto aparece cuando alguien te destaca en su secciÃ³n "Yo Creo en Ellos". Escribe algo breve que inspire a otros a apoyarte.</p>
+              <textarea id="edit-story-description" rows="3" placeholder="Ej: Soy mÃºsico independiente creando mi primer Ã¡lbum..." class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">${esc(s.description || '')}</textarea>
             </div>
             <div>
               <label class="text-xs font-semibold text-gray-600">Tu Historia Completa</label>
-              <p class="text-[10px] text-gray-400 mb-1">El contenido completo de tu historia. Aquí cuentas tu camino, tu visión y por qué haces lo que haces.</p>
-              <textarea id="edit-story-content" rows="4" placeholder="Cuéntale al mundo tu historia..." class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">${esc(s.content || '')}</textarea>
+              <p class="text-[10px] text-gray-400 mb-1">El contenido completo de tu historia. AquÃ­ cuentas tu camino, tu visiÃ³n y por quÃ© haces lo que haces.</p>
+              <textarea id="edit-story-content" rows="4" placeholder="CuÃ©ntale al mundo tu historia..." class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">${esc(s.content || '')}</textarea>
             </div>
 
             <!-- Main Video -->
@@ -2244,7 +2244,7 @@
         else preview = `<div class="h-24 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-500">Archivo</div>`;
         return `<div class="relative group">
           ${preview}
-          <button onclick="removeEditMediaItem(${idx})" class="absolute -top-1.5 -right-1.5 w-6 h-6 bg-red-500 text-white rounded-full text-sm flex items-center justify-center hover:bg-red-600 shadow-md opacity-80 group-hover:opacity-100 transition">×</button>
+          <button onclick="removeEditMediaItem(${idx})" class="absolute -top-1.5 -right-1.5 w-6 h-6 bg-red-500 text-white rounded-full text-sm flex items-center justify-center hover:bg-red-600 shadow-md opacity-80 group-hover:opacity-100 transition">Ã—</button>
         </div>`;
       }).join('');
     }
@@ -2324,7 +2324,7 @@
 
         activeRecorder._stream = stream;
       }).catch(err => {
-        showToast('No se pudo acceder a ' + (isVideo ? 'la cámara' : 'el micrófono') + ': ' + err.message, 'error');
+        showToast('No se pudo acceder a ' + (isVideo ? 'la cÃ¡mara' : 'el micrÃ³fono') + ': ' + err.message, 'error');
       });
     }
 
@@ -2361,14 +2361,14 @@
 
       const status = document.getElementById('edit-story-upload-status');
       status.classList.remove('hidden');
-      status.textContent = 'Subiendo grabación...';
+      status.textContent = 'Subiendo grabaciÃ³n...';
       const maxMB = isVideo ? 50 : 10;
       const url = await uploadToStorage(file, 'stories', maxMB);
       status.classList.add('hidden');
       if (url) {
         editStoryData.media_urls.push(url);
         renderEditMediaGrid();
-        showToast('Grabación guardada', 'success');
+        showToast('GrabaciÃ³n guardada', 'success');
       }
     }
 
@@ -2404,7 +2404,7 @@
     }
 
     async function deleteProfileStory(id) {
-      if (!confirm('¿Eliminar esta historia? Esta acción no se puede deshacer.')) return;
+      if (!confirm('Â¿Eliminar esta historia? Esta acciÃ³n no se puede deshacer.')) return;
       const { error } = await sb.from('creator_stories').delete().eq('id', id);
       if (error) { showToast('Error: ' + error.message, 'error'); return; }
       const card = document.getElementById('story-card-' + id);
@@ -2474,12 +2474,12 @@
 
     async function toggleFollow() {
       const { data: { user } } = await sb.auth.getUser();
-      if (!user) { showToast('Inicia sesión para seguir', 'error'); return; }
+      if (!user) { showToast('Inicia sesiÃ³n para seguir', 'error'); return; }
       try {
         const { data, error } = await sb.rpc('toggle_follow', { p_following_id: creatorProfile.id });
         if (error) {
           if (error.message && error.message.includes('toggle_follow')) {
-            showToast('Función de seguimiento no disponible aún', 'info');
+            showToast('FunciÃ³n de seguimiento no disponible aÃºn', 'info');
           } else {
             showToast(error.message || 'Error', 'error');
           }
@@ -2492,7 +2492,7 @@
           createNotification(creatorProfile.id, 'follow', 'Tienes un nuevo seguidor', null, 'profile.html?u=' + creatorProfile.username + '#followers');
         }
       } catch (e) {
-        showToast('Seguimiento no disponible aún', 'info');
+        showToast('Seguimiento no disponible aÃºn', 'info');
       }
     }
 
@@ -2500,7 +2500,7 @@
     function shareProfile() {
       if (!creatorProfile) return;
       const url = 'https://fullnessmindset.github.io/creo/profile.html?u=' + creatorProfile.username;
-      const title = 'CREO — ' + (creatorProfile.display_name || creatorProfile.username);
+      const title = 'CREO â€” ' + (creatorProfile.display_name || creatorProfile.username);
       if (navigator.share) {
         navigator.share({ title, url });
       } else {
@@ -2543,7 +2543,7 @@
               </div>
               <span class="text-[10px] text-gray-400">$${raised}/$${goal}</span>
             </div>
-            <p class="text-[10px] text-gray-400 mt-0.5">${m.start_date} — ${m.end_date}</p>
+            <p class="text-[10px] text-gray-400 mt-0.5">${m.start_date} â€” ${m.end_date}</p>
           </div>
         </div>`;
       }).join('');
@@ -2591,12 +2591,12 @@
           <div class="p-3">
             ${post.title ? `<p class="text-xs font-bold" style="color:var(--brand-text-color, #374151)">${esc(post.title)}</p>` : ''}
             ${post.body && post.post_type !== 'text' ? `<p class="text-sm leading-relaxed" style="color:var(--brand-text-color, #374151)">${esc(post.body)}</p>` : ''}
-            <p class="text-[10px] mt-1" style="color:var(--brand-text-color, #9ca3af); opacity:0.6">${post.post_type} · ${timeAgo(post.created_at)}</p>
+            <p class="text-[10px] mt-1" style="color:var(--brand-text-color, #9ca3af); opacity:0.6">${post.post_type} Â· ${timeAgo(post.created_at)}</p>
           </div>
         </div>`;
       }).join('');
 
-      // Wheel → horizontal scroll conversion for desktop
+      // Wheel â†’ horizontal scroll conversion for desktop
       scroll.addEventListener('wheel', (e) => {
         if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
           e.preventDefault();
@@ -2669,7 +2669,7 @@
         else preview = `<img src="${url}" class="w-full h-full object-cover">`;
         return `<div class="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
           ${preview}
-          <button onclick="profilePostMediaFiles.splice(${i},1);renderProfilePostMedia()" class="absolute top-0.5 right-0.5 w-5 h-5 bg-black/60 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-500">✕</button>
+          <button onclick="profilePostMediaFiles.splice(${i},1);renderProfilePostMedia()" class="absolute top-0.5 right-0.5 w-5 h-5 bg-black/60 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-500">âœ•</button>
         </div>`;
       }).join('');
     }
@@ -2734,7 +2734,7 @@
       window._profRecChunks = [];
       const m = document.getElementById('profile-rec-modal');
       if (m) m.remove();
-      showToast('Grabación lista', 'success');
+      showToast('GrabaciÃ³n lista', 'success');
     }
 
     async function createProfilePost() {
@@ -2797,7 +2797,7 @@
         profilePostMediaFiles = [];
         renderProfilePostMedia();
         setProfilePostType('normal');
-        showToast(toComunidad ? '¡Publicado en tu perfil y Comunidad!' : '¡Publicado solo en tu perfil!', 'success');
+        showToast(toComunidad ? 'Â¡Publicado en tu perfil y Comunidad!' : 'Â¡Publicado solo en tu perfil!', 'success');
         loadCreatorPosts(user.id);
       } catch (e) {
         btn.innerText = 'Publicar'; btn.disabled = false;
@@ -2885,27 +2885,27 @@
       }
       document.body.style.fontFamily = font + ', sans-serif';
 
-      // Section cards — all glass sections, payment panels, metas, stories
+      // Section cards â€” all glass sections, payment panels, metas, stories
       document.querySelectorAll('.glass, .glass-dark, #profile-header-card, .pay-panel > div, #payment-tabs').forEach(el => {
         el.style.background = sectionBg;
         el.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '';
       });
 
-      // Titles — white in dark mode
+      // Titles â€” white in dark mode
       document.querySelectorAll('.section-title, #profile-name, h3.text-lg, h2.section-title').forEach(el => {
         el.style.color = titleColor;
       });
-      // Meta media card titles sit on gradient overlay — always white
+      // Meta media card titles sit on gradient overlay â€” always white
       document.querySelectorAll('.meta-media-card h3').forEach(el => {
         el.style.color = '#ffffff';
       });
 
-      // Regular text — apply in both light and dark mode
+      // Regular text â€” apply in both light and dark mode
       document.querySelectorAll('#profile-bio, #profile-username, .text-gray-900, .text-gray-700').forEach(el => {
         el.style.color = textColor;
       });
 
-      // Payment buttons ONLY — Follow/Message/Share stay default
+      // Payment buttons ONLY â€” Follow/Message/Share stay default
       document.querySelectorAll('#tip-btn, #sub-btn, #meta-support-btn').forEach(el => {
         if (!el.disabled) {
           el.style.backgroundColor = buttonColor;
@@ -3022,7 +3022,7 @@
           avatarContainer.style.borderRadius = shapeMap[layout.profileImage.shape] || '50%';
         }
       } else {
-        // No profileImage setting — apply default margin based on position
+        // No profileImage setting â€” apply default margin based on position
         const hc = document.getElementById('profile-header-card');
         if (hc) {
           const defSz = 112;
@@ -3111,7 +3111,7 @@
       const name = p.display_name || p.username;
       const initials = name[0].toUpperCase();
       const avatar = p.avatar_url;
-      const badge = isDummy ? ' 🤖' : '';
+      const badge = isDummy ? ' ðŸ¤–' : '';
       const bio = (p.bio || p.content || '').slice(0, 60) + ((p.bio || p.content || '').length > 60 ? '...' : '');
       const cover = p.cover_url || '';
       const dataAttrs = `data-creo-user="${esc(p.username)}" data-creo-name="${esc(name)}" data-creo-avatar="${esc(avatar || '')}" data-creo-bio="${esc(p.bio || p.content || '')}" data-creo-cover="${esc(cover)}" data-creo-dummy="${isDummy}"`;
@@ -3230,10 +3230,10 @@
         if (!header) return;
         const btn = document.createElement('button');
         btn.className = 'absolute top-2 right-2 bg-amber-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full opacity-0 hover:opacity-100 transition-opacity shadow-lg z-20';
-        btn.textContent = '🔑 Actuar como ' + (creatorProfile.display_name || creatorProfile.username);
+        btn.textContent = 'ðŸ”‘ Actuar como ' + (creatorProfile.display_name || creatorProfile.username);
         btn.onclick = () => {
           sessionStorage.setItem('creo-impersonate', JSON.stringify({ id: creatorProfile.id, username: creatorProfile.username, display_name: creatorProfile.display_name }));
-          showToast('Modo impersonación: ' + (creatorProfile.display_name || creatorProfile.username), 'info');
+          showToast('Modo impersonaciÃ³n: ' + (creatorProfile.display_name || creatorProfile.username), 'info');
           window.location.href = 'index.html';
         };
         header.style.position = 'relative';
@@ -3271,9 +3271,9 @@
       loadNotificationBell();
       checkMetaSupportEligibility();
       const status = urlParams.get('status');
-      if (status === 'completed') showToast('¡Gracias por tu apoyo!', 'success');
-      if (status === 'meta_completed') showToast('¡Gracias por contribuir a la meta!', 'success');
-      if (status === 'subscribed') showToast('¡Suscripción activada! Gracias por tu apoyo mensual.', 'success');
+      if (status === 'completed') showToast('Â¡Gracias por tu apoyo!', 'success');
+      if (status === 'meta_completed') showToast('Â¡Gracias por contribuir a la meta!', 'success');
+      if (status === 'subscribed') showToast('Â¡SuscripciÃ³n activada! Gracias por tu apoyo mensual.', 'success');
       if (window.location.hash) {
         setTimeout(() => {
           const hash = window.location.hash.slice(1);

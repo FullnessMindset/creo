@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CREO — Admin Dashboard</title>
+  <title>CREO â€” Admin Dashboard</title>
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="X-Frame-Options" content="DENY">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -27,7 +27,7 @@
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300 overflow-x-hidden">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js"></script>
+  <script src="shared.js?v=2"></script>
 
   <!-- Auth Gate -->
   <div id="auth-gate" class="flex flex-col items-center justify-center min-h-screen px-4">
@@ -56,7 +56,7 @@
             <span>Continuar con Google</span>
           </button>
           <div class="bg-green-50 border border-green-200 rounded-lg p-3 flex gap-2 items-start">
-            <span class="text-lg">🛡️</span>
+            <span class="text-lg">ðŸ›¡ï¸</span>
             <p class="text-xs text-green-700">Solo el email del administrador autorizado puede acceder a este panel.</p>
           </div>
         </div>
@@ -74,7 +74,7 @@
 
         <div class="flex items-center justify-center gap-2 pt-2">
           <svg class="w-3.5 h-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
-          <span class="text-[10px] text-gray-400">Autenticación verificada por Stripe + Supabase</span>
+          <span class="text-[10px] text-gray-400">AutenticaciÃ³n verificada por Stripe + Supabase</span>
         </div>
       </div>
     </div>
@@ -116,48 +116,48 @@
       <!-- Stats Row -->
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('creators')">
-          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="personas">👥</span> Total Creators</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="personas">ðŸ‘¥</span> Total Creators</p>
           <p id="stat-total" class="text-3xl font-bold text-gray-900 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('verification')">
-          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="reloj">⏳</span> Pending Review</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="reloj">â³</span> Pending Review</p>
           <p id="stat-pending-review" class="text-3xl font-bold text-yellow-600 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('verification')">
-          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="verificado">✅</span> Verified</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="verificado">âœ…</span> Verified</p>
           <p id="stat-verified" class="text-3xl font-bold text-green-600 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('reports')">
-          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="alerta">⚠️</span> Open Reports</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="alerta">âš ï¸</span> Open Reports</p>
           <p id="stat-reports" class="text-3xl font-bold text-red-500 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
-          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="grafico">📈</span> Platform Revenue</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="grafico">ðŸ“ˆ</span> Platform Revenue</p>
           <p id="stat-revenue" class="text-3xl font-bold text-emerald-600 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
-          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="billetera">💰</span> Available Balance</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="billetera">ðŸ’°</span> Available Balance</p>
           <p id="stat-balance" class="text-3xl font-bold text-creo-purple mt-1">-</p>
         </div>
       </div>
 
       <!-- Tabs -->
       <div class="flex space-x-1 bg-gray-100 p-1 rounded-xl border border-gray-200 transition-colors overflow-x-auto max-w-full sticky top-[57px] z-[5]" style="scrollbar-width:thin;-webkit-overflow-scrolling:touch">
-        <button onclick="showTab('verification')" id="tab-verification" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-creo-purple text-white transition relative">🛡️ Verification<span id="badge-verification" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('creators')" id="tab-creators" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">👥 Creators</button>
-        <button onclick="showTab('transactions')" id="tab-transactions" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">💳 Transactions</button>
+        <button onclick="showTab('verification')" id="tab-verification" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-creo-purple text-white transition relative">ðŸ›¡ï¸ Verification<span id="badge-verification" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('creators')" id="tab-creators" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">ðŸ‘¥ Creators</button>
+        <button onclick="showTab('transactions')" id="tab-transactions" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">ðŸ’³ Transactions</button>
         <button onclick="showTab('accounts')" id="tab-accounts" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">Stripe Accounts</button>
-        <button onclick="showTab('links')" id="tab-links" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">🔗 Quick Links</button>
-        <button onclick="showTab('allusers')" id="tab-allusers" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">👤 All Users</button>
-        <button onclick="showTab('metareviews')" id="tab-metareviews" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">🎯 Meta Reviews<span id="badge-metareviews" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('dealpayouts')" id="tab-dealpayouts" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">💰 Deal Payouts<span id="badge-dealpayouts" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('reports')" id="tab-reports" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">🚩 Reports<span id="badge-reports" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('announcements')" id="tab-announcements" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">📢 Announcements</button>
-        <button onclick="showTab('moderation')" id="tab-moderation" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">⚖️ Moderation<span id="badge-moderation" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('manipulation')" id="tab-manipulation" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">🛡️ Anti-Abuse<span id="badge-manipulation" class="hidden absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('fairness')" id="tab-fairness" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">⚖️ Fairness</button>
-        <button onclick="showTab('featureflags')" id="tab-featureflags" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">🚩 Feature Flags</button>
-        <button onclick="showTab('monitoring')" id="tab-monitoring" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">📊 Monitoring</button>
+        <button onclick="showTab('links')" id="tab-links" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">ðŸ”— Quick Links</button>
+        <button onclick="showTab('allusers')" id="tab-allusers" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">ðŸ‘¤ All Users</button>
+        <button onclick="showTab('metareviews')" id="tab-metareviews" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">ðŸŽ¯ Meta Reviews<span id="badge-metareviews" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('dealpayouts')" id="tab-dealpayouts" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">ðŸ’° Deal Payouts<span id="badge-dealpayouts" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('reports')" id="tab-reports" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">ðŸš© Reports<span id="badge-reports" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('announcements')" id="tab-announcements" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">ðŸ“¢ Announcements</button>
+        <button onclick="showTab('moderation')" id="tab-moderation" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">âš–ï¸ Moderation<span id="badge-moderation" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('manipulation')" id="tab-manipulation" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">ðŸ›¡ï¸ Anti-Abuse<span id="badge-manipulation" class="hidden absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('fairness')" id="tab-fairness" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">âš–ï¸ Fairness</button>
+        <button onclick="showTab('featureflags')" id="tab-featureflags" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">ðŸš© Feature Flags</button>
+        <button onclick="showTab('monitoring')" id="tab-monitoring" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">ðŸ“Š Monitoring</button>
         <button onclick="showTab('stripe')" id="tab-stripe" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
           Stripe
@@ -410,7 +410,7 @@
                 <p class="text-xs text-red-500 font-semibold uppercase mb-1">Reason</p>
                 <p class="text-sm font-medium text-red-800" id="rr-reason"></p>
                 <p class="text-xs text-gray-600 mt-1" id="rr-details"></p>
-                <p class="text-xs text-gray-400 mt-2">Reported by <span id="rr-reporter-name" class="font-medium text-gray-600"></span> · <span id="rr-report-date"></span></p>
+                <p class="text-xs text-gray-400 mt-2">Reported by <span id="rr-reporter-name" class="font-medium text-gray-600"></span> Â· <span id="rr-report-date"></span></p>
               </div>
 
               <!-- Past Reports History -->
@@ -456,7 +456,7 @@
                 <button onclick="applySanction('temporary_lock')" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">Temporary Lock</button>
                 <button onclick="applySanction('life_ban')" class="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">Life Ban</button>
               </div>
-              <p class="text-[10px] text-gray-400 mt-1.5">Partial = no funds/deals/metas · Temporary = full account lock · Life Ban = permanent</p>
+              <p class="text-[10px] text-gray-400 mt-1.5">Partial = no funds/deals/metas Â· Temporary = full account lock Â· Life Ban = permanent</p>
             </div>
           </div>
         </div>
@@ -497,7 +497,7 @@
             </div>
             <div>
               <label class="text-xs text-gray-500 uppercase">Icon Emoji (optional)</label>
-              <input id="ann-icon" type="text" maxlength="4" placeholder="e.g. 🎉 📢 🔥" class="w-full bg-white border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple" style="font-size:max(16px,1em);">
+              <input id="ann-icon" type="text" maxlength="4" placeholder="e.g. ðŸŽ‰ ðŸ“¢ ðŸ”¥" class="w-full bg-white border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple" style="font-size:max(16px,1em);">
             </div>
             <div id="ann-user-select" class="hidden">
               <label class="text-xs text-gray-500 uppercase">Select User</label>
@@ -520,7 +520,7 @@
       </div>
 
       <!-- STRIPE PANEL -->
-      <!-- ═══ MODERATION QUEUE ═══ -->
+      <!-- â•â•â• MODERATION QUEUE â•â•â• -->
       <div id="panel-moderation" class="hidden fade-in space-y-4">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-bold text-gray-900">Moderation Queue</h2>
@@ -555,7 +555,7 @@
         </div>
       </div>
 
-      <!-- ═══ MANIPULATION ALERTS ═══ -->
+      <!-- â•â•â• MANIPULATION ALERTS â•â•â• -->
       <div id="panel-manipulation" class="hidden fade-in space-y-4">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-bold text-gray-900">Anti-Manipulation Alerts</h2>
@@ -582,7 +582,7 @@
         </div>
       </div>
 
-      <!-- ═══ FAIRNESS METRICS ═══ -->
+      <!-- â•â•â• FAIRNESS METRICS â•â•â• -->
       <div id="panel-fairness" class="hidden fade-in space-y-4">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-bold text-gray-900">Creator Fairness Metrics</h2>
@@ -593,7 +593,7 @@
         <div id="fairness-empty" class="p-8 text-center text-gray-400 text-sm">Loading fairness data...</div>
       </div>
 
-      <!-- ═══ FEATURE FLAGS ═══ -->
+      <!-- â•â•â• FEATURE FLAGS â•â•â• -->
       <div id="panel-featureflags" class="hidden fade-in space-y-4">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-bold text-gray-900">Feature Flags & Rollback Controls</h2>
@@ -621,7 +621,7 @@
         </div>
       </div>
 
-      <!-- ═══ MONITORING ═══ -->
+      <!-- â•â•â• MONITORING â•â•â• -->
       <div id="panel-monitoring" class="hidden fade-in space-y-4">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-bold text-gray-900">System Monitoring</h2>
@@ -651,15 +651,15 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="bg-gradient-to-br from-stripe-purple to-indigo-600 rounded-xl p-5 text-white stat-card">
             <p class="text-xs uppercase tracking-wider opacity-80">Balance Disponible</p>
-            <p id="stripe-available" class="text-2xl font-bold mt-1">—</p>
+            <p id="stripe-available" class="text-2xl font-bold mt-1">â€”</p>
           </div>
           <div class="bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl p-5 text-white stat-card">
             <p class="text-xs uppercase tracking-wider opacity-80">Balance Pendiente</p>
-            <p id="stripe-pending" class="text-2xl font-bold mt-1">—</p>
+            <p id="stripe-pending" class="text-2xl font-bold mt-1">â€”</p>
           </div>
           <div class="bg-gradient-to-br from-emerald-600 to-teal-500 rounded-xl p-5 text-white stat-card">
             <p class="text-xs uppercase tracking-wider opacity-80">Cuentas Conectadas</p>
-            <p id="stripe-accounts-count" class="text-2xl font-bold mt-1">—</p>
+            <p id="stripe-accounts-count" class="text-2xl font-bold mt-1">â€”</p>
             <p id="stripe-accounts-active" class="text-xs opacity-80 mt-0.5"></p>
           </div>
         </div>
@@ -694,7 +694,7 @@
           </div>
           <div id="stripe-payments-empty" class="p-8 text-center text-gray-400 text-sm">Cargando pagos...</div>
           <div id="stripe-payments-more" class="hidden px-5 py-3 border-t border-gray-100 text-center">
-            <button onclick="loadStripePayments(true)" class="text-sm text-stripe-purple font-semibold hover:underline">Cargar más</button>
+            <button onclick="loadStripePayments(true)" class="text-sm text-stripe-purple font-semibold hover:underline">Cargar mÃ¡s</button>
           </div>
         </div>
 
@@ -711,7 +711,7 @@
                   <th class="px-4 py-3 text-left">ID</th>
                   <th class="px-4 py-3 text-left">Monto</th>
                   <th class="px-4 py-3 text-left">Estado</th>
-                  <th class="px-4 py-3 text-left">Método</th>
+                  <th class="px-4 py-3 text-left">MÃ©todo</th>
                   <th class="px-4 py-3 text-left">Llegada</th>
                 </tr>
               </thead>
@@ -733,7 +733,7 @@
                 <tr>
                   <th class="px-4 py-3 text-left">ID</th>
                   <th class="px-4 py-3 text-left">Email</th>
-                  <th class="px-4 py-3 text-left">País</th>
+                  <th class="px-4 py-3 text-left">PaÃ­s</th>
                   <th class="px-4 py-3 text-left">Cobros</th>
                   <th class="px-4 py-3 text-left">Payouts</th>
                   <th class="px-4 py-3 text-left">Creada</th>
@@ -765,9 +765,9 @@
           <input id="mr-admin-notes" type="text" placeholder="Notas internas..." class="w-full bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900">
         </div>
         <div class="flex space-x-3">
-          <button onclick="approveMetaStage()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold text-sm transition">✅ Aprobar</button>
-          <button onclick="rejectMetaStage()" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold text-sm transition">❌ Rechazar</button>
-          <button id="mr-fraud-btn" class="hidden flex-1 bg-red-900 hover:bg-red-950 text-white py-3 rounded-lg font-semibold text-sm transition" onclick="markMetaFraud()">⛔ Fraude — Banear</button>
+          <button onclick="approveMetaStage()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold text-sm transition">âœ… Aprobar</button>
+          <button onclick="rejectMetaStage()" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold text-sm transition">âŒ Rechazar</button>
+          <button id="mr-fraud-btn" class="hidden flex-1 bg-red-900 hover:bg-red-950 text-white py-3 rounded-lg font-semibold text-sm transition" onclick="markMetaFraud()">â›” Fraude â€” Banear</button>
           <button onclick="closeMetaReviewModal()" class="px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold text-sm transition">Cancelar</button>
         </div>
       </div>
@@ -798,7 +798,7 @@
               <div>
                 <label class="text-xs text-gray-500 uppercase font-medium">Verification Status</label>
                 <select id="override-verification-status" class="w-full bg-gray-50 border border-gray-300 p-2 rounded-lg text-sm mt-1 text-gray-900">
-                  <option value="">— no change —</option>
+                  <option value="">â€” no change â€”</option>
                   <option value="approved">Approved</option>
                   <option value="submitted">Pending (submitted)</option>
                   <option value="rejected">Rejected</option>
@@ -809,7 +809,7 @@
               <div>
                 <label class="text-xs text-gray-500 uppercase font-medium">Stripe Onboarded</label>
                 <select id="override-stripe-onboarded" class="w-full bg-gray-50 border border-gray-300 p-2 rounded-lg text-sm mt-1 text-gray-900">
-                  <option value="">— no change —</option>
+                  <option value="">â€” no change â€”</option>
                   <option value="true">Yes (mark as onboarded)</option>
                   <option value="false">No (mark as not onboarded)</option>
                 </select>
@@ -817,7 +817,7 @@
               <div>
                 <label class="text-xs text-gray-500 uppercase font-medium">Identity Verified</label>
                 <select id="override-identity-verified" class="w-full bg-gray-50 border border-gray-300 p-2 rounded-lg text-sm mt-1 text-gray-900">
-                  <option value="">— no change —</option>
+                  <option value="">â€” no change â€”</option>
                   <option value="true">Yes (mark as verified)</option>
                   <option value="false">No (mark as not verified)</option>
                 </select>
@@ -833,7 +833,7 @@
               <div>
                 <label class="text-xs text-gray-500 uppercase font-medium">Onboarding Completed</label>
                 <select id="override-onboarding-completed" class="w-full bg-gray-50 border border-gray-300 p-2 rounded-lg text-sm mt-1 text-gray-900">
-                  <option value="">— no change —</option>
+                  <option value="">â€” no change â€”</option>
                   <option value="true">Yes</option>
                   <option value="false">No</option>
                 </select>
@@ -945,12 +945,12 @@
           <label class="text-xs text-gray-500 uppercase font-semibold">Template</label>
           <select id="email-template" onchange="applyEmailTemplate()" class="w-full bg-gray-50 border border-gray-300 p-2.5 rounded-lg text-sm mt-1 text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             <option value="">Write from scratch...</option>
-            <option value="invite">🎉 Invite to CREO</option>
-            <option value="brand-deal">💼 New Brand Deal</option>
-            <option value="new-feature">🚀 New Feature</option>
-            <option value="update">📢 Platform Update</option>
-            <option value="welcome">👋 Welcome to CREO</option>
-            <option value="payout">💰 Payout Notification</option>
+            <option value="invite">ðŸŽ‰ Invite to CREO</option>
+            <option value="brand-deal">ðŸ’¼ New Brand Deal</option>
+            <option value="new-feature">ðŸš€ New Feature</option>
+            <option value="update">ðŸ“¢ Platform Update</option>
+            <option value="welcome">ðŸ‘‹ Welcome to CREO</option>
+            <option value="payout">ðŸ’° Payout Notification</option>
           </select>
         </div>
         <div>
@@ -978,7 +978,7 @@
                 <option value="https://fullnessmindset.github.io/creo/messages.html">Mensajes</option>
                 <option value="https://fullnessmindset.github.io/creo/profile.html">Mi Perfil</option>
                 <option value="https://fullnessmindset.github.io/creo/privacidad.html">Privacidad</option>
-                <option value="https://fullnessmindset.github.io/creo/terminos.html">Términos</option>
+                <option value="https://fullnessmindset.github.io/creo/terminos.html">TÃ©rminos</option>
                 <option value="custom">Custom URL...</option>
               </select>
             </div>
@@ -1013,7 +1013,7 @@
         </div>
 
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex gap-2 items-start">
-          <span class="text-sm">📧</span>
+          <span class="text-sm">ðŸ“§</span>
           <p class="text-xs text-blue-700">This email will be sent from CREO's official email and will appear in the user's inbox.</p>
         </div>
       </div>
@@ -1060,7 +1060,7 @@
           document.getElementById('account-name').textContent = res.account.name || res.account.id;
         }
       } catch (e) {
-        // Stripe account info not available — non-critical
+        // Stripe account info not available â€” non-critical
       }
 
       document.getElementById('auth-gate').classList.add('hidden');
@@ -1263,7 +1263,7 @@
               <div class="space-y-2">
                 ${docs.map(d => `<a href="${esc(d.file_url)}" target="_blank" class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition text-sm">
                   <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                  <div class="flex-1 min-w-0"><p class="text-gray-900 truncate">${esc(d.file_name || 'Document')}</p><p class="text-xs text-gray-400">${esc(d.document_type)} · ${new Date(d.uploaded_at).toLocaleDateString()}</p></div>
+                  <div class="flex-1 min-w-0"><p class="text-gray-900 truncate">${esc(d.file_name || 'Document')}</p><p class="text-xs text-gray-400">${esc(d.document_type)} Â· ${new Date(d.uploaded_at).toLocaleDateString()}</p></div>
                   <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                 </a>`).join('')}
               </div>
@@ -1442,9 +1442,9 @@
 
       // Send notification if verification status changed
       if (vs === 'approved') {
-        await createNotification(reviewingProfile.id, 'approval', '¡Tu cuenta ha sido verificada!', 'Un administrador verificó tu cuenta manualmente.', 'index.html');
+        await createNotification(reviewingProfile.id, 'approval', 'Â¡Tu cuenta ha sido verificada!', 'Un administrador verificÃ³ tu cuenta manualmente.', 'index.html');
       } else if (vs === 'rejected' && rr) {
-        await createNotification(reviewingProfile.id, 'rejection', 'Verificación rechazada', rr, 'index.html#verify');
+        await createNotification(reviewingProfile.id, 'rejection', 'VerificaciÃ³n rechazada', rr, 'index.html#verify');
       }
 
       closeReviewModal();
@@ -1465,7 +1465,7 @@
             const shouldBeOnboarded = acct.charges_enabled && acct.details_submitted;
             if (p.stripe_onboarded !== shouldBeOnboarded) {
               updates.stripe_onboarded = shouldBeOnboarded;
-              synced.push('stripe_onboarded → ' + shouldBeOnboarded);
+              synced.push('stripe_onboarded â†’ ' + shouldBeOnboarded);
             }
           }
         } catch(e) { showToast('Failed to fetch Stripe Connect status', 'error'); }
@@ -1479,14 +1479,14 @@
             const shouldBeVerified = res.status === 'verified';
             if (p.identity_verified !== shouldBeVerified) {
               updates.identity_verified = shouldBeVerified;
-              synced.push('identity_verified → ' + shouldBeVerified);
+              synced.push('identity_verified â†’ ' + shouldBeVerified);
             }
           }
         } catch(e) { showToast('Failed to fetch Identity status', 'error'); }
       }
 
       if (Object.keys(updates).length === 0) {
-        showToast('DB already matches Stripe — no changes needed', 'success');
+        showToast('DB already matches Stripe â€” no changes needed', 'success');
         return;
       }
 
@@ -1511,7 +1511,7 @@
       });
       if (res.error) return showToast('Error: ' + res.error, 'error');
 
-      await createNotification(reviewingProfile.id, 'system', 'Verificación de identidad reiniciada', 'Tu verificación de identidad fue reiniciada por un administrador. Por favor, verifica tu identidad nuevamente.', 'index.html');
+      await createNotification(reviewingProfile.id, 'system', 'VerificaciÃ³n de identidad reiniciada', 'Tu verificaciÃ³n de identidad fue reiniciada por un administrador. Por favor, verifica tu identidad nuevamente.', 'index.html');
 
       showToast('Identity verification reset for @' + reviewingProfile.username, 'success');
       closeReviewModal();
@@ -1530,7 +1530,7 @@
       });
       if (res.error) return showToast('Error: ' + res.error, 'error');
 
-      await createNotification(reviewingProfile.id, 'approval', '¡Tu cuenta ha sido verificada!', 'Ya puedes recibir pagos y aparecer como creador verificado.', 'index.html');
+      await createNotification(reviewingProfile.id, 'approval', 'Â¡Tu cuenta ha sido verificada!', 'Ya puedes recibir pagos y aparecer como creador verificado.', 'index.html');
 
       closeReviewModal();
       loadDashboard();
@@ -1551,7 +1551,7 @@
       });
       if (res.error) return showToast('Error: ' + res.error, 'error');
 
-      await createNotification(reviewingProfile.id, 'rejection', 'Verificación rechazada', reason, 'index.html#verify');
+      await createNotification(reviewingProfile.id, 'rejection', 'VerificaciÃ³n rechazada', reason, 'index.html#verify');
 
       closeReviewModal();
       loadDashboard();
@@ -1635,7 +1635,7 @@
             <button onclick="deleteCreator('${p.id}', '${esc(p.username)}')" class="text-xs text-red-500 hover:underline">Delete</button>
           </td>
           <td class="px-5 py-3">
-            ${p.email ? `<div class="flex items-center gap-2"><span class="text-xs text-gray-500 truncate max-w-[160px]">${esc(p.email)}</span><button onclick="openEmailModal('${esc(p.email)}', '${esc(p.display_name || p.username)}')" class="text-xs bg-creo-purple/10 text-creo-purple px-2 py-0.5 rounded hover:bg-creo-purple/20 transition font-medium flex-shrink-0">Send</button></div>` : '<span class="text-xs text-gray-300">—</span>'}
+            ${p.email ? `<div class="flex items-center gap-2"><span class="text-xs text-gray-500 truncate max-w-[160px]">${esc(p.email)}</span><button onclick="openEmailModal('${esc(p.email)}', '${esc(p.display_name || p.username)}')" class="text-xs bg-creo-purple/10 text-creo-purple px-2 py-0.5 rounded hover:bg-creo-purple/20 transition font-medium flex-shrink-0">Send</button></div>` : '<span class="text-xs text-gray-300">â€”</span>'}
           </td>
         </tr>`;
       }).join('');
@@ -1827,7 +1827,7 @@
         return;
       }
 
-      btn.innerHTML = '✅ Released!';
+      btn.innerHTML = 'âœ… Released!';
       btn.classList.remove('bg-green-600', 'hover:bg-green-700');
       btn.classList.add('bg-gray-400', 'cursor-not-allowed');
       setTimeout(() => { loadDealPayouts(); }, 1500);
@@ -1886,8 +1886,8 @@
       };
 
       data.data.forEach(pi => {
-        const dest = pi.transfer_data?.destination || '—';
-        const fee = pi.application_fee_amount ? '$' + (pi.application_fee_amount / 100).toFixed(2) : '—';
+        const dest = pi.transfer_data?.destination || 'â€”';
+        const fee = pi.application_fee_amount ? '$' + (pi.application_fee_amount / 100).toFixed(2) : 'â€”';
         const date = new Date(pi.created * 1000).toLocaleDateString('es', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         body.innerHTML += `<tr class="hover:bg-gray-50">
           <td class="px-4 py-3 text-xs font-mono text-gray-500">${pi.id.slice(0, 18)}...</td>
@@ -1895,7 +1895,7 @@
           <td class="px-4 py-3 text-emerald-600 font-medium">${fee}</td>
           <td class="px-4 py-3">${statusBadge(pi.status)}</td>
           <td class="px-4 py-3 text-gray-500">${date}</td>
-          <td class="px-4 py-3 text-xs font-mono text-gray-400">${typeof dest === 'string' ? dest.slice(0, 18) : '—'}</td>
+          <td class="px-4 py-3 text-xs font-mono text-gray-400">${typeof dest === 'string' ? dest.slice(0, 18) : 'â€”'}</td>
         </tr>`;
         lastPaymentId = pi.id;
       });
@@ -1912,7 +1912,7 @@
 
       const data = await apiCall('payouts');
       if (data.error) { empty.textContent = 'Error: ' + data.error; return; }
-      if (!data.data || data.data.length === 0) { empty.textContent = 'No hay payouts aún'; return; }
+      if (!data.data || data.data.length === 0) { empty.textContent = 'No hay payouts aÃºn'; return; }
       empty.classList.add('hidden');
 
       const statusBadge = (s) => {
@@ -1926,7 +1926,7 @@
           <td class="px-4 py-3 text-xs font-mono text-gray-500">${p.id.slice(0, 18)}...</td>
           <td class="px-4 py-3 font-semibold">$${(p.amount / 100).toFixed(2)}</td>
           <td class="px-4 py-3">${statusBadge(p.status)}</td>
-          <td class="px-4 py-3 text-gray-500">${p.method || '—'}</td>
+          <td class="px-4 py-3 text-gray-500">${p.method || 'â€”'}</td>
           <td class="px-4 py-3 text-gray-500">${arrival}</td>
         </tr>`;
       });
@@ -1946,11 +1946,11 @@
 
       data.data.forEach(a => {
         const date = new Date(a.created * 1000).toLocaleDateString('es', { month: 'short', day: 'numeric', year: 'numeric' });
-        const badge = (v) => v ? '<span class="text-xs px-2 py-0.5 rounded-full font-medium bg-green-100 text-green-700">Sí</span>' : '<span class="text-xs px-2 py-0.5 rounded-full font-medium bg-red-100 text-red-700">No</span>';
+        const badge = (v) => v ? '<span class="text-xs px-2 py-0.5 rounded-full font-medium bg-green-100 text-green-700">SÃ­</span>' : '<span class="text-xs px-2 py-0.5 rounded-full font-medium bg-red-100 text-red-700">No</span>';
         body.innerHTML += `<tr class="hover:bg-gray-50">
           <td class="px-4 py-3 text-xs font-mono text-gray-500">${a.id.slice(0, 20)}...</td>
-          <td class="px-4 py-3 text-gray-700">${a.email || '—'}</td>
-          <td class="px-4 py-3 text-gray-500">${a.country || '—'}</td>
+          <td class="px-4 py-3 text-gray-700">${a.email || 'â€”'}</td>
+          <td class="px-4 py-3 text-gray-500">${a.country || 'â€”'}</td>
           <td class="px-4 py-3">${badge(a.charges_enabled)}</td>
           <td class="px-4 py-3">${badge(a.payouts_enabled)}</td>
           <td class="px-4 py-3 text-gray-500">${date}</td>
@@ -1968,7 +1968,7 @@
       document.getElementById('edit-type').value = p.account_type || 'creator';
       let info = 'No Stripe account connected.';
       if (p.stripe_connect_id) {
-        info = 'Stripe ID: ' + p.stripe_connect_id + ' — loading...';
+        info = 'Stripe ID: ' + p.stripe_connect_id + ' â€” loading...';
         document.getElementById('edit-stripe-info').textContent = info;
         const d = await apiCall('stripe-account-status', { connect_id: p.stripe_connect_id });
         if (!d.error) info = `ID: ${d.id} | Charges: ${d.charges_enabled ? 'Yes' : 'No'} | Payouts: ${d.payouts_enabled ? 'Yes' : 'No'} | Country: ${d.country || 'N/A'}`;
@@ -2105,7 +2105,7 @@
       // Show warning count
       const totalWarnings = activeReportHistory.filter(h => h._type === 'sanction' && h.sanction_type === 'warning').length;
       const totalPastReports = activeReportHistory.filter(h => h._type === 'report').length;
-      document.getElementById('rr-warning-count').textContent = `${totalWarnings} warning${totalWarnings !== 1 ? 's' : ''} · ${totalPastReports} past report${totalPastReports !== 1 ? 's' : ''}`;
+      document.getElementById('rr-warning-count').textContent = `${totalWarnings} warning${totalWarnings !== 1 ? 's' : ''} Â· ${totalPastReports} past report${totalPastReports !== 1 ? 's' : ''}`;
 
       // Sanction status
       const profile = allProfiles.find(p => p.id === reported.id);
@@ -2153,21 +2153,21 @@
       if (activeReportHistory.length === 0) { section.classList.add('hidden'); return; }
       section.classList.remove('hidden');
 
-      const sanctionIcons = { warning: '⚠️', partial_lock: '🔒', temporary_lock: '🚫', life_ban: '⛔' };
+      const sanctionIcons = { warning: 'âš ï¸', partial_lock: 'ðŸ”’', temporary_lock: 'ðŸš«', life_ban: 'â›”' };
       const sanctionLabels = { warning: 'Warning', partial_lock: 'Partial Lock', temporary_lock: 'Temp Lock', life_ban: 'Life Ban' };
 
       list.innerHTML = activeReportHistory.map(h => {
         if (h._type === 'report') {
           const isCurrent = activeReport && h.id === activeReport.id;
           return `<div class="flex items-center gap-2 text-xs p-2 rounded-lg ${isCurrent ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'}">
-            <span class="text-red-500">📋</span>
+            <span class="text-red-500">ðŸ“‹</span>
             <span class="text-gray-700 flex-1">Report: <strong>${esc(h.reason)}</strong></span>
             <span class="text-xs px-1.5 py-0.5 rounded-full ${h.status === 'resolved' ? 'bg-green-100 text-green-700' : h.status === 'reviewed' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}">${esc(h.status)}</span>
             <span class="text-gray-400">${new Date(h.created_at).toLocaleDateString()}</span>
           </div>`;
         } else {
           return `<div class="flex items-center gap-2 text-xs p-2 rounded-lg bg-orange-50">
-            <span>${sanctionIcons[h.sanction_type] || '⚠️'}</span>
+            <span>${sanctionIcons[h.sanction_type] || 'âš ï¸'}</span>
             <span class="text-gray-700 flex-1"><strong>${sanctionLabels[h.sanction_type] || h.sanction_type}</strong>${h.reason ? ': ' + esc(h.reason) : ''}</span>
             <span class="text-xs px-1.5 py-0.5 rounded-full ${h.is_active ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-500'}">${h.is_active ? 'Active' : 'Expired'}</span>
             <span class="text-gray-400">${new Date(h.created_at).toLocaleDateString()}</span>
@@ -2193,7 +2193,7 @@
         const isSystem = m.message_type === 'system' || m.message_type === 'action';
         const isWarning = m.message_type === 'warning';
         const bg = isSystem ? 'bg-gray-200 text-gray-600' : isWarning ? 'bg-orange-100 text-orange-800 border border-orange-200' : 'bg-creo-purple text-white';
-        const icon = isWarning ? '⚠️ ' : isSystem ? '⚙️ ' : '';
+        const icon = isWarning ? 'âš ï¸ ' : isSystem ? 'âš™ï¸ ' : '';
         return `<div class="flex ${isSystem ? 'justify-center' : 'justify-end'}">
           <div class="${bg} px-3 py-2 rounded-lg max-w-[80%] text-xs ${isSystem ? 'rounded-full' : ''}">
             ${icon}${esc(m.content)}
@@ -2249,7 +2249,7 @@
         link: 'messages.html',
         category: 'admin',
         priority: 'high',
-        icon: '⚠️'
+        icon: 'âš ï¸'
       });
     }
 
@@ -2259,10 +2259,10 @@
       if (!r || !r.reported?.id) return;
       const reported = r.reported;
       const name = reported.display_name || reported.username || 'usuario';
-      const msg = `Hola ${name}, hemos recibido un reporte sobre tu cuenta por: "${r.reason}". Por favor revisa tu comportamiento en la plataforma. Si crees que esto es un error, puedes contactarnos. — Admin CREO`;
+      const msg = `Hola ${name}, hemos recibido un reporte sobre tu cuenta por: "${r.reason}". Por favor revisa tu comportamiento en la plataforma. Si crees que esto es un error, puedes contactarnos. â€” Admin CREO`;
 
       await sendPrivateMessageToUser(reported.id, msg);
-      await sendPushNotification(reported.id, 'Notificación del Admin', msg);
+      await sendPushNotification(reported.id, 'NotificaciÃ³n del Admin', msg);
 
       // Record warning
       await sb.from('report_messages').insert({ report_id: reportId, sender_id: currentUser.id, sender_role: 'admin', content: msg, message_type: 'warning' });
@@ -2302,7 +2302,7 @@
       if (!reported?.id) return;
       const name = reported.display_name || reported.username || 'usuario';
       const warningNum = (activeReport.warning_count || 0) + 1;
-      const msg = `⚠️ Advertencia ${warningNum}: Hola ${name}, has recibido una advertencia oficial por: "${activeReport.reason}". ${warningNum >= 3 ? 'Esta es tu última advertencia antes de acciones más severas.' : 'Por favor respeta las normas de la comunidad.'} — Admin CREO`;
+      const msg = `âš ï¸ Advertencia ${warningNum}: Hola ${name}, has recibido una advertencia oficial por: "${activeReport.reason}". ${warningNum >= 3 ? 'Esta es tu Ãºltima advertencia antes de acciones mÃ¡s severas.' : 'Por favor respeta las normas de la comunidad.'} â€” Admin CREO`;
 
       await sendPrivateMessageToUser(reported.id, msg);
       await sendPushNotification(reported.id, `Advertencia ${warningNum}`, msg);
@@ -2322,7 +2322,7 @@
       // Show escalation if 3+ warnings
       const totalWarnings = activeReportHistory.filter(h => h._type === 'sanction' && h.sanction_type === 'warning').length + 1;
       document.getElementById('rr-escalation').classList.toggle('hidden', totalWarnings < 2);
-      document.getElementById('rr-warning-count').textContent = `${totalWarnings} warning${totalWarnings !== 1 ? 's' : ''} · ${activeReportHistory.filter(h => h._type === 'report').length} past reports`;
+      document.getElementById('rr-warning-count').textContent = `${totalWarnings} warning${totalWarnings !== 1 ? 's' : ''} Â· ${activeReportHistory.filter(h => h._type === 'report').length} past reports`;
 
       await loadReportMessages(activeReport.id);
       showToast(`Warning #${warningNum} sent to ${name}`, 'success');
@@ -2347,8 +2347,8 @@
 
       const labels = { partial_lock: 'Bloqueo Parcial (sin fondos, deals ni metas)', temporary_lock: 'Bloqueo Temporal (cuenta suspendida)', life_ban: 'Baneo Permanente (cuenta eliminada de la plataforma)' };
       const confirmMsg = sanctionType === 'life_ban'
-        ? `⛔ ¿Estás seguro de BANEAR PERMANENTEMENTE a ${name}?\n\nEsto es irreversible.`
-        : `¿Aplicar ${labels[sanctionType]} a ${name}?`;
+        ? `â›” Â¿EstÃ¡s seguro de BANEAR PERMANENTEMENTE a ${name}?\n\nEsto es irreversible.`
+        : `Â¿Aplicar ${labels[sanctionType]} a ${name}?`;
       if (!confirm(confirmMsg)) return;
 
       let expiresAt = null;
@@ -2378,9 +2378,9 @@
 
       // Notify user
       const sanctionMessages = {
-        partial_lock: `🔒 Tu cuenta ha sido parcialmente bloqueada por: "${activeReport.reason}". No podrás liberar fondos, publicar brand deals ni crear metas hasta nuevo aviso. Contacta al admin si tienes preguntas.`,
-        temporary_lock: `🚫 Tu cuenta ha sido temporalmente suspendida por 30 días por: "${activeReport.reason}". Durante este periodo no podrás acceder a las funciones de la plataforma.`,
-        life_ban: `⛔ Tu cuenta ha sido permanentemente baneada por: "${activeReport.reason}". Esta decisión es final.`
+        partial_lock: `ðŸ”’ Tu cuenta ha sido parcialmente bloqueada por: "${activeReport.reason}". No podrÃ¡s liberar fondos, publicar brand deals ni crear metas hasta nuevo aviso. Contacta al admin si tienes preguntas.`,
+        temporary_lock: `ðŸš« Tu cuenta ha sido temporalmente suspendida por 30 dÃ­as por: "${activeReport.reason}". Durante este periodo no podrÃ¡s acceder a las funciones de la plataforma.`,
+        life_ban: `â›” Tu cuenta ha sido permanentemente baneada por: "${activeReport.reason}". Esta decisiÃ³n es final.`
       };
       const sanctionMsg = sanctionMessages[sanctionType];
       await sendPrivateMessageToUser(reported.id, sanctionMsg);
@@ -2458,7 +2458,7 @@
             <div class="flex items-center gap-2 flex-wrap mb-1">
               ${iconHtml}
               <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${sc} border">${esc(a.style || 'info')}</span>
-              <span class="text-xs text-gray-400">${esc(targetLabels[a.target_type] || a.target_type)}${a.target_user_id ? ' → ' + esc(a.target_username || a.target_user_id) : ''}</span>
+              <span class="text-xs text-gray-400">${esc(targetLabels[a.target_type] || a.target_type)}${a.target_user_id ? ' â†’ ' + esc(a.target_username || a.target_user_id) : ''}</span>
               ${deliveryHtml}
               <span class="text-xs text-gray-300">${dateStr}</span>
             </div>
@@ -2517,7 +2517,7 @@
       if (!confirm(`Resend notifications for: "${a.message}"?`)) return;
 
       let sent = 0, failed = 0;
-      const notif = { type: 'admin_report', category: 'admin', priority: 'high', icon: '📢', link: 'comunidad.html' };
+      const notif = { type: 'admin_report', category: 'admin', priority: 'high', icon: 'ðŸ“¢', link: 'comunidad.html' };
 
       if (a.target_type === 'global') {
         const recipients = allProfiles.filter(p => p.id !== currentUser.id);
@@ -2590,7 +2590,7 @@
       }
 
       let sent = 0, failed = 0;
-      const notif = { type: 'admin_report', category: 'admin', priority: 'high', icon: '📢', link: 'comunidad.html' };
+      const notif = { type: 'admin_report', category: 'admin', priority: 'high', icon: 'ðŸ“¢', link: 'comunidad.html' };
 
       if (target === 'global') {
         btn.textContent = 'Notifying users...';
@@ -2693,20 +2693,20 @@
               <option value="brand" ${acctType === 'brand' || acctType === 'empresa' || acctType === 'business' ? 'selected' : ''}>Brand</option>
               <option value="admin" ${acctType === 'admin' ? 'selected' : ''}>Admin</option>
             </select>`
-          : '<span class="text-xs text-gray-400">—</span>';
+          : '<span class="text-xs text-gray-400">â€”</span>';
 
         return `<tr class="border-b border-gray-100 hover:bg-gray-50 transition">
           <td class="px-5 py-3 text-gray-900 text-sm">${esc(u.email || '-')}</td>
           <td class="px-5 py-3">${providerBadge}</td>
           <td class="px-5 py-3">${profileBadge}</td>
           <td class="px-5 py-3 text-gray-500">${username !== '-' ? '<a href="${PROFILE_BASE}' + esc(username) + '" target="_blank" class="text-creo-purple hover:underline">@' + esc(username) + '</a>' : '-'}${displayName ? ' <span class="text-gray-400 text-xs">(' + esc(displayName) + ')</span>' : ''}</td>
-          <td class="px-5 py-3">${u.has_profile ? statusBadge(u.profile?.verification_status) : '<span class="text-xs text-gray-300">—</span>'}</td>
-          <td class="px-5 py-3">${u.has_profile ? stripeBadge(u.profile || {}) : '<span class="text-xs text-gray-300">—</span>'}</td>
+          <td class="px-5 py-3">${u.has_profile ? statusBadge(u.profile?.verification_status) : '<span class="text-xs text-gray-300">â€”</span>'}</td>
+          <td class="px-5 py-3">${u.has_profile ? stripeBadge(u.profile || {}) : '<span class="text-xs text-gray-300">â€”</span>'}</td>
           <td class="px-5 py-3 text-gray-500 text-xs">${registered}</td>
           <td class="px-5 py-3 text-gray-500 text-xs">${lastLogin}</td>
           <td class="px-5 py-3">${typeSelect}</td>
           <td class="px-5 py-3">
-            ${u.email ? '<button onclick="openEmailModal(\'' + esc(u.email) + '\', \'' + esc(displayName || username) + '\')" class="text-xs bg-creo-purple/10 text-creo-purple px-2.5 py-1 rounded-lg hover:bg-creo-purple/20 transition font-medium">📧 Email</button>' : ''}
+            ${u.email ? '<button onclick="openEmailModal(\'' + esc(u.email) + '\', \'' + esc(displayName || username) + '\')" class="text-xs bg-creo-purple/10 text-creo-purple px-2.5 py-1 rounded-lg hover:bg-creo-purple/20 transition font-medium">ðŸ“§ Email</button>' : ''}
           </td>
         </tr>`;
       }).join('');
@@ -2736,40 +2736,40 @@
     // ===== EMAIL COMPOSE =====
     const EMAIL_TEMPLATES = {
       'invite': {
-        subject: '¡Te invitamos a unirte a CREO!',
-        message: '¡Hola {name}!\n\nQueremos invitarte a formar parte de CREO, la plataforma donde los creadores conectan con su comunidad y reciben apoyo directo de quienes creen en su talento.\n\nEn CREO puedes:\n• Crear tu perfil de creador\n• Recibir propinas y apoyo mensual de tus fans\n• Lanzar metas de financiamiento para tus proyectos\n• Conectar con marcas para brand deals\n• Compartir tu contenido con una comunidad que te valora\n\n¡Tu talento merece ser apoyado! Únete hoy y empieza a construir tu comunidad.',
+        subject: 'Â¡Te invitamos a unirte a CREO!',
+        message: 'Â¡Hola {name}!\n\nQueremos invitarte a formar parte de CREO, la plataforma donde los creadores conectan con su comunidad y reciben apoyo directo de quienes creen en su talento.\n\nEn CREO puedes:\nâ€¢ Crear tu perfil de creador\nâ€¢ Recibir propinas y apoyo mensual de tus fans\nâ€¢ Lanzar metas de financiamiento para tus proyectos\nâ€¢ Conectar con marcas para brand deals\nâ€¢ Compartir tu contenido con una comunidad que te valora\n\nÂ¡Tu talento merece ser apoyado! Ãšnete hoy y empieza a construir tu comunidad.',
         button_text: 'Unirme a CREO',
         button_url: 'https://fullnessmindset.github.io/creo/explore.html',
         image_url: 'https://fullnessmindset.github.io/creo/assets/imagina%20una%20red%20social.png',
         image_position: 'cover',
       },
       'brand-deal': {
-        subject: '💼 Nueva oportunidad de Brand Deal disponible',
-        message: '¡Hola {name}!\n\nTenemos una nueva oportunidad de colaboración con una marca que está buscando creadores como tú.\n\nRevisa los detalles en tu sección de Brand Deals y aplica si te interesa. Las marcas buscan creadores auténticos que conecten con su audiencia — y tu perfil encaja perfecto.\n\nRecuerda que las oportunidades son por tiempo limitado, así que no esperes demasiado para aplicar.',
+        subject: 'ðŸ’¼ Nueva oportunidad de Brand Deal disponible',
+        message: 'Â¡Hola {name}!\n\nTenemos una nueva oportunidad de colaboraciÃ³n con una marca que estÃ¡ buscando creadores como tÃº.\n\nRevisa los detalles en tu secciÃ³n de Brand Deals y aplica si te interesa. Las marcas buscan creadores autÃ©nticos que conecten con su audiencia â€” y tu perfil encaja perfecto.\n\nRecuerda que las oportunidades son por tiempo limitado, asÃ­ que no esperes demasiado para aplicar.',
         button_text: 'Ver Brand Deals',
         button_url: 'https://fullnessmindset.github.io/creo/brand-deals.html',
       },
       'new-feature': {
-        subject: '🚀 Nueva función disponible en CREO',
-        message: '¡Hola {name}!\n\nEstamos emocionados de compartir que hemos lanzado una nueva función en CREO.\n\nQueremos que tu experiencia como creador sea cada vez mejor, así que hemos estado trabajando en mejoras que te van a encantar.\n\nEntra a tu panel para descubrir qué hay de nuevo y empieza a aprovecharlo hoy mismo. Como siempre, tu feedback es super importante para nosotros.',
+        subject: 'ðŸš€ Nueva funciÃ³n disponible en CREO',
+        message: 'Â¡Hola {name}!\n\nEstamos emocionados de compartir que hemos lanzado una nueva funciÃ³n en CREO.\n\nQueremos que tu experiencia como creador sea cada vez mejor, asÃ­ que hemos estado trabajando en mejoras que te van a encantar.\n\nEntra a tu panel para descubrir quÃ© hay de nuevo y empieza a aprovecharlo hoy mismo. Como siempre, tu feedback es super importante para nosotros.',
         button_text: 'Descubrir Novedades',
         button_url: 'https://fullnessmindset.github.io/creo/index.html',
       },
       'update': {
-        subject: '📢 Actualización importante de CREO',
-        message: '¡Hola {name}!\n\nQueremos mantenerte al día con lo que está pasando en CREO.\n\nHemos realizado algunas mejoras y ajustes en la plataforma para ofrecerte una mejor experiencia. Estos cambios están diseñados para hacer todo más fácil y eficiente para ti como creador.\n\nSi tienes preguntas o sugerencias, no dudes en contactarnos. Estamos aquí para ti.',
+        subject: 'ðŸ“¢ ActualizaciÃ³n importante de CREO',
+        message: 'Â¡Hola {name}!\n\nQueremos mantenerte al dÃ­a con lo que estÃ¡ pasando en CREO.\n\nHemos realizado algunas mejoras y ajustes en la plataforma para ofrecerte una mejor experiencia. Estos cambios estÃ¡n diseÃ±ados para hacer todo mÃ¡s fÃ¡cil y eficiente para ti como creador.\n\nSi tienes preguntas o sugerencias, no dudes en contactarnos. Estamos aquÃ­ para ti.',
         button_text: 'Ir a CREO',
         button_url: 'https://fullnessmindset.github.io/creo/index.html',
       },
       'welcome': {
-        subject: '👋 ¡Bienvenido/a a CREO!',
-        message: '¡Hola {name}!\n\n¡Bienvenido/a a la familia CREO! Estamos felices de que estés aquí.\n\nAquí tienes unos pasos para empezar:\n1. Completa tu perfil con tu foto, bio y redes sociales\n2. Comparte tu enlace de perfil con tu comunidad\n3. Explora la sección de Brand Deals para oportunidades\n4. Crea tu primera Meta para financiar un proyecto\n\nRecuerda: CREO existe porque creemos en ti y en tu talento. Si necesitas ayuda con cualquier cosa, estamos a un mensaje de distancia.',
+        subject: 'ðŸ‘‹ Â¡Bienvenido/a a CREO!',
+        message: 'Â¡Hola {name}!\n\nÂ¡Bienvenido/a a la familia CREO! Estamos felices de que estÃ©s aquÃ­.\n\nAquÃ­ tienes unos pasos para empezar:\n1. Completa tu perfil con tu foto, bio y redes sociales\n2. Comparte tu enlace de perfil con tu comunidad\n3. Explora la secciÃ³n de Brand Deals para oportunidades\n4. Crea tu primera Meta para financiar un proyecto\n\nRecuerda: CREO existe porque creemos en ti y en tu talento. Si necesitas ayuda con cualquier cosa, estamos a un mensaje de distancia.',
         button_text: 'Completar Mi Perfil',
         button_url: 'https://fullnessmindset.github.io/creo/index.html',
       },
       'payout': {
-        subject: '💰 ¡Tienes fondos disponibles!',
-        message: '¡Hola {name}!\n\nTe escribimos para informarte que se han aprobado fondos a tu cuenta de creador en CREO.\n\nLos fondos serán transferidos a tu cuenta bancaria conectada. El tiempo de procesamiento puede variar dependiendo de tu banco, pero normalmente toma entre 2-5 días hábiles.\n\nSigue creando contenido increíble — tu comunidad te está apoyando. ¡Gracias por ser parte de CREO!',
+        subject: 'ðŸ’° Â¡Tienes fondos disponibles!',
+        message: 'Â¡Hola {name}!\n\nTe escribimos para informarte que se han aprobado fondos a tu cuenta de creador en CREO.\n\nLos fondos serÃ¡n transferidos a tu cuenta bancaria conectada. El tiempo de procesamiento puede variar dependiendo de tu banco, pero normalmente toma entre 2-5 dÃ­as hÃ¡biles.\n\nSigue creando contenido increÃ­ble â€” tu comunidad te estÃ¡ apoyando. Â¡Gracias por ser parte de CREO!',
         button_text: 'Ver Mi Panel',
         button_url: 'https://fullnessmindset.github.io/creo/index.html',
       },
@@ -2930,7 +2930,7 @@
           'https://fullnessmindset.github.io/creo/messages.html': 'Ver Mensajes',
           'https://fullnessmindset.github.io/creo/profile.html': 'Ver Mi Perfil',
           'https://fullnessmindset.github.io/creo/privacidad.html': 'Leer Privacidad',
-          'https://fullnessmindset.github.io/creo/terminos.html': 'Leer Términos',
+          'https://fullnessmindset.github.io/creo/terminos.html': 'Leer TÃ©rminos',
         };
         if (labels[val]) document.getElementById('email-btn-text').value = labels[val];
       }
@@ -3032,7 +3032,7 @@
       }
 
       const label = failed > 0 ? `Sent ${sent}/${total} (${failed} failed)` : (total > 1 ? `All ${total} sent!` : 'Sent!');
-      btn.innerHTML = (failed > 0 ? '⚠️ ' : '✅ ') + label;
+      btn.innerHTML = (failed > 0 ? 'âš ï¸ ' : 'âœ… ') + label;
       btn.classList.remove('bg-creo-purple');
       btn.classList.add(failed > 0 ? 'bg-yellow-500' : 'bg-green-600');
       setTimeout(() => {
@@ -3046,9 +3046,9 @@
     let allMetaReviews = [];
     let metaReviewFilter = 'pending';
 
-    // ═══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     // MODERATION QUEUE TAB
-    // ═══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     let moderationLoaded = false;
     let moderationFilter = 'pending';
 
@@ -3098,7 +3098,7 @@
       empty.classList.add('hidden');
       body.innerHTML = flags.map(f => {
         const date = new Date(f.created_at).toLocaleDateString();
-        const confPct = f.confidence ? Math.round(f.confidence * 100) + '%' : '—';
+        const confPct = f.confidence ? Math.round(f.confidence * 100) + '%' : 'â€”';
         const statusColors = { pending: 'yellow', approved: 'green', removed: 'red', appealed: 'blue', escalated: 'red' };
         const sc = statusColors[f.status] || 'gray';
         const actions = f.status === 'pending' || f.status === 'appealed' || f.status === 'escalated'
@@ -3124,9 +3124,9 @@
       else showError(res.error || 'Failed');
     }
 
-    // ═══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     // MANIPULATION ALERTS TAB
-    // ═══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     let manipulationLoaded = false;
 
     async function loadManipulationAlerts() {
@@ -3170,9 +3170,9 @@
       }).join('');
     }
 
-    // ═══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     // FAIRNESS METRICS TAB
-    // ═══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     let fairnessLoaded = false;
 
     async function loadFairnessMetrics() {
@@ -3216,9 +3216,9 @@
       }).join('');
     }
 
-    // ═══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     // FEATURE FLAGS TAB
-    // ═══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     let featureFlagsLoaded = false;
 
     async function loadFeatureFlags() {
@@ -3268,9 +3268,9 @@
       else showError(res.error || 'Failed');
     }
 
-    // ═══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     // MONITORING TAB (Part 4)
-    // ═══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     let monitoringLoaded = false;
 
     async function loadMonitoring() {
@@ -3326,9 +3326,9 @@
       `).join('');
     }
 
-    // ═══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     // END PART 3/4 TABS
-    // ═══════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
     async function loadMetaReviews() {
       const { data, error } = await sb.from('metas')
@@ -3366,7 +3366,7 @@
 
       if (filtered.length === 0) {
         list.innerHTML = '';
-        empty.textContent = 'No hay metas en esta categoría';
+        empty.textContent = 'No hay metas en esta categorÃ­a';
         empty.classList.remove('hidden');
         return;
       }
@@ -3384,14 +3384,14 @@
         const stage = m.fund_stage || 1;
         const statusColor = m.fund_status?.includes('review') ? 'yellow' : m.fund_status === 'completed' ? 'green' : m.fund_status === 'fraud_banned' ? 'red' : 'gray';
         const statusLabel = {
-          'stage2_review': 'Etapa 2 — Pendiente',
-          'stage3_review': 'Etapa 3 — Pendiente',
-          'cancelled_review': 'Cancelación — Pendiente',
-          'stage2_approved': 'Etapa 2 ✓',
-          'stage3_approved': 'Etapa 3 ✓',
-          'completed': 'Completada ✓',
+          'stage2_review': 'Etapa 2 â€” Pendiente',
+          'stage3_review': 'Etapa 3 â€” Pendiente',
+          'cancelled_review': 'CancelaciÃ³n â€” Pendiente',
+          'stage2_approved': 'Etapa 2 âœ“',
+          'stage3_approved': 'Etapa 3 âœ“',
+          'completed': 'Completada âœ“',
           'rejected': 'Rechazada',
-          'fraud_banned': 'Fraude — Baneado',
+          'fraud_banned': 'Fraude â€” Baneado',
           'early_complete': 'Completada Anticipada'
         }[m.fund_status] || esc(m.fund_status || '');
 
@@ -3399,7 +3399,7 @@
           ${avatar}
           <div class="flex-1 min-w-0">
             <p class="font-semibold text-sm truncate">${esc(m.title || '')}</p>
-            <p class="text-xs text-gray-500">por @${esc(creator.username || '?')} · $${raised}/$${goal} · Etapa ${stage}</p>
+            <p class="text-xs text-gray-500">por @${esc(creator.username || '?')} Â· $${raised}/$${goal} Â· Etapa ${stage}</p>
           </div>
           <span class="text-[10px] bg-${statusColor}-100 text-${statusColor}-700 px-3 py-1 rounded-full font-semibold whitespace-nowrap">${statusLabel}</span>
         </div>`;
@@ -3430,7 +3430,7 @@
           ${creator.avatar_url ? `<img src="${cAvatar}" class="w-14 h-14 rounded-full object-cover border-2 border-creo-mint">` : `<div class="w-14 h-14 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold text-xl">${cName[0] ? cName[0].toUpperCase() : '?'}</span></div>`}
           <div>
             <p class="font-bold text-lg">${cName}</p>
-            <p class="text-sm text-gray-500">@${cUser} · ${cEmail}</p>
+            <p class="text-sm text-gray-500">@${cUser} Â· ${cEmail}</p>
           </div>
         </div>
 
@@ -3440,21 +3440,21 @@
           <div class="flex gap-4 text-xs text-gray-500">
             <span>Meta: $${(meta.goal_amount_cents/100).toFixed(2)}</span>
             <span>Recaudado: $${(meta.raised_cents/100).toFixed(2)}</span>
-            <span>${meta.start_date} — ${meta.end_date}</span>
+            <span>${meta.start_date} â€” ${meta.end_date}</span>
           </div>
         </div>`;
 
       if (meta.fund_status === 'stage2_review') {
         html += `<div class="bg-blue-50 rounded-xl p-4 space-y-3 border border-blue-200">
-          <h4 class="font-semibold text-blue-800 text-sm">📋 Etapa 2 — Primera Liberación (50%)</h4>
+          <h4 class="font-semibold text-blue-800 text-sm">ðŸ“‹ Etapa 2 â€” Primera LiberaciÃ³n (50%)</h4>
           <p class="text-xs font-medium text-gray-700">Monto a liberar: $${(meta.raised_cents/200).toFixed(2)}</p>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Recibos de compra:</p>
             <div class="flex flex-wrap gap-2">${(meta.stage2_receipt_urls||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin recibos</p>'}</div>
           </div>
           <div>
-            <p class="text-xs font-semibold text-gray-600 mb-1">Actualización para la comunidad:</p>
-            <p class="text-sm bg-white p-3 rounded-lg border">${esc(meta.stage2_update_text || 'Sin actualización')}</p>
+            <p class="text-xs font-semibold text-gray-600 mb-1">ActualizaciÃ³n para la comunidad:</p>
+            <p class="text-sm bg-white p-3 rounded-lg border">${esc(meta.stage2_update_text || 'Sin actualizaciÃ³n')}</p>
           </div>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Evidencia (fotos/videos):</p>
@@ -3465,27 +3465,27 @@
 
       if (meta.fund_status === 'stage3_review') {
         html += `<div class="bg-emerald-50 rounded-xl p-4 space-y-3 border border-emerald-200">
-          <h4 class="font-semibold text-emerald-800 text-sm">📋 Etapa 3 — Liberación Final (50% restante)</h4>
+          <h4 class="font-semibold text-emerald-800 text-sm">ðŸ“‹ Etapa 3 â€” LiberaciÃ³n Final (50% restante)</h4>
           <p class="text-xs font-medium text-gray-700">Monto a liberar: $${(meta.raised_cents/200).toFixed(2)}</p>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Recibos y comprobantes finales:</p>
             <div class="flex flex-wrap gap-2">${(meta.stage3_proof_urls||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-emerald-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin pruebas</p>'}</div>
           </div>
           <div>
-            <p class="text-xs font-semibold text-gray-600 mb-1">Descripción de la adquisición:</p>
-            <p class="text-sm bg-white p-3 rounded-lg border">${esc(meta.stage3_proof_text || 'Sin descripción')}</p>
+            <p class="text-xs font-semibold text-gray-600 mb-1">DescripciÃ³n de la adquisiciÃ³n:</p>
+            <p class="text-sm bg-white p-3 rounded-lg border">${esc(meta.stage3_proof_text || 'Sin descripciÃ³n')}</p>
           </div>
         </div>`;
       }
 
       if (meta.fund_status === 'cancelled_review') {
         html += `<div class="bg-red-50 rounded-xl p-4 space-y-3 border border-red-200">
-          <h4 class="font-semibold text-red-800 text-sm">⚠️ Cancelación de Meta</h4>
+          <h4 class="font-semibold text-red-800 text-sm">âš ï¸ CancelaciÃ³n de Meta</h4>
           <div>
-            <p class="text-xs font-semibold text-gray-600 mb-1">Razón del creador:</p>
-            <p class="text-sm bg-white p-3 rounded-lg border">${esc(meta.cancellation_reason || 'Sin razón proporcionada')}</p>
+            <p class="text-xs font-semibold text-gray-600 mb-1">RazÃ³n del creador:</p>
+            <p class="text-sm bg-white p-3 rounded-lg border">${esc(meta.cancellation_reason || 'Sin razÃ³n proporcionada')}</p>
           </div>
-          <p class="text-[10px] text-red-600">Si es fraude verificado, haz clic en "Fraude — Banear" para bloquear al creador permanentemente.</p>
+          <p class="text-[10px] text-red-600">Si es fraude verificado, haz clic en "Fraude â€” Banear" para bloquear al creador permanentemente.</p>
         </div>`;
       }
 
@@ -3537,7 +3537,7 @@
             meta_id: metaId,
             amount_cents: payoutAmount,
             connect_id: connectId,
-            description: `CREO Meta: ${meta.title} — ${stageLabel}`,
+            description: `CREO Meta: ${meta.title} â€” ${stageLabel}`,
           });
 
           if (payoutRes.error) {
@@ -3546,7 +3546,7 @@
           }
           updateData.last_payout_transfer_id = payoutRes.transfer_id;
         } else {
-          if (!confirm('⚠️ Creator has no Stripe account connected.\nApprove without payout? (You can manually transfer later)')) return;
+          if (!confirm('âš ï¸ Creator has no Stripe account connected.\nApprove without payout? (You can manually transfer later)')) return;
         }
       }
 
@@ -3555,7 +3555,7 @@
 
       // Notify creator
       if (meta.creator_id) {
-        const statusMsg = stage === 'cancelled_review' ? 'Tu cancelación ha sido procesada.' : `¡Los fondos de tu meta "${meta.title}" han sido liberados!`;
+        const statusMsg = stage === 'cancelled_review' ? 'Tu cancelaciÃ³n ha sido procesada.' : `Â¡Los fondos de tu meta "${meta.title}" han sido liberados!`;
         await createNotification(meta.creator_id, 'payout', 'Fondos Liberados', statusMsg, 'index.html#metas').catch(() => {});
       }
 
@@ -3566,7 +3566,7 @@
     async function rejectMetaStage() {
       const metaId = document.getElementById('mr-meta-id').value;
       const notes = document.getElementById('mr-admin-notes').value.trim();
-      if (!notes) { showToast('Escribe una razón para el rechazo', 'error'); return; }
+      if (!notes) { showToast('Escribe una razÃ³n para el rechazo', 'error'); return; }
 
       const { error } = await sb.from('metas').update({
         fund_status: 'rejected',
@@ -3583,11 +3583,11 @@
       const metaId = document.getElementById('mr-meta-id').value;
       const meta = allMetaReviews.find(m => m.id === metaId);
       if (!meta) return;
-      if (!confirm('⛔ ¿Estás seguro? Esto BANEARÁ permanentemente al creador y marcará la meta como FRAUDE.')) return;
+      if (!confirm('â›” Â¿EstÃ¡s seguro? Esto BANEARÃ permanentemente al creador y marcarÃ¡ la meta como FRAUDE.')) return;
 
       const { error: metaError } = await sb.from('metas').update({
         fund_status: 'fraud_banned',
-        admin_review_notes: 'FRAUDE VERIFICADO — Creador baneado',
+        admin_review_notes: 'FRAUDE VERIFICADO â€” Creador baneado',
         admin_reviewed_at: new Date().toISOString(),
         is_active: false
       }).eq('id', metaId);
@@ -3619,7 +3619,7 @@
     (async () => {
       const loggedIn = await tryAutoLogin();
       if (!loggedIn) {
-        // Session may not be ready yet after OAuth redirect — listen for it
+        // Session may not be ready yet after OAuth redirect â€” listen for it
         const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
           if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && session?.user && isAdmin(session.user.email)) {
             subscription.unsubscribe();

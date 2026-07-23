@@ -1934,14 +1934,23 @@ function renderSidebar(activePage) {
   document.body.classList.add('lg:pl-[220px]');
 
   updateSidebarAuth();
+  restoreMobileMenu();
 }
 
 function toggleMobileMenu() {
   const menu = document.getElementById('creo-mobile-menu');
-  menu.classList.toggle('hidden');
+  const isHidden = menu.classList.toggle('hidden');
+  sessionStorage.setItem('creo-menu-open', isHidden ? '' : '1');
 }
 function closeMobileMenu() {
   document.getElementById('creo-mobile-menu').classList.add('hidden');
+  sessionStorage.setItem('creo-menu-open', '');
+}
+function restoreMobileMenu() {
+  if (sessionStorage.getItem('creo-menu-open') === '1') {
+    const menu = document.getElementById('creo-mobile-menu');
+    if (menu) menu.classList.remove('hidden');
+  }
 }
 
 async function updateSidebarAuth() {

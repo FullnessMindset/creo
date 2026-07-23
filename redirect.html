@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CREO — Verificando...</title>
+  <title>CREO â€” Verificando...</title>
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="X-Frame-Options" content="DENY">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -30,7 +30,7 @@
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js"></script>
+  <script src="shared.js?v=2"></script>
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('status') || urlParams.get('stripe');
@@ -54,7 +54,7 @@
 
     async function handleAuthRedirect(user) {
       if (!user) {
-        setUI('❌ Error', 'No se pudo verificar tu cuenta');
+        setUI('âŒ Error', 'No se pudo verificar tu cuenta');
         setTimeout(() => { window.location.href = 'comunidad.html'; }, 2000);
         return;
       }
@@ -66,11 +66,11 @@
 
       if (isAdmin(user.email) && isAdminLogin) {
         sessionStorage.setItem('admin_mode', 'true');
-        setUI('🛡️ Acceso Admin Verificado', 'Redirigiendo al panel...');
+        setUI('ðŸ›¡ï¸ Acceso Admin Verificado', 'Redirigiendo al panel...');
         document.getElementById('spinner').classList.add('hidden');
         setTimeout(() => { window.location.href = 'admin.html'; }, 1000);
       } else {
-        setUI('👋 ¡Bienvenido!', 'Redirigiendo a la comunidad...');
+        setUI('ðŸ‘‹ Â¡Bienvenido!', 'Redirigiendo a la comunidad...');
         document.getElementById('spinner').classList.add('hidden');
         setTimeout(() => { window.location.href = 'comunidad.html'; }, 1000);
       }
@@ -78,7 +78,7 @@
 
     (async function() {
       if (status === 'success') {
-        setUI('💳 Verificando conexión con Stripe...', 'Confirmando tu cuenta...');
+        setUI('ðŸ’³ Verificando conexiÃ³n con Stripe...', 'Confirmando tu cuenta...');
         try {
           const { data: { session } } = await sb.auth.getSession();
           if (session) {
@@ -88,17 +88,17 @@
             });
             const result = await res.json();
             if (result.status === 'complete') {
-              setUI('✅ ¡Stripe Conectado!', 'Tu cuenta está lista para recibir pagos.');
+              setUI('âœ… Â¡Stripe Conectado!', 'Tu cuenta estÃ¡ lista para recibir pagos.');
             } else if (result.status === 'incomplete') {
-              setUI('⚠️ Stripe Conectado', 'Configuración casi lista. Completa los datos pendientes desde tu panel.');
+              setUI('âš ï¸ Stripe Conectado', 'ConfiguraciÃ³n casi lista. Completa los datos pendientes desde tu panel.');
             } else {
-              setUI('✅ Stripe Conectado', 'Redirigiendo al panel...');
+              setUI('âœ… Stripe Conectado', 'Redirigiendo al panel...');
             }
           } else {
-            setUI('✅ ¡Stripe Conectado!', 'Redirigiendo al panel...');
+            setUI('âœ… Â¡Stripe Conectado!', 'Redirigiendo al panel...');
           }
         } catch (_) {
-          setUI('✅ ¡Stripe Conectado!', 'Redirigiendo al panel...');
+          setUI('âœ… Â¡Stripe Conectado!', 'Redirigiendo al panel...');
         }
         document.getElementById('spinner').classList.add('hidden');
         setTimeout(() => { window.location.href = 'index.html?stripe=success'; }, 1500);
@@ -106,13 +106,13 @@
       }
 
       if (status === 'refresh') {
-        setUI('⚠️ Configuración incompleta', 'La configuración de Stripe no se completó. Puedes reintentar desde tu panel.');
+        setUI('âš ï¸ ConfiguraciÃ³n incompleta', 'La configuraciÃ³n de Stripe no se completÃ³. Puedes reintentar desde tu panel.');
         document.getElementById('spinner').classList.add('hidden');
         setTimeout(() => { window.location.href = 'index.html'; }, 2000);
         return;
       }
 
-      // Listen for auth state change FIRST — Supabase auto-detects OAuth tokens
+      // Listen for auth state change FIRST â€” Supabase auto-detects OAuth tokens
       // in the URL (both ?code= for PKCE and #access_token= for implicit flow)
       let handled = false;
 
@@ -137,7 +137,7 @@
         }
       }
 
-      // Final fallback — if nothing detected after 8 seconds, redirect
+      // Final fallback â€” if nothing detected after 8 seconds, redirect
       setTimeout(async () => {
         if (handled) return;
         const { data: { user } } = await sb.auth.getUser();
@@ -146,7 +146,7 @@
           subscription.unsubscribe();
           await handleAuthRedirect(user);
         } else {
-          setUI('🔒 Sesión no detectada', 'Redirigiendo...');
+          setUI('ðŸ”’ SesiÃ³n no detectada', 'Redirigiendo...');
           setTimeout(() => { window.location.href = 'comunidad.html'; }, 1500);
         }
       }, 8000);

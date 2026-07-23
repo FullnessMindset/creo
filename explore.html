@@ -1,18 +1,18 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CREO — Explorar Creadores</title>
+  <title>CREO â€” Explorar Creadores</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a0a3e">
-  <meta property="og:title" content="CREO — Explorar Creadores">
+  <meta property="og:title" content="CREO â€” Explorar Creadores">
   <meta property="og:description" content="Descubre y apoya a creadores con tips, metas y suscripciones mensuales">
   <meta property="og:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
   <meta property="og:url" content="https://fullnessmindset.github.io/creo/explore.html">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="CREO — Explorar Creadores">
+  <meta name="twitter:title" content="CREO â€” Explorar Creadores">
   <meta name="twitter:description" content="Descubre y apoya a creadores con tips, metas y suscripciones mensuales">
   <meta name="twitter:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
   <link rel="canonical" href="https://fullnessmindset.github.io/creo/explore.html">
@@ -35,13 +35,13 @@
   </style>
 </head>
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
-  <script src="shared.js"></script>
+  <script src="shared.js?v=2"></script>
 
   <!-- Sticky Header (below mobile header, beside desktop sidebar) -->
   <div class="fixed top-[60px] lg:top-0 left-0 lg:left-[220px] right-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-200 dark-aware-header">
     <div class="max-w-2xl mx-auto px-4 py-3 space-y-3">
       <div class="flex items-center justify-between">
-        <h1 class="text-lg font-bold tracking-[0.15em] text-creo-purple" data-i18n="explorarHeader"><span aria-label="brujula">🧭</span> EXPLORAR</h1>
+        <h1 class="text-lg font-bold tracking-[0.15em] text-creo-purple" data-i18n="explorarHeader"><span aria-label="brujula">ðŸ§­</span> EXPLORAR</h1>
       </div>
       <!-- Search -->
       <div class="relative">
@@ -58,17 +58,17 @@
     <div id="stories-loading" class="text-center py-8">
       <div class="inline-block w-6 h-6 border-2 border-creo-mint border-t-transparent rounded-full animate-spin"></div>
     </div>
-    <p id="no-stories" class="hidden text-center text-gray-400 text-xs py-8" data-i18n="sinHistoriasPublicadas"><span aria-label="libro">📖</span> Aún no hay historias publicadas</p>
+    <p id="no-stories" class="hidden text-center text-gray-400 text-xs py-8" data-i18n="sinHistoriasPublicadas"><span aria-label="libro">ðŸ“–</span> AÃºn no hay historias publicadas</p>
 
     <!-- Search results -->
     <div id="search-results" class="hidden px-4 space-y-3">
       <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3" data-i18n="resultados">Resultados</h2>
       <div id="search-results-list" class="space-y-3"></div>
-      <p id="no-search" class="hidden text-center text-gray-400 text-xs py-8" data-i18n="sinResultadosBusqueda"><span aria-label="buscar">🔍</span> No se encontraron resultados</p>
+      <p id="no-search" class="hidden text-center text-gray-400 text-xs py-8" data-i18n="sinResultadosBusqueda"><span aria-label="buscar">ðŸ”</span> No se encontraron resultados</p>
     </div>
   </div>
 
-  <!-- Story viewer modal — TikTok-style vertical scroll -->
+  <!-- Story viewer modal â€” TikTok-style vertical scroll -->
   <div id="story-viewer" class="fixed inset-0 z-[35] hidden bg-black">
     <button onclick="closeStoryViewer()" class="fixed top-4 right-4 z-[120] text-white/70 hover:text-white">
       <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -78,7 +78,7 @@
     <div id="story-comments-panel" class="fixed bottom-0 left-0 right-0 z-[110] hidden transform translate-y-full transition-transform duration-300" style="max-height:60vh">
       <div class="bg-gray-900 rounded-t-2xl border-t border-gray-700 flex flex-col" style="max-height:60vh">
         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-          <h3 class="text-white font-bold text-sm" data-i18n="comentarios"><span aria-label="comentarios">💬</span> Comentarios</h3>
+          <h3 class="text-white font-bold text-sm" data-i18n="comentarios"><span aria-label="comentarios">ðŸ’¬</span> Comentarios</h3>
           <button onclick="closeStoryComments()" class="text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
         <div id="story-comments-list" class="flex-1 overflow-y-auto px-4 py-3 space-y-3" style="max-height:40vh"></div>
@@ -473,7 +473,7 @@
       const verified = p.verification_status === 'approved' ? '<svg class="w-4 h-4 text-creo-mint flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' : '';
       const dk = isDark();
       const isAdm = exploreUser && exploreUser.email === ADMIN_EMAIL;
-      const impBtn = isAdm ? `<button onclick="event.preventDefault();event.stopPropagation();sessionStorage.setItem('creo-impersonate',JSON.stringify({id:'${p.id}',username:'${esc(p.username)}',display_name:'${esc(p.display_name||p.username)}'}));window.location='index.html'" class="hidden group-hover:flex items-center gap-1 text-[9px] bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-semibold whitespace-nowrap">🔑 Admin</button>` : '';
+      const impBtn = isAdm ? `<button onclick="event.preventDefault();event.stopPropagation();sessionStorage.setItem('creo-impersonate',JSON.stringify({id:'${p.id}',username:'${esc(p.username)}',display_name:'${esc(p.display_name||p.username)}'}));window.location='index.html'" class="hidden group-hover:flex items-center gap-1 text-[9px] bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-semibold whitespace-nowrap">ðŸ”‘ Admin</button>` : '';
 
       return `<a href="profile.html?u=${esc(p.username)}" class="flex items-center gap-3 p-3 ${dk ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-xl border hover:border-creo-mint transition group">
         ${avatar}
