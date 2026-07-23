@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CREO â€” Mensajes</title>
+  <title>CREO — Mensajes</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a0a3e">
-  <meta name="description" content="CREO â€” Mensajes privados entre creadores y seguidores">
+  <meta name="description" content="CREO — Mensajes privados entre creadores y seguidores">
   <link rel="icon" href="assets/logo-icon.png" type="image/png">
   <link rel="stylesheet" href="tailwind.min.css?v=20260719">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -34,8 +34,8 @@
     <div class="flex-1 flex flex-col bg-gray-50/50" id="desktop-chat-panel">
       <div id="desktop-empty-state" class="flex-1 flex flex-col items-center justify-center text-gray-300">
         <svg class="w-20 h-20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        <p class="text-lg font-semibold"><span aria-label="chat">ðŸ’¬</span> Selecciona una conversaciÃ³n</p>
-        <p class="text-sm mt-1"><span aria-label="buscar">ðŸ”</span> o busca un creador para iniciar</p>
+        <p class="text-lg font-semibold"><span aria-label="chat">💬</span> Selecciona una conversación</p>
+        <p class="text-sm mt-1"><span aria-label="buscar">🔍</span> o busca un creador para iniciar</p>
       </div>
       <!-- Desktop chat area -->
       <div id="desktop-chat-area" class="hidden flex-1 flex flex-col">
@@ -85,7 +85,7 @@
             <!-- Text input -->
             <div class="flex-1 relative flex items-center bg-gray-100 rounded-full border border-gray-200 focus-within:border-creo-mint/50 transition">
               <input id="d-chat-input" type="text" placeholder="Escribe un mensaje..." class="flex-1 bg-transparent rounded-full px-4 py-2 text-sm outline-none border-none !border-0" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendMessage()">
-              <span id="d-emoji-btn" class="cursor-pointer text-lg hover:scale-110 transition pr-3">ðŸ˜Š</span>
+              <span id="d-emoji-btn" class="cursor-pointer text-lg hover:scale-110 transition pr-3">😊</span>
             </div>
             <!-- GIF -->
             <button onclick="toggleChatGif()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition" title="GIF">
@@ -109,7 +109,7 @@
     <div class="w-72 lg:w-80 border-l border-gray-200 flex flex-col bg-white flex-shrink-0">
       <div class="px-4 pt-4 pb-3 border-b border-gray-100">
         <div class="flex items-center justify-between mb-3">
-          <h2 class="text-sm font-bold text-gray-700 tracking-wide"><span aria-label="mensajes">ðŸ’¬</span> Conversaciones</h2>
+          <h2 class="text-sm font-bold text-gray-700 tracking-wide"><span aria-label="mensajes">💬</span> Conversaciones</h2>
           <button onclick="openNewMessage()" class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center hover:bg-creo-purple/20 transition" title="Nuevo mensaje">
             <svg class="w-4 h-4 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
           </button>
@@ -121,7 +121,7 @@
         </div>
       </div>
       <div id="desktop-convos" class="flex-1 overflow-y-auto px-2 pt-1"></div>
-      <p id="no-messages-desktop" class="hidden text-center text-gray-400 text-sm py-8"><span aria-label="bandeja vacia">ðŸ“­</span> Sin mensajes</p>
+      <p id="no-messages-desktop" class="hidden text-center text-gray-400 text-sm py-8"><span aria-label="bandeja vacia">📭</span> Sin mensajes</p>
     </div>
   </div>
 
@@ -129,7 +129,7 @@
   <div class="md:hidden pb-24">
     <div class="sticky top-0 z-20 bg-white/95 backdrop-blur-lg border-b border-gray-100 px-4 pt-4 pb-3">
       <div class="flex items-center justify-between mb-3">
-        <h1 class="text-xl font-bold text-creo-purple tracking-wider"><span aria-label="sobre">âœ‰ï¸</span> Mensajes</h1>
+        <h1 class="text-xl font-bold text-creo-purple tracking-wider"><span aria-label="sobre">✉️</span> Mensajes</h1>
         <button onclick="openNewMessage()" class="w-9 h-9 rounded-full bg-creo-purple/10 flex items-center justify-center hover:bg-creo-purple/20 transition">
           <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
         </button>
@@ -142,12 +142,12 @@
     </div>
     <div id="auth-required" class="hidden px-4 pt-8">
       <div class="glass p-8 rounded-2xl text-center space-y-3">
-        <p class="text-gray-500 text-sm"><span aria-label="candado">ðŸ”’</span> Inicia sesiÃ³n para ver tus mensajes</p>
-        <button onclick="signInWithGoogle()" class="bg-creo-purple text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-creo-light transition">Iniciar SesiÃ³n</button>
+        <p class="text-gray-500 text-sm"><span aria-label="candado">🔒</span> Inicia sesión para ver tus mensajes</p>
+        <button onclick="signInWithGoogle()" class="bg-creo-purple text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-creo-light transition">Iniciar Sesión</button>
       </div>
     </div>
     <div id="mobile-convos" class="px-2 pt-2"></div>
-    <p id="no-messages-mobile" class="hidden text-center text-gray-400 text-sm py-12">ðŸ’¬ No tienes mensajes aÃºn<br><span class="text-xs text-gray-300">Busca un creador para iniciar</span></p>
+    <p id="no-messages-mobile" class="hidden text-center text-gray-400 text-sm py-12">💬 No tienes mensajes aún<br><span class="text-xs text-gray-300">Busca un creador para iniciar</span></p>
   </div>
 
   <!-- MOBILE CHAT MODAL -->
@@ -187,12 +187,12 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           </button>
           <input type="file" id="m-image-input" accept="image/*,video/*" class="hidden" capture="environment" onchange="handleFileSelect(this)">
-          <button id="m-audio-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition" title="MantÃ©n para grabar">
+          <button id="m-audio-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition" title="Mantén para grabar">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
           </button>
           <div class="flex-1 relative flex items-center bg-gray-100 rounded-full border border-gray-200 focus-within:border-creo-mint/50 transition">
             <input id="m-chat-input" type="text" placeholder="Aa" class="flex-1 bg-transparent rounded-full px-4 py-2 text-sm outline-none border-none !border-0" onkeydown="if(event.key==='Enter')sendMessage()">
-            <button id="m-emoji-btn" type="button" class="p-1.5 mr-1 text-gray-400 hover:text-yellow-500 transition rounded-lg" title="Emojis">ðŸ˜Š</button>
+            <button id="m-emoji-btn" type="button" class="p-1.5 mr-1 text-gray-400 hover:text-yellow-500 transition rounded-lg" title="Emojis">😊</button>
           </div>
           <button onclick="toggleChatGif()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition">
             <span class="text-xs font-black">GIF</span>
@@ -215,7 +215,7 @@
     <div class="absolute inset-0 bg-black/40" onclick="closeNewMessage()"></div>
     <div class="absolute inset-x-0 bottom-0 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[420px] bg-white rounded-t-2xl md:rounded-2xl max-h-[80vh] flex flex-col shadow-2xl">
       <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-        <h3 class="font-bold text-gray-900"><span aria-label="escribir">âœï¸</span> Nuevo Mensaje</h3>
+        <h3 class="font-bold text-gray-900"><span aria-label="escribir">✏️</span> Nuevo Mensaje</h3>
         <button onclick="closeNewMessage()" class="text-gray-400 hover:text-gray-600 transition">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -383,8 +383,8 @@
         let preview = '';
         if (c.lastMsg.body) preview = esc(c.lastMsg.body).slice(0, 40);
         else if (c.lastMsg.media_type) {
-          const icons = { gif: 'ðŸŽ¬ GIF', audio: 'ðŸŽ¤ Audio', image: 'ðŸ“· Imagen', video: 'ðŸŽ¥ Video', document: 'ðŸ“„ Documento', archive: 'ðŸ“¦ Archivo', file: 'ðŸ“Ž Archivo' };
-          preview = icons[c.lastMsg.media_type] || 'ðŸ“Ž Adjunto';
+          const icons = { gif: '🎬 GIF', audio: '🎤 Audio', image: '📷 Imagen', video: '🎥 Video', document: '📄 Documento', archive: '📦 Archivo', file: '📎 Archivo' };
+          preview = icons[c.lastMsg.media_type] || '📎 Adjunto';
         }
         const isMine = c.lastMsg.sender_id === currentUser.id;
         const hasUnread = c.unread > 0;
@@ -396,7 +396,7 @@
               <p class="font-semibold text-sm ${hasUnread ? 'text-gray-900' : 'text-gray-700'} truncate">${esc(name)}</p>
               <span class="text-[10px] ${hasUnread ? 'text-creo-purple font-semibold' : 'text-gray-400'} flex-shrink-0 ml-2">${timeAgo(c.lastMsg.created_at)}</span>
             </div>
-            <p class="text-xs ${hasUnread ? 'text-gray-700 font-medium' : 'text-gray-400'} truncate mt-0.5">${isMine ? 'TÃº: ' : ''}${preview}</p>
+            <p class="text-xs ${hasUnread ? 'text-gray-700 font-medium' : 'text-gray-400'} truncate mt-0.5">${isMine ? 'Tú: ' : ''}${preview}</p>
           </div>
           ${hasUnread ? `<span class="w-5 h-5 rounded-full bg-creo-mint text-creo-purple text-[10px] font-bold flex items-center justify-center flex-shrink-0">${c.unread}</span>` : ''}
         </button>`;
@@ -469,7 +469,7 @@
         const av = activeChatUser.avatar_url
           ? `<img src="${esc(activeChatUser.avatar_url)}" class="w-16 h-16 rounded-full object-cover">`
           : `<div class="w-16 h-16 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-creo-purple font-bold text-2xl">${esc(n[0]?.toUpperCase()||'?')}</span></div>`;
-        list.innerHTML = `<div class="flex flex-col items-center justify-center py-12 space-y-3">${av}<p class="font-bold text-gray-900">${esc(n)}</p><p class="text-xs text-gray-400">EnvÃ­a un mensaje para iniciar</p></div>`;
+        list.innerHTML = `<div class="flex flex-col items-center justify-center py-12 space-y-3">${av}<p class="font-bold text-gray-900">${esc(n)}</p><p class="text-xs text-gray-400">Envía un mensaje para iniciar</p></div>`;
         return;
       }
 
@@ -508,12 +508,12 @@
             <p class="text-[10px] ${isMine?'text-white/40':'text-gray-400'} text-right leading-none">${timeAgo(m.created_at)}</p>
           </div>
           ${reactionHtml}
-          <button onclick="showReactionPicker('${m.id}',${isMine})" class="absolute ${isMine?'-left-7':'-right-7'} top-1 opacity-0 group-hover:opacity-100 transition text-gray-300 hover:text-gray-500 text-sm">ðŸ˜Š</button>
+          <button onclick="showReactionPicker('${m.id}',${isMine})" class="absolute ${isMine?'-left-7':'-right-7'} top-1 opacity-0 group-hover:opacity-100 transition text-gray-300 hover:text-gray-500 text-sm">😊</button>
         </div>
       </div>`;
     }
 
-    // ===== FILE HANDLING â€” Universal =====
+    // ===== FILE HANDLING — Universal =====
     function handleFileSelect(input) {
       if (!input.files || !input.files.length) return;
       handleFiles(Array.from(input.files));
@@ -567,8 +567,8 @@
         const div = document.createElement('div');
         div.className = 'relative bg-gray-100 rounded-xl px-3 py-2 flex items-center gap-2';
         const audioUrl = URL.createObjectURL(audioBlob);
-        div.innerHTML = `<span class="text-lg">ðŸŽ¤</span><audio controls src="${audioUrl}" class="h-8 flex-1" style="max-width:200px"></audio>
-          <button onclick="cancelAudio()" class="text-red-400 hover:text-red-600 text-xs font-bold">âœ•</button>`;
+        div.innerHTML = `<span class="text-lg">🎤</span><audio controls src="${audioUrl}" class="h-8 flex-1" style="max-width:200px"></audio>
+          <button onclick="cancelAudio()" class="text-red-400 hover:text-red-600 text-xs font-bold">✕</button>`;
         container.appendChild(div);
       }
 
@@ -579,18 +579,18 @@
         if (entry.category === 'image') {
           const url = URL.createObjectURL(entry.file);
           div.innerHTML = `<img src="${url}" class="h-16 w-16 object-cover rounded-lg border border-gray-200">
-            <button onclick="removePendingFile('${entry.id}')" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">âœ•</button>`;
+            <button onclick="removePendingFile('${entry.id}')" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">✕</button>`;
         } else if (entry.category === 'video') {
           const url = URL.createObjectURL(entry.file);
           div.innerHTML = `<video src="${url}" class="h-16 w-16 object-cover rounded-lg border border-gray-200" muted></video>
-            <button onclick="removePendingFile('${entry.id}')" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">âœ•</button>`;
+            <button onclick="removePendingFile('${entry.id}')" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">✕</button>`;
         } else {
           const icon = MediaUploadService.getIcon(entry.category);
           div.innerHTML = `<div class="h-16 px-3 bg-gray-100 rounded-lg border border-gray-200 flex items-center gap-2">
             <span class="text-xl">${icon}</span>
             <div class="min-w-0"><p class="text-[10px] font-medium truncate max-w-[100px]">${esc(entry.file.name)}</p><p class="text-[9px] text-gray-400">${MediaUploadService.formatSize(entry.file.size)}</p></div>
           </div>
-          <button onclick="removePendingFile('${entry.id}')" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">âœ•</button>`;
+          <button onclick="removePendingFile('${entry.id}')" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center shadow">✕</button>`;
         }
         container.appendChild(div);
       });
@@ -738,7 +738,7 @@
         const btn = P(getPrefix() + 'audio-btn') || P('d-audio-btn');
         if (btn) btn.classList.add('text-red-500');
         startRecTimer();
-      } catch(e) { showToast('No se pudo acceder al micrÃ³fono', 'error'); }
+      } catch(e) { showToast('No se pudo acceder al micrófono', 'error'); }
     }
 
     function stopAudioRecord() { if (recorder && recorder.state === 'recording') recorder.stop(); }
@@ -780,7 +780,7 @@
           P('m-recording-indicator')?.classList.remove('hidden');
           btn.classList.add('text-red-500');
           startRecTimer();
-        } catch(e) { showToast('No se pudo acceder al micrÃ³fono', 'error'); isHoldRecording = false; }
+        } catch(e) { showToast('No se pudo acceder al micrófono', 'error'); isHoldRecording = false; }
       }
       function endHold(e) {
         e.preventDefault();
@@ -798,7 +798,7 @@
     }
 
     // ===== REACTIONS =====
-    const QUICK_REACTIONS = ['â¤ï¸','ðŸ˜‚','ðŸ˜®','ðŸ˜¢','ðŸ˜¡','ðŸ‘','ðŸ”¥','ðŸ™','ðŸ’¯','âœ¨'];
+    const QUICK_REACTIONS = ['❤️','😂','😮','😢','😡','👍','🔥','🙏','💯','✨'];
     function showReactionPicker(msgId, isMine) {
       const existing = P('reaction-picker'); if (existing) existing.remove();
       const msgEl = P('msg-' + msgId); if (!msgEl) return;
@@ -842,7 +842,7 @@
         }
         const wasAdded = reactions && reactions[emoji] && reactions[emoji].includes(currentUser.id);
         const other = msg.sender_id === currentUser.id ? msg.receiver_id : msg.sender_id;
-        if (wasAdded) createNotification(other, 'message', `ReacciÃ³n ${emoji}`, null, 'messages.html#chat-' + currentUser.id);
+        if (wasAdded) createNotification(other, 'message', `Reacción ${emoji}`, null, 'messages.html#chat-' + currentUser.id);
       } finally {
         reactionInProgress = false;
         loadChatMessages(true);
@@ -864,7 +864,7 @@
 
     window.addEventListener('resize', () => { isDesktop = window.innerWidth >= 768; });
 
-    // ===== PASTE HANDLER â€” paste images/files directly =====
+    // ===== PASTE HANDLER — paste images/files directly =====
     document.addEventListener('paste', (e) => {
       if (!activeChatUser) return;
       const items = e.clipboardData?.items;

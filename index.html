@@ -1,20 +1,20 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CREO â€” Panel de Creador</title>
+  <title>CREO — Panel de Creador</title>
   <link rel="manifest" href="manifest.json">
   <link rel="canonical" href="https://fullnessmindset.github.io/creo/index.html">
   <meta name="theme-color" content="#1a0a3e">
-  <meta name="description" content="CREO â€” Panel de creador. Gestiona tu perfil, metas y contenido">
-  <meta property="og:title" content="CREO â€” Panel de Creador">
+  <meta name="description" content="CREO — Panel de creador. Gestiona tu perfil, metas y contenido">
+  <meta property="og:title" content="CREO — Panel de Creador">
   <meta property="og:description" content="Gestiona tu perfil, metas y contenido en CREO">
   <meta property="og:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
   <meta property="og:url" content="https://fullnessmindset.github.io/creo/index.html">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="CREO â€” Panel de Creador">
+  <meta name="twitter:title" content="CREO — Panel de Creador">
   <meta name="twitter:description" content="Gestiona tu perfil, metas y contenido en CREO">
   <meta name="twitter:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -46,18 +46,18 @@
 
     <!-- AUTH SECTION (Google-only) -->
     <div id="auth-section" class="glass p-6 rounded-xl shadow-xl space-y-4 transition-colors">
-      <h3 class="text-lg font-bold text-center text-gray-900" data-i18n="authHeading">Inicia sesiÃ³n para gestionar tu panel</h3>
+      <h3 class="text-lg font-bold text-center text-gray-900" data-i18n="authHeading">Inicia sesión para gestionar tu panel</h3>
       <p class="text-sm text-gray-500 text-center" data-i18n="authSubtext">Usa tu cuenta de Google para acceder de forma segura</p>
       <button onclick="signInWithGoogle()" class="w-full flex items-center justify-center space-x-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-3 rounded-lg font-semibold transition shadow-sm">
         <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         <span data-i18n="continuarConGoogle">Continuar con Google</span>
       </button>
       <div class="bg-green-50 border border-green-200 rounded-lg p-3 flex gap-2 items-start">
-        <span class="text-lg">ðŸ›¡ï¸</span>
-        <p class="text-xs text-green-700" data-i18n="authSecurityNote">CREO usa exclusivamente Google para inicio de sesiÃ³n. Tu cuenta estÃ¡ protegida por la autenticaciÃ³n de Google.</p>
+        <span class="text-lg">🛡️</span>
+        <p class="text-xs text-green-700" data-i18n="authSecurityNote">CREO usa exclusivamente Google para inicio de sesión. Tu cuenta está protegida por la autenticación de Google.</p>
       </div>
       <div class="text-center pt-2 border-t border-gray-200">
-        <p class="text-xs text-gray-500 mb-2" data-i18n="eresEmpresa">Â¿Eres una empresa o marca?</p>
+        <p class="text-xs text-gray-500 mb-2" data-i18n="eresEmpresa">¿Eres una empresa o marca?</p>
         <a href="registro-empresa.html" class="inline-flex items-center gap-2 bg-creo-purple/10 hover:bg-creo-purple/20 text-creo-purple px-4 py-2.5 rounded-lg font-semibold text-sm transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
           <span data-i18n="registrarEmpresa">Registrar como Empresa</span>
@@ -97,49 +97,48 @@
         </div>
       </div>
 
-      <!-- TABS â€” main row (matches public profile section order) -->
+      <!-- TABS — main row (matches public profile section order) -->
       <div class="flex glass rounded-xl overflow-x-auto text-[11px] no-scrollbar md:flex-wrap">
-        <button onclick="showTab('profile')" id="tab-profile" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition tab-active">ðŸ‘¤ <span data-i18n="tabPerfil">Perfil</span></button>
-        <button onclick="showTab('story')" id="tab-story" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">ðŸ“– <span data-i18n="tabHistoria">Historia</span></button>
-        <button onclick="showTab('posts')" id="tab-posts" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">ðŸ“¸ <span data-i18n="tabPosts">Posts</span></button>
+        <button onclick="showTab('profile')" id="tab-profile" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition tab-active">👤 <span data-i18n="tabPerfil">Perfil</span></button>
+        <button onclick="showTab('story')" id="tab-story" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">📖 <span data-i18n="tabHistoria">Historia</span></button>
+        <button onclick="showTab('posts')" id="tab-posts" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">📸 <span data-i18n="tabPosts">Posts</span></button>
         <button onclick="toggleMetasDropdown()" id="tab-metas-group" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1">
-          ðŸŽ¯ <span data-i18n="tabMetas">Metas</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          🎯 <span data-i18n="tabMetas">Metas</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
-        <button onclick="showTab('business')" id="tab-business" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">ðŸ’¼ <span data-i18n="tabCreaciones">Creaciones</span></button>
+        <button onclick="showTab('cfh')" id="tab-cfh" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1"><img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="CFH"> Creo Futuro Hoy</button>
+        <button onclick="showTab('business')" id="tab-business" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">💼 <span data-i18n="tabCreaciones">Creaciones</span></button>
         <button onclick="showTab('creoellos')" id="tab-creoellos" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1"><img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="CREO"> <span data-i18n="tabCreoEnEllos">Creo en Ellos</span></button>
 
         <button onclick="toggleHerramientas()" id="tab-herramientas" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1">
-          ðŸ› ï¸ <span data-i18n="tabHerramientas">Herramientas</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          🛠️ <span data-i18n="tabHerramientas">Herramientas</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
       </div>
       <!-- Metas dropdown -->
       <div id="metas-dropdown" class="hidden bg-white rounded-xl shadow-xl border border-gray-200 z-50 py-1 text-[12px]">
-        <button onclick="showTab('metas');closeMetasDropdown()" id="tab-metas" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">ðŸŽ¯ <span data-i18n="tabMisMetas">Mis Metas</span></button>
+        <button onclick="showTab('metas');closeMetasDropdown()" id="tab-metas" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎯 <span data-i18n="tabMisMetas">Mis Metas</span></button>
         <div class="border-t border-gray-100 my-1"></div>
         <p class="px-4 py-1 text-[10px] text-gray-400 font-semibold uppercase tracking-wider" data-i18n="tabMecenas">Mecenas</p>
-        <button onclick="showTab('mecenas-tip');closeMetasDropdown()" id="tab-mecenas-tip" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">ðŸ’š <span data-i18n="tabYoCreoEnTi">Yo Creo en Ti</span></button>
-        <button onclick="showTab('mecenas-sub');closeMetasDropdown()" id="tab-mecenas-sub" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">â­ <span data-i18n="tabApoyoFull">Apoyo Full</span></button>
+        <button onclick="showTab('mecenas-tip');closeMetasDropdown()" id="tab-mecenas-tip" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💚 <span data-i18n="tabYoCreoEnTi">Yo Creo en Ti</span></button>
+        <button onclick="showTab('mecenas-sub');closeMetasDropdown()" id="tab-mecenas-sub" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">⭐ <span data-i18n="tabApoyoFull">Apoyo Full</span></button>
         <div class="border-t border-gray-100 my-1"></div>
-        <button onclick="showTab('my-subs');closeMetasDropdown()" id="tab-my-subs" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">ðŸ’œ Mis Suscripciones</button>
-        <button onclick="showTab('my-payments');closeMetasDropdown()" id="tab-my-payments" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">ðŸ“‹ Mis Pagos</button>
+        <button onclick="showTab('my-subs');closeMetasDropdown()" id="tab-my-subs" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💜 Mis Suscripciones</button>
+        <button onclick="showTab('my-payments');closeMetasDropdown()" id="tab-my-payments" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">📋 Mis Pagos</button>
       </div>
-      <!-- Herramientas dropdown â€” outside the overflow container -->
+      <!-- Herramientas dropdown — outside the overflow container -->
       <div id="herramientas-menu" class="hidden bg-white rounded-xl shadow-xl border border-gray-200 z-50 py-1 text-[12px]">
-        <button onclick="showTab('verify');closeHerramientas()" id="tab-verify" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">âœ… <span data-i18n="tabVerificacion">VerificaciÃ³n</span></button>
-        <button onclick="showTab('stripe');closeHerramientas()" id="tab-stripe" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">ðŸ’³ <span data-i18n="tabStripe">Stripe</span></button>
-        <button onclick="showTab('branding');closeHerramientas()" id="tab-branding" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">ðŸŽ¨ <span data-i18n="tabBranding">PersonalizaciÃ³n</span></button>
-        <button onclick="showTab('sounds');closeHerramientas()" id="tab-sounds" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">ðŸ”” <span data-i18n="tabSonidos">Sonidos</span></button>
-        <button onclick="showTab('earnings');closeHerramientas()" id="tab-earnings" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">ðŸ’° Ingresos</button>
-        <button onclick="showTab('subscribers');closeHerramientas()" id="tab-subscribers" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">ðŸ‘¥ Suscriptores</button>
-        <button onclick="showTab('account');closeHerramientas()" id="tab-account" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">âš™ï¸ Mi Cuenta</button>
-        <div class="border-t border-gray-100 my-1"></div>
-        <button onclick="showTab('cfh');closeHerramientas()" id="tab-cfh" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">âš¡ Creo Futuro Hoy</button>
+        <button onclick="showTab('verify');closeHerramientas()" id="tab-verify" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">✅ <span data-i18n="tabVerificacion">Verificación</span></button>
+        <button onclick="showTab('stripe');closeHerramientas()" id="tab-stripe" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💳 <span data-i18n="tabStripe">Stripe</span></button>
+        <button onclick="showTab('branding');closeHerramientas()" id="tab-branding" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎨 <span data-i18n="tabBranding">Personalización</span></button>
+        <button onclick="showTab('sounds');closeHerramientas()" id="tab-sounds" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🔔 <span data-i18n="tabSonidos">Sonidos</span></button>
+        <button onclick="showTab('earnings');closeHerramientas()" id="tab-earnings" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💰 Ingresos</button>
+        <button onclick="showTab('subscribers');closeHerramientas()" id="tab-subscribers" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">👥 Suscriptores</button>
+        <button onclick="showTab('account');closeHerramientas()" id="tab-account" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">⚙️ Mi Cuenta</button>
       </div>
 
       <!-- TAB: Profile -->
       <div id="panel-profile" class="tab-panel space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
-          <h3 class="font-bold text-gray-900" data-i18n="infoPerfilHeading">InformaciÃ³n del Perfil</h3>
+          <h3 class="font-bold text-gray-900" data-i18n="infoPerfilHeading">Información del Perfil</h3>
 
           <!-- Avatar Upload -->
           <div>
@@ -162,7 +161,7 @@
               <span class="text-xs text-gray-400" data-i18n="sinPortada">Sin portada</span>
             </div>
             <input type="file" id="cover-file" accept="image/*" onchange="uploadFile('cover-file','covers','cover_url','cover-preview')" class="mt-2 block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
-            <p class="text-[10px] text-gray-400 mt-1" data-i18n="portadaRecomendacion">JPG, PNG. Max 5MB. Recomendado: 1200Ã—400px</p>
+            <p class="text-[10px] text-gray-400 mt-1" data-i18n="portadaRecomendacion">JPG, PNG. Max 5MB. Recomendado: 1200×400px</p>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
@@ -183,30 +182,30 @@
             </div>
             <div>
               <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="nombreMostrar">Nombre para Mostrar</label>
-              <input id="display_name" type="text" placeholder="Se genera automÃ¡ticamente" data-i18n-placeholder="nombreMostrarPlaceholder" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-400 outline-none text-sm" readonly>
+              <input id="display_name" type="text" placeholder="Se genera automáticamente" data-i18n-placeholder="nombreMostrarPlaceholder" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-400 outline-none text-sm" readonly>
             </div>
           </div>
 
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1" data-i18n="bio">Bio</label>
-            <textarea id="bio" placeholder="CuÃ©ntale al mundo quiÃ©n eres..." data-i18n-placeholder="bioPlaceholder" rows="2" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+            <textarea id="bio" placeholder="Cuéntale al mundo quién eres..." data-i18n-placeholder="bioPlaceholder" rows="2" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
           </div>
 
-          <h4 class="font-semibold text-sm text-gray-700 pt-2" data-i18n="infoContacto">InformaciÃ³n de Contacto</h4>
-          <p class="text-[10px] text-gray-400 -mt-3" data-i18n="infoContactoSub">Visible en tu perfil pÃºblico (opcional)</p>
+          <h4 class="font-semibold text-sm text-gray-700 pt-2" data-i18n="infoContacto">Información de Contacto</h4>
+          <p class="text-[10px] text-gray-400 -mt-3" data-i18n="infoContactoSub">Visible en tu perfil público (opcional)</p>
           <div class="space-y-3">
             <input id="contact-email" type="email" placeholder="Email de contacto" data-i18n-placeholder="emailContacto" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             <div class="flex gap-2">
-              <input id="contact-phone" type="tel" placeholder="TelÃ©fono o WhatsApp" data-i18n-placeholder="telefonoWhatsapp" class="flex-1 border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              <input id="contact-phone" type="tel" placeholder="Teléfono o WhatsApp" data-i18n-placeholder="telefonoWhatsapp" class="flex-1 border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
               <select id="contact-type" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
-                <option value="phone" data-i18n="telefono">ðŸ“ž TelÃ©fono</option>
-                <option value="whatsapp" data-i18n="whatsapp">ðŸ’¬ WhatsApp</option>
+                <option value="phone" data-i18n="telefono">📞 Teléfono</option>
+                <option value="whatsapp" data-i18n="whatsapp">💬 WhatsApp</option>
               </select>
             </div>
             <input id="contact-website" type="url" placeholder="Sitio web (https://...)" data-i18n-placeholder="sitioWeb" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             <div class="grid grid-cols-2 gap-2">
               <input id="contact-city" type="text" placeholder="Ciudad" data-i18n-placeholder="ciudad" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
-              <input id="contact-country" type="text" placeholder="PaÃ­s" data-i18n-placeholder="pais" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
+              <input id="contact-country" type="text" placeholder="País" data-i18n-placeholder="pais" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             </div>
           </div>
 
@@ -225,7 +224,7 @@
         </div>
 
         <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
-          <p class="text-sm text-blue-800 mb-1 font-semibold" data-i18n="tuEnlacePublico">Tu Enlace PÃºblico:</p>
+          <p class="text-sm text-blue-800 mb-1 font-semibold" data-i18n="tuEnlacePublico">Tu Enlace Público:</p>
           <p id="profile-link" class="text-xs text-creo-purple break-all font-mono"></p>
         </div>
       </div>
@@ -239,28 +238,28 @@
 
         <!-- Verification Form -->
         <div id="verify-form" class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
-          <h3 class="font-bold text-gray-900" data-i18n="verificacionHeading">Solicitud de VerificaciÃ³n</h3>
-          <p class="text-xs text-gray-500 leading-relaxed" data-i18n="verificacionDesc">Para proteger a los Supporters y mantener la integridad de CREO, todos los creadores deben ser verificados antes de recibir pagos. Completa la informaciÃ³n y envÃ­a tu solicitud.</p>
+          <h3 class="font-bold text-gray-900" data-i18n="verificacionHeading">Solicitud de Verificación</h3>
+          <p class="text-xs text-gray-500 leading-relaxed" data-i18n="verificacionDesc">Para proteger a los Supporters y mantener la integridad de CREO, todos los creadores deben ser verificados antes de recibir pagos. Completa la información y envía tu solicitud.</p>
 
           <div class="p-3 bg-amber-50 rounded-lg border border-amber-200">
-            <p class="text-xs text-amber-800 font-semibold mb-1" data-i18n="politicaContenido">PolÃ­tica de Contenido</p>
+            <p class="text-xs text-amber-800 font-semibold mb-1" data-i18n="politicaContenido">Política de Contenido</p>
             <ul class="text-[10px] text-amber-700 space-y-0.5">
-              <li data-i18n="noContenidoSexual">â€¢ No se permite contenido sexual o para adultos</li>
-              <li data-i18n="noContenidoDrogas">â€¢ No se permiten metas para drogas o sustancias ilegales</li>
-              <li data-i18n="noContenidoDonaciones">â€¢ No se aceptan solicitudes de donaciones â€” todo es apoyo voluntario</li>
-              <li data-i18n="metasLegitimas">â€¢ Las metas deben ser para herramientas, equipos o necesidades legÃ­timas del creador</li>
-              <li data-i18n="empresasDocumentos">â€¢ Empresas deben presentar documentos legales (LLC, licencia comercial)</li>
+              <li data-i18n="noContenidoSexual">• No se permite contenido sexual o para adultos</li>
+              <li data-i18n="noContenidoDrogas">• No se permiten metas para drogas o sustancias ilegales</li>
+              <li data-i18n="noContenidoDonaciones">• No se aceptan solicitudes de donaciones — todo es apoyo voluntario</li>
+              <li data-i18n="metasLegitimas">• Las metas deben ser para herramientas, equipos o necesidades legítimas del creador</li>
+              <li data-i18n="empresasDocumentos">• Empresas deben presentar documentos legales (LLC, licencia comercial)</li>
             </ul>
           </div>
 
-          <h4 class="font-semibold text-sm text-gray-700"><span data-i18n="infoPersonal">InformaciÃ³n Personal</span> <span class="text-red-500">*</span></h4>
+          <h4 class="font-semibold text-sm text-gray-700"><span data-i18n="infoPersonal">Información Personal</span> <span class="text-red-500">*</span></h4>
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-[10px] text-gray-500 mb-1" data-i18n="nombreCompleto">Nombre Completo</label>
               <input id="v-fullname" type="text" placeholder="Nombre Apellido" data-i18n-placeholder="nombreApellidoPlaceholder" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             </div>
             <div>
-              <label class="block text-[10px] text-gray-500 mb-1" data-i18n="telefono">TelÃ©fono</label>
+              <label class="block text-[10px] text-gray-500 mb-1" data-i18n="telefono">Teléfono</label>
               <input id="v-phone" type="tel" placeholder="+1 (555) 000-0000" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
             </div>
           </div>
@@ -296,28 +295,28 @@
             <div>
               <label class="block text-[10px] text-gray-500 mb-1">Documentos Legales (LLC, Licencia Comercial) <span class="text-red-500">*</span></label>
               <input type="file" id="doc-file" accept=".pdf,.jpg,.png,.jpeg" multiple onchange="uploadDocument()" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
-              <p class="text-[10px] text-gray-400 mt-1">PDF, JPG o PNG. Sube tus documentos de incorporaciÃ³n.</p>
+              <p class="text-[10px] text-gray-400 mt-1">PDF, JPG o PNG. Sube tus documentos de incorporación.</p>
               <div id="doc-list" class="mt-2 space-y-1"></div>
             </div>
           </div>
 
           <h4 class="font-semibold text-sm text-gray-700 pt-2">Redes Sociales <span class="text-red-500">*</span></h4>
           <p class="text-[10px] text-gray-400 -mt-3">Requerido: al menos 2 perfiles de redes sociales activos</p>
-          <p id="social-verify-note" class="text-[10px] text-gray-400">Las redes se toman de tu perfil. Guarda tu perfil primero si aÃºn no las has agregado.</p>
+          <p id="social-verify-note" class="text-[10px] text-gray-400">Las redes se toman de tu perfil. Guarda tu perfil primero si aún no las has agregado.</p>
 
           <!-- Identity Verification -->
           <div class="p-4 bg-creo-purple/5 rounded-xl border border-creo-purple/20 space-y-3">
             <h4 class="font-semibold text-sm text-gray-900 flex items-center gap-2">
               <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              VerificaciÃ³n de Identidad (Stripe Identity)
+              Verificación de Identidad (Stripe Identity)
             </h4>
-            <p class="text-xs text-gray-500">Stripe verificarÃ¡ tu identidad con foto de documento + selfie. Esto garantiza que eres una persona real. <strong>Costo: $1.50 USD</strong> (cargo Ãºnico al creador).</p>
+            <p class="text-xs text-gray-500">Stripe verificará tu identidad con foto de documento + selfie. Esto garantiza que eres una persona real. <strong>Costo: $1.50 USD</strong> (cargo único al creador).</p>
             <div id="identity-status" class="text-xs font-medium text-gray-500">No verificado</div>
-            <button onclick="startIdentityVerification()" id="identity-btn" class="w-full bg-creo-purple text-white py-2 rounded-lg font-bold text-sm transition hover:opacity-90">Iniciar VerificaciÃ³n de Identidad â€” $1.50</button>
+            <button onclick="startIdentityVerification()" id="identity-btn" class="w-full bg-creo-purple text-white py-2 rounded-lg font-bold text-sm transition hover:opacity-90">Iniciar Verificación de Identidad — $1.50</button>
           </div>
 
-          <button onclick="submitApplication()" id="submit-app-btn" class="w-full bg-creo-mint hover:bg-creo-mintDark text-creo-purple font-bold py-3 rounded-xl transition text-sm">Enviar Solicitud para RevisiÃ³n</button>
-          <p class="text-[10px] text-gray-400 text-center">Tu perfil serÃ¡ revisado por nuestro equipo. Te notificaremos cuando seas aprobado.</p>
+          <button onclick="submitApplication()" id="submit-app-btn" class="w-full bg-creo-mint hover:bg-creo-mintDark text-creo-purple font-bold py-3 rounded-xl transition text-sm">Enviar Solicitud para Revisión</button>
+          <p class="text-[10px] text-gray-400 text-center">Tu perfil será revisado por nuestro equipo. Te notificaremos cuando seas aprobado.</p>
         </div>
       </div>
 
@@ -325,24 +324,24 @@
       <div id="panel-metas" class="tab-panel hidden space-y-4">
         <div id="meta-locked" class="hidden bg-amber-50 p-4 rounded-xl border border-amber-200 text-center">
           <p class="text-sm text-amber-800 font-semibold">Debes ser verificado para crear metas</p>
-          <p class="text-xs text-amber-700 mt-1">Ve a la pestaÃ±a "VerificaciÃ³n" para iniciar el proceso.</p>
+          <p class="text-xs text-amber-700 mt-1">Ve a la pestaña "Verificación" para iniciar el proceso.</p>
         </div>
 
         <div id="meta-form-container" class="glass p-6 rounded-xl shadow-xl space-y-4">
           <h3 class="font-bold text-gray-900">Crear Nueva Meta</h3>
 
           <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <p class="text-[10px] text-blue-800 leading-relaxed"><strong>RecomendaciÃ³n:</strong> Sube screenshots de los precios del producto/herramienta que necesitas con el link directo de compra. Esto genera credibilidad y transparencia para tus Supporters.</p>
+            <p class="text-[10px] text-blue-800 leading-relaxed"><strong>Recomendación:</strong> Sube screenshots de los precios del producto/herramienta que necesitas con el link directo de compra. Esto genera credibilidad y transparencia para tus Supporters.</p>
           </div>
 
-          <input id="meta-title" type="text" placeholder="TÃ­tulo de la meta (ej: Nueva cÃ¡mara para contenido)" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
-          <textarea id="meta-desc" placeholder="Â¿QuÃ© necesitas y para quÃ©? Describe brevemente tu meta y cÃ³mo ayudarÃ¡ a tu trabajo como creador..." rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+          <input id="meta-title" type="text" placeholder="Título de la meta (ej: Nueva cámara para contenido)" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          <textarea id="meta-desc" placeholder="¿Qué necesitas y para qué? Describe brevemente tu meta y cómo ayudará a tu trabajo como creador..." rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
 
           <!-- Meta Images -->
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">ImÃ¡genes / Screenshots de precio <span class="text-red-500">*</span></label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Imágenes / Screenshots de precio <span class="text-red-500">*</span></label>
             <input type="file" id="meta-images-file" accept="image/*" multiple onchange="uploadMetaImages()" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
-            <p class="text-[10px] text-gray-400 mt-1">Sube imÃ¡genes del producto, screenshots de precios, o evidencia visual</p>
+            <p class="text-[10px] text-gray-400 mt-1">Sube imágenes del producto, screenshots de precios, o evidencia visual</p>
             <div id="meta-images-preview" class="flex flex-wrap gap-2 mt-2"></div>
           </div>
 
@@ -350,7 +349,7 @@
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Video de la meta (opcional)</label>
             <input type="file" id="meta-video-file" accept="video/*" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
-            <p class="text-[10px] text-gray-400 mt-1">Sube un video explicando tu meta (MÃ¡x 50MB)</p>
+            <p class="text-[10px] text-gray-400 mt-1">Sube un video explicando tu meta (Máx 50MB)</p>
           </div>
 
           <!-- Product Links -->
@@ -379,7 +378,7 @@
         <!-- Incoming Meta Invites -->
         <div id="meta-invites-section" class="hidden space-y-3">
           <h3 class="font-bold text-gray-900 flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-creo-mint/20 flex items-center justify-center text-sm">ðŸ¤</span>
+            <span class="w-6 h-6 rounded-full bg-creo-mint/20 flex items-center justify-center text-sm">🤝</span>
             Invitaciones a Metas
           </h3>
           <div id="meta-invites-list" class="space-y-2"></div>
@@ -391,29 +390,29 @@
         <div class="bg-gradient-to-br from-creo-purple/5 to-creo-mint/5 p-5 rounded-xl border border-creo-purple/20 space-y-3">
           <h4 class="font-bold text-sm text-gray-900 flex items-center gap-2">
             <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-            Sistema de LiberaciÃ³n de Fondos en 3 Etapas
+            Sistema de Liberación de Fondos en 3 Etapas
           </h4>
           <p class="text-[10px] text-gray-500 leading-relaxed">Para proteger a los supporters y garantizar transparencia, los fondos de cada meta se liberan en 3 etapas verificadas.</p>
           <div class="space-y-2">
             <div class="flex items-start gap-3 p-3 bg-white/80 rounded-lg">
               <div class="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0"><span class="text-sm font-bold text-amber-600">1</span></div>
               <div>
-                <p class="text-xs font-semibold text-gray-900">RetenciÃ³n en Stripe (7-14 dÃ­as)</p>
+                <p class="text-xs font-semibold text-gray-900">Retención en Stripe (7-14 días)</p>
                 <p class="text-[10px] text-gray-500">Los fondos se retienen para verificar que no sean pagos fraudulentos o tarjetas robadas.</p>
               </div>
             </div>
             <div class="flex items-start gap-3 p-3 bg-white/80 rounded-lg">
               <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0"><span class="text-sm font-bold text-blue-600">2</span></div>
               <div>
-                <p class="text-xs font-semibold text-gray-900">Primera liberaciÃ³n (50%)</p>
-                <p class="text-[10px] text-gray-500">Recibes la mitad. Debes subir recibo de compra + actualizaciÃ³n a la comunidad (foto/video con descripciÃ³n).</p>
+                <p class="text-xs font-semibold text-gray-900">Primera liberación (50%)</p>
+                <p class="text-[10px] text-gray-500">Recibes la mitad. Debes subir recibo de compra + actualización a la comunidad (foto/video con descripción).</p>
               </div>
             </div>
             <div class="flex items-start gap-3 p-3 bg-white/80 rounded-lg">
               <div class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0"><span class="text-sm font-bold text-green-600">3</span></div>
               <div>
-                <p class="text-xs font-semibold text-gray-900">LiberaciÃ³n final (50% restante)</p>
-                <p class="text-[10px] text-gray-500">Sube recibos finales, fotos y videos de la adquisiciÃ³n. El admin revisa y aprueba.</p>
+                <p class="text-xs font-semibold text-gray-900">Liberación final (50% restante)</p>
+                <p class="text-[10px] text-gray-500">Sube recibos finales, fotos y videos de la adquisición. El admin revisa y aprueba.</p>
               </div>
             </div>
           </div>
@@ -426,15 +425,15 @@
       <!-- TAB: Posts (posts to Comunidad) -->
       <div id="panel-posts" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
-          <h3 class="font-bold text-gray-900">Nueva PublicaciÃ³n</h3>
-          <p class="text-[10px] text-gray-400">Tu publicaciÃ³n aparecerÃ¡ en la Comunidad para que todos la vean.</p>
-          <input id="post-title" type="text" placeholder="TÃ­tulo (opcional)" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm font-semibold">
-          <textarea id="post-body" placeholder="Â¿QuÃ© quieres compartir con la comunidad?" rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+          <h3 class="font-bold text-gray-900">Nueva Publicación</h3>
+          <p class="text-[10px] text-gray-400">Tu publicación aparecerá en la Comunidad para que todos la vean.</p>
+          <input id="post-title" type="text" placeholder="Título (opcional)" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm font-semibold">
+          <textarea id="post-body" placeholder="¿Qué quieres compartir con la comunidad?" rows="3" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
           <!-- Post type selector -->
           <div class="flex gap-2 flex-wrap">
             <button onclick="setDashPostType('normal')" class="dash-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-creo-purple text-white" data-type="normal">Normal</button>
-            <button onclick="setDashPostType('evento')" class="dash-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="evento">ðŸ“… Evento</button>
-            <button onclick="setDashPostType('en_vivo')" class="dash-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="en_vivo">ðŸ“¡ En Vivo</button>
+            <button onclick="setDashPostType('evento')" class="dash-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="evento">📅 Evento</button>
+            <button onclick="setDashPostType('en_vivo')" class="dash-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="en_vivo">📡 En Vivo</button>
           </div>
           <div id="dash-evento-fields" class="hidden space-y-2">
             <div class="grid grid-cols-2 gap-2">
@@ -486,29 +485,29 @@
       <div id="panel-story" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
           <h3 class="font-bold text-gray-900">Mi Historia</h3>
-          <p class="text-xs text-gray-500">Deja que la gente te conozca mÃ¡s. Comparte cÃ³mo has llegado hasta aquÃ­.</p>
+          <p class="text-xs text-gray-500">Deja que la gente te conozca más. Comparte cómo has llegado hasta aquí.</p>
 
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">TÃ­tulo</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Título</label>
             <input id="story-title" type="text" placeholder="Ej: Mi camino como creador" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">DescripciÃ³n</label>
-            <textarea id="story-content" placeholder="CuÃ©ntale al mundo tu historia..." rows="4" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
+            <textarea id="story-content" placeholder="Cuéntale al mundo tu historia..." rows="4" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">ðŸ“¹ Video Principal</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">📹 Video Principal</label>
             <input type="file" id="story-main-video-file" accept="video/*" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
-            <p class="text-[10px] text-gray-400 mt-1">ExplÃ­cale al mundo tu historia en no mÃ¡s de 5 minutos. Comparte cÃ³mo has llegado hasta aquÃ­ y luego di tu meta. (MÃ¡x 50MB)</p>
+            <p class="text-[10px] text-gray-400 mt-1">Explícale al mundo tu historia en no más de 5 minutos. Comparte cómo has llegado hasta aquí y luego di tu meta. (Máx 50MB)</p>
             <div id="story-video-preview" class="hidden mt-2"><video class="w-full rounded-lg" controls></video></div>
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">ðŸ“Ž ImÃ¡genes y Audios Adicionales</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">📎 Imágenes y Audios Adicionales</label>
             <input type="file" id="story-media-files" accept="image/*,audio/*,video/*" multiple class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
-            <p class="text-[10px] text-gray-400 mt-1">Sube fotos de cartas escritas a mano, fotos de equipos antiguos, o graba un audio con tu historia. (MÃ¡x 10MB c/u)</p>
+            <p class="text-[10px] text-gray-400 mt-1">Sube fotos de cartas escritas a mano, fotos de equipos antiguos, o graba un audio con tu historia. (Máx 10MB c/u)</p>
             <div id="story-media-preview" class="flex flex-wrap gap-2 mt-2"></div>
           </div>
 
@@ -516,7 +515,7 @@
             <input type="checkbox" id="story-share-community" class="accent-creo-mint w-4 h-4">
             <div>
               <span class="text-sm font-semibold text-gray-900">Compartir en el Muro de Comunidad</span>
-              <p class="text-[10px] text-gray-500">Tu historia aparecerÃ¡ en el feed de la comunidad</p>
+              <p class="text-[10px] text-gray-500">Tu historia aparecerá en el feed de la comunidad</p>
             </div>
           </label>
           <button onclick="createStory()" id="create-story-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Publicar Historia</button>
@@ -532,10 +531,10 @@
       <div id="panel-business" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
           <h3 class="font-bold text-gray-900">Mis Creaciones</h3>
-          <p class="text-xs text-gray-500">Agrega enlaces a tus productos, sitios web o servicios (mÃ¡ximo 10).</p>
-          <input id="biz-title" type="text" placeholder="TÃ­tulo del enlace" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          <p class="text-xs text-gray-500">Agrega enlaces a tus productos, sitios web o servicios (máximo 10).</p>
+          <input id="biz-title" type="text" placeholder="Título del enlace" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           <input id="biz-url" type="url" placeholder="https://tu-sitio.com" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
-          <input id="biz-desc" type="text" placeholder="DescripciÃ³n corta (opcional)" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+          <input id="biz-desc" type="text" placeholder="Descripción corta (opcional)" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           <label class="block text-xs font-medium text-gray-500 mb-1">Imagen (opcional)</label>
           <input type="file" id="biz-image-file" accept="image/*" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
           <button onclick="createBusinessLink()" id="create-biz-btn" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-semibold transition">Agregar Enlace</button>
@@ -610,24 +609,24 @@
         <!-- Stripe connect action -->
         <div id="stripe-connect-regular">
           <div class="bg-amber-50 p-6 rounded-xl border border-amber-200 space-y-3">
-            <h3 class="font-bold text-amber-800">ConexiÃ³n con Stripe</h3>
+            <h3 class="font-bold text-amber-800">Conexión con Stripe</h3>
             <p class="text-sm text-amber-700">Conecta tu cuenta de Stripe para recibir pagos.</p>
             <button id="stripe-btn" onclick="startStripeOnboarding()" class="w-full bg-creo-purple text-white py-3 rounded-xl font-bold transition hover:opacity-90">Conectar Stripe</button>
           </div>
           <div class="bg-white p-4 rounded-xl border border-gray-200 mt-4">
-            <p class="text-xs text-gray-500">CREO retiene un 5% de comisiÃ³n por transacciÃ³n. Stripe cobra un 3% adicional al que paga. TÃº recibes el 95% de cada pago.</p>
+            <p class="text-xs text-gray-500">CREO retiene un 5% de comisión por transacción. Stripe cobra un 3% adicional al que paga. Tú recibes el 95% de cada pago.</p>
           </div>
         </div>
       </div>
 
-    </div><!-- /max-w-2xl wrapper â€” close so branding panel gets full width -->
+    </div><!-- /max-w-2xl wrapper — close so branding panel gets full width -->
 
-    <!-- TAB: PersonalizaciÃ³n â€” full-width for side-by-side preview + editor -->
+    <!-- TAB: Personalización — full-width for side-by-side preview + editor -->
     <div id="panel-branding" class="tab-panel hidden px-4">
       <!-- Split-screen: Editor (left) + Preview (right) on desktop -->
       <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 lg:items-start max-w-5xl mx-auto">
 
-          <!-- LIVE PREVIEW â€” sticky on desktop, collapsible on mobile -->
+          <!-- LIVE PREVIEW — sticky on desktop, collapsible on mobile -->
           <div class="lg:sticky lg:top-4 lg:w-[380px] lg:flex-shrink-0 order-2 lg:order-2">
             <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
               <div class="flex items-center justify-between px-4 py-2.5 bg-gray-50 border-b border-gray-100">
@@ -638,7 +637,7 @@
                 </div>
                 <span class="text-[10px] text-gray-400 font-mono truncate max-w-[180px]" id="preview-url-bar">creo/profile.html</span>
                 <div class="flex items-center gap-1">
-                  <button onclick="setPreviewDevice('mobile')" id="preview-dev-mobile" class="p-1 rounded text-gray-400 hover:text-creo-purple transition" title="MÃ³vil">
+                  <button onclick="setPreviewDevice('mobile')" id="preview-dev-mobile" class="p-1 rounded text-gray-400 hover:text-creo-purple transition" title="Móvil">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                   </button>
                   <button onclick="setPreviewDevice('desktop')" id="preview-dev-desktop" class="p-1 rounded text-creo-purple transition" title="Escritorio">
@@ -672,17 +671,17 @@
           <div>
             <h3 class="font-bold text-gray-900 flex items-center gap-2">
               <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
-              PersonalizaciÃ³n
+              Personalización
             </h3>
             <p class="text-xs text-gray-500 mt-1">Edita tu perfil en tiempo real. Los cambios se reflejan al instante.</p>
           </div>
 
           <!-- Sub-navigation tabs -->
           <div class="flex gap-1 bg-gray-50 rounded-xl p-1 overflow-x-auto no-scrollbar text-[11px]">
-            <button onclick="switchPersonaTab('images')" id="persona-tab-images" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition bg-creo-purple text-white">ImÃ¡genes</button>
+            <button onclick="switchPersonaTab('images')" id="persona-tab-images" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition bg-creo-purple text-white">Imágenes</button>
             <button onclick="switchPersonaTab('sections')" id="persona-tab-sections" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Secciones</button>
             <button onclick="switchPersonaTab('colors')" id="persona-tab-colors" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Colores</button>
-            <button onclick="switchPersonaTab('typography')" id="persona-tab-typography" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">TipografÃ­a</button>
+            <button onclick="switchPersonaTab('typography')" id="persona-tab-typography" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Tipografía</button>
             <button onclick="switchPersonaTab('cards')" id="persona-tab-cards" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Tarjetas</button>
             <button onclick="switchPersonaTab('buttons')" id="persona-tab-buttons" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Botones</button>
             <button onclick="switchPersonaTab('mecenas-inline')" id="persona-tab-mecenas-inline" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Mecenas</button>
@@ -708,14 +707,14 @@
           <div class="flex gap-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
             <svg class="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <div>
-              <p class="text-[11px] font-semibold text-blue-800">ImÃ¡genes de perfil</p>
-              <p class="text-[10px] text-blue-600 mt-0.5">Sube tu foto de perfil y portada. Puedes ajustar la forma (redondo, cuadrado) y el tamaÃ±o del avatar. Formatos: JPG, PNG, GIF. MÃ¡x 5MB.</p>
+              <p class="text-[11px] font-semibold text-blue-800">Imágenes de perfil</p>
+              <p class="text-[10px] text-blue-600 mt-0.5">Sube tu foto de perfil y portada. Puedes ajustar la forma (redondo, cuadrado) y el tamaño del avatar. Formatos: JPG, PNG, GIF. Máx 5MB.</p>
             </div>
           </div>
 
           <!-- Profile & Cover Images -->
           <div class="space-y-4 pb-4 border-b border-gray-200">
-            <h4 class="text-xs font-semibold text-gray-700">ImÃ¡genes de perfil</h4>
+            <h4 class="text-xs font-semibold text-gray-700">Imágenes de perfil</h4>
             <div class="flex gap-4 items-start">
               <div class="text-center space-y-2">
                 <div id="brand-avatar-preview" class="w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden mx-auto">
@@ -740,16 +739,16 @@
 
             <!-- Profile Image Size & Shape -->
             <div class="pt-3 border-t border-gray-100 space-y-3">
-              <h4 class="text-xs font-semibold text-gray-700">Forma y tamaÃ±o del avatar</h4>
+              <h4 class="text-xs font-semibold text-gray-700">Forma y tamaño del avatar</h4>
               <div class="flex gap-2">
                 <button onclick="setProfileShape('round')" id="pshape-round" class="flex-1 py-2 rounded-lg text-xs font-semibold border-2 border-creo-purple text-creo-purple transition text-center">Redondo</button>
                 <button onclick="setProfileShape('square')" id="pshape-square" class="flex-1 py-2 rounded-lg text-xs font-semibold border-2 border-gray-200 text-gray-500 transition text-center">Cuadrado</button>
                 <button onclick="setProfileShape('rounded')" id="pshape-rounded" class="flex-1 py-2 rounded-lg text-xs font-semibold border-2 border-gray-200 text-gray-500 transition text-center">Redondeado</button>
               </div>
               <div>
-                <label class="text-[10px] text-gray-500">TamaÃ±o: <span id="psize-label">Mediano</span></label>
+                <label class="text-[10px] text-gray-500">Tamaño: <span id="psize-label">Mediano</span></label>
                 <input type="range" id="psize-range" min="0" max="3" value="1" step="1" class="w-full accent-creo-mint" oninput="setProfileSize(['sm','md','lg','xl'][this.value])">
-                <div class="flex justify-between text-[9px] text-gray-400"><span>PequeÃ±o</span><span>Mediano</span><span>Grande</span></div>
+                <div class="flex justify-between text-[9px] text-gray-400"><span>Pequeño</span><span>Mediano</span><span>Grande</span></div>
               </div>
             </div>
           </div>
@@ -774,7 +773,7 @@
               <svg class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
               <div>
                 <p class="text-[11px] font-semibold text-amber-800">Orden de secciones</p>
-                <p class="text-[10px] text-amber-600 mt-0.5">Arrastra las secciones para reordenar tu perfil. Toca el botÃ³n de visibilidad para ocultar secciones que no quieras mostrar. Los visitantes verÃ¡n el orden que configures aquÃ­.</p>
+                <p class="text-[10px] text-amber-600 mt-0.5">Arrastra las secciones para reordenar tu perfil. Toca el botón de visibilidad para ocultar secciones que no quieras mostrar. Los visitantes verán el orden que configures aquí.</p>
               </div>
             </div>
             <div id="section-sortable" class="space-y-2"></div>
@@ -788,7 +787,7 @@
             <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
             <div>
               <p class="text-[11px] font-semibold text-purple-800">Colores y tema</p>
-              <p class="text-[10px] text-purple-600 mt-0.5">Cada color que cambies se refleja al instante en la vista previa. Elige tema claro u oscuro como base, luego ajusta cada color individualmente. AsegÃºrate de que el texto sea legible sobre el fondo.</p>
+              <p class="text-[10px] text-purple-600 mt-0.5">Cada color que cambies se refleja al instante en la vista previa. Elige tema claro u oscuro como base, luego ajusta cada color individualmente. Asegúrate de que el texto sea legible sobre el fondo.</p>
             </div>
           </div>
 
@@ -818,7 +817,7 @@
               <div id="brand-warn-text" class="hidden text-[10px] text-amber-700 bg-amber-50 rounded px-2 py-1 mt-1"></div>
             </div>
             <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">TÃ­tulos</label>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Títulos</label>
               <div class="flex items-center gap-2">
                 <div class="brand-swatch"><input type="color" id="brand-title-color" value="#111827" oninput="updateBrandingPreview()"></div>
                 <span class="text-[10px] text-gray-400 font-mono" id="brand-title-hex">#111827</span>
@@ -847,7 +846,7 @@
               <div id="brand-warn-btn" class="hidden text-[10px] text-amber-700 bg-amber-50 rounded px-2 py-1 mt-1"></div>
             </div>
             <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Fondo de pÃ¡gina</label>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Fondo de página</label>
               <div class="flex items-center gap-2">
                 <div class="brand-swatch"><input type="color" id="brand-bg-color" value="#f9fafb" oninput="updateBrandingPreview()"></div>
                 <span class="text-[10px] text-gray-400 font-mono" id="brand-bg-hex">#f9fafb</span>
@@ -882,7 +881,7 @@
             <div id="brand-preview-card" class="relative p-5 rounded-2xl border border-gray-200 overflow-hidden" style="min-height:140px">
               <div id="brand-preview-bg-media" class="absolute inset-0 z-0"></div>
               <div class="relative z-10 space-y-3">
-                <p id="brand-preview-text" class="text-sm font-semibold">AsÃ­ se verÃ¡ tu perfil</p>
+                <p id="brand-preview-text" class="text-sm font-semibold">Así se verá tu perfil</p>
                 <p id="brand-preview-subtext" class="text-xs opacity-70">Los textos y secciones reflejan tus colores</p>
                 <div class="flex gap-2">
                   <button id="brand-preview-pay-btn" class="px-4 py-2 rounded-full text-xs font-semibold">Creo en Ti</button>
@@ -897,8 +896,8 @@
             <div class="flex gap-3 p-3 bg-green-50 rounded-xl border border-green-100">
               <svg class="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
               <div>
-                <p class="text-[11px] font-semibold text-green-800">TipografÃ­a</p>
-                <p class="text-[10px] text-green-600 mt-0.5">Elige la fuente principal para el texto del cuerpo y opcionalmente una fuente diferente para los tÃ­tulos. La vista previa de abajo muestra cÃ³mo se verÃ¡ en tu perfil.</p>
+                <p class="text-[11px] font-semibold text-green-800">Tipografía</p>
+                <p class="text-[10px] text-green-600 mt-0.5">Elige la fuente principal para el texto del cuerpo y opcionalmente una fuente diferente para los títulos. La vista previa de abajo muestra cómo se verá en tu perfil.</p>
               </div>
             </div>
             <div>
@@ -921,7 +920,7 @@
               </select>
             </div>
             <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Fuente de tÃ­tulos</label>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Fuente de títulos</label>
               <select id="brand-heading-font" onchange="updateTypographyPreview();personaTrack()" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-xl text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
                 <option value="">(Misma que principal)</option>
                 <option value="Playfair Display">Playfair Display</option>
@@ -935,8 +934,8 @@
               </select>
             </div>
             <p id="brand-font-preview" class="text-sm text-gray-600 p-4 bg-gray-50 rounded-lg border border-gray-100">
-              <span class="block text-lg font-bold mb-1" id="brand-heading-preview">Vista previa de tÃ­tulos</span>
-              Vista previa del texto del cuerpo con la tipografÃ­a seleccionada
+              <span class="block text-lg font-bold mb-1" id="brand-heading-preview">Vista previa de títulos</span>
+              Vista previa del texto del cuerpo con la tipografía seleccionada
             </p>
           </div><!-- /persona-panel-typography -->
 
@@ -981,8 +980,8 @@
             <div>
               <label class="text-xs font-semibold text-gray-700 block mb-2">Vista previa</label>
               <div id="card-style-preview" class="glass p-5 rounded-2xl shadow-xl space-y-2 transition-all">
-                <h4 class="font-bold text-gray-900 text-sm">SecciÃ³n de ejemplo</h4>
-                <p class="text-xs text-gray-500">AsÃ­ se verÃ¡n las tarjetas de tu perfil pÃºblico.</p>
+                <h4 class="font-bold text-gray-900 text-sm">Sección de ejemplo</h4>
+                <p class="text-xs text-gray-500">Así se verán las tarjetas de tu perfil público.</p>
               </div>
             </div>
           </div><!-- /persona-panel-cards -->
@@ -993,7 +992,7 @@
               <svg class="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
               <div>
                 <p class="text-[11px] font-semibold text-cyan-800">Estilo de botones</p>
-                <p class="text-[10px] text-cyan-600 mt-0.5">Personaliza la forma, sombra y animaciÃ³n hover de los botones de tu perfil. Prueba pasar el mouse sobre la vista previa para ver las animaciones.</p>
+                <p class="text-[10px] text-cyan-600 mt-0.5">Personaliza la forma, sombra y animación hover de los botones de tu perfil. Prueba pasar el mouse sobre la vista previa para ver las animaciones.</p>
               </div>
             </div>
             <div>
@@ -1011,7 +1010,7 @@
               </button>
             </div>
             <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">AnimaciÃ³n al hover</label>
+              <label class="text-xs font-semibold text-gray-700 block mb-2">Animación al hover</label>
               <div class="grid grid-cols-3 gap-2">
                 <button onclick="setButtonAnim('none')" id="banim-none" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-creo-purple text-creo-purple transition">Ninguna</button>
                 <button onclick="setButtonAnim('lift')" id="banim-lift" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Elevar</button>
@@ -1030,18 +1029,18 @@
           <!-- Section: Metas Branding (visible in all sub-tabs) -->
           <div class="pt-4 border-t border-gray-200 space-y-4 persona-sub hidden" id="persona-panel-mecenas-inline">
             <div class="flex items-center gap-2">
-              <span class="text-lg">ðŸŽ¯</span>
+              <span class="text-lg">🎯</span>
               <div>
-                <h4 class="text-sm font-bold text-gray-900">SecciÃ³n de Metas</h4>
-                <p class="text-[10px] text-gray-500">Personaliza cÃ³mo se ven las metas en tu perfil</p>
+                <h4 class="text-sm font-bold text-gray-900">Sección de Metas</h4>
+                <p class="text-[10px] text-gray-500">Personaliza cómo se ven las metas en tu perfil</p>
               </div>
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">TÃ­tulo de la secciÃ³n</label>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Título de la sección</label>
               <input id="mec-meta-title" type="text" placeholder="Mi Meta" maxlength="60" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">DescripciÃ³n</label>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
               <textarea id="mec-meta-desc" rows="2" maxlength="200" placeholder="Apoya mis metas como creador" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
             </div>
             <div>
@@ -1051,7 +1050,7 @@
             </div>
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Color del botÃ³n</label>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Color del botón</label>
                 <div class="flex items-center gap-2">
                   <div class="brand-swatch"><input type="color" id="mec-meta-btn-color" value="#1a0a3e"></div>
                   <span class="text-[10px] text-gray-400 font-mono" id="mec-meta-btn-hex">#1a0a3e</span>
@@ -1082,7 +1081,7 @@
           <!-- Save All Branding -->
           <button onclick="savePersonalizacion()" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
             <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-            Guardar PersonalizaciÃ³n
+            Guardar Personalización
           </button>
         </div>
           </div><!-- /editor panel -->
@@ -1095,9 +1094,9 @@
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
           <h3 class="font-bold text-gray-900 flex items-center gap-2">
             <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 6v12m-3.536-2.464a5 5 0 010-7.072M18.364 5.636a9 9 0 010 12.728M5.636 18.364a9 9 0 010-12.728"/></svg>
-            Sonido de NotificaciÃ³n
+            Sonido de Notificación
           </h3>
-          <p class="text-xs text-gray-500">Elige el sonido que se reproducirÃ¡ cuando recibas una nueva notificaciÃ³n.</p>
+          <p class="text-xs text-gray-500">Elige el sonido que se reproducirá cuando recibas una nueva notificación.</p>
 
           <div class="flex items-center justify-between">
             <label class="text-sm font-medium text-gray-700">Activar sonidos</label>
@@ -1124,7 +1123,7 @@
             <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
             Yo Creo en Ellos
           </h3>
-          <p class="text-xs text-gray-500">Selecciona los creadores que quieres destacar en tu perfil. AparecerÃ¡n en la secciÃ³n "Yo Creo en Ellos" de tu pÃ¡gina pÃºblica.</p>
+          <p class="text-xs text-gray-500">Selecciona los creadores que quieres destacar en tu perfil. Aparecerán en la sección "Yo Creo en Ellos" de tu página pública.</p>
 
           <div class="relative">
             <input id="creoellos-search" type="text" placeholder="Buscar creador por nombre o @usuario..." class="w-full border border-gray-300 bg-gray-50 p-3 pl-10 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
@@ -1136,30 +1135,30 @@
             <h4 class="text-sm font-semibold text-gray-700 mb-3">Creadores destacados (<span id="creoellos-count">0</span>/10)</h4>
             <div id="creoellos-selected" class="space-y-2"></div>
             <div id="creoellos-empty" class="text-center py-6">
-              <p class="text-xs text-gray-400">ðŸ¤ No has seleccionado ningÃºn creador aÃºn.</p>
-              <p class="text-xs text-gray-400 mt-1">ðŸ” Busca arriba para agregar creadores a tu secciÃ³n.</p>
+              <p class="text-xs text-gray-400">🤝 No has seleccionado ningún creador aún.</p>
+              <p class="text-xs text-gray-400 mt-1">🔍 Busca arriba para agregar creadores a tu sección.</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- TAB: Mecenas â€” Yo Creo en Ti -->
+      <!-- TAB: Mecenas — Yo Creo en Ti -->
       <div id="panel-mecenas-tip" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center text-lg">ðŸ’š</div>
+            <div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center text-lg">💚</div>
             <div>
               <h3 class="font-bold text-gray-900">Yo Creo en Ti</h3>
-              <p class="text-xs text-gray-500">Personaliza cÃ³mo se ve la secciÃ³n de tips en tu perfil</p>
+              <p class="text-xs text-gray-500">Personaliza cómo se ve la sección de tips en tu perfil</p>
             </div>
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">TÃ­tulo</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Título</label>
             <input id="mec-tip-title" type="text" placeholder="Yo Creo en Ti" maxlength="60" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">DescripciÃ³n</label>
-            <textarea id="mec-tip-desc" rows="2" maxlength="200" placeholder="EnvÃ­a un apoyo Ãºnico al creador" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
+            <textarea id="mec-tip-desc" rows="2" maxlength="200" placeholder="Envía un apoyo único al creador" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Imagen o Video</label>
@@ -1168,7 +1167,7 @@
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">Color del botÃ³n</label>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Color del botón</label>
               <div class="flex items-center gap-2">
                 <div class="brand-swatch"><input type="color" id="mec-tip-btn-color" value="#1a0a3e"></div>
                 <span class="text-[10px] text-gray-400 font-mono" id="mec-tip-btn-hex">#1a0a3e</span>
@@ -1188,7 +1187,7 @@
             <div id="mec-tip-preview" class="p-5 rounded-2xl border border-gray-200 space-y-3 transition-all" style="background:#ffffff">
               <div class="text-center">
                 <h3 class="text-lg font-bold" style="color:#1f2937">Yo Creo en Ti</h3>
-                <p class="text-xs mt-1" style="color:#6b7280">EnvÃ­a un apoyo Ãºnico al creador</p>
+                <p class="text-xs mt-1" style="color:#6b7280">Envía un apoyo único al creador</p>
               </div>
               <button class="w-full py-3 rounded-xl font-bold text-white text-sm transition" style="background:#1a0a3e">Apoyar Creador</button>
             </div>
@@ -1197,23 +1196,23 @@
         </div>
       </div>
 
-      <!-- TAB: Mecenas â€” Apoyo Full -->
+      <!-- TAB: Mecenas — Apoyo Full -->
       <div id="panel-mecenas-sub" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-lg">â­</div>
+            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-lg">⭐</div>
             <div>
               <h3 class="font-bold text-gray-900">Apoyo Full</h3>
-              <p class="text-xs text-gray-500">Personaliza la secciÃ³n de suscripciones mensuales</p>
+              <p class="text-xs text-gray-500">Personaliza la sección de suscripciones mensuales</p>
             </div>
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">TÃ­tulo</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Título</label>
             <input id="mec-sub-title" type="text" placeholder="Apoyo Full" maxlength="60" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">DescripciÃ³n</label>
-            <textarea id="mec-sub-desc" rows="2" maxlength="200" placeholder="Apoya mensualmente con una cantidad que tÃº elijas" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
+            <textarea id="mec-sub-desc" rows="2" maxlength="200" placeholder="Apoya mensualmente con una cantidad que tú elijas" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Imagen o Video</label>
@@ -1222,7 +1221,7 @@
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">Color del botÃ³n</label>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Color del botón</label>
               <div class="flex items-center gap-2">
                 <div class="brand-swatch"><input type="color" id="mec-sub-btn-color" value="#1a0a3e"></div>
                 <span class="text-[10px] text-gray-400 font-mono" id="mec-sub-btn-hex">#1a0a3e</span>
@@ -1242,7 +1241,7 @@
             <div id="mec-sub-preview" class="p-5 rounded-2xl border border-gray-200 space-y-3 transition-all" style="background:#ffffff">
               <div class="text-center">
                 <h3 class="text-lg font-bold" style="color:#1f2937">Apoyo Full</h3>
-                <p class="text-xs mt-1" style="color:#6b7280">Apoya mensualmente con una cantidad que tÃº elijas</p>
+                <p class="text-xs mt-1" style="color:#6b7280">Apoya mensualmente con una cantidad que tú elijas</p>
               </div>
               <button class="w-full py-3 rounded-xl font-bold text-white text-sm transition" style="background:#1a0a3e">Suscribirme Mensualmente</button>
             </div>
@@ -1259,7 +1258,7 @@
           <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-4 rounded-xl">
             <p class="text-xs opacity-80">Total Ganado</p>
             <p class="text-xl font-bold" id="earnings-total">$0.00</p>
-            <p class="text-[10px] opacity-60 mt-1">DespuÃ©s de comisiones</p>
+            <p class="text-[10px] opacity-60 mt-1">Después de comisiones</p>
           </div>
           <div class="bg-gradient-to-br from-creo-purple to-indigo-700 text-white p-4 rounded-xl">
             <p class="text-xs opacity-80">Este Mes</p>
@@ -1371,7 +1370,7 @@
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
           <div class="flex items-center justify-between">
             <h3 class="font-bold text-gray-900 flex items-center gap-2">
-              <span class="text-xl">âš¡</span> Creo Futuro Hoy
+              <img src="assets/logo-icon.png" class="w-6 h-6 rounded-full" alt="CREO"> Creo Futuro Hoy
             </h3>
             <button onclick="showCfhForm()" class="bg-creo-purple hover:bg-creo-light text-white text-xs font-bold px-4 py-2 rounded-lg transition flex items-center gap-1">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -1381,13 +1380,13 @@
 
           <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-[11px]">
             <button onclick="cfhFilterCat(null)" data-cfhcat="" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-creo-purple text-white font-semibold whitespace-nowrap">Todos</button>
-            <button onclick="cfhFilterCat('music')" data-cfhcat="music" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">ðŸŽµ Music</button>
-            <button onclick="cfhFilterCat('books')" data-cfhcat="books" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">ðŸ“š Books</button>
-            <button onclick="cfhFilterCat('food')" data-cfhcat="food" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">ðŸ½ï¸ Food</button>
-            <button onclick="cfhFilterCat('health')" data-cfhcat="health" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">ðŸ¥ Health</button>
-            <button onclick="cfhFilterCat('fitness')" data-cfhcat="fitness" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">ðŸ’ª Fitness</button>
-            <button onclick="cfhFilterCat('education')" data-cfhcat="education" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">ðŸŽ“ Education</button>
-            <button onclick="cfhFilterCat('faith')" data-cfhcat="faith" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">âœï¸ Fe</button>
+            <button onclick="cfhFilterCat('music')" data-cfhcat="music" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">🎵 Music</button>
+            <button onclick="cfhFilterCat('books')" data-cfhcat="books" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">📚 Books</button>
+            <button onclick="cfhFilterCat('food')" data-cfhcat="food" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">🍽️ Food</button>
+            <button onclick="cfhFilterCat('health')" data-cfhcat="health" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">🏥 Health</button>
+            <button onclick="cfhFilterCat('fitness')" data-cfhcat="fitness" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">💪 Fitness</button>
+            <button onclick="cfhFilterCat('education')" data-cfhcat="education" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">🎓 Education</button>
+            <button onclick="cfhFilterCat('faith')" data-cfhcat="faith" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">✝️ Fe</button>
           </div>
 
           <div id="cfh-stats" class="grid grid-cols-3 gap-2 text-center">
@@ -1403,11 +1402,11 @@
 
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
           <div class="flex items-center justify-between">
-            <h4 class="font-bold text-gray-900 text-sm flex items-center gap-2">ðŸ“‚ Mis SubcategorÃ­as</h4>
+            <h4 class="font-bold text-gray-900 text-sm flex items-center gap-2">📂 Mis Subcategorías</h4>
             <button onclick="showCfhSubcatForm()" class="text-xs text-creo-purple font-semibold hover:underline">+ Agregar</button>
           </div>
           <div id="cfh-my-subcats" class="space-y-2">
-            <p class="text-gray-400 text-xs text-center py-4">Sin subcategorÃ­as</p>
+            <p class="text-gray-400 text-xs text-center py-4">Sin subcategorías</p>
           </div>
         </div>
       </div>
@@ -1426,40 +1425,40 @@
             <input type="hidden" id="cfh-edit-id" value="">
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">CategorÃ­a <span class="text-red-500">*</span></label>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Categoría <span class="text-red-500">*</span></label>
                 <select id="cfh-category" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" onchange="loadCfhSubcatsForForm()">
-                  <option value="music">ðŸŽµ Music</option>
-                  <option value="books">ðŸ“š Books</option>
-                  <option value="food">ðŸ½ï¸ Food</option>
-                  <option value="health">ðŸ¥ Health</option>
-                  <option value="fitness">ðŸ’ª Fitness</option>
-                  <option value="education">ðŸŽ“ Education</option>
-                  <option value="faith">âœï¸ Fe</option>
+                  <option value="music">🎵 Music</option>
+                  <option value="books">📚 Books</option>
+                  <option value="food">🍽️ Food</option>
+                  <option value="health">🏥 Health</option>
+                  <option value="fitness">💪 Fitness</option>
+                  <option value="education">🎓 Education</option>
+                  <option value="faith">✝️ Fe</option>
                 </select>
               </div>
               <div>
                 <label class="block text-xs font-medium text-gray-500 mb-1">Tipo <span class="text-red-500">*</span></label>
                 <select id="cfh-content-type" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" onchange="toggleCfhTypeFields()">
-                  <option value="video">â–¶ï¸ Video</option>
-                  <option value="book">ðŸ“– Libro</option>
-                  <option value="recipe">ðŸ³ Receta</option>
-                  <option value="course">ðŸŽ“ Curso</option>
-                  <option value="article">ðŸ“ ArtÃ­culo</option>
+                  <option value="video">▶️ Video</option>
+                  <option value="book">📖 Libro</option>
+                  <option value="recipe">🍳 Receta</option>
+                  <option value="course">🎓 Curso</option>
+                  <option value="article">📝 Artículo</option>
                 </select>
               </div>
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">SubcategorÃ­a</label>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Subcategoría</label>
               <select id="cfh-subcategory" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
-                <option value="">â€” Sin subcategorÃ­a â€”</option>
+                <option value="">— Sin subcategoría —</option>
               </select>
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">TÃ­tulo <span class="text-red-500">*</span></label>
-              <input id="cfh-title" type="text" placeholder="TÃ­tulo del contenido" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+              <label class="block text-xs font-medium text-gray-500 mb-1">Título <span class="text-red-500">*</span></label>
+              <input id="cfh-title" type="text" placeholder="Título del contenido" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
             </div>
             <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">DescripciÃ³n</label>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
               <textarea id="cfh-description" rows="3" placeholder="Describe tu contenido..." class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple"></textarea>
             </div>
             <div id="cfh-video-fields" class="space-y-3">
@@ -1479,7 +1478,7 @@
                   </select>
                 </div>
                 <div>
-                  <label class="block text-xs font-medium text-gray-500 mb-1">DuraciÃ³n (seg)</label>
+                  <label class="block text-xs font-medium text-gray-500 mb-1">Duración (seg)</label>
                   <input id="cfh-duration" type="number" placeholder="120" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
                 </div>
               </div>
@@ -1505,20 +1504,20 @@
             <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-3">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input type="radio" name="cfh-access" id="cfh-free" value="true" checked class="accent-creo-purple">
-                <span class="text-sm text-gray-700">ðŸ†“ Gratis</span>
+                <span class="text-sm text-gray-700">🆓 Gratis</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input type="radio" name="cfh-access" id="cfh-paid" value="false" class="accent-creo-purple">
-                <span class="text-sm text-gray-700">â­ Premium (Apoyo Full)</span>
+                <span class="text-sm text-gray-700">⭐ Premium (Apoyo Full)</span>
               </label>
             </div>
             <label class="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" id="cfh-allow-download" class="accent-creo-purple">
-              <span class="text-sm text-gray-700">ðŸ“¥ Permitir descarga</span>
+              <span class="text-sm text-gray-700">📥 Permitir descarga</span>
             </label>
             <div>
               <label class="block text-xs font-medium text-gray-500 mb-1">Tags (separados por coma)</label>
-              <input id="cfh-tags" type="text" placeholder="guitarra, tutorial, bÃ¡sico" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+              <input id="cfh-tags" type="text" placeholder="guitarra, tutorial, básico" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
             </div>
             <div>
               <label class="block text-xs font-medium text-gray-500 mb-1">Materiales Descargables</label>
@@ -1528,13 +1527,13 @@
             <div>
               <label class="block text-xs font-medium text-gray-500 mb-1">Estado</label>
               <select id="cfh-status" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
-                <option value="published">âœ… Publicado</option>
-                <option value="draft">ðŸ“ Borrador</option>
-                <option value="archived">ðŸ“¦ Archivado</option>
+                <option value="published">✅ Publicado</option>
+                <option value="draft">📝 Borrador</option>
+                <option value="archived">📦 Archivado</option>
               </select>
             </div>
             <button onclick="saveCfhContent()" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 rounded-xl transition text-sm">
-              ðŸ’¾ Guardar Contenido
+              💾 Guardar Contenido
             </button>
           </div>
         </div>
@@ -1544,18 +1543,18 @@
       <div id="cfh-subcat-modal" class="fixed inset-0 z-[80] hidden">
         <div class="absolute inset-0 bg-black/50" onclick="closeCfhSubcatForm()"></div>
         <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 max-w-md mx-auto bg-white rounded-2xl shadow-2xl p-6 space-y-4 z-10">
-          <h3 class="font-bold text-gray-900">Nueva SubcategorÃ­a</h3>
+          <h3 class="font-bold text-gray-900">Nueva Subcategoría</h3>
           <input type="hidden" id="cfh-subcat-edit-id" value="">
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">CategorÃ­a</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
             <select id="cfh-subcat-category" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
-              <option value="music">ðŸŽµ Music</option>
-              <option value="books">ðŸ“š Books</option>
-              <option value="food">ðŸ½ï¸ Food</option>
-              <option value="health">ðŸ¥ Health</option>
-              <option value="fitness">ðŸ’ª Fitness</option>
-              <option value="education">ðŸŽ“ Education</option>
-              <option value="faith">âœï¸ Fe</option>
+              <option value="music">🎵 Music</option>
+              <option value="books">📚 Books</option>
+              <option value="food">🍽️ Food</option>
+              <option value="health">🏥 Health</option>
+              <option value="fitness">💪 Fitness</option>
+              <option value="education">🎓 Education</option>
+              <option value="faith">✝️ Fe</option>
             </select>
           </div>
           <div>
@@ -1563,10 +1562,10 @@
             <input id="cfh-subcat-name" type="text" placeholder="Ej: Recetas Veganas" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">DescripciÃ³n (opcional)</label>
-            <input id="cfh-subcat-desc" type="text" placeholder="Breve descripciÃ³n" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripción (opcional)</label>
+            <input id="cfh-subcat-desc" type="text" placeholder="Breve descripción" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
           </div>
-          <button onclick="saveCfhSubcat()" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 rounded-xl transition text-sm">ðŸ’¾ Guardar</button>
+          <button onclick="saveCfhSubcat()" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 rounded-xl transition text-sm">💾 Guardar</button>
         </div>
       </div>
 
@@ -1582,15 +1581,15 @@
               <h4 class="font-semibold text-sm text-blue-900 mb-1">Descargar mis datos</h4>
               <p class="text-xs text-blue-700 mb-3">Descarga una copia de todos tus datos en CREO (perfil, posts, metas, mensajes, etc.) en formato JSON.</p>
               <button onclick="requestDataExport()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl transition">
-                ðŸ“¥ Descargar mis datos
+                📥 Descargar mis datos
               </button>
             </div>
 
             <div class="p-4 bg-red-50 rounded-xl border border-red-200">
               <h4 class="font-semibold text-sm text-red-900 mb-1">Eliminar mi cuenta</h4>
-              <p class="text-xs text-red-700 mb-3">Esta acciÃ³n es irreversible. Todos tus datos, posts, metas y mensajes serÃ¡n eliminados permanentemente.</p>
+              <p class="text-xs text-red-700 mb-3">Esta acción es irreversible. Todos tus datos, posts, metas y mensajes serán eliminados permanentemente.</p>
               <button onclick="requestAccountDeletion()" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl transition">
-                ðŸ—‘ï¸ Eliminar mi cuenta
+                🗑️ Eliminar mi cuenta
               </button>
             </div>
           </div>
@@ -1627,7 +1626,7 @@
       if (!e.target.closest('#tab-metas-group') && !e.target.closest('#metas-dropdown')) closeMetasDropdown();
     });
 
-    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'sounds', 'earnings', 'subscribers', 'cfh'];
+    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'sounds', 'earnings', 'subscribers'];
     const METAS_TABS = ['metas', 'mecenas-tip', 'mecenas-sub', 'my-subs', 'my-payments'];
 
     function toggleMetasDropdown() {
@@ -1826,7 +1825,7 @@
       const warnBtn = document.getElementById('brand-warn-btn');
       const btnContrast = getContrast(btnTextColor, buttonColor);
       if (btnContrast < 2.5) {
-        warnBtn.textContent = 'Texto de botÃ³n poco visible sobre el fondo';
+        warnBtn.textContent = 'Texto de botón poco visible sobre el fondo';
         warnBtn.classList.remove('hidden');
       } else { warnBtn.classList.add('hidden'); }
 
@@ -1839,7 +1838,7 @@
       const card = document.getElementById('brand-preview-card');
       card.style.backgroundColor = bgColor;
 
-      // Background media in preview â€” safe DOM construction
+      // Background media in preview — safe DOM construction
       const mediaCont = document.getElementById('brand-preview-bg-media');
       mediaCont.innerHTML = '';
       if (bgMedia && /^https?:\/\//i.test(bgMedia)) {
@@ -2134,7 +2133,7 @@
       if (text) text.textContent = hidden ? 'Ocultar vista previa' : 'Mostrar vista previa';
     }
 
-    // ===== PERSONALIZACIÃ“N EDITOR =====
+    // ===== PERSONALIZACIÓN EDITOR =====
     let personaLayout = {
       sections: [
         {id:'cover',visible:true,order:0},{id:'header',visible:true,order:1},
@@ -2241,7 +2240,7 @@
     function setProfileSize(val) {
       personaLayout.profileImage.size = val;
       const label = document.getElementById('psize-label');
-      const labels = { sm: 'PequeÃ±o', md: 'Mediano', lg: 'Grande', xl: 'Extra Grande' };
+      const labels = { sm: 'Pequeño', md: 'Mediano', lg: 'Grande', xl: 'Extra Grande' };
       if (label) label.textContent = labels[val] || val;
       personaTrack();
     }
@@ -2431,7 +2430,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </button>
           <button onclick="toggleSectionVisibility('${s.id}')" class="text-xs px-2 py-1 rounded-lg transition ${s.visible ? 'bg-creo-mint/20 text-creo-purple' : 'bg-gray-100 text-gray-400'}">
-            ${s.visible ? 'ðŸ‘ Visible' : 'ðŸ‘â€ðŸ—¨ Oculto'}
+            ${s.visible ? '👁 Visible' : '👁‍🗨 Oculto'}
           </button>
         </div>
       `).join('');
@@ -2621,7 +2620,7 @@
       }).eq('id', currentProfile.id);
 
       if (error) {
-        if (!isAutosave) showToast('Error al guardar personalizaciÃ³n', 'error');
+        if (!isAutosave) showToast('Error al guardar personalización', 'error');
         if (status) status.textContent = 'Error';
         return;
       }
@@ -2630,8 +2629,8 @@
       currentProfile.profile_layout = personaLayout;
       currentProfile.profile_theme = personaTheme;
 
-      if (status) status.textContent = 'Guardado âœ“';
-      if (!isAutosave) showToast('PersonalizaciÃ³n guardada. Visita tu perfil para verlo.', 'success');
+      if (status) status.textContent = 'Guardado ✓';
+      if (!isAutosave) showToast('Personalización guardada. Visita tu perfil para verlo.', 'success');
     }
 
     // ===== MECENAS SETTINGS =====
@@ -2685,7 +2684,7 @@
       return key === 'tip' ? 'Yo Creo en Ti' : key === 'meta' ? 'Mi Meta' : 'Apoyo Full';
     }
     function getDefaultMecDesc(key) {
-      return key === 'tip' ? 'EnvÃ­a un apoyo Ãºnico al creador' : key === 'meta' ? 'Apoya mis metas como creador' : 'Apoya mensualmente con una cantidad que tÃº elijas';
+      return key === 'tip' ? 'Envía un apoyo único al creador' : key === 'meta' ? 'Apoya mis metas como creador' : 'Apoya mensualmente con una cantidad que tú elijas';
     }
 
     async function saveMecenasSettings(key) {
@@ -2781,7 +2780,7 @@
         let targetUserId = user.id;
         if (impersonate && user.email === 'fullnessmindset@gmail.com') {
           const imp = JSON.parse(impersonate);
-          document.getElementById('user-welcome').innerHTML = `ðŸ”‘ Actuando como <strong>${esc(imp.display_name || imp.username)}</strong> <button onclick="sessionStorage.removeItem('creo-impersonate');location.reload()" class="ml-2 text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-semibold">Salir</button>`;
+          document.getElementById('user-welcome').innerHTML = `🔑 Actuando como <strong>${esc(imp.display_name || imp.username)}</strong> <button onclick="sessionStorage.removeItem('creo-impersonate');location.reload()" class="ml-2 text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-semibold">Salir</button>`;
           targetUserId = imp.id;
           currentUser = { ...user, id: imp.id };
         } else {
@@ -2838,7 +2837,7 @@
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                   Stripe Conectado
                 </h3>
-                <p class="text-sm text-green-700">Tu cuenta estÃ¡ lista para recibir pagos. Los fondos se depositan directamente en tu cuenta bancaria.</p>
+                <p class="text-sm text-green-700">Tu cuenta está lista para recibir pagos. Los fondos se depositan directamente en tu cuenta bancaria.</p>
                 <div class="flex flex-col sm:flex-row gap-2 pt-1">
                   <a href="https://dashboard.stripe.com" target="_blank" rel="noopener" class="flex-1 text-center bg-creo-purple text-white py-3 rounded-xl font-bold transition hover:opacity-90 text-sm">
                     <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
@@ -2850,10 +2849,10 @@
                 </div>
               </div>
               <div class="bg-white p-4 rounded-xl border border-gray-200 mt-4">
-                <p class="text-xs text-gray-500">CREO retiene un 5% de comisiÃ³n por transacciÃ³n. Stripe cobra un 3% adicional al que paga. TÃº recibes el 95% de cada pago.</p>
+                <p class="text-xs text-gray-500">CREO retiene un 5% de comisión por transacción. Stripe cobra un 3% adicional al que paga. Tú recibes el 95% de cada pago.</p>
               </div>`;
           } else if (data.stripe_connect_id) {
-            document.getElementById('stripe-btn').innerText = "Completar configuraciÃ³n de Stripe";
+            document.getElementById('stripe-btn').innerText = "Completar configuración de Stripe";
             document.getElementById('stripe-btn').className = "w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 rounded-xl font-bold transition";
           }
 
@@ -2876,32 +2875,32 @@
       const metaForm = document.getElementById('meta-form-container');
 
       if (profile.identity_verified) {
-        document.getElementById('identity-status').innerHTML = '<span class="text-green-600">âœ“ Identidad verificada</span>';
-        document.getElementById('identity-btn').innerText = "Verificado âœ“";
+        document.getElementById('identity-status').innerHTML = '<span class="text-green-600">✓ Identidad verificada</span>';
+        document.getElementById('identity-btn').innerText = "Verificado ✓";
         document.getElementById('identity-btn').disabled = true;
         document.getElementById('identity-btn').className = "w-full bg-green-600 text-white py-2 rounded-lg font-bold text-sm cursor-default";
       }
 
       if (status === 'approved') {
-        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center"><svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><div><p class="font-bold text-green-700">Cuenta Verificada</p><p class="text-xs text-gray-500">Tu cuenta estÃ¡ aprobada y activa</p></div></div>';
+        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center"><svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><div><p class="font-bold text-green-700">Cuenta Verificada</p><p class="text-xs text-gray-500">Tu cuenta está aprobada y activa</p></div></div>';
         document.getElementById('verify-form').classList.add('hidden');
         banner.classList.add('hidden');
         metaLocked.classList.add('hidden');
         metaForm.classList.remove('hidden');
       } else if (status === 'submitted') {
-        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center"><svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><p class="font-bold text-yellow-700">En RevisiÃ³n</p><p class="text-xs text-gray-500">Tu solicitud estÃ¡ siendo revisada por nuestro equipo</p></div></div>';
+        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center"><svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><p class="font-bold text-yellow-700">En Revisión</p><p class="text-xs text-gray-500">Tu solicitud está siendo revisada por nuestro equipo</p></div></div>';
         document.getElementById('verify-form').classList.add('hidden');
-        banner.innerHTML = '<div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 text-center"><p class="text-sm text-yellow-800 font-semibold">Tu solicitud de verificaciÃ³n estÃ¡ en revisiÃ³n</p></div>';
+        banner.innerHTML = '<div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 text-center"><p class="text-sm text-yellow-800 font-semibold">Tu solicitud de verificación está en revisión</p></div>';
         banner.classList.remove('hidden');
         metaLocked.classList.remove('hidden');
         metaForm.classList.add('hidden');
       } else if (status === 'rejected') {
-        const reason = profile.rejection_reason || 'No se proporcionÃ³ razÃ³n';
-        statusCard.innerHTML = `<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center"><svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div><div><p class="font-bold text-red-700">Solicitud Rechazada</p><p class="text-xs text-gray-500">RazÃ³n: ${esc(reason)}</p><p class="text-xs text-gray-400 mt-1">Puedes corregir y enviar de nuevo.</p></div></div>`;
+        const reason = profile.rejection_reason || 'No se proporcionó razón';
+        statusCard.innerHTML = `<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center"><svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div><div><p class="font-bold text-red-700">Solicitud Rechazada</p><p class="text-xs text-gray-500">Razón: ${esc(reason)}</p><p class="text-xs text-gray-400 mt-1">Puedes corregir y enviar de nuevo.</p></div></div>`;
         metaLocked.classList.remove('hidden');
         metaForm.classList.add('hidden');
       } else {
-        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center"><svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div><div><p class="font-bold text-gray-700">No Verificado</p><p class="text-xs text-gray-500">Completa el formulario abajo para solicitar verificaciÃ³n</p></div></div>';
+        statusCard.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center"><svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div><div><p class="font-bold text-gray-700">No Verificado</p><p class="text-xs text-gray-500">Completa el formulario abajo para solicitar verificación</p></div></div>';
         metaLocked.classList.remove('hidden');
         metaForm.classList.add('hidden');
       }
@@ -2998,7 +2997,7 @@
       btn.innerText = "Redirigiendo..."; btn.disabled = true;
       const session = await sb.auth.getSession();
       const token = session.data.session?.access_token;
-      if (!token) { btn.innerText = "Iniciar VerificaciÃ³n â€” $1.50"; btn.disabled = false; return showToast('Inicia sesiÃ³n primero', 'error'); }
+      if (!token) { btn.innerText = "Iniciar Verificación — $1.50"; btn.disabled = false; return showToast('Inicia sesión primero', 'error'); }
 
       try {
         const res = await fetch(`${SUPABASE_URL}/functions/v1/create-identity-verification`, {
@@ -3008,8 +3007,8 @@
         });
         const data = await res.json();
         if (data.url) window.location.href = data.url;
-        else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerText = "Iniciar VerificaciÃ³n â€” $1.50"; btn.disabled = false; }
-      } catch (e) { showToast('Error de conexiÃ³n', 'error'); btn.innerText = "Iniciar VerificaciÃ³n â€” $1.50"; btn.disabled = false; }
+        else { showToast('Error: ' + (data.error || 'Unknown'), 'error'); btn.innerText = "Iniciar Verificación — $1.50"; btn.disabled = false; }
+      } catch (e) { showToast('Error de conexión', 'error'); btn.innerText = "Iniciar Verificación — $1.50"; btn.disabled = false; }
     }
 
     // SUBMIT APPLICATION
@@ -3021,7 +3020,7 @@
       const businessType = document.querySelector('input[name="business_type"]:checked').value;
       const businessName = document.getElementById('v-business')?.value.trim() || '';
 
-      if (!fullName || !phone || !email) return showToast('Completa nombre, telÃ©fono y email', 'error');
+      if (!fullName || !phone || !email) return showToast('Completa nombre, teléfono y email', 'error');
 
       const socials = currentProfile?.social_links || {};
       const socialCount = Object.values(socials).filter(v => v && v.trim()).length;
@@ -3039,7 +3038,7 @@
         submitted_at: new Date().toISOString(),
       }).eq('id', currentUser.id);
 
-      btn.innerText = 'Enviar Solicitud para RevisiÃ³n'; btn.disabled = false;
+      btn.innerText = 'Enviar Solicitud para Revisión'; btn.disabled = false;
       if (error) return showToast(error.message, 'error');
 
       currentProfile.verification_status = 'submitted';
@@ -3051,14 +3050,14 @@
     async function signUp() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      if (!email || !password) return showToast('Ingresa email y contraseÃ±a', 'error');
+      if (!email || !password) return showToast('Ingresa email y contraseña', 'error');
       // Show terms if hidden
       const termsSection = document.getElementById('register-terms');
       if (termsSection.classList.contains('hidden')) {
         termsSection.classList.remove('hidden');
-        return showToast('Acepta los tÃ©rminos para continuar', 'error');
+        return showToast('Acepta los términos para continuar', 'error');
       }
-      if (!document.getElementById('accept-terms').checked) return showToast('Debes aceptar los TÃ©rminos y PolÃ­tica de Privacidad', 'error');
+      if (!document.getElementById('accept-terms').checked) return showToast('Debes aceptar los Términos y Política de Privacidad', 'error');
       if (!document.getElementById('accept-conduct').checked) return showToast('Debes aceptar las normas de conducta', 'error');
       const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: 'https://fullnessmindset.github.io/creo/redirect.html' } });
       if (error) return showToast(error.message, 'error');
@@ -3075,7 +3074,7 @@
     async function signIn() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      if (!email || !password) return showToast('Ingresa email y contraseÃ±a', 'error');
+      if (!email || !password) return showToast('Ingresa email y contraseña', 'error');
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (error) return showToast(error.message, 'error');
       checkUser();
@@ -3107,7 +3106,7 @@
       };
       const hasSocial = Object.values(social_links).some(v => v);
       if (!first_name || !last_name) { btn.innerText = 'Guardar Perfil'; btn.disabled = false; return showToast('Nombre y apellido son requeridos', 'error'); }
-      if (username.length < 3) { btn.innerText = 'Guardar Perfil'; btn.disabled = false; return showToast('Username mÃ­nimo 3 caracteres', 'error'); }
+      if (username.length < 3) { btn.innerText = 'Guardar Perfil'; btn.disabled = false; return showToast('Username mínimo 3 caracteres', 'error'); }
       if (!hasSocial) { btn.innerText = 'Guardar Perfil'; btn.disabled = false; return showToast('Agrega al menos 1 red social', 'error'); }
       const display_name = first_name + ' ' + last_name;
       document.getElementById('display_name').value = display_name;
@@ -3145,7 +3144,7 @@
       const raised = (m.raised_cents / 100).toFixed(2);
       const goal = (m.goal_amount_cents / 100).toFixed(2);
       const imgs = m.images || [];
-      const badge = isDummy ? ' <span class="text-[10px]">ðŸ¤–</span>' : '';
+      const badge = isDummy ? ' <span class="text-[10px]">🤖</span>' : '';
       const actions = isDummy ? '' : `<div class="flex gap-2">
         <button onclick="editMeta('${m.id}')" class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-600">Editar</button>
         <button onclick="toggleMeta('${m.id}', ${!m.is_active})" class="text-xs px-2 py-1 rounded ${m.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">${m.is_active ? 'Activa' : 'Inactiva'}</button>
@@ -3165,7 +3164,7 @@
         </div>
         ${imgs.length ? `<div class="flex gap-1 overflow-x-auto">${imgs.map(i => `<img src="${i}" class="w-14 h-14 rounded object-cover flex-shrink-0">`).join('')}</div>` : ''}
         <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden"><div class="${pct >= 100 ? 'bg-green-500' : 'bg-creo-mint'} h-full rounded-full transition-all duration-500" style="width:${pct}%"></div></div>
-        <div class="flex justify-between text-xs text-gray-500"><span>$${raised} / $${goal} (${pct}%)${pct >= 100 ? ' âœ… Meta Alcanzada' : ''}</span><span>${m.start_date} â€” ${m.end_date}</span></div>
+        <div class="flex justify-between text-xs text-gray-500"><span>$${raised} / $${goal} (${pct}%)${pct >= 100 ? ' ✅ Meta Alcanzada' : ''}</span><span>${m.start_date} — ${m.end_date}</span></div>
         ${stageProgress}
       </div>`;
     }
@@ -3225,7 +3224,7 @@
 
       if (!title || !description || !goal || goal < 10 || !start_date || !end_date) {
         btn.innerText = 'Crear Meta'; btn.disabled = false;
-        return showToast('Completa tÃ­tulo, descripciÃ³n, meta ($10 min), y fechas', 'error');
+        return showToast('Completa título, descripción, meta ($10 min), y fechas', 'error');
       }
       if (metaImageUrls.length === 0 && !metaVideoFile) {
         btn.innerText = 'Crear Meta'; btn.disabled = false;
@@ -3264,7 +3263,7 @@
     }
 
     async function toggleMeta(id, active) { const { error } = await sb.from('metas').update({ is_active: active }).eq('id', id); if (error) return showToast('Error: ' + error.message, 'error'); loadMetas(); }
-    async function deleteMeta(id) { if (!confirm('Â¿Eliminar esta meta?')) return; const { error } = await sb.from('metas').delete().eq('id', id); if (error) return showToast('Error: ' + error.message, 'error'); showToast('Meta eliminada', 'success'); loadMetas(); }
+    async function deleteMeta(id) { if (!confirm('¿Eliminar esta meta?')) return; const { error } = await sb.from('metas').delete().eq('id', id); if (error) return showToast('Error: ' + error.message, 'error'); showToast('Meta eliminada', 'success'); loadMetas(); }
 
     function editMeta(id) {
       const m = myMetasCache.find(x => x.id === id);
@@ -3315,7 +3314,7 @@
             </div>
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">ImÃ¡genes / Videos</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Imágenes / Videos</label>
             <div id="edit-meta-media-preview" class="flex flex-wrap gap-2 mb-2">${(m.images || []).map((url, i) => '<div class="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 group"><img src="' + esc(url) + '" class="w-full h-full object-cover"><button onclick="removeEditMetaMedia(' + i + ')" class="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-xs rounded-bl opacity-0 group-hover:opacity-100 transition">&times;</button></div>').join('')}</div>
             <input type="file" id="edit-meta-media-file" accept="image/*,video/*" multiple class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
           </div>
@@ -3419,13 +3418,13 @@
 
     function getMetaStatusBadge(stage) {
       if (!stage) return '';
-      if (stage.banned) return `<span class="absolute -top-2 -right-2 text-[9px] bg-red-600 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">â›” Creador Baneado</span>`;
-      if (stage.cancellation_type === 'fraud') return `<span class="absolute -top-2 -right-2 text-[9px] bg-red-600 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">ðŸš« Meta Cancelada â€” Fraude</span>`;
-      if (stage.cancellation_type === 'early_complete') return `<span class="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">âœ… Meta Completada Antes de lo Esperado â€” Gracias al apoyo de todos</span>`;
-      if (stage.cancellation_type === 'cancelled') return `<span class="absolute -top-2 -right-2 text-[9px] bg-gray-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">âŒ Meta Cancelada</span>`;
-      if (stage.stage3_approved) return `<span class="absolute -top-2 -right-2 text-[9px] bg-green-600 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">âœ… Meta Completada LegÃ­timamente</span>`;
-      if (stage.admin_review_status === 'pending') return `<span class="absolute -top-2 -right-2 text-[9px] bg-yellow-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10 animate-pulse">â³ Meta en Review por Admin</span>`;
-      if (stage.admin_review_status === 'rejected') return `<span class="absolute -top-2 -right-2 text-[9px] bg-red-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">âŒ Rechazada por Admin</span>`;
+      if (stage.banned) return `<span class="absolute -top-2 -right-2 text-[9px] bg-red-600 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">⛔ Creador Baneado</span>`;
+      if (stage.cancellation_type === 'fraud') return `<span class="absolute -top-2 -right-2 text-[9px] bg-red-600 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">🚫 Meta Cancelada — Fraude</span>`;
+      if (stage.cancellation_type === 'early_complete') return `<span class="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">✅ Meta Completada Antes de lo Esperado — Gracias al apoyo de todos</span>`;
+      if (stage.cancellation_type === 'cancelled') return `<span class="absolute -top-2 -right-2 text-[9px] bg-gray-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">❌ Meta Cancelada</span>`;
+      if (stage.stage3_approved) return `<span class="absolute -top-2 -right-2 text-[9px] bg-green-600 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">✅ Meta Completada Legítimamente</span>`;
+      if (stage.admin_review_status === 'pending') return `<span class="absolute -top-2 -right-2 text-[9px] bg-yellow-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10 animate-pulse">⏳ Meta en Review por Admin</span>`;
+      if (stage.admin_review_status === 'rejected') return `<span class="absolute -top-2 -right-2 text-[9px] bg-red-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">❌ Rechazada por Admin</span>`;
       return '';
     }
 
@@ -3443,20 +3442,20 @@
       if (stage.stage3_approved || stage.cancellation_type) return '';
 
       let html = `<div class="mt-3 pt-3 border-t border-gray-100 space-y-3">
-        <p class="text-[10px] font-bold text-creo-purple uppercase tracking-wider">LiberaciÃ³n de Fondos</p>`;
+        <p class="text-[10px] font-bold text-creo-purple uppercase tracking-wider">Liberación de Fondos</p>`;
 
       // STAGE 1: Stripe Hold
       const s1Done = holdComplete && stage.stage1_complete;
       html += `<div class="p-3 rounded-lg border ${s1Done ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}">
         <div class="flex items-center gap-2 mb-1">
           <span class="w-5 h-5 rounded-full ${s1Done ? 'bg-green-500' : 'bg-amber-400'} text-white text-[10px] font-bold flex items-center justify-center">1</span>
-          <span class="text-xs font-semibold ${s1Done ? 'text-green-700' : 'text-amber-700'}">RetenciÃ³n Stripe${s1Done ? ' âœ“' : ''}</span>
+          <span class="text-xs font-semibold ${s1Done ? 'text-green-700' : 'text-amber-700'}">Retención Stripe${s1Done ? ' ✓' : ''}</span>
         </div>`;
       if (!holdComplete) {
-        html += `<p class="text-[10px] text-amber-600 ml-7">Faltan <strong>${daysLeft} dÃ­as</strong> de retenciÃ³n para verificar los pagos.</p>
+        html += `<p class="text-[10px] text-amber-600 ml-7">Faltan <strong>${daysLeft} días</strong> de retención para verificar los pagos.</p>
           <div class="ml-7 mt-1 w-full bg-amber-200 rounded-full h-1.5"><div class="bg-amber-500 h-full rounded-full" style="width:${Math.round(((STRIPE_HOLD_DAYS - daysLeft) / STRIPE_HOLD_DAYS) * 100)}%"></div></div>`;
       } else if (!stage.stage1_complete) {
-        html += `<p class="text-[10px] text-green-600 ml-7">Periodo de retenciÃ³n completado. Fondos verificados.</p>
+        html += `<p class="text-[10px] text-green-600 ml-7">Periodo de retención completado. Fondos verificados.</p>
           <button onclick="completeStage1('${metaId}')" class="ml-7 mt-1 text-[10px] bg-green-600 text-white px-3 py-1 rounded-full font-semibold hover:bg-green-700 transition">Confirmar y Proceder a Etapa 2</button>`;
       }
       html += `</div>`;
@@ -3467,10 +3466,10 @@
         html += `<div class="p-3 rounded-lg border ${s2Done ? 'border-green-200 bg-green-50' : stage.stage2_submitted ? 'border-yellow-200 bg-yellow-50' : 'border-blue-200 bg-blue-50'}">
           <div class="flex items-center gap-2 mb-1">
             <span class="w-5 h-5 rounded-full ${s2Done ? 'bg-green-500' : 'bg-blue-500'} text-white text-[10px] font-bold flex items-center justify-center">2</span>
-            <span class="text-xs font-semibold ${s2Done ? 'text-green-700' : 'text-blue-700'}">Primera LiberaciÃ³n: $${half1} (50%)${s2Done ? ' âœ“' : ''}</span>
+            <span class="text-xs font-semibold ${s2Done ? 'text-green-700' : 'text-blue-700'}">Primera Liberación: $${half1} (50%)${s2Done ? ' ✓' : ''}</span>
           </div>`;
         if (stage.stage2_submitted && !stage.stage2_approved) {
-          html += `<p class="text-[10px] text-yellow-600 ml-7">ðŸ“¤ Enviado para revisiÃ³n del admin. Esperando aprobaciÃ³n...</p>`;
+          html += `<p class="text-[10px] text-yellow-600 ml-7">📤 Enviado para revisión del admin. Esperando aprobación...</p>`;
         } else if (!stage.stage2_submitted) {
           html += `<div class="ml-7 space-y-2 mt-2">
             <p class="text-[10px] text-blue-600 font-medium">Sube tu recibo de compra y actualiza a tu comunidad:</p>
@@ -3479,14 +3478,14 @@
               <input type="file" id="stage2-receipt-${metaId}" accept="image/*" multiple class="block w-full text-[10px] text-gray-500 file:mr-1 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-blue-100 file:text-blue-600 cursor-pointer mt-1">
             </div>
             <div>
-              <label class="text-[10px] text-gray-600 font-medium">ActualizaciÃ³n para la comunidad * (quÃ© hiciste con los fondos)</label>
-              <textarea id="stage2-text-${metaId}" rows="2" placeholder="Ej: ComprÃ© el micrÃ³fono Blue Yeti en Amazon. Â¡Llega en 3 dÃ­as!" class="w-full border border-gray-300 bg-white p-2 rounded-lg text-[11px] text-gray-900 outline-none focus:ring-1 focus:ring-blue-400 mt-1"></textarea>
+              <label class="text-[10px] text-gray-600 font-medium">Actualización para la comunidad * (qué hiciste con los fondos)</label>
+              <textarea id="stage2-text-${metaId}" rows="2" placeholder="Ej: Compré el micrófono Blue Yeti en Amazon. ¡Llega en 3 días!" class="w-full border border-gray-300 bg-white p-2 rounded-lg text-[11px] text-gray-900 outline-none focus:ring-1 focus:ring-blue-400 mt-1"></textarea>
             </div>
             <div>
               <label class="text-[10px] text-gray-600 font-medium">Foto o video de evidencia *</label>
               <input type="file" id="stage2-media-${metaId}" accept="image/*,video/*" multiple class="block w-full text-[10px] text-gray-500 file:mr-1 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-blue-100 file:text-blue-600 cursor-pointer mt-1">
             </div>
-            <button onclick="submitStage2('${metaId}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-xs font-semibold transition">Enviar Etapa 2 para RevisiÃ³n</button>
+            <button onclick="submitStage2('${metaId}')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-xs font-semibold transition">Enviar Etapa 2 para Revisión</button>
           </div>`;
         }
         html += `</div>`;
@@ -3498,22 +3497,22 @@
         html += `<div class="p-3 rounded-lg border ${s3Done ? 'border-green-200 bg-green-50' : stage.stage3_submitted ? 'border-yellow-200 bg-yellow-50' : 'border-emerald-200 bg-emerald-50'}">
           <div class="flex items-center gap-2 mb-1">
             <span class="w-5 h-5 rounded-full ${s3Done ? 'bg-green-500' : 'bg-emerald-500'} text-white text-[10px] font-bold flex items-center justify-center">3</span>
-            <span class="text-xs font-semibold ${s3Done ? 'text-green-700' : 'text-emerald-700'}">LiberaciÃ³n Final: $${half2} (50% restante)${s3Done ? ' âœ“' : ''}</span>
+            <span class="text-xs font-semibold ${s3Done ? 'text-green-700' : 'text-emerald-700'}">Liberación Final: $${half2} (50% restante)${s3Done ? ' ✓' : ''}</span>
           </div>`;
         if (stage.stage3_submitted && !stage.stage3_approved) {
-          html += `<p class="text-[10px] text-yellow-600 ml-7">ðŸ“¤ Documentos finales enviados. Esperando aprobaciÃ³n del admin...</p>`;
+          html += `<p class="text-[10px] text-yellow-600 ml-7">📤 Documentos finales enviados. Esperando aprobación del admin...</p>`;
         } else if (!stage.stage3_submitted) {
           html += `<div class="ml-7 space-y-2 mt-2">
-            <p class="text-[10px] text-emerald-600 font-medium">Sube prueba final de la adquisiciÃ³n (recibos, fotos, videos):</p>
+            <p class="text-[10px] text-emerald-600 font-medium">Sube prueba final de la adquisición (recibos, fotos, videos):</p>
             <div>
               <label class="text-[10px] text-gray-600 font-medium">Recibos finales y comprobantes *</label>
               <input type="file" id="stage3-proof-${metaId}" accept="image/*,video/*" multiple class="block w-full text-[10px] text-gray-500 file:mr-1 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-emerald-100 file:text-emerald-600 cursor-pointer mt-1">
             </div>
             <div>
-              <label class="text-[10px] text-gray-600 font-medium">DescripciÃ³n de la adquisiciÃ³n *</label>
-              <textarea id="stage3-text-${metaId}" rows="2" placeholder="Ej: Ya tengo el micrÃ³fono instalado. AquÃ­ fotos del unboxing y setup completo." class="w-full border border-gray-300 bg-white p-2 rounded-lg text-[11px] text-gray-900 outline-none focus:ring-1 focus:ring-emerald-400 mt-1"></textarea>
+              <label class="text-[10px] text-gray-600 font-medium">Descripción de la adquisición *</label>
+              <textarea id="stage3-text-${metaId}" rows="2" placeholder="Ej: Ya tengo el micrófono instalado. Aquí fotos del unboxing y setup completo." class="w-full border border-gray-300 bg-white p-2 rounded-lg text-[11px] text-gray-900 outline-none focus:ring-1 focus:ring-emerald-400 mt-1"></textarea>
             </div>
-            <button onclick="submitStage3('${metaId}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-xs font-semibold transition">Enviar Prueba Final para RevisiÃ³n</button>
+            <button onclick="submitStage3('${metaId}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-xs font-semibold transition">Enviar Prueba Final para Revisión</button>
           </div>`;
         }
         html += `</div>`;
@@ -3524,10 +3523,10 @@
         html += `<div class="pt-2 border-t border-gray-100">
           <button onclick="showCancelMeta('${metaId}')" class="text-[10px] text-red-500 hover:text-red-700 underline">Cancelar esta meta</button>
           <div id="cancel-meta-${metaId}" class="hidden mt-2 space-y-2 p-3 bg-red-50 rounded-lg border border-red-200">
-            <p class="text-[10px] text-red-600 font-semibold">âš ï¸ Cancelar una meta requiere una explicaciÃ³n pÃºblica:</p>
-            <textarea id="cancel-reason-${metaId}" rows="2" placeholder="Explica por quÃ© cancelas esta meta..." class="w-full border border-red-300 bg-white p-2 rounded-lg text-[11px] text-gray-900 outline-none focus:ring-1 focus:ring-red-400"></textarea>
+            <p class="text-[10px] text-red-600 font-semibold">⚠️ Cancelar una meta requiere una explicación pública:</p>
+            <textarea id="cancel-reason-${metaId}" rows="2" placeholder="Explica por qué cancelas esta meta..." class="w-full border border-red-300 bg-white p-2 rounded-lg text-[11px] text-gray-900 outline-none focus:ring-1 focus:ring-red-400"></textarea>
             <div class="flex gap-2">
-              <button onclick="cancelMeta('${metaId}')" class="flex-1 bg-red-600 text-white py-1.5 rounded-lg text-[10px] font-semibold hover:bg-red-700 transition">Confirmar CancelaciÃ³n</button>
+              <button onclick="cancelMeta('${metaId}')" class="flex-1 bg-red-600 text-white py-1.5 rounded-lg text-[10px] font-semibold hover:bg-red-700 transition">Confirmar Cancelación</button>
               <button onclick="document.getElementById('cancel-meta-${metaId}').classList.add('hidden')" class="flex-1 bg-gray-200 text-gray-600 py-1.5 rounded-lg text-[10px] font-semibold hover:bg-gray-300 transition">No, Mantener</button>
             </div>
           </div>
@@ -3555,7 +3554,7 @@
       const text = document.getElementById('stage2-text-' + metaId)?.value.trim();
       const mediaFiles = document.getElementById('stage2-media-' + metaId)?.files;
       if (!receiptFiles?.length) { showToast('Sube al menos un recibo', 'error'); return; }
-      if (!text) { showToast('Escribe una actualizaciÃ³n para tu comunidad', 'error'); return; }
+      if (!text) { showToast('Escribe una actualización para tu comunidad', 'error'); return; }
       if (!mediaFiles?.length) { showToast('Sube al menos una foto o video de evidencia', 'error'); return; }
 
       showToast('Subiendo documentos...', 'info');
@@ -3589,7 +3588,7 @@
       }).eq('id', metaId);
       if (s2Err) return showToast('Error: ' + s2Err.message, 'error');
 
-      showToast('Etapa 2 enviada para revisiÃ³n del admin');
+      showToast('Etapa 2 enviada para revisión del admin');
       loadMetas();
       loadMetaStageCards();
     }
@@ -3597,8 +3596,8 @@
     async function submitStage3(metaId) {
       const proofFiles = document.getElementById('stage3-proof-' + metaId)?.files;
       const text = document.getElementById('stage3-text-' + metaId)?.value.trim();
-      if (!proofFiles?.length) { showToast('Sube recibos y pruebas de la adquisiciÃ³n', 'error'); return; }
-      if (!text) { showToast('Escribe una descripciÃ³n de la adquisiciÃ³n', 'error'); return; }
+      if (!proofFiles?.length) { showToast('Sube recibos y pruebas de la adquisición', 'error'); return; }
+      if (!text) { showToast('Escribe una descripción de la adquisición', 'error'); return; }
 
       showToast('Subiendo pruebas finales...', 'info');
       const proofUrls = [];
@@ -3624,7 +3623,7 @@
       }).eq('id', metaId);
       if (s3Err) return showToast('Error: ' + s3Err.message, 'error');
 
-      showToast('Prueba final enviada para revisiÃ³n del admin');
+      showToast('Prueba final enviada para revisión del admin');
       loadMetas();
       loadMetaStageCards();
     }
@@ -3635,7 +3634,7 @@
 
     async function cancelMeta(metaId) {
       const reason = document.getElementById('cancel-reason-' + metaId)?.value.trim();
-      if (!reason) { showToast('Debes escribir una razÃ³n para cancelar', 'error'); return; }
+      if (!reason) { showToast('Debes escribir una razón para cancelar', 'error'); return; }
 
       const stages = getMetaStages();
       stages[metaId].cancellation_reason = reason;
@@ -3652,7 +3651,7 @@
       }).eq('id', metaId);
       if (cErr) return showToast('Error: ' + cErr.message, 'error');
 
-      showToast('Meta cancelada. El admin revisarÃ¡ tu explicaciÃ³n.');
+      showToast('Meta cancelada. El admin revisará tu explicación.');
       loadMetas();
       loadMetaStageCards();
     }
@@ -3692,8 +3691,8 @@
           <div class="flex items-center gap-3">
             ${avatar}
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-semibold text-gray-900">${esc(name)} te invitÃ³ a colaborar</p>
-              <p class="text-xs text-gray-500 truncate">Meta: ${esc(meta.title || 'Sin tÃ­tulo')}</p>
+              <p class="text-sm font-semibold text-gray-900">${esc(name)} te invitó a colaborar</p>
+              <p class="text-xs text-gray-500 truncate">Meta: ${esc(meta.title || 'Sin título')}</p>
               ${meta.description ? `<p class="text-xs text-gray-400 mt-1 line-clamp-2">${esc(meta.description)}</p>` : ''}
             </div>
           </div>
@@ -3712,7 +3711,7 @@
     async function acceptInvite(inviteId) {
       const { data, error } = await sb.rpc('accept_meta_invite', { p_invite_id: inviteId });
       if (error) { showToast(error.message || 'Error', 'error'); return; }
-      showToast('Â¡Te uniste a la meta! Ahora es una meta conjunta.', 'success');
+      showToast('¡Te uniste a la meta! Ahora es una meta conjunta.', 'success');
       loadMetaInvites();
       loadMetas();
     }
@@ -3720,7 +3719,7 @@
     async function declineInvite(inviteId) {
       const { data, error } = await sb.rpc('decline_meta_invite', { p_invite_id: inviteId });
       if (error) { showToast(error.message || 'Error', 'error'); return; }
-      showToast('InvitaciÃ³n declinada', 'info');
+      showToast('Invitación declinada', 'info');
       loadMetaInvites();
     }
 
@@ -3763,7 +3762,7 @@
         else preview = `<img src="${url}" class="w-full h-full object-cover">`;
         return `<div class="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
           ${preview}
-          <button onclick="removePostMedia(${i})" class="absolute top-0.5 right-0.5 w-5 h-5 bg-black/60 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-500">âœ•</button>
+          <button onclick="removePostMedia(${i})" class="absolute top-0.5 right-0.5 w-5 h-5 bg-black/60 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-500">✕</button>
         </div>`;
       }).join('');
     }
@@ -3835,7 +3834,7 @@
       window._postRecChunks = [];
       const m = document.getElementById('post-rec-modal');
       if (m) m.remove();
-      showToast('GrabaciÃ³n lista', 'success');
+      showToast('Grabación lista', 'success');
     }
 
     async function loadPosts() {
@@ -3843,7 +3842,7 @@
       const list = document.getElementById('posts-list');
       if (!data || data.length === 0) {
         myPostsCache = [];
-        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">ðŸ“­ AÃºn no tienes publicaciones</p>';
+        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">📭 Aún no tienes publicaciones</p>';
         return;
       }
       myPostsCache = data;
@@ -3859,7 +3858,7 @@
             <div class="flex-1 mr-3">
               ${p.title ? `<p class="text-sm font-bold text-gray-900">${esc(p.title)}</p>` : ''}
               ${p.body ? `<p class="text-sm text-gray-700">${esc(p.body)}</p>` : ''}
-              <p class="text-[10px] text-gray-400 mt-1">${p.post_type} Â· ${new Date(p.created_at).toLocaleDateString()}</p>
+              <p class="text-[10px] text-gray-400 mt-1">${p.post_type} · ${new Date(p.created_at).toLocaleDateString()}</p>
             </div>
             <div class="flex gap-1">
               <button onclick="editCommunityPostDash('${p.id}')" class="text-gray-400 hover:text-creo-purple p-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
@@ -3928,7 +3927,7 @@
         postMediaFiles = [];
         renderPostMediaPreview();
         setDashPostType('normal');
-        showToast('Â¡Publicado en Comunidad!', 'success');
+        showToast('¡Publicado en Comunidad!', 'success');
         loadPosts();
       } catch (e) {
         btn.innerText = 'Publicar'; btn.disabled = false;
@@ -3937,7 +3936,7 @@
     }
 
     async function deletePost(id) {
-      if (!confirm('Â¿Eliminar?')) return;
+      if (!confirm('¿Eliminar?')) return;
       const { error } = await sb.from('community_posts').delete().eq('id', id);
       if (error) return showToast('Error: ' + error.message, 'error');
       showToast('Post eliminado', 'success');
@@ -3962,7 +3961,7 @@
             </button>
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">TÃ­tulo</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Título</label>
             <input id="edit-post-title" type="text" value="${esc(p.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           </div>
           <div>
@@ -4036,7 +4035,7 @@
     async function startStripeOnboarding() {
       const session = await sb.auth.getSession();
       const token = session.data.session?.access_token;
-      if (!token) return showToast('Inicia sesiÃ³n primero', 'error');
+      if (!token) return showToast('Inicia sesión primero', 'error');
       document.getElementById('stripe-btn').innerText = "Redirigiendo...";
       const response = await fetch(`${SUPABASE_URL}/functions/v1/stripe-onboard`, {
         method: 'POST',
@@ -4052,7 +4051,7 @@
       showToast('Verificando estado de Stripe...', 'info');
       try {
         const { data: { session } } = await sb.auth.getSession();
-        if (!session) return showToast('Inicia sesiÃ³n primero', 'error');
+        if (!session) return showToast('Inicia sesión primero', 'error');
         const res = await fetch(SUPABASE_URL + '/functions/v1/check-stripe-status', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token }
@@ -4067,7 +4066,7 @@
           if (!result.payouts_enabled) missing.push('pagos no habilitados');
           showToast('Stripe incompleto: ' + missing.join(', '), 'warning');
         } else {
-          showToast('Stripe no conectado aÃºn', 'warning');
+          showToast('Stripe no conectado aún', 'warning');
         }
         loadAccountStatus(currentProfile, result);
       } catch (e) {
@@ -4114,9 +4113,9 @@
       } else if (vStatus === 'submitted') {
         creoIdIcon.className = 'w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0';
         creoIdIcon.innerHTML = '<svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
-        creoIdText.textContent = 'Tu solicitud estÃ¡ siendo revisada por nuestro equipo. Te notificaremos cuando estÃ© lista.';
+        creoIdText.textContent = 'Tu solicitud está siendo revisada por nuestro equipo. Te notificaremos cuando esté lista.';
         creoIdBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-yellow-100 text-yellow-700';
-        creoIdBadge.textContent = 'En RevisiÃ³n';
+        creoIdBadge.textContent = 'En Revisión';
         statusCreoId.className = 'flex items-center gap-3 p-4 rounded-xl border border-yellow-200 bg-yellow-50';
         creoIdBtn.textContent = 'Ver Estado';
         creoIdBtn.className = 'text-xs px-3 py-1.5 rounded-lg font-semibold transition bg-yellow-100 text-yellow-700 hover:bg-yellow-200';
@@ -4125,7 +4124,7 @@
       } else if (vStatus === 'rejected') {
         creoIdIcon.className = 'w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0';
         creoIdIcon.innerHTML = '<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
-        creoIdText.textContent = (profile.rejection_reason ? 'RazÃ³n: ' + profile.rejection_reason + '. ' : '') + 'Puedes corregir y enviar de nuevo.';
+        creoIdText.textContent = (profile.rejection_reason ? 'Razón: ' + profile.rejection_reason + '. ' : '') + 'Puedes corregir y enviar de nuevo.';
         creoIdBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-red-100 text-red-700';
         creoIdBadge.textContent = 'Rechazado';
         statusCreoId.className = 'flex items-center gap-3 p-4 rounded-xl border border-red-200 bg-red-50';
@@ -4136,7 +4135,7 @@
       } else {
         creoIdIcon.className = 'w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0';
         creoIdIcon.innerHTML = '<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg>';
-        creoIdText.textContent = 'Completa el formulario de verificaciÃ³n para empezar a recibir pagos.';
+        creoIdText.textContent = 'Completa el formulario de verificación para empezar a recibir pagos.';
         creoIdBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-500';
         creoIdBadge.textContent = 'Pendiente';
         statusCreoId.className = 'flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50';
@@ -4176,7 +4175,7 @@
       if (sr && sr.status === 'complete') {
         stripeIcon.className = 'w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0';
         stripeIcon.innerHTML = '<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
-        stripeText.textContent = 'Tu cuenta de Stripe estÃ¡ lista. Cargos y pagos habilitados.';
+        stripeText.textContent = 'Tu cuenta de Stripe está lista. Cargos y pagos habilitados.';
         stripeBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-green-100 text-green-700';
         stripeBadge.textContent = 'Activo';
         statusStripe.className = 'flex items-center gap-3 p-4 rounded-xl border border-green-200 bg-green-50';
@@ -4191,7 +4190,7 @@
         if (!sr.details_submitted) details.push('datos incompletos');
         if (!sr.charges_enabled) details.push('cargos no habilitados');
         if (!sr.payouts_enabled) details.push('pagos no habilitados');
-        stripeText.textContent = 'ConfiguraciÃ³n incompleta: ' + details.join(', ') + '.';
+        stripeText.textContent = 'Configuración incompleta: ' + details.join(', ') + '.';
         stripeBadge.className = 'text-xs px-2.5 py-1 rounded-full font-medium bg-yellow-100 text-yellow-700';
         stripeBadge.textContent = 'Incompleto';
         statusStripe.className = 'flex items-center gap-3 p-4 rounded-xl border border-yellow-200 bg-yellow-50';
@@ -4226,7 +4225,7 @@
 
       if (idOk && stripeOk) {
         readiness.className = 'p-4 rounded-xl border-2 border-green-300 bg-green-50';
-        readiness.querySelector('p').textContent = 'Â¡Listo para recibir pagos!';
+        readiness.querySelector('p').textContent = '¡Listo para recibir pagos!';
         readiness.querySelector('p').className = 'font-semibold text-sm text-green-700 mb-2';
       } else {
         readiness.className = 'p-4 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50';
@@ -4285,7 +4284,7 @@
       const list = document.getElementById('my-stories-list');
       const countEl = document.getElementById('stories-count');
       if (!data || data.length === 0) {
-        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-6">ðŸ“– AÃºn no has publicado historias</p>';
+        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-6">📖 Aún no has publicado historias</p>';
         if (countEl) countEl.textContent = '';
         myStoriesCache = [];
         return;
@@ -4314,11 +4313,11 @@
             </button>
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">TÃ­tulo</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Título</label>
             <input id="edit-story-title" type="text" value="${esc(s.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">DescripciÃ³n</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
             <textarea id="edit-story-content" rows="5" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">${esc(s.content || s.description || '')}</textarea>
           </div>
           ${s.main_video_url ? `<div>
@@ -4326,7 +4325,7 @@
             <div class="flex items-center gap-2 bg-gray-50 rounded-lg p-2">
               <svg class="w-5 h-5 text-creo-purple flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
               <span class="text-xs text-gray-600 truncate flex-1">${esc(s.main_video_url)}</span>
-              <button onclick="document.getElementById('edit-remove-video').value='1';this.parentElement.style.opacity='0.3'" class="text-red-400 hover:text-red-600 text-xs">âœ•</button>
+              <button onclick="document.getElementById('edit-remove-video').value='1';this.parentElement.style.opacity='0.3'" class="text-red-400 hover:text-red-600 text-xs">✕</button>
             </div>
             <input type="hidden" id="edit-remove-video" value="0">
           </div>` : ''}
@@ -4368,7 +4367,7 @@
       const content = document.getElementById('story-content').value.trim();
       const mainVideoFile = document.getElementById('story-main-video-file').files[0];
       const mediaFiles = document.getElementById('story-media-files').files;
-      if (!content && !mainVideoFile && mediaFiles.length === 0) { btn.innerText = 'Publicar Historia'; btn.disabled = false; return showToast('Agrega al menos una descripciÃ³n, video o media', 'error'); }
+      if (!content && !mainVideoFile && mediaFiles.length === 0) { btn.innerText = 'Publicar Historia'; btn.disabled = false; return showToast('Agrega al menos una descripción, video o media', 'error'); }
       let mainVideoUrl = null;
       if (mainVideoFile) {
         mainVideoUrl = await uploadToStorage(mainVideoFile, 'videos', 50);
@@ -4398,7 +4397,7 @@
         await sb.from('community_posts').insert({
           author_id: currentUser.id,
           post_type: communityMedia.length > 0 ? 'video' : 'text',
-          title: title ? 'ðŸ“– ' + title : 'ðŸ“– Mi Historia',
+          title: title ? '📖 ' + title : '📖 Mi Historia',
           body: content || null,
           media_urls: communityMedia
         });
@@ -4415,7 +4414,7 @@
     }
 
     async function deleteStory(id) {
-      if (!confirm('Â¿Eliminar esta historia? Esta acciÃ³n no se puede deshacer.')) return;
+      if (!confirm('¿Eliminar esta historia? Esta acción no se puede deshacer.')) return;
       const { error } = await sb.from('creator_stories').delete().eq('id', id).eq('creator_id', currentUser.id);
       if (error) { showToast('Error al eliminar', 'error'); return; }
       showToast('Historia eliminada', 'success');
@@ -4427,7 +4426,7 @@
       if (!currentUser) return;
       const { data } = await sb.from('business_links').select('*').eq('creator_id', currentUser.id).order('sort_order', { ascending: true });
       const list = document.getElementById('my-biz-list');
-      if (!data || data.length === 0) { myBizLinksCache = []; list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">ðŸ”— No tienes enlaces de negocio aÃºn.</p>'; return; }
+      if (!data || data.length === 0) { myBizLinksCache = []; list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">🔗 No tienes enlaces de negocio aún.</p>'; return; }
       myBizLinksCache = data;
       list.innerHTML = data.map((l, i) => `<div class="bg-white p-4 rounded-xl border border-gray-200 flex gap-3 items-center">
         ${l.image_url ? `<img src="${esc(l.image_url)}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0">` : `<div class="w-12 h-12 rounded-lg bg-creo-purple/10 flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/></svg></div>`}
@@ -4436,8 +4435,8 @@
           <p class="text-[10px] text-gray-400 truncate">${esc(l.url)}</p>
           ${l.description ? `<p class="text-xs text-gray-500 truncate">${esc(l.description)}</p>` : ''}
         </div>
-        <button onclick="editBusinessLink('${l.id}')" class="text-blue-500 hover:text-blue-700 text-xs px-2 py-1 bg-blue-50 rounded flex-shrink-0">âœŽ</button>
-        <button onclick="deleteBusinessLink('${l.id}')" class="text-red-500 hover:text-red-700 text-xs px-2 py-1 bg-red-50 rounded flex-shrink-0">âœ•</button>
+        <button onclick="editBusinessLink('${l.id}')" class="text-blue-500 hover:text-blue-700 text-xs px-2 py-1 bg-blue-50 rounded flex-shrink-0">✎</button>
+        <button onclick="deleteBusinessLink('${l.id}')" class="text-red-500 hover:text-red-700 text-xs px-2 py-1 bg-red-50 rounded flex-shrink-0">✕</button>
       </div>`).join('');
     }
 
@@ -4448,9 +4447,9 @@
       const url = document.getElementById('biz-url').value.trim();
       const description = document.getElementById('biz-desc').value.trim();
       const imageFile = document.getElementById('biz-image-file').files[0];
-      if (!title || !url) return showToast('TÃ­tulo y URL son requeridos', 'error');
+      if (!title || !url) return showToast('Título y URL son requeridos', 'error');
       const { count } = await sb.from('business_links').select('*', { count: 'exact', head: true }).eq('creator_id', currentUser.id);
-      if (count >= 10) return showToast('MÃ¡ximo 10 enlaces permitidos', 'error');
+      if (count >= 10) return showToast('Máximo 10 enlaces permitidos', 'error');
       btn.innerText = 'Agregando...'; btn.disabled = true;
       let image_url = null;
       if (imageFile) {
@@ -4468,7 +4467,7 @@
     }
 
     async function deleteBusinessLink(id) {
-      if (!confirm('Â¿Eliminar este enlace?')) return;
+      if (!confirm('¿Eliminar este enlace?')) return;
       const { error } = await sb.from('business_links').delete().eq('id', id).eq('creator_id', currentUser.id);
       if (error) return showToast('Error: ' + error.message, 'error');
       showToast('Enlace eliminado', 'success');
@@ -4532,7 +4531,7 @@
     if (_urlParams.get('verification') === 'complete') {
       window.addEventListener('load', async () => {
         showTab('verify');
-        showToast('Confirmando resultado de verificaciÃ³n...', 'info');
+        showToast('Confirmando resultado de verificación...', 'info');
         let verified = false;
         for (let i = 0; i < 10; i++) {
           const { data: { user } } = await sb.auth.getUser();
@@ -4542,10 +4541,10 @@
           await new Promise(r => setTimeout(r, 3000));
         }
         if (verified) {
-          showToast('Â¡Identidad verificada exitosamente!', 'success');
+          showToast('¡Identidad verificada exitosamente!', 'success');
           checkUser();
         } else {
-          showToast('La verificaciÃ³n no se completÃ³. Si no terminaste el proceso, intÃ©ntalo de nuevo.', 'warning');
+          showToast('La verificación no se completó. Si no terminaste el proceso, inténtalo de nuevo.', 'warning');
         }
       });
     }
@@ -4562,62 +4561,62 @@
           });
           const result = await res.json();
           if (result.status === 'complete') {
-            showToast('Â¡Stripe conectado exitosamente! Ya puedes recibir pagos.', 'success');
+            showToast('¡Stripe conectado exitosamente! Ya puedes recibir pagos.', 'success');
             checkUser();
           } else {
-            showToast('La configuraciÃ³n de Stripe no se completÃ³. Por favor, intenta de nuevo para terminar el proceso.', 'warning');
+            showToast('La configuración de Stripe no se completó. Por favor, intenta de nuevo para terminar el proceso.', 'warning');
           }
         } catch (e) {
-          showToast('No se pudo verificar el estado de Stripe. Recarga la pÃ¡gina.', 'error');
+          showToast('No se pudo verificar el estado de Stripe. Recarga la página.', 'error');
         }
       });
     }
     if (_urlParams.get('stripe') === 'refresh') {
-      window.addEventListener('load', () => { showToast('ConfiguraciÃ³n de Stripe incompleta. Intenta de nuevo.', 'error'); });
+      window.addEventListener('load', () => { showToast('Configuración de Stripe incompleta. Intenta de nuevo.', 'error'); });
     }
 
     // ===== ONBOARDING GUIDE =====
     const onboardingSteps = [
       {
-        title: 'Â¡Bienvenido a CREO!',
+        title: '¡Bienvenido a CREO!',
         message: 'Tu cuenta ha sido confirmada. Te guiaremos paso a paso para configurar tu perfil de creador.',
-        icon: 'ðŸŽ‰',
+        icon: '🎉',
         target: null,
         action: null
       },
       {
         title: 'Completa tu Perfil',
-        message: 'Agrega tu nombre, foto de perfil y biografÃ­a. Esto es lo primero que verÃ¡n las personas que te apoyan.',
-        icon: 'ðŸ‘¤',
+        message: 'Agrega tu nombre, foto de perfil y biografía. Esto es lo primero que verán las personas que te apoyan.',
+        icon: '👤',
         target: 'panel-profile',
         action: () => showTab('profile')
       },
       {
         title: 'Comparte tu Historia',
-        message: 'CuÃ©ntale al mundo quiÃ©n eres. Sube un video de hasta 5 minutos y fotos que cuenten tu historia. No es obligatorio, pero los creadores con historia reciben hasta 3x mÃ¡s apoyo.',
-        icon: 'ðŸ“–',
+        message: 'Cuéntale al mundo quién eres. Sube un video de hasta 5 minutos y fotos que cuenten tu historia. No es obligatorio, pero los creadores con historia reciben hasta 3x más apoyo.',
+        icon: '📖',
         target: 'panel-story',
         action: () => showTab('story'),
         highlight: true
       },
       {
         title: 'Crea tu Primera Meta',
-        message: 'Las metas son objetivos financieros. Publica quÃ© necesitas, cuÃ¡nto cuesta y deja que la comunidad te ayude a lograrlo.',
-        icon: 'ðŸŽ¯',
+        message: 'Las metas son objetivos financieros. Publica qué necesitas, cuánto cuesta y deja que la comunidad te ayude a lograrlo.',
+        icon: '🎯',
         target: 'panel-metas',
         action: () => showTab('metas')
       },
       {
         title: 'Conecta Stripe',
         message: 'Para recibir pagos necesitas conectar tu cuenta de Stripe. Es gratis y toma solo 5 minutos.',
-        icon: 'ðŸ’³',
+        icon: '💳',
         target: 'panel-stripe',
         action: () => showTab('stripe')
       },
       {
-        title: 'Â¡Listo para empezar!',
-        message: 'Tu perfil pÃºblico estarÃ¡ disponible en tu enlace personal. CompÃ¡rtelo en redes sociales para que te descubran.',
-        icon: 'ðŸš€',
+        title: '¡Listo para empezar!',
+        message: 'Tu perfil público estará disponible en tu enlace personal. Compártelo en redes sociales para que te descubran.',
+        icon: '🚀',
         target: null,
         action: null
       }
@@ -4661,13 +4660,13 @@
             </div>
           </div>
           <p class="text-sm text-gray-600 leading-relaxed">${step.message}</p>
-          ${step.highlight ? '<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700 flex items-start gap-2"><span>ðŸ’¡</span><span>Los creadores que comparten su historia reciben significativamente mÃ¡s apoyo. Â¡Te lo recomendamos!</span></div>' : ''}
+          ${step.highlight ? '<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700 flex items-start gap-2"><span>💡</span><span>Los creadores que comparten su historia reciben significativamente más apoyo. ¡Te lo recomendamos!</span></div>' : ''}
           <div class="flex items-center justify-between pt-2">
-            <button onclick="skipOnboarding()" class="text-xs text-gray-400 hover:text-gray-600 transition">Saltar guÃ­a</button>
+            <button onclick="skipOnboarding()" class="text-xs text-gray-400 hover:text-gray-600 transition">Saltar guía</button>
             <div class="flex gap-2">
-              ${onboardingStep > 0 ? '<button onclick="prevOnboardingStep()" class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition">AtrÃ¡s</button>' : ''}
+              ${onboardingStep > 0 ? '<button onclick="prevOnboardingStep()" class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition">Atrás</button>' : ''}
               <button onclick="nextOnboardingStep()" class="px-5 py-2 text-sm font-semibold text-white bg-creo-purple rounded-xl hover:bg-creo-light transition">
-                ${onboardingStep === onboardingSteps.length - 1 ? 'Â¡Empezar!' : 'Siguiente'}
+                ${onboardingStep === onboardingSteps.length - 1 ? '¡Empezar!' : 'Siguiente'}
               </button>
             </div>
           </div>
@@ -4777,7 +4776,7 @@
         creoEllosList.splice(idx, 1);
       } else {
         if (creoEllosList.length >= 10) {
-          showToast('MÃ¡ximo 10 creadores destacados', 'error');
+          showToast('Máximo 10 creadores destacados', 'error');
           return;
         }
         creoEllosList.push({ id, username, display_name: displayName, avatar_url: avatarUrl });
@@ -4847,7 +4846,7 @@
       const historyContainer = document.getElementById('earnings-history');
       try {
         const { data: { session } } = await sb.auth.getSession();
-        if (!session) { historyContainer.innerHTML = '<p class="text-center text-gray-400 py-4">Inicia sesiÃ³n para ver tus ingresos</p>'; return; }
+        if (!session) { historyContainer.innerHTML = '<p class="text-center text-gray-400 py-4">Inicia sesión para ver tus ingresos</p>'; return; }
         const userId = session.user.id;
         const now = new Date();
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -4894,20 +4893,20 @@
         document.getElementById('earnings-metas-total').textContent = '$' + (totalMetas / 100).toFixed(2) + ' total';
 
         const allTransactions = [
-          ...tips.map(t => ({ type: 'tip', amount: creatorAmount(t), name: t.tipper_name || 'AnÃ³nimo', date: t.created_at })),
-          ...subs.map(s => ({ type: 'sub', amount: creatorAmount(s), name: s.subscriber_name || 'AnÃ³nimo', date: s.created_at, status: s.status })),
-          ...metas.map(m => ({ type: 'meta', amount: creatorAmount(m), name: m.contributor_name || 'AnÃ³nimo', date: m.created_at }))
+          ...tips.map(t => ({ type: 'tip', amount: creatorAmount(t), name: t.tipper_name || 'Anónimo', date: t.created_at })),
+          ...subs.map(s => ({ type: 'sub', amount: creatorAmount(s), name: s.subscriber_name || 'Anónimo', date: s.created_at, status: s.status })),
+          ...metas.map(m => ({ type: 'meta', amount: creatorAmount(m), name: m.contributor_name || 'Anónimo', date: m.created_at }))
         ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 50);
 
         if (allTransactions.length === 0) {
-          historyContainer.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">ðŸ’° AÃºn no tienes ingresos</p><p class="text-xs text-gray-300 mt-1">Comparte tu perfil para comenzar a recibir apoyo</p></div>';
+          historyContainer.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">💰 Aún no tienes ingresos</p><p class="text-xs text-gray-300 mt-1">Comparte tu perfil para comenzar a recibir apoyo</p></div>';
           return;
         }
 
         const typeConfig = {
-          tip: { icon: 'ðŸ’š', label: 'Tip', color: 'bg-green-50 border-green-200' },
-          sub: { icon: 'â­', label: 'SuscripciÃ³n', color: 'bg-purple-50 border-purple-200' },
-          meta: { icon: 'ðŸŽ¯', label: 'Meta', color: 'bg-amber-50 border-amber-200' }
+          tip: { icon: '💚', label: 'Tip', color: 'bg-green-50 border-green-200' },
+          sub: { icon: '⭐', label: 'Suscripción', color: 'bg-purple-50 border-purple-200' },
+          meta: { icon: '🎯', label: 'Meta', color: 'bg-amber-50 border-amber-200' }
         };
 
         historyContainer.innerHTML = allTransactions.map(tx => {
@@ -4917,7 +4916,7 @@
             <span class="text-lg">${cfg.icon}</span>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-gray-900 truncate">${escapeHtml(tx.name)}</p>
-              <p class="text-[10px] text-gray-500">${cfg.label} Â· ${date}</p>
+              <p class="text-[10px] text-gray-500">${cfg.label} · ${date}</p>
             </div>
             <p class="font-bold text-sm text-green-700">+$${(tx.amount / 100).toFixed(2)}</p>
           </div>`;
@@ -4934,7 +4933,7 @@
       const summary = document.getElementById('subscribers-summary');
       try {
         const { data: { session } } = await sb.auth.getSession();
-        if (!session) { container.innerHTML = '<p class="text-center text-gray-400 py-4">Inicia sesiÃ³n para ver tus suscriptores</p>'; return; }
+        if (!session) { container.innerHTML = '<p class="text-center text-gray-400 py-4">Inicia sesión para ver tus suscriptores</p>'; return; }
         const res = await fetch(SUPABASE_URL + '/functions/v1/manage-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
@@ -4944,7 +4943,7 @@
         if (!res.ok) throw new Error(data.error);
         const supporters = data.supporters || [];
         if (supporters.length === 0) {
-          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">ðŸ‘¥ AÃºn no tienes suscriptores</p><p class="text-xs text-gray-300 mt-1">Cuando alguien se suscriba a tu Apoyo Full, aparecerÃ¡ aquÃ­</p></div>';
+          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">👥 Aún no tienes suscriptores</p><p class="text-xs text-gray-300 mt-1">Cuando alguien se suscriba a tu Apoyo Full, aparecerá aquí</p></div>';
           summary.classList.add('hidden');
           return;
         }
@@ -4959,8 +4958,8 @@
           const date = new Date(s.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
           return `<div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
             <div>
-              <p class="font-semibold text-sm text-gray-900">${escapeHtml(s.subscriber_name || s.subscriber_email || 'AnÃ³nimo')}</p>
-              <p class="text-xs text-gray-500">${escapeHtml(s.subscriber_email || '')} Â· Desde ${date}</p>
+              <p class="font-semibold text-sm text-gray-900">${escapeHtml(s.subscriber_name || s.subscriber_email || 'Anónimo')}</p>
+              <p class="text-xs text-gray-500">${escapeHtml(s.subscriber_email || '')} · Desde ${date}</p>
             </div>
             <div class="text-right">
               <p class="font-bold text-creo-purple">$${((s.amount_cents || 0) / 100).toFixed(2)}/mes</p>
@@ -4978,7 +4977,7 @@
       const container = document.getElementById('my-subs-list');
       try {
         const { data: { session } } = await sb.auth.getSession();
-        if (!session) { container.innerHTML = '<p class="text-center text-gray-400 py-4">Inicia sesiÃ³n para ver tus suscripciones</p>'; return; }
+        if (!session) { container.innerHTML = '<p class="text-center text-gray-400 py-4">Inicia sesión para ver tus suscripciones</p>'; return; }
         const res = await fetch(SUPABASE_URL + '/functions/v1/manage-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
@@ -4988,7 +4987,7 @@
         if (!res.ok) throw new Error(data.error);
         const subs = data.subscriptions || [];
         if (subs.length === 0) {
-          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">ðŸ’œ No tienes suscripciones activas</p><p class="text-xs text-gray-300 mt-1">SuscrÃ­bete a un creador desde su perfil con Apoyo Full</p></div>';
+          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">💜 No tienes suscripciones activas</p><p class="text-xs text-gray-300 mt-1">Suscríbete a un creador desde su perfil con Apoyo Full</p></div>';
           return;
         }
         container.innerHTML = subs.map(s => {
@@ -5008,7 +5007,7 @@
               <img src="${escapeHtml(avatarUrl)}" alt="" class="w-10 h-10 rounded-full object-cover border-2 border-creo-mint">
               <div class="flex-1">
                 <p class="font-semibold text-sm text-gray-900">${escapeHtml(creator.display_name || creator.username || 'Creador')}</p>
-                <p class="text-xs text-gray-500">@${escapeHtml(creator.username || '')} Â· Desde ${date}</p>
+                <p class="text-xs text-gray-500">@${escapeHtml(creator.username || '')} · Desde ${date}</p>
               </div>
               <div class="text-right">
                 <p class="font-bold text-creo-purple">$${((s.amount_cents || 0) / 100).toFixed(2)}/mes</p>
@@ -5030,7 +5029,7 @@
       const summary = document.getElementById('my-payments-summary');
       try {
         const { data: { session } } = await sb.auth.getSession();
-        if (!session) { container.innerHTML = '<p class="text-center text-gray-400 py-4">Inicia sesiÃ³n para ver tus pagos</p>'; return; }
+        if (!session) { container.innerHTML = '<p class="text-center text-gray-400 py-4">Inicia sesión para ver tus pagos</p>'; return; }
         const userId = session.user.id;
         const userEmail = session.user.email;
 
@@ -5051,7 +5050,7 @@
         ].sort((a, b) => new Date(b.date) - new Date(a.date));
 
         if (allPayments.length === 0) {
-          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">ðŸ“‹ No tienes pagos registrados</p><p class="text-xs text-gray-300 mt-1">Apoya a un creador desde su perfil</p></div>';
+          container.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">📋 No tienes pagos registrados</p><p class="text-xs text-gray-300 mt-1">Apoya a un creador desde su perfil</p></div>';
           summary.classList.add('hidden');
           return;
         }
@@ -5062,8 +5061,8 @@
         summary.classList.remove('hidden');
 
         const typeConfig = {
-          tip: { icon: 'ðŸ’š', label: 'Tip', color: 'bg-green-50 border-green-200' },
-          sub: { icon: 'â­', label: 'SuscripciÃ³n', color: 'bg-purple-50 border-purple-200' }
+          tip: { icon: '💚', label: 'Tip', color: 'bg-green-50 border-green-200' },
+          sub: { icon: '⭐', label: 'Suscripción', color: 'bg-purple-50 border-purple-200' }
         };
 
         container.innerHTML = allPayments.map(p => {
@@ -5076,7 +5075,7 @@
             <img src="${escapeHtml(avatarUrl)}" alt="" class="w-9 h-9 rounded-full object-cover border border-gray-200">
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-gray-900 truncate">${escapeHtml(creatorName)}</p>
-              <p class="text-[10px] text-gray-500">${cfg.label} Â· ${date} ${statusBadge}</p>
+              <p class="text-[10px] text-gray-500">${cfg.label} · ${date} ${statusBadge}</p>
             </div>
             <p class="font-bold text-sm text-gray-700">$${(p.amount / 100).toFixed(2)}</p>
           </div>`;
@@ -5090,7 +5089,7 @@
     async function openBillingPortal(subscriptionId) {
       try {
         const { data: { session } } = await sb.auth.getSession();
-        if (!session) { showToast('Inicia sesiÃ³n primero', 'error'); return; }
+        if (!session) { showToast('Inicia sesión primero', 'error'); return; }
         const res = await fetch(SUPABASE_URL + '/functions/v1/manage-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
@@ -5105,10 +5104,10 @@
     }
 
     async function cancelSubscription(subscriptionId) {
-      if (!confirm('Â¿EstÃ¡s seguro de que deseas cancelar esta suscripciÃ³n? Se mantendrÃ¡ activa hasta el final del perÃ­odo de facturaciÃ³n actual.')) return;
+      if (!confirm('¿Estás seguro de que deseas cancelar esta suscripción? Se mantendrá activa hasta el final del período de facturación actual.')) return;
       try {
         const { data: { session } } = await sb.auth.getSession();
-        if (!session) { showToast('Inicia sesiÃ³n primero', 'error'); return; }
+        if (!session) { showToast('Inicia sesión primero', 'error'); return; }
         const res = await fetch(SUPABASE_URL + '/functions/v1/manage-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
@@ -5116,7 +5115,7 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
-        showToast('SuscripciÃ³n cancelada. Se mantendrÃ¡ activa hasta el final del perÃ­odo.', 'success');
+        showToast('Suscripción cancelada. Se mantendrá activa hasta el final del período.', 'success');
         loadMySubscriptions();
       } catch (err) {
         showToast('Error al cancelar: ' + err.message, 'error');
@@ -5161,7 +5160,7 @@
       loadCfhPanel();
     }
 
-    const CFH_TYPE_ICONS = { video: 'â–¶ï¸', book: 'ðŸ“–', recipe: 'ðŸ³', course: 'ðŸŽ“', article: 'ðŸ“' };
+    const CFH_TYPE_ICONS = { video: '▶️', book: '📖', recipe: '🍳', course: '🎓', article: '📝' };
     const CFH_STATUS_BADGES = {
       published: '<span class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Publicado</span>',
       draft: '<span class="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">Borrador</span>',
@@ -5172,11 +5171,11 @@
     function renderCfhContentList(items) {
       const list = document.getElementById('cfh-my-content-list');
       if (!items.length) {
-        list.innerHTML = '<div class="text-center py-8"><p class="text-3xl mb-2">ðŸŒ±</p><p class="text-gray-400 text-sm">Sin contenido aÃºn</p><p class="text-gray-500 text-xs mt-1">Publica tu primer contenido en Creo Futuro Hoy</p></div>';
+        list.innerHTML = '<div class="text-center py-8"><p class="text-3xl mb-2">🌱</p><p class="text-gray-400 text-sm">Sin contenido aún</p><p class="text-gray-500 text-xs mt-1">Publica tu primer contenido en Creo Futuro Hoy</p></div>';
         return;
       }
       list.innerHTML = items.map(item => {
-        const icon = CFH_TYPE_ICONS[item.content_type] || 'ðŸ“';
+        const icon = CFH_TYPE_ICONS[item.content_type] || '📁';
         const badge = CFH_STATUS_BADGES[item.status] || '';
         const freeBadge = item.is_free ? '<span class="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">Gratis</span>' : '<span class="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded">Premium</span>';
         const subName = item.subcategory?.name ? `<span class="text-[10px] text-gray-400">/ ${escapeHtml(item.subcategory.name)}</span>` : '';
@@ -5192,9 +5191,9 @@
             </div>
             <div class="flex items-center gap-3 mt-1 text-[10px] text-gray-400">
               <span>${icon} ${item.content_type}</span>
-              <span>ðŸ‘ ${item.view_count || 0}</span>
-              <span>â¤ï¸ ${item.like_count || 0}</span>
-              <span>ðŸ’¬ ${item.comment_count || 0}</span>
+              <span>👁 ${item.view_count || 0}</span>
+              <span>❤️ ${item.like_count || 0}</span>
+              <span>💬 ${item.comment_count || 0}</span>
               <span>${date}</span>
             </div>
           </div>
@@ -5220,13 +5219,13 @@
         const { data } = await res.json();
         const container = document.getElementById('cfh-my-subcats');
         if (!data || data.length === 0) {
-          container.innerHTML = '<p class="text-gray-400 text-xs text-center py-4">Sin subcategorÃ­as</p>';
+          container.innerHTML = '<p class="text-gray-400 text-xs text-center py-4">Sin subcategorías</p>';
           return;
         }
-        const CAT_ICONS = { music: 'ðŸŽµ', books: 'ðŸ“š', food: 'ðŸ½ï¸', health: 'ðŸ¥', fitness: 'ðŸ’ª', education: 'ðŸŽ“', faith: 'âœï¸' };
+        const CAT_ICONS = { music: '🎵', books: '📚', food: '🍽️', health: '🏥', fitness: '💪', education: '🎓', faith: '✝️' };
         container.innerHTML = data.map(sc => `<div class="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
           <div>
-            <span class="text-xs font-semibold text-gray-700">${CAT_ICONS[sc.category] || 'ðŸ“‚'} ${escapeHtml(sc.name)}</span>
+            <span class="text-xs font-semibold text-gray-700">${CAT_ICONS[sc.category] || '📂'} ${escapeHtml(sc.name)}</span>
             ${sc.description ? `<span class="text-[10px] text-gray-400 ml-2">${escapeHtml(sc.description)}</span>` : ''}
           </div>
           <button onclick="deleteCfhSubcat('${sc.id}')" class="text-[10px] text-red-500 hover:underline">Eliminar</button>
@@ -5280,7 +5279,7 @@
     async function loadCfhSubcatsForForm() {
       const cat = document.getElementById('cfh-category').value;
       const select = document.getElementById('cfh-subcategory');
-      select.innerHTML = '<option value="">â€” Sin subcategorÃ­a â€”</option>';
+      select.innerHTML = '<option value="">— Sin subcategoría —</option>';
       try {
         const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
           method: 'POST',
@@ -5308,16 +5307,16 @@
       div.innerHTML = `
         <input type="text" placeholder="Nombre" value="${escapeHtml(name)}" class="cfh-mat-name flex-1 border border-gray-300 bg-gray-50 p-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-creo-purple">
         <input type="url" placeholder="URL" value="${escapeHtml(url)}" class="cfh-mat-url flex-1 border border-gray-300 bg-gray-50 p-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-creo-purple">
-        <button onclick="document.getElementById('cfh-mat-${id}').remove()" class="text-red-400 hover:text-red-600 text-sm">âœ•</button>`;
+        <button onclick="document.getElementById('cfh-mat-${id}').remove()" class="text-red-400 hover:text-red-600 text-sm">✕</button>`;
       container.appendChild(div);
     }
 
     async function saveCfhContent() {
       const session = (await sb.auth.getSession()).data.session;
-      if (!session) { showToast('Inicia sesiÃ³n', 'error'); return; }
+      if (!session) { showToast('Inicia sesión', 'error'); return; }
 
       const title = document.getElementById('cfh-title').value.trim();
-      if (!title) { showToast('El tÃ­tulo es obligatorio', 'error'); return; }
+      if (!title) { showToast('El título es obligatorio', 'error'); return; }
 
       const contentType = document.getElementById('cfh-content-type').value;
       const materials = [];
@@ -5372,7 +5371,7 @@
     }
 
     async function deleteCfhContent(id, title) {
-      if (!confirm('Â¿Eliminar "' + title + '"?')) return;
+      if (!confirm('¿Eliminar "' + title + '"?')) return;
       const session = (await sb.auth.getSession()).data.session;
       if (!session) return;
       try {
@@ -5401,7 +5400,7 @@
 
     async function saveCfhSubcat() {
       const session = (await sb.auth.getSession()).data.session;
-      if (!session) { showToast('Inicia sesiÃ³n', 'error'); return; }
+      if (!session) { showToast('Inicia sesión', 'error'); return; }
       const name = document.getElementById('cfh-subcat-name').value.trim();
       if (!name) { showToast('El nombre es obligatorio', 'error'); return; }
       try {
@@ -5415,16 +5414,16 @@
             description: document.getElementById('cfh-subcat-desc').value.trim() || null
           })
         });
-        showToast('SubcategorÃ­a creada', 'success');
+        showToast('Subcategoría creada', 'success');
         closeCfhSubcatForm();
         loadCfhPanel();
       } catch (e) {
-        showToast('Error al crear subcategorÃ­a', 'error');
+        showToast('Error al crear subcategoría', 'error');
       }
     }
 
     async function deleteCfhSubcat(id) {
-      if (!confirm('Â¿Eliminar esta subcategorÃ­a?')) return;
+      if (!confirm('¿Eliminar esta subcategoría?')) return;
       const session = (await sb.auth.getSession()).data.session;
       if (!session) return;
       try {
@@ -5433,7 +5432,7 @@
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
           body: JSON.stringify({ action: 'delete-subcategory', id })
         });
-        showToast('SubcategorÃ­a eliminada', 'success');
+        showToast('Subcategoría eliminada', 'success');
         loadCfhPanel();
       } catch (e) {
         showToast('Error al eliminar', 'error');

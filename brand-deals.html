@@ -1,19 +1,19 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CREO â€” Brand Deals</title>
+  <title>CREO — Brand Deals</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a0a3e">
-  <meta name="description" content="CREO â€” Colaboraciones con marcas">
-  <meta property="og:title" content="CREO â€” Brand Deals">
+  <meta name="description" content="CREO — Colaboraciones con marcas">
+  <meta property="og:title" content="CREO — Brand Deals">
   <meta property="og:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
   <meta property="og:url" content="https://fullnessmindset.github.io/creo/brand-deals.html">
   <meta property="og:type" content="website">
   <meta property="og:description" content="Colaboraciones con marcas en CREO">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="CREO â€” Brand Deals">
+  <meta name="twitter:title" content="CREO — Brand Deals">
   <meta name="twitter:description" content="Colaboraciones con marcas en CREO">
   <meta name="twitter:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
   <link rel="canonical" href="https://fullnessmindset.github.io/creo/brand-deals.html">
@@ -45,7 +45,7 @@
     <button onclick="filterDeals('all')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-creo-purple text-white" data-cat="all" data-i18n="todosDeals">Todos</button>
   </div>
 
-  <!-- Post Deal button (admin/brand only) â€” fixed bottom center -->
+  <!-- Post Deal button (admin/brand only) — fixed bottom center -->
   <div id="post-deal-bar" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-30">
     <button onclick="openPostDeal()" class="flex items-center justify-center gap-2 bg-gradient-to-r from-creo-purple to-creo-light text-white py-3 px-8 rounded-full font-bold hover:opacity-90 transition shadow-lg whitespace-nowrap">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -55,14 +55,14 @@
 
   <!-- Deals grid: 3 cols desktop, 1 col mobile -->
   <div id="deals-grid" class="px-4 pb-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-    <div class="text-center text-gray-400 py-12 col-span-full" data-i18n="cargando"><span aria-label="cargando">â³</span> Cargando deals...</div>
+    <div class="text-center text-gray-400 py-12 col-span-full" data-i18n="cargando"><span aria-label="cargando">⏳</span> Cargando deals...</div>
   </div>
 
   <!-- Empty state -->
   <div id="no-deals" class="hidden text-center py-16 px-4">
     <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-    <p class="text-gray-500 font-semibold" data-i18n="todosDeals"><span aria-label="maletin">ðŸ’¼</span> No hay deals disponibles</p>
-    <p class="text-gray-400 text-sm mt-1">Las marcas publicarÃ¡n oportunidades pronto</p>
+    <p class="text-gray-500 font-semibold" data-i18n="todosDeals"><span aria-label="maletin">💼</span> No hay deals disponibles</p>
+    <p class="text-gray-400 text-sm mt-1">Las marcas publicarán oportunidades pronto</p>
   </div>
 
   <!-- ==================== POST DEAL MODAL ==================== -->
@@ -71,46 +71,46 @@
     <div class="absolute inset-x-0 bottom-0 top-4 md:top-10 bg-white rounded-t-3xl overflow-y-auto shadow-2xl">
       <div class="max-w-2xl mx-auto p-5 pb-8">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-bold text-creo-purple" data-i18n="publicarDeal"><span aria-label="deal">ðŸ¤</span> Publicar Brand Deal</h2>
+          <h2 class="text-xl font-bold text-creo-purple" data-i18n="publicarDeal"><span aria-label="deal">🤝</span> Publicar Brand Deal</h2>
           <button onclick="closePostDeal()" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
         <div class="space-y-5">
           <!-- Title -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="tituloDeal">TÃ­tulo del Deal *</label>
-            <input id="deal-title" type="text" maxlength="120" placeholder="Ej: CampaÃ±a de verano para ropa deportiva" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="tituloDeal">Título del Deal *</label>
+            <input id="deal-title" type="text" maxlength="120" placeholder="Ej: Campaña de verano para ropa deportiva" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
           </div>
 
           <!-- Category (dynamic) -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="categoria">CategorÃ­a *</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="categoria">Categoría *</label>
             <select id="deal-category" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple bg-white">
               <option value="">Seleccionar...</option>
             </select>
             <div class="mt-2 flex gap-2">
-              <input id="new-cat-input" type="text" maxlength="30" placeholder="Nueva categorÃ­a..." class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
+              <input id="new-cat-input" type="text" maxlength="30" placeholder="Nueva categoría..." class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
               <button type="button" onclick="createCategory()" class="px-4 py-2 bg-creo-mint text-creo-purple rounded-lg text-sm font-bold hover:bg-creo-mintDark transition shrink-0">+ Crear</button>
             </div>
           </div>
 
           <!-- Description -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="descripcionDeal">DescripciÃ³n *</label>
-            <textarea id="deal-description" rows="3" maxlength="1000" placeholder="Describe la campaÃ±a, el producto/servicio y lo que buscas" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="descripcionDeal">Descripción *</label>
+            <textarea id="deal-description" rows="3" maxlength="1000" placeholder="Describe la campaña, el producto/servicio y lo que buscas" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
           </div>
 
           <!-- Video Vibe / Creative Direction -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="vibeVideo">Vibe del Video / DirecciÃ³n Creativa *</label>
-            <textarea id="deal-video-vibe" rows="3" maxlength="800" placeholder="Describe el estilo visual, tono, duraciÃ³n, plataforma (TikTok, Reels, YouTube), referencias de contenido similar, hashtags requeridos..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
-            <p class="text-[11px] text-gray-400 mt-1">Ej: Video estilo lifestyle, 30-60 seg, tono casual y autÃ©ntico, para Instagram Reels</p>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="vibeVideo">Vibe del Video / Dirección Creativa *</label>
+            <textarea id="deal-video-vibe" rows="3" maxlength="800" placeholder="Describe el estilo visual, tono, duración, plataforma (TikTok, Reels, YouTube), referencias de contenido similar, hashtags requeridos..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
+            <p class="text-[11px] text-gray-400 mt-1">Ej: Video estilo lifestyle, 30-60 seg, tono casual y auténtico, para Instagram Reels</p>
           </div>
 
           <!-- Requirements -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="requisitos">Requisitos del Creador *</label>
-            <textarea id="deal-requirements" rows="3" maxlength="800" placeholder="MÃ­nimo de seguidores, nicho, ubicaciÃ³n, idioma, tipo de contenido que publican..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
+            <textarea id="deal-requirements" rows="3" maxlength="800" placeholder="Mínimo de seguidores, nicho, ubicación, idioma, tipo de contenido que publican..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
           </div>
 
           <!-- Payment row -->
@@ -130,27 +130,27 @@
 
           <!-- Payment description -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="descripcionPago">DescripciÃ³n del Pago</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="descripcionPago">Descripción del Pago</label>
             <input id="deal-payment-desc" type="text" maxlength="200" placeholder="Ej: 50% al aceptar, 50% al publicar el contenido" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
-            <p class="text-[11px] text-gray-400 mt-1">Explica cÃ³mo y cuÃ¡ndo se realizarÃ¡ el pago</p>
+            <p class="text-[11px] text-gray-400 mt-1">Explica cómo y cuándo se realizará el pago</p>
           </div>
 
           <!-- Terms -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="terminosCondiciones">TÃ©rminos y Condiciones</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="terminosCondiciones">Términos y Condiciones</label>
             <textarea id="deal-terms" rows="2" maxlength="800" placeholder="Derechos de uso del contenido, exclusividad, plazos de entrega..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
           </div>
 
           <!-- Deadlines -->
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="aplicar">Fecha LÃ­mite para Aplicar</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="aplicar">Fecha Límite para Aplicar</label>
               <input id="deal-deadline" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="fechaEntrega">Fecha LÃ­mite de Entrega *</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="fechaEntrega">Fecha Límite de Entrega *</label>
               <input id="deal-delivery-deadline" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
-              <p class="text-[11px] text-gray-400 mt-1">CuÃ¡ndo el creador debe entregar el contenido</p>
+              <p class="text-[11px] text-gray-400 mt-1">Cuándo el creador debe entregar el contenido</p>
             </div>
           </div>
 
@@ -166,14 +166,14 @@
             <div id="cover-buttons" class="flex gap-3">
               <button type="button" onclick="document.getElementById('deal-cover-camera').click()" class="flex-1 flex items-center justify-center gap-2 py-3 border-2 border-dashed border-gray-300 rounded-xl text-sm font-semibold text-gray-600 hover:border-creo-purple hover:text-creo-purple transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                <span data-i18n="foto">CÃ¡mara</span>
+                <span data-i18n="foto">Cámara</span>
               </button>
               <button type="button" onclick="document.getElementById('deal-cover-file').click()" class="flex-1 flex items-center justify-center gap-2 py-3 border-2 border-dashed border-gray-300 rounded-xl text-sm font-semibold text-gray-600 hover:border-creo-purple hover:text-creo-purple transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 <span data-i18n="portada">Subir Imagen</span>
               </button>
             </div>
-            <p class="text-[11px] text-gray-400 mt-1.5">Imagen de la marca o producto (mÃ¡x 10MB)</p>
+            <p class="text-[11px] text-gray-400 mt-1.5">Imagen de la marca o producto (máx 10MB)</p>
           </div>
 
           <!-- Submit -->
@@ -213,7 +213,7 @@
 
         <div class="space-y-4 text-sm text-gray-600">
           <div class="bg-gray-50 rounded-xl p-4">
-            <p class="font-semibold text-gray-800 mb-1.5 flex items-center gap-2"><svg class="w-4 h-4 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> <span data-i18n="descripcionDeal">DescripciÃ³n</span></p>
+            <p class="font-semibold text-gray-800 mb-1.5 flex items-center gap-2"><svg class="w-4 h-4 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> <span data-i18n="descripcionDeal">Descripción</span></p>
             <p id="detail-description" class="whitespace-pre-wrap"></p>
           </div>
 
@@ -229,7 +229,7 @@
 
           <div id="detail-terms-wrap">
             <div class="bg-gray-50 rounded-xl p-4">
-              <p class="font-semibold text-gray-800 mb-1.5" data-i18n="terminosCondiciones">TÃ©rminos y Condiciones</p>
+              <p class="font-semibold text-gray-800 mb-1.5" data-i18n="terminosCondiciones">Términos y Condiciones</p>
               <p id="detail-terms" class="whitespace-pre-wrap"></p>
             </div>
           </div>
@@ -277,21 +277,21 @@
         <div class="space-y-5">
           <input type="hidden" id="edit-deal-id">
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="tituloDeal">TÃ­tulo del Deal *</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="tituloDeal">Título del Deal *</label>
             <input id="edit-deal-title" type="text" maxlength="120" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="categoria">CategorÃ­a *</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="categoria">Categoría *</label>
             <select id="edit-deal-category" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple bg-white">
               <option value="">Seleccionar...</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="descripcionDeal">DescripciÃ³n *</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="descripcionDeal">Descripción *</label>
             <textarea id="edit-deal-description" rows="3" maxlength="1000" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="vibeVideo">Vibe del Video / DirecciÃ³n Creativa *</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="vibeVideo">Vibe del Video / Dirección Creativa *</label>
             <textarea id="edit-deal-video-vibe" rows="3" maxlength="800" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
           </div>
           <div>
@@ -312,20 +312,20 @@
             </div>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="descripcionPago">DescripciÃ³n del Pago</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="descripcionPago">Descripción del Pago</label>
             <input id="edit-deal-payment-desc" type="text" maxlength="200" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
           </div>
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="terminosCondiciones">TÃ©rminos y Condiciones</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="terminosCondiciones">Términos y Condiciones</label>
             <textarea id="edit-deal-terms" rows="2" maxlength="800" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple resize-none"></textarea>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="aplicar">Fecha LÃ­mite para Aplicar</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="aplicar">Fecha Límite para Aplicar</label>
               <input id="edit-deal-deadline" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
             </div>
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="fechaEntrega">Fecha LÃ­mite de Entrega *</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5" data-i18n="fechaEntrega">Fecha Límite de Entrega *</label>
               <input id="edit-deal-delivery-deadline" type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-purple focus:border-creo-purple">
             </div>
           </div>
@@ -358,7 +358,7 @@
         </div>
         <div class="flex items-center gap-1 text-xs text-creo-mint font-semibold">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-          <span data-i18n="chat">ðŸ”’ Encriptado</span>
+          <span data-i18n="chat">🔒 Encriptado</span>
         </div>
       </div>
 
@@ -384,11 +384,11 @@
       <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         <div class="text-center text-xs text-gray-400 py-4">
           <svg class="w-8 h-8 mx-auto mb-2 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-          <span data-i18n="chat">ðŸ” Mensajes encriptados. Solo tÃº y la otra parte pueden leerlos.</span>
+          <span data-i18n="chat">🔐 Mensajes encriptados. Solo tú y la otra parte pueden leerlos.</span>
         </div>
       </div>
 
-      <!-- Trato Hecho Panel (brand pays creator â€” final payout) -->
+      <!-- Trato Hecho Panel (brand pays creator — final payout) -->
       <div id="trato-hecho-panel" class="hidden px-4 py-4 bg-gradient-to-r from-creo-mint/10 to-creo-mint/5 border-t border-creo-mint/30 shrink-0">
         <div class="flex items-center gap-3 mb-3">
           <img id="trato-creator-avatar" src="" class="w-12 h-12 rounded-full border-2 border-creo-mint object-cover">
@@ -403,16 +403,16 @@
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
             <input id="trato-amount" type="number" min="1" step="0.01" placeholder="0.00" class="w-full pl-8 pr-3 py-2.5 border border-gray-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-creo-mint focus:border-creo-mint">
           </div>
-          <input id="trato-desc" type="text" placeholder="DescripciÃ³n del pago" value="Pago por Brand Deal" class="flex-1 px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-mint">
+          <input id="trato-desc" type="text" placeholder="Descripción del pago" value="Pago por Brand Deal" class="flex-1 px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-mint">
         </div>
         <button onclick="sendTratoHecho()" class="w-full bg-gradient-to-r from-creo-mint to-creo-mintDark text-creo-purple py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition shadow-md">
           <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-          <span data-i18n="tratoHecho">ðŸ¤ Trato Hecho</span>
+          <span data-i18n="tratoHecho">🤝 Trato Hecho</span>
         </button>
-        <p class="text-[11px] text-gray-400 mt-1.5 text-center">5% comisiÃ³n de plataforma. El creador recibe el 95%.</p>
+        <p class="text-[11px] text-gray-400 mt-1.5 text-center">5% comisión de plataforma. El creador recibe el 95%.</p>
       </div>
 
-      <!-- Payment popup (legacy â€” kept for backwards compat) -->
+      <!-- Payment popup (legacy — kept for backwards compat) -->
       <div id="payment-popup" class="hidden px-4 py-3 bg-creo-mint/10 border-t border-creo-mint/30 shrink-0">
         <div class="flex items-center gap-2 mb-2">
           <svg class="w-5 h-5 text-creo-mintDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -424,10 +424,10 @@
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
             <input id="payment-amount" type="number" min="1" step="0.01" placeholder="0.00" class="w-full pl-8 pr-3 py-2.5 border border-gray-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-creo-mint focus:border-creo-mint">
           </div>
-          <input id="payment-desc" type="text" placeholder="DescripciÃ³n" class="flex-1 px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-mint">
+          <input id="payment-desc" type="text" placeholder="Descripción" class="flex-1 px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-creo-mint">
           <button onclick="sendPayment()" class="bg-creo-mint text-creo-purple px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap hover:bg-creo-mintDark transition" data-i18n="pagarCreador">Pagar</button>
         </div>
-        <p class="text-[11px] text-gray-400 mt-1.5">5% comisiÃ³n de plataforma. El creador recibe el 95%.</p>
+        <p class="text-[11px] text-gray-400 mt-1.5">5% comisión de plataforma. El creador recibe el 95%.</p>
       </div>
 
       <!-- Image preview -->
@@ -505,7 +505,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
           </button>
           <!-- Payment / Trato Hecho button (brand only) -->
-          <button id="pay-toggle-btn" class="hidden p-2 rounded-full bg-creo-mint/20 text-creo-mintDark hover:bg-creo-mint/30 transition shrink-0" onclick="toggleTratoHecho()" title="Trato Hecho â€” Enviar Pago">
+          <button id="pay-toggle-btn" class="hidden p-2 rounded-full bg-creo-mint/20 text-creo-mintDark hover:bg-creo-mint/30 transition shrink-0" onclick="toggleTratoHecho()" title="Trato Hecho — Enviar Pago">
             <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
           </button>
           <!-- Send button -->
@@ -578,7 +578,7 @@
       { slug: 'food', label: 'Comida' },
       { slug: 'fitness', label: 'Fitness' },
       { slug: 'beauty', label: 'Belleza' },
-      { slug: 'music', label: 'MÃºsica' },
+      { slug: 'music', label: 'Música' },
       { slug: 'other', label: 'Otro' }
     ];
 
@@ -640,12 +640,12 @@
     async function createCategory() {
       const input = document.getElementById('new-cat-input');
       const label = input.value.trim();
-      if (!label) { showToast('Escribe un nombre para la categorÃ­a', 'error'); return; }
-      if (label.length > 30) { showToast('MÃ¡ximo 30 caracteres', 'error'); return; }
+      if (!label) { showToast('Escribe un nombre para la categoría', 'error'); return; }
+      if (label.length > 30) { showToast('Máximo 30 caracteres', 'error'); return; }
 
-      const slug = label.toLowerCase().normalize('NFD').replace(/[Ì€-Í¯]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const slug = label.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
       if (allCategories.some(c => c.slug === slug)) {
-        showToast('Esa categorÃ­a ya existe', 'error');
+        showToast('Esa categoría ya existe', 'error');
         return;
       }
 
@@ -657,7 +657,7 @@
       }
 
       input.value = '';
-      showToast('CategorÃ­a "' + label + '" creada', 'success');
+      showToast('Categoría "' + label + '" creada', 'success');
       await loadCategories();
       document.getElementById('deal-category').value = slug;
     }
@@ -667,8 +667,8 @@
     function handleCoverFile(input) {
       const file = input.files[0];
       if (!file) return;
-      if (file.size > 10 * 1024 * 1024) { showToast('Imagen mÃ¡x 10MB', 'error'); input.value = ''; return; }
-      if (!file.type.startsWith('image/')) { showToast('Solo imÃ¡genes', 'error'); input.value = ''; return; }
+      if (file.size > 10 * 1024 * 1024) { showToast('Imagen máx 10MB', 'error'); input.value = ''; return; }
+      if (!file.type.startsWith('image/')) { showToast('Solo imágenes', 'error'); input.value = ''; return; }
 
       pendingCoverFile = file;
       const reader = new FileReader();
@@ -763,7 +763,7 @@
     }
 
     async function submitDeal() {
-      if (!currentUser) { showToast('Inicia sesiÃ³n', 'error'); return; }
+      if (!currentUser) { showToast('Inicia sesión', 'error'); return; }
 
       const title = document.getElementById('deal-title').value.trim();
       const category = document.getElementById('deal-category').value;
@@ -777,12 +777,12 @@
       const deadline = document.getElementById('deal-deadline').value || null;
       const deliveryDeadline = document.getElementById('deal-delivery-deadline').value || null;
 
-      if (!title) { showToast('TÃ­tulo requerido', 'error'); return; }
-      if (!category) { showToast('CategorÃ­a requerida', 'error'); return; }
-      if (!description) { showToast('DescripciÃ³n requerida', 'error'); return; }
+      if (!title) { showToast('Título requerido', 'error'); return; }
+      if (!category) { showToast('Categoría requerida', 'error'); return; }
+      if (!description) { showToast('Descripción requerida', 'error'); return; }
       if (!videoVibe) { showToast('Vibe del video requerido', 'error'); return; }
       if (!requirements) { showToast('Requisitos requeridos', 'error'); return; }
-      if (!budgetUsd || budgetUsd < 1) { showToast('Pago mÃ­nimo $1', 'error'); return; }
+      if (!budgetUsd || budgetUsd < 1) { showToast('Pago mínimo $1', 'error'); return; }
       if (!deliveryDeadline) { showToast('Fecha de entrega requerida', 'error'); return; }
 
       const btn = document.getElementById('submit-deal-btn');
@@ -855,7 +855,7 @@
       document.getElementById('detail-category').textContent = getCatLabel(selectedDeal.category);
       document.getElementById('detail-budget').textContent = '$' + budget + ' por creador';
       document.getElementById('detail-payment-desc').textContent = selectedDeal.payment_description || '';
-      document.getElementById('detail-description').textContent = selectedDeal.description || 'Sin descripciÃ³n';
+      document.getElementById('detail-description').textContent = selectedDeal.description || 'Sin descripción';
       document.getElementById('detail-video-vibe').textContent = selectedDeal.video_vibe || 'No especificado';
       document.getElementById('detail-requirements').textContent = selectedDeal.requirements || 'No especificado';
       document.getElementById('detail-terms').textContent = selectedDeal.terms_conditions || 'No especificado';
@@ -887,7 +887,7 @@
       const contactBtn = document.getElementById('detail-contact-btn');
 
       if (!currentUser) {
-        applyBtn.textContent = 'Inicia sesiÃ³n para aplicar';
+        applyBtn.textContent = 'Inicia sesión para aplicar';
         applyBtn.onclick = () => signInWithGoogle();
         contactBtn.classList.add('hidden');
       } else if (isOwnDeal) {
@@ -965,8 +965,8 @@
     function handleEditCoverFile(input) {
       const file = input.files[0];
       if (!file) return;
-      if (file.size > 10 * 1024 * 1024) { showToast('Imagen mÃ¡x 10MB', 'error'); input.value = ''; return; }
-      if (!file.type.startsWith('image/')) { showToast('Solo imÃ¡genes', 'error'); input.value = ''; return; }
+      if (file.size > 10 * 1024 * 1024) { showToast('Imagen máx 10MB', 'error'); input.value = ''; return; }
+      if (!file.type.startsWith('image/')) { showToast('Solo imágenes', 'error'); input.value = ''; return; }
       editDealCoverFile = file;
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -1045,7 +1045,7 @@
           .insert({ deal_id: selectedDeal.id, creator_id: currentUser.id, brand_id: selectedDeal.brand_id })
           .select()
           .single();
-        if (error) { showToast('Error al iniciar conversaciÃ³n', 'error'); console.error(error); return; }
+        if (error) { showToast('Error al iniciar conversación', 'error'); console.error(error); return; }
         conv = newConv;
       }
 
@@ -1075,7 +1075,7 @@
         document.getElementById('deal-card-desc').textContent = chatDeal.description || '';
         document.getElementById('deal-card-budget').textContent = budget;
         document.getElementById('deal-card-delivery').textContent = chatDeal.delivery_deadline ? 'Entrega: ' + new Date(chatDeal.delivery_deadline).toLocaleDateString('es') : '';
-        document.getElementById('deal-card-vibe').textContent = chatDeal.video_vibe ? 'ðŸŽ¬ ' + chatDeal.video_vibe : '';
+        document.getElementById('deal-card-vibe').textContent = chatDeal.video_vibe ? '🎬 ' + chatDeal.video_vibe : '';
         document.getElementById('deal-card').classList.remove('hidden');
       } else {
         document.getElementById('deal-card').classList.add('hidden');
@@ -1131,7 +1131,7 @@
 
       const banner = `<div class="text-center text-xs text-gray-400 py-4">
         <svg class="w-8 h-8 mx-auto mb-2 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-        Mensajes encriptados. Solo tÃº y la otra parte pueden leerlos.
+        Mensajes encriptados. Solo tú y la otra parte pueden leerlos.
       </div>`;
 
       if (!data || data.length === 0) { container.innerHTML = banner; return; }
@@ -1151,7 +1151,7 @@
           <div class="payment-bubble px-4 py-3 max-w-[85%] shadow-md">
             <div class="flex items-center gap-2 mb-1">
               <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-              <span class="font-bold">Trato Hecho â€” $${amt}</span>
+              <span class="font-bold">Trato Hecho — $${amt}</span>
             </div>
             <p class="text-sm">${esc(m.content)}</p>
             <div class="flex items-center justify-between mt-2 text-xs opacity-80">
@@ -1165,7 +1165,7 @@
         return `<div class="text-center text-xs text-gray-400 py-1">${esc(m.content)}</div>`;
       }
 
-      // Media messages â€” URL is stored in content field
+      // Media messages — URL is stored in content field
       let mediaHtml = '';
       let textContent = '';
       const mt = m.message_type || 'text';
@@ -1259,11 +1259,11 @@
       document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
     }
 
-    // ===== DEAL CHAT â€” IMAGE =====
+    // ===== DEAL CHAT — IMAGE =====
     function handleDealImage(input) {
       const file = input.files[0];
       if (!file) return;
-      if (file.size > 10 * 1024 * 1024) { showToast('Imagen mÃ¡x 10MB', 'error'); return; }
+      if (file.size > 10 * 1024 * 1024) { showToast('Imagen máx 10MB', 'error'); return; }
       dcPendingImageFile = file;
       document.getElementById('dc-image-thumb').src = URL.createObjectURL(file);
       document.getElementById('dc-image-preview').classList.remove('hidden');
@@ -1274,7 +1274,7 @@
       document.getElementById('dc-image-preview')?.classList.add('hidden');
     }
 
-    // ===== DEAL CHAT â€” GIF =====
+    // ===== DEAL CHAT — GIF =====
     let dcGifTimer = null;
     function toggleDealGif() { document.getElementById('dc-gif-picker').classList.toggle('hidden'); searchDealGifs(''); }
     async function searchDealGifs(q) {
@@ -1306,7 +1306,7 @@
       loadMessages();
     }
 
-    // ===== DEAL CHAT â€” AUDIO (desktop: tap to record/stop) =====
+    // ===== DEAL CHAT — AUDIO (desktop: tap to record/stop) =====
     function dcStartRecTimer() {
       dcRecStartTime = Date.now();
       dcRecTimerInterval = setInterval(() => {
@@ -1336,7 +1336,7 @@
         document.getElementById('dc-recording-indicator').classList.remove('hidden');
         document.getElementById('dc-audio-btn').classList.add('text-red-500');
         dcStartRecTimer();
-      } catch(e) { showToast('No se pudo acceder al micrÃ³fono', 'error'); }
+      } catch(e) { showToast('No se pudo acceder al micrófono', 'error'); }
     }
 
     function stopDealAudioRecord() {
@@ -1372,7 +1372,7 @@
       loadMessages();
     }
 
-    // ===== DEAL CHAT â€” AUDIO (mobile: hold to record) =====
+    // ===== DEAL CHAT — AUDIO (mobile: hold to record) =====
     function setupDealMobileHoldToRecord() {
       const btn = document.getElementById('dc-audio-btn');
       if (!btn || btn._holdSetup) return;
@@ -1400,7 +1400,7 @@
           document.getElementById('dc-recording-indicator').classList.remove('hidden');
           btn.classList.add('text-red-500');
           dcStartRecTimer();
-        } catch(e) { showToast('No se pudo acceder al micrÃ³fono', 'error'); dcIsHoldRecording = false; }
+        } catch(e) { showToast('No se pudo acceder al micrófono', 'error'); dcIsHoldRecording = false; }
       }
 
       function endHold(e) {
@@ -1416,7 +1416,7 @@
       btn.addEventListener('touchcancel', endHold, { passive: false });
     }
 
-    // ===== DEAL CHAT â€” VIDEO RECORDING =====
+    // ===== DEAL CHAT — VIDEO RECORDING =====
     async function startDealVideoRecord() {
       const modal = document.getElementById('dc-video-record-modal');
       modal.classList.remove('hidden');
@@ -1427,7 +1427,7 @@
         dcVideoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
         document.getElementById('dc-video-live-preview').srcObject = dcVideoStream;
       } catch(e) {
-        showToast('No se pudo acceder a la cÃ¡mara', 'error');
+        showToast('No se pudo acceder a la cámara', 'error');
         modal.classList.add('hidden');
       }
     }
@@ -1508,7 +1508,7 @@
     async function sendTratoHecho() {
       const amount = parseFloat(document.getElementById('trato-amount').value);
       const desc = document.getElementById('trato-desc').value.trim() || 'Pago por Brand Deal';
-      if (!amount || amount < 1) { showToast('Monto mÃ­nimo $1', 'error'); return; }
+      if (!amount || amount < 1) { showToast('Monto mínimo $1', 'error'); return; }
       if (!activeConversation) return;
       await processDealPayment(amount, desc);
     }
@@ -1516,7 +1516,7 @@
     async function sendPayment() {
       const amount = parseFloat(document.getElementById('payment-amount').value);
       const desc = document.getElementById('payment-desc').value.trim();
-      if (!amount || amount < 1) { showToast('Monto mÃ­nimo $1', 'error'); return; }
+      if (!amount || amount < 1) { showToast('Monto mínimo $1', 'error'); return; }
       if (!activeConversation) return;
       await processDealPayment(amount, desc);
     }
@@ -1537,7 +1537,7 @@
 
       try {
         const { data: { session: authSession } } = await sb.auth.getSession();
-        if (!authSession) { showToast('Inicia sesiÃ³n primero', 'error'); return; }
+        if (!authSession) { showToast('Inicia sesión primero', 'error'); return; }
         const res = await fetch(SUPABASE_FN_URL + '/create-deal-payment', {
           method: 'POST',
           headers: {
