@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CREO — Creo Futuro Hoy</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a0a3e">
+  <meta name="description" content="CREO Futuro Hoy — Plataforma de contenido educativo y creativo para un futuro sostenible">
+  <meta property="og:title" content="CREO — Creo Futuro Hoy">
+  <meta property="og:description" content="Contenido educativo y creativo: música, libros, recetas, salud, fitness, educación y fe.">
+  <meta property="og:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
+  <meta property="og:url" content="https://fullnessmindset.github.io/creo/futuro.html">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/logo-icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/logo-icon.png">
+  <link rel="stylesheet" href="tailwind.min.css?v=20260719">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { overscroll-behavior: contain; }
+    input, select, textarea { font-size: max(16px, 1em) !important; }
+    .glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
+    .cfh-hero { background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 40%, #0d0d0d 100%); }
+    .cfh-card { position: relative; border-radius: 8px; overflow: hidden; background: #111; aspect-ratio: 16/9; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+    .cfh-card:hover { transform: scale(1.05); box-shadow: 0 8px 30px rgba(108,58,237,0.3); z-index: 5; }
+    .cfh-card img, .cfh-card video { width: 100%; height: 100%; object-fit: cover; }
+    .cfh-card .card-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 40%, rgba(0,0,0,0.85)); pointer-events: none; }
+    .cfh-card .card-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px; z-index: 2; }
+    .cfh-card .lock-badge { position: absolute; top: 8px; right: 8px; z-index: 3; }
+    .cfh-row { display: flex; gap: 10px; overflow-x: auto; padding: 0 16px 12px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .cfh-row::-webkit-scrollbar { display: none; }
+    .cfh-row .cfh-card { flex-shrink: 0; width: 260px; scroll-snap-align: start; }
+    @media (min-width: 768px) { .cfh-row .cfh-card { width: 300px; } }
+    .cfh-book-card { aspect-ratio: 2/3; }
+    .cat-tab { white-space: nowrap; transition: all 0.2s; }
+    .cat-tab.active { color: #33f0b0; border-bottom: 2px solid #33f0b0; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { scrollbar-width: none; }
+    /* Video player modal */
+    .player-modal { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.95); display: none; }
+    .player-modal.show { display: flex; }
+    /* E-reader */
+    .reader-modal { position: fixed; inset: 0; z-index: 100; display: none; }
+    .reader-modal.show { display: flex; flex-direction: column; }
+    .reader-light { background: #faf8f5; color: #1a1a1a; }
+    .reader-dark { background: #1a1a1a; color: #e0dcd4; }
+    .subcat-pill { transition: all 0.15s; }
+    .subcat-pill.active { background: #6C3AED; color: white; }
+  </style>
+</head>
+<body class="bg-gray-950 text-white min-h-screen">
+  <script src="shared.js"></script>
+
+  <!-- Hero Banner -->
+  <div class="cfh-hero px-4 pt-6 pb-4 lg:pt-8 lg:pb-6">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-2xl lg:text-3xl font-black tracking-tight">
+        <span class="text-creo-mint">⚡</span> Creo Futuro Hoy
+      </h1>
+      <p class="text-gray-400 text-sm mt-1 max-w-xl">Contenido educativo y creativo para construir un futuro sostenible. Música, libros, recetas, salud, fitness, educación y fe.</p>
+    </div>
+  </div>
+
+  <!-- Category Tabs -->
+  <div class="sticky top-0 z-30 bg-gray-950/95 backdrop-blur-lg border-b border-gray-800">
+    <div class="max-w-7xl mx-auto flex gap-1 overflow-x-auto no-scrollbar px-4 py-2" id="category-tabs">
+      <button onclick="switchCategory('music')" data-cat="music" class="cat-tab px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-lg active">🎵 <span data-i18n="cfhMusic">Creo Music</span></button>
+      <button onclick="switchCategory('books')" data-cat="books" class="cat-tab px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-lg">📚 <span data-i18n="cfhBooks">Creo Books</span></button>
+      <button onclick="switchCategory('food')" data-cat="food" class="cat-tab px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-lg">🍽️ <span data-i18n="cfhFood">Creo Food</span></button>
+      <button onclick="switchCategory('health')" data-cat="health" class="cat-tab px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-lg">🏥 <span data-i18n="cfhHealth">Creo Health</span></button>
+      <button onclick="switchCategory('fitness')" data-cat="fitness" class="cat-tab px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-lg">💪 <span data-i18n="cfhFitness">Creo Fitness</span></button>
+      <button onclick="switchCategory('education')" data-cat="education" class="cat-tab px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-lg">🎓 <span data-i18n="cfhEducation">Creo Education</span></button>
+      <button onclick="switchCategory('faith')" data-cat="faith" class="cat-tab px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-lg">✝️ <span data-i18n="cfhFaith">Creo en Dios</span></button>
+    </div>
+  </div>
+
+  <!-- Health Disclaimer (only visible on health tab) -->
+  <div id="health-disclaimer" class="hidden max-w-7xl mx-auto px-4 pt-3">
+    <div class="bg-amber-900/30 border border-amber-700/50 rounded-xl px-4 py-3 flex items-start gap-3">
+      <span class="text-amber-400 text-lg flex-shrink-0">⚠️</span>
+      <p class="text-amber-200 text-xs leading-relaxed" data-i18n="cfhHealthDisclaimer">Contenido educativo únicamente. No constituye consejo médico profesional. No crea una relación médico-paciente. Para emergencias, contacte servicios de emergencia inmediatamente.</p>
+    </div>
+  </div>
+
+  <!-- Subcategory Filter -->
+  <div class="max-w-7xl mx-auto px-4 pt-3 pb-2">
+    <div class="flex gap-2 overflow-x-auto no-scrollbar" id="subcategory-pills">
+      <button onclick="filterSubcategory(null)" class="subcat-pill active px-3 py-1.5 text-xs font-semibold rounded-full bg-gray-800 text-gray-300 hover:bg-gray-700">Todos</button>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="max-w-7xl mx-auto px-4 pb-3">
+    <div class="relative">
+      <svg class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input id="cfh-search" type="text" placeholder="Buscar contenido..." class="w-full bg-gray-800/80 text-white rounded-full pl-10 pr-4 py-2.5 text-sm outline-none border border-gray-700 focus:border-creo-mint/50 transition" oninput="debounceSearch(this.value)">
+    </div>
+  </div>
+
+  <!-- Content Area -->
+  <div id="cfh-content-area" class="max-w-7xl mx-auto pb-24 space-y-6">
+    <!-- Populated by JS: rows of content grouped by subcategory or trending -->
+    <div class="px-4 py-12 text-center">
+      <div class="animate-pulse text-gray-500">Cargando contenido...</div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div id="cfh-empty" class="hidden max-w-7xl mx-auto px-4 py-16 text-center">
+    <p class="text-4xl mb-3">🌱</p>
+    <p class="text-gray-400 text-sm" data-i18n="cfhNoContent">Aún no hay contenido en esta categoría</p>
+    <p class="text-gray-500 text-xs mt-1">Sé el primero en publicar desde tu Panel de Creador</p>
+  </div>
+
+  <!-- ===== VIDEO PLAYER MODAL ===== -->
+  <div id="player-modal" class="player-modal" onclick="if(event.target===this)closePlayer()">
+    <div class="flex flex-col lg:flex-row w-full h-full">
+      <!-- Video Side -->
+      <div class="flex-1 flex flex-col bg-black relative">
+        <button onclick="closePlayer()" class="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <div class="flex-1 flex items-center justify-center">
+          <video id="player-video" controls class="max-w-full max-h-full" playsinline></video>
+        </div>
+        <!-- Video info -->
+        <div class="px-4 py-3 bg-gray-900">
+          <h2 id="player-title" class="font-bold text-lg text-white"></h2>
+          <div class="flex items-center gap-2 mt-1">
+            <div id="player-avatar" class="w-8 h-8 rounded-full bg-creo-purple/20 overflow-hidden"></div>
+            <a id="player-creator-link" href="#" class="text-sm text-creo-mint hover:underline"></a>
+          </div>
+          <p id="player-description" class="text-gray-400 text-sm mt-2 line-clamp-3"></p>
+          <!-- Actions -->
+          <div class="flex items-center gap-4 mt-3 text-sm">
+            <button onclick="togglePlayerLike()" id="player-like-btn" class="flex items-center gap-1.5 text-gray-400 hover:text-red-400 transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+              <span id="player-like-count">0</span>
+            </button>
+            <button onclick="togglePlayerComments()" class="flex items-center gap-1.5 text-gray-400 hover:text-white transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              <span id="player-comment-count">0</span>
+            </button>
+            <button onclick="shareContent()" class="flex items-center gap-1.5 text-gray-400 hover:text-creo-mint transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+            </button>
+            <span class="text-gray-600 text-xs ml-auto"><span id="player-views">0</span> vistas</span>
+          </div>
+          <!-- Co-creators -->
+          <div id="player-cocreators" class="hidden mt-2 flex items-center gap-2 text-xs text-gray-500">
+            <span>Co-creadores:</span>
+            <div id="player-cocreators-list" class="flex gap-1"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Right Panel: Materials + Comments -->
+      <div class="w-full lg:w-96 bg-gray-900 border-l border-gray-800 flex flex-col max-h-[40vh] lg:max-h-full">
+        <!-- Panel tabs -->
+        <div class="flex border-b border-gray-800">
+          <button onclick="showPlayerPanel('materials')" id="panel-tab-materials" class="flex-1 px-4 py-3 text-xs font-semibold text-creo-mint border-b-2 border-creo-mint">📥 Materiales</button>
+          <button onclick="showPlayerPanel('comments')" id="panel-tab-comments" class="flex-1 px-4 py-3 text-xs font-semibold text-gray-500 border-b-2 border-transparent hover:text-white">💬 Comentarios</button>
+        </div>
+        <!-- Materials panel -->
+        <div id="player-materials-panel" class="flex-1 overflow-y-auto p-4 space-y-2">
+          <p id="no-materials" class="text-gray-500 text-sm text-center py-8">Sin materiales descargables</p>
+          <div id="materials-list"></div>
+        </div>
+        <!-- Comments panel -->
+        <div id="player-comments-panel" class="hidden flex-1 overflow-y-auto p-4 space-y-3">
+          <div id="player-comments-list" class="space-y-3"></div>
+        </div>
+        <!-- Comment input -->
+        <div id="comment-input-area" class="hidden border-t border-gray-800 p-3 flex gap-2">
+          <input id="player-comment-input" type="text" placeholder="Escribe un comentario..." class="flex-1 bg-gray-800 text-white rounded-full px-4 py-2 text-sm outline-none border border-gray-700 focus:border-creo-mint/50" onkeydown="if(event.key==='Enter')submitPlayerComment()">
+          <button onclick="submitPlayerComment()" class="w-9 h-9 rounded-full bg-creo-purple flex items-center justify-center hover:bg-creo-light transition flex-shrink-0">
+            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== E-READER MODAL (Books tab) ===== -->
+  <div id="reader-modal" class="reader-modal reader-light">
+    <div class="flex items-center justify-between px-4 py-3 border-b" id="reader-header">
+      <button onclick="closeReader()" class="p-2 rounded-lg hover:bg-gray-200 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      </button>
+      <h3 id="reader-title" class="font-bold text-sm truncate mx-4 flex-1 text-center"></h3>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleReaderTheme()" id="reader-theme-btn" class="p-2 rounded-lg hover:bg-gray-200 transition" title="Cambiar tema">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <a id="reader-download-btn" href="#" download class="hidden p-2 rounded-lg hover:bg-gray-200 transition" title="Descargar">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="flex-1 overflow-y-auto flex justify-center">
+      <iframe id="reader-frame" class="w-full max-w-3xl h-full border-0"></iframe>
+    </div>
+  </div>
+
+  <!-- ===== LOCKED CONTENT MODAL ===== -->
+  <div id="locked-modal" class="fixed inset-0 z-[90] hidden" onclick="if(event.target===this)closeLocked()">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 max-w-md mx-auto bg-gray-900 rounded-2xl p-6 border border-gray-700 space-y-4 z-10">
+      <div class="text-center">
+        <p class="text-3xl mb-2">🔒</p>
+        <h3 class="font-bold text-lg text-white" data-i18n="cfhLocked">Contenido Premium</h3>
+        <p class="text-gray-400 text-sm mt-1">Suscríbete con <strong class="text-creo-mint">Apoyo Full</strong> para desbloquear todo el contenido de este creador</p>
+      </div>
+      <div id="locked-creator-info" class="flex items-center gap-3 bg-gray-800/50 rounded-xl p-3"></div>
+      <button onclick="subscribeToCreator()" class="w-full bg-creo-mint text-creo-purple font-bold py-3 rounded-xl hover:brightness-110 transition text-sm">
+        ⭐ <span data-i18n="cfhSubscribe">Suscribirse con Apoyo Full</span>
+      </button>
+      <button onclick="closeLocked()" class="w-full text-gray-500 text-sm hover:text-white transition py-1">Cancelar</button>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://qddxoyjtoxtdcezwuvcq.supabase.co';
+    const SUPABASE_FN_URL = SUPABASE_URL + '/functions/v1';
+    const sb = supabase.createClient(SUPABASE_URL, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZHhveWp0b3h0ZGNlend1dmNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNTMxMzMsImV4cCI6MjA2NDgyOTEzM30.se1wNVfrmj-NzGGdOIhazLOvxQgMCdDHwwSCdGheqUk');
+
+    let currentUser = null;
+    let activeCategory = 'music';
+    let activeSubcategoryId = null;
+    let currentContentItem = null;
+    let searchTimeout = null;
+    let allContent = [];
+    let readerDark = false;
+
+    const CATEGORY_ICONS = {
+      music: '🎵', books: '📚', food: '🍽️', health: '🏥',
+      fitness: '💪', education: '🎓', faith: '✝️'
+    };
+
+    // ===== INIT =====
+    window.onload = async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      currentUser = session?.user || null;
+      renderBottomNav('futuro');
+      updateNavAuth();
+      loadNotificationBell();
+      translatePage();
+      await loadCategory(activeCategory);
+    };
+
+    // ===== CATEGORY SWITCHING =====
+    function switchCategory(cat) {
+      activeCategory = cat;
+      activeSubcategoryId = null;
+      document.querySelectorAll('.cat-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.cat === cat);
+      });
+      document.getElementById('health-disclaimer').classList.toggle('hidden', cat !== 'health');
+      loadCategory(cat);
+    }
+
+    async function loadCategory(cat) {
+      const area = document.getElementById('cfh-content-area');
+      area.innerHTML = '<div class="px-4 py-12 text-center"><div class="animate-pulse text-gray-500">Cargando...</div></div>';
+      document.getElementById('cfh-empty').classList.add('hidden');
+
+      // Load subcategories
+      await loadSubcategories(cat);
+
+      // Load content
+      await loadContent(cat);
+    }
+
+    async function loadSubcategories(cat) {
+      const container = document.getElementById('subcategory-pills');
+      try {
+        const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'list-subcategories', category: cat })
+        });
+        const { data } = await res.json();
+        const pills = (data || []).map(sc =>
+          `<button onclick="filterSubcategory('${sc.id}')" data-subid="${sc.id}" class="subcat-pill px-3 py-1.5 text-xs font-semibold rounded-full bg-gray-800 text-gray-300 hover:bg-gray-700 whitespace-nowrap">${escapeHtml(sc.name)}</button>`
+        ).join('');
+        container.innerHTML = `<button onclick="filterSubcategory(null)" class="subcat-pill active px-3 py-1.5 text-xs font-semibold rounded-full bg-gray-800 text-gray-300 hover:bg-gray-700">Todos</button>${pills}`;
+      } catch (e) {
+        container.innerHTML = '<button class="subcat-pill active px-3 py-1.5 text-xs font-semibold rounded-full bg-gray-800 text-gray-300">Todos</button>';
+      }
+    }
+
+    function filterSubcategory(id) {
+      activeSubcategoryId = id;
+      document.querySelectorAll('.subcat-pill').forEach(p => {
+        p.classList.toggle('active', id ? p.dataset.subid === id : !p.dataset.subid);
+      });
+      loadContent(activeCategory, id);
+    }
+
+    async function loadContent(cat, subcategoryId = null, search = null) {
+      const area = document.getElementById('cfh-content-area');
+      const emptyEl = document.getElementById('cfh-empty');
+      try {
+        const body = { action: 'list', category: cat, limit: 50 };
+        if (subcategoryId) body.subcategory_id = subcategoryId;
+        if (search) body.search = search;
+
+        const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const { data, total } = await res.json();
+        allContent = data || [];
+
+        if (allContent.length === 0) {
+          area.innerHTML = '';
+          emptyEl.classList.remove('hidden');
+          return;
+        }
+        emptyEl.classList.add('hidden');
+        renderContentGrid(allContent, cat);
+      } catch (e) {
+        area.innerHTML = '<div class="px-4 py-12 text-center text-red-400 text-sm">Error al cargar contenido</div>';
+      }
+    }
+
+    // ===== RENDER NETFLIX-STYLE GRID =====
+    function renderContentGrid(items, cat) {
+      const area = document.getElementById('cfh-content-area');
+      const isBooks = cat === 'books';
+
+      // Group by subcategory
+      const groups = new Map();
+      const noSub = [];
+      items.forEach(item => {
+        if (item.subcategory?.name) {
+          if (!groups.has(item.subcategory.name)) groups.set(item.subcategory.name, []);
+          groups.get(item.subcategory.name).push(item);
+        } else {
+          noSub.push(item);
+        }
+      });
+
+      let html = '';
+
+      // Trending row (all items, sorted by views)
+      const trending = [...items].sort((a, b) => (b.view_count || 0) - (a.view_count || 0)).slice(0, 15);
+      if (trending.length > 0) {
+        html += renderRow('🔥 Tendencia', trending, isBooks);
+      }
+
+      // Recent row
+      const recent = [...items].slice(0, 15);
+      if (recent.length > 0) {
+        html += renderRow('🆕 Recientes', recent, isBooks);
+      }
+
+      // Free content row
+      const free = items.filter(i => i.is_free);
+      if (free.length > 0) {
+        html += renderRow('🆓 Contenido Gratis', free, isBooks);
+      }
+
+      // Subcategory rows
+      groups.forEach((subItems, subName) => {
+        html += renderRow(subName, subItems, isBooks);
+      });
+
+      // Uncategorized
+      if (noSub.length > 0 && groups.size > 0) {
+        html += renderRow('📁 Otros', noSub, isBooks);
+      }
+
+      area.innerHTML = html;
+    }
+
+    function renderRow(title, items, isBooks) {
+      const cards = items.map(item => renderCard(item, isBooks)).join('');
+      return `
+        <div class="space-y-2">
+          <h3 class="px-4 text-sm font-bold text-gray-300 tracking-wide">${title}</h3>
+          <div class="cfh-row">${cards}</div>
+        </div>`;
+    }
+
+    function renderCard(item, isBooks) {
+      const thumb = item.thumbnail_url || (item.video_url && item.video_type === 'youtube'
+        ? `https://img.youtube.com/vi/${extractYouTubeId(item.video_url)}/mqdefault.jpg`
+        : '');
+      const lockHtml = !item.is_free
+        ? '<div class="lock-badge"><span class="bg-amber-500/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">⭐ Premium</span></div>'
+        : '';
+      const creatorName = item.creator?.display_name || item.creator?.username || '';
+      const avatarUrl = item.creator?.avatar_url || '';
+      const avatarHtml = avatarUrl
+        ? `<img src="${escapeHtml(avatarUrl)}" class="w-6 h-6 rounded-full object-cover" alt="">`
+        : `<div class="w-6 h-6 rounded-full bg-creo-purple/30 flex items-center justify-center text-[10px] text-white font-bold">${escapeHtml(creatorName[0]?.toUpperCase() || '?')}</div>`;
+
+      const cardClass = isBooks ? 'cfh-card cfh-book-card' : 'cfh-card';
+      const typeIcon = item.content_type === 'book' ? '📖' : item.content_type === 'recipe' ? '🍳' : item.content_type === 'course' ? '🎓' : '▶️';
+
+      const imgHtml = thumb
+        ? `<img src="${escapeHtml(thumb)}" alt="${escapeHtml(item.title)}" loading="lazy">`
+        : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-creo-purple/40 to-gray-900"><span class="text-4xl">${CATEGORY_ICONS[item.category] || '📁'}</span></div>`;
+
+      return `
+        <div class="${cardClass}" onclick="openContent('${item.id}')">
+          ${imgHtml}
+          <div class="card-overlay"></div>
+          ${lockHtml}
+          <div class="card-info">
+            <div class="flex items-center gap-1.5 mb-1">
+              ${avatarHtml}
+              <span class="text-[10px] text-gray-300 truncate">${escapeHtml(creatorName)}</span>
+            </div>
+            <p class="text-white text-sm font-bold leading-tight line-clamp-2">${escapeHtml(item.title)}</p>
+            <div class="flex items-center gap-2 mt-1 text-[10px] text-gray-400">
+              <span>${typeIcon} ${item.content_type}</span>
+              ${item.duration_seconds ? `<span>${formatDuration(item.duration_seconds)}</span>` : ''}
+              <span>${item.view_count || 0} vistas</span>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ===== OPEN CONTENT =====
+    async function openContent(contentId) {
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        const session = (await sb.auth.getSession()).data.session;
+        if (session) headers['Authorization'] = 'Bearer ' + session.access_token;
+
+        const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST', headers,
+          body: JSON.stringify({ action: 'get', id: contentId })
+        });
+        const { data: item } = await res.json();
+        if (!item) { showToast('Contenido no encontrado', 'error'); return; }
+
+        currentContentItem = item;
+
+        // Check access for paid content
+        if (!item.is_free) {
+          if (!currentUser) {
+            showLockedModal(item);
+            return;
+          }
+          const accessRes = await fetch(SUPABASE_FN_URL + '/cfh-content', {
+            method: 'POST', headers,
+            body: JSON.stringify({ action: 'check-access', content_id: item.id, creator_id: item.creator_id })
+          });
+          const access = await accessRes.json();
+
+          if (!access.access) {
+            showLockedModal(item);
+            return;
+          }
+          if (access.type === 'download_only' && item.content_type === 'video') {
+            showToast('Tu suscripción expiró. Solo puedes acceder al material descargable.', 'info');
+            // Still open player but disable video, show materials
+          }
+        }
+
+        // Open based on content type
+        if (item.content_type === 'book') {
+          openReader(item);
+        } else {
+          openPlayer(item);
+        }
+      } catch (e) {
+        showToast('Error al abrir contenido', 'error');
+      }
+    }
+
+    // ===== VIDEO PLAYER =====
+    function openPlayer(item) {
+      const modal = document.getElementById('player-modal');
+      const video = document.getElementById('player-video');
+
+      document.getElementById('player-title').textContent = item.title;
+      document.getElementById('player-description').textContent = item.description || '';
+      document.getElementById('player-like-count').textContent = item.like_count || 0;
+      document.getElementById('player-comment-count').textContent = item.comment_count || 0;
+      document.getElementById('player-views').textContent = item.view_count || 0;
+
+      const creator = item.creator || {};
+      const creatorLink = document.getElementById('player-creator-link');
+      creatorLink.textContent = creator.display_name || creator.username || '';
+      creatorLink.href = `profile.html?u=${creator.username || ''}`;
+
+      const avatarDiv = document.getElementById('player-avatar');
+      avatarDiv.innerHTML = creator.avatar_url
+        ? `<img src="${escapeHtml(creator.avatar_url)}" class="w-8 h-8 rounded-full object-cover">`
+        : `<div class="w-8 h-8 rounded-full bg-creo-purple/30 flex items-center justify-center text-xs text-white font-bold">${escapeHtml((creator.display_name || '?')[0].toUpperCase())}</div>`;
+
+      // Set video source
+      if (item.video_type === 'youtube') {
+        const ytId = extractYouTubeId(item.video_url);
+        video.style.display = 'none';
+        video.parentElement.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1" class="w-full h-full max-w-4xl" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+      } else if (item.video_url) {
+        video.src = item.video_url;
+        video.style.display = '';
+        video.play().catch(() => {});
+      }
+
+      // Materials
+      renderMaterials(item);
+
+      // Co-creators
+      const coDiv = document.getElementById('player-cocreators');
+      if (item.co_creators && item.co_creators.length > 0) {
+        coDiv.classList.remove('hidden');
+        // TODO: resolve co-creator profiles
+        document.getElementById('player-cocreators-list').innerHTML = item.co_creators.map(id =>
+          `<a href="profile.html?id=${id}" class="text-creo-mint hover:underline">${id.slice(0, 8)}</a>`
+        ).join(', ');
+      } else {
+        coDiv.classList.add('hidden');
+      }
+
+      showPlayerPanel('materials');
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePlayer() {
+      const modal = document.getElementById('player-modal');
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+      // Stop video/iframe
+      const video = document.getElementById('player-video');
+      if (video) { video.pause(); video.src = ''; }
+      const iframe = modal.querySelector('iframe');
+      if (iframe) {
+        iframe.parentElement.innerHTML = '<video id="player-video" controls class="max-w-full max-h-full" playsinline></video>';
+      }
+      currentContentItem = null;
+    }
+
+    function renderMaterials(item) {
+      const list = document.getElementById('materials-list');
+      const noMat = document.getElementById('no-materials');
+      const materials = item.downloadable_urls || [];
+
+      if (materials.length === 0) {
+        noMat.classList.remove('hidden');
+        list.innerHTML = '';
+        return;
+      }
+      noMat.classList.add('hidden');
+      list.innerHTML = materials.map((m, i) => `
+        <a href="${escapeHtml(m.url)}" download="${escapeHtml(m.name || 'material')}" target="_blank" class="flex items-center gap-3 p-3 rounded-xl bg-gray-800 hover:bg-gray-700 transition group">
+          <div class="w-10 h-10 rounded-lg bg-creo-purple/20 flex items-center justify-center text-creo-mint flex-shrink-0">
+            ${getFileIcon(m.type || m.name)}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-white truncate">${escapeHtml(m.name || `Material ${i + 1}`)}</p>
+            <p class="text-[10px] text-gray-500">${m.type || 'Archivo'} ${m.size_bytes ? '· ' + formatFileSize(m.size_bytes) : ''}</p>
+          </div>
+          <svg class="w-5 h-5 text-gray-500 group-hover:text-creo-mint transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        </a>`).join('');
+    }
+
+    function showPlayerPanel(panel) {
+      document.getElementById('player-materials-panel').classList.toggle('hidden', panel !== 'materials');
+      document.getElementById('player-comments-panel').classList.toggle('hidden', panel !== 'comments');
+      document.getElementById('comment-input-area').classList.toggle('hidden', panel !== 'comments');
+      document.getElementById('panel-tab-materials').classList.toggle('text-creo-mint', panel === 'materials');
+      document.getElementById('panel-tab-materials').classList.toggle('border-creo-mint', panel === 'materials');
+      document.getElementById('panel-tab-materials').classList.toggle('text-gray-500', panel !== 'materials');
+      document.getElementById('panel-tab-materials').classList.toggle('border-transparent', panel !== 'materials');
+      document.getElementById('panel-tab-comments').classList.toggle('text-creo-mint', panel === 'comments');
+      document.getElementById('panel-tab-comments').classList.toggle('border-creo-mint', panel === 'comments');
+      document.getElementById('panel-tab-comments').classList.toggle('text-gray-500', panel !== 'comments');
+      document.getElementById('panel-tab-comments').classList.toggle('border-transparent', panel !== 'comments');
+
+      if (panel === 'comments' && currentContentItem) loadPlayerComments();
+    }
+
+    function togglePlayerComments() { showPlayerPanel('comments'); }
+
+    async function loadPlayerComments() {
+      if (!currentContentItem) return;
+      const list = document.getElementById('player-comments-list');
+      list.innerHTML = '<p class="text-gray-500 text-sm text-center py-4 animate-pulse">Cargando...</p>';
+      try {
+        const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'list-comments', content_id: currentContentItem.id })
+        });
+        const { data } = await res.json();
+        if (!data || data.length === 0) {
+          list.innerHTML = '<p class="text-gray-500 text-sm text-center py-8">Sin comentarios aún</p>';
+          return;
+        }
+        list.innerHTML = data.map(c => {
+          const author = c.author || {};
+          const av = author.avatar_url
+            ? `<img src="${escapeHtml(author.avatar_url)}" class="w-7 h-7 rounded-full object-cover">`
+            : `<div class="w-7 h-7 rounded-full bg-creo-purple/20 flex items-center justify-center text-[10px] text-white font-bold">${(author.display_name || '?')[0].toUpperCase()}</div>`;
+          const date = new Date(c.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+          return `<div class="flex gap-2">
+            ${av}
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-white">${escapeHtml(author.display_name || author.username || 'Anónimo')}</span>
+                <span class="text-[10px] text-gray-600">${date}</span>
+              </div>
+              <p class="text-sm text-gray-300 mt-0.5">${escapeHtml(c.body)}</p>
+            </div>
+          </div>`;
+        }).join('');
+      } catch (e) {
+        list.innerHTML = '<p class="text-red-400 text-sm text-center py-4">Error</p>';
+      }
+    }
+
+    async function submitPlayerComment() {
+      if (!currentUser || !currentContentItem) { showToast('Inicia sesión para comentar', 'info'); return; }
+      const input = document.getElementById('player-comment-input');
+      const body = input.value.trim();
+      if (!body) return;
+      input.value = '';
+      try {
+        const session = (await sb.auth.getSession()).data.session;
+        await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({ action: 'add-comment', content_id: currentContentItem.id, body })
+        });
+        loadPlayerComments();
+        document.getElementById('player-comment-count').textContent = (parseInt(document.getElementById('player-comment-count').textContent) || 0) + 1;
+      } catch (e) {
+        showToast('Error al comentar', 'error');
+      }
+    }
+
+    async function togglePlayerLike() {
+      if (!currentUser || !currentContentItem) { showToast('Inicia sesión para dar like', 'info'); return; }
+      try {
+        const session = (await sb.auth.getSession()).data.session;
+        const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({ action: 'toggle-like', content_id: currentContentItem.id })
+        });
+        const { liked } = await res.json();
+        const btn = document.getElementById('player-like-btn');
+        const count = document.getElementById('player-like-count');
+        const current = parseInt(count.textContent) || 0;
+        count.textContent = liked ? current + 1 : Math.max(current - 1, 0);
+        btn.classList.toggle('text-red-400', liked);
+        btn.classList.toggle('text-gray-400', !liked);
+      } catch (e) {}
+    }
+
+    function shareContent() {
+      if (!currentContentItem) return;
+      const url = `${window.location.origin}/creo/futuro.html?content=${currentContentItem.id}`;
+      if (navigator.share) {
+        navigator.share({ title: currentContentItem.title, url });
+      } else {
+        navigator.clipboard.writeText(url);
+        showToast('Enlace copiado', 'success');
+      }
+    }
+
+    // ===== E-READER =====
+    function openReader(item) {
+      if (!item.book_file_url) { showToast('Archivo no disponible', 'error'); return; }
+      const modal = document.getElementById('reader-modal');
+      document.getElementById('reader-title').textContent = item.title;
+      document.getElementById('reader-frame').src = item.book_file_url;
+
+      const downloadBtn = document.getElementById('reader-download-btn');
+      if (item.allow_download) {
+        downloadBtn.href = item.book_file_url;
+        downloadBtn.classList.remove('hidden');
+      } else {
+        downloadBtn.classList.add('hidden');
+      }
+
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeReader() {
+      const modal = document.getElementById('reader-modal');
+      modal.classList.remove('show');
+      document.getElementById('reader-frame').src = '';
+      document.body.style.overflow = '';
+    }
+
+    function toggleReaderTheme() {
+      readerDark = !readerDark;
+      const modal = document.getElementById('reader-modal');
+      modal.classList.toggle('reader-light', !readerDark);
+      modal.classList.toggle('reader-dark', readerDark);
+      const header = document.getElementById('reader-header');
+      if (readerDark) {
+        header.className = 'flex items-center justify-between px-4 py-3 border-b border-gray-700 bg-gray-900 text-gray-200';
+      } else {
+        header.className = 'flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white text-gray-900';
+      }
+    }
+
+    // ===== LOCKED MODAL =====
+    function showLockedModal(item) {
+      const creator = item.creator || {};
+      const info = document.getElementById('locked-creator-info');
+      const av = creator.avatar_url
+        ? `<img src="${escapeHtml(creator.avatar_url)}" class="w-10 h-10 rounded-full object-cover">`
+        : `<div class="w-10 h-10 rounded-full bg-creo-purple/30 flex items-center justify-center text-sm text-white font-bold">${(creator.display_name || '?')[0].toUpperCase()}</div>`;
+      const price = creator.meta_fixed_price_cents
+        ? `$${(creator.meta_fixed_price_cents / 100).toFixed(2)}/mes`
+        : '';
+      info.innerHTML = `${av}<div class="flex-1 min-w-0"><p class="font-bold text-white text-sm truncate">${escapeHtml(creator.display_name || creator.username || '')}</p>${price ? `<p class="text-creo-mint text-xs">${price}</p>` : ''}</div>`;
+
+      // Store creator for subscribe
+      document.getElementById('locked-modal').dataset.creatorId = item.creator_id;
+      document.getElementById('locked-modal').dataset.connectId = creator.stripe_connect_id || '';
+      document.getElementById('locked-modal').classList.remove('hidden');
+    }
+
+    function closeLocked() {
+      document.getElementById('locked-modal').classList.add('hidden');
+    }
+
+    async function subscribeToCreator() {
+      if (!currentUser) { showToast('Inicia sesión primero', 'info'); return; }
+      const modal = document.getElementById('locked-modal');
+      const connectId = modal.dataset.connectId;
+      if (!connectId) { showToast('Este creador no ha configurado Stripe', 'error'); return; }
+
+      try {
+        const session = (await sb.auth.getSession()).data.session;
+        const res = await fetch(SUPABASE_FN_URL + '/create-subscription-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({
+            creator_connect_id: connectId,
+            amount_usd: 5,
+            success_url: window.location.href,
+            cancel_url: window.location.href
+          })
+        });
+        const data = await res.json();
+        if (data.url) window.location.href = data.url;
+        else showToast(data.error || 'Error al crear suscripción', 'error');
+      } catch (e) {
+        showToast('Error al conectar con Stripe', 'error');
+      }
+    }
+
+    // ===== SEARCH =====
+    function debounceSearch(value) {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        if (value.trim()) {
+          loadContent(activeCategory, activeSubcategoryId, value.trim());
+        } else {
+          loadContent(activeCategory, activeSubcategoryId);
+        }
+      }, 400);
+    }
+
+    // ===== HELPERS =====
+    function extractYouTubeId(url) {
+      if (!url) return '';
+      const m = url.match(/(?:v=|youtu\.be\/|embed\/|\/v\/)([a-zA-Z0-9_-]{11})/);
+      return m ? m[1] : '';
+    }
+
+    function formatDuration(secs) {
+      if (!secs) return '';
+      const m = Math.floor(secs / 60);
+      const s = secs % 60;
+      return m + ':' + String(s).padStart(2, '0');
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    function getFileIcon(type) {
+      if (!type) return '📄';
+      type = type.toLowerCase();
+      if (type.includes('pdf')) return '📄';
+      if (type.includes('doc') || type.includes('word')) return '📝';
+      if (type.includes('xls') || type.includes('sheet')) return '📊';
+      if (type.includes('ppt') || type.includes('slide')) return '📊';
+      if (type.includes('image') || type.includes('jpg') || type.includes('png')) return '🖼️';
+      if (type.includes('zip') || type.includes('rar')) return '📦';
+      if (type.includes('audio') || type.includes('mp3')) return '🎵';
+      return '📁';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    // ===== URL params: deep-link to content =====
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const contentId = params.get('content');
+      const cat = params.get('cat');
+      if (cat && ['music','books','food','health','fitness','education','faith'].includes(cat)) {
+        activeCategory = cat;
+      }
+      if (contentId) {
+        window.addEventListener('load', () => setTimeout(() => openContent(contentId), 500));
+      }
+    })();
+  </script>
+  <script>renderBottomNav('futuro');</script>
+</body>
+</html>

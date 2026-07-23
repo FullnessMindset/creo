@@ -118,7 +118,10 @@ const CREO_TRANSLATIONS = {
   es: {
     // Nav & sidebar
     comunidad: 'Comunidad', explorar: 'Explorar', creadores: 'Creadores', mensajes: 'Mensajes', perfil: 'Perfil',
-    brandDeals: 'Brand Deals', panel: 'Panel', admin: 'Admin', tema: 'Tema', salir: 'Salir',
+    brandDeals: 'Brand Deals', panel: 'Panel', admin: 'Admin', tema: 'Tema', salir: 'Salir', creoFuturoHoy: 'Creo Futuro Hoy',
+    cfhMusic: 'Creo Music', cfhBooks: 'Creo Books', cfhFood: 'Creo Food', cfhHealth: 'Creo Health', cfhFitness: 'Creo Fitness', cfhEducation: 'Creo Education', cfhFaith: 'Creo en Dios',
+    cfhFree: 'Gratis', cfhPaid: 'Premium', cfhSubscribe: 'Suscribirse', cfhUnlocked: 'Desbloqueado', cfhLocked: 'Contenido Premium', cfhDownload: 'Descargar', cfhReadNow: 'Leer Ahora',
+    cfhNoContent: 'Aún no hay contenido en esta categoría', cfhHealthDisclaimer: 'Contenido educativo únicamente. No constituye consejo médico profesional.',
     entrarGoogle: 'Entrar con Google', idioma: 'Idioma',
     entrarCreoId: 'Iniciar sesión con CREO ID',
 
@@ -803,7 +806,10 @@ const CREO_TRANSLATIONS = {
   en: {
     // Nav & sidebar
     comunidad: 'Community', explorar: 'Explore', creadores: 'Creators', mensajes: 'Messages', perfil: 'Profile',
-    brandDeals: 'Brand Deals', panel: 'Dashboard', admin: 'Admin', tema: 'Theme', salir: 'Sign Out',
+    brandDeals: 'Brand Deals', panel: 'Dashboard', admin: 'Admin', tema: 'Theme', salir: 'Sign Out', creoFuturoHoy: 'Creo Futuro Hoy',
+    cfhMusic: 'Creo Music', cfhBooks: 'Creo Books', cfhFood: 'Creo Food', cfhHealth: 'Creo Health', cfhFitness: 'Creo Fitness', cfhEducation: 'Creo Education', cfhFaith: 'Creo en Dios',
+    cfhFree: 'Free', cfhPaid: 'Premium', cfhSubscribe: 'Subscribe', cfhUnlocked: 'Unlocked', cfhLocked: 'Premium Content', cfhDownload: 'Download', cfhReadNow: 'Read Now',
+    cfhNoContent: 'No content in this category yet', cfhHealthDisclaimer: 'Educational content only. This does not constitute professional medical advice.',
     entrarGoogle: 'Sign in with Google', idioma: 'Language',
     entrarCreoId: 'Sign in with CREO ID',
 
@@ -1807,6 +1813,7 @@ function renderSidebar(activePage) {
     { id: 'messages', label: t('mensajes'), href: 'messages.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>', authOnly: true },
     { id: 'profile', label: t('perfil'), href: 'profile.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>' },
     { id: 'deals', label: t('brandDeals'), href: 'brand-deals.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>' },
+    { id: 'futuro', label: t('creoFuturoHoy'), href: 'futuro.html', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>' },
     { id: 'dashboard', label: t('panel'), href: 'index.html?panel=1', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>', authOnly: true }
   ];
 
