@@ -1264,7 +1264,7 @@
     }
 
     async function loadMetaComments(metaId) {
-      const { data } = await sb.from('meta_comments').select('*, profiles:user_id(username, display_name, avatar_url)').eq('meta_id', metaId).order('created_at', { ascending: true });
+      const { data } = await sb.from('meta_comments').select('*, profiles:user_id(username, display_name, avatar_url)').eq('meta_id', metaId).order('created_at', { ascending: true }).limit(200);
       const list = document.getElementById('meta-comments-list');
       if (!data || data.length === 0) {
         list.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">Sin comentarios aún</p>';

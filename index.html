@@ -3838,7 +3838,7 @@
     }
 
     async function loadPosts() {
-      const { data } = await sb.from('community_posts').select('*').eq('author_id', currentUser.id).order('created_at', { ascending: false });
+      const { data } = await sb.from('community_posts').select('*').eq('author_id', currentUser.id).order('created_at', { ascending: false }).limit(200);
       const list = document.getElementById('posts-list');
       if (!data || data.length === 0) {
         myPostsCache = [];
@@ -4280,7 +4280,7 @@
 
     async function loadMyStories() {
       if (!currentUser) return;
-      const { data } = await sb.from('creator_stories').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false });
+      const { data } = await sb.from('creator_stories').select('*').eq('creator_id', currentUser.id).order('created_at', { ascending: false }).limit(100);
       const list = document.getElementById('my-stories-list');
       const countEl = document.getElementById('stories-count');
       if (!data || data.length === 0) {
@@ -4424,7 +4424,7 @@
     // ===== BUSINESS LINKS MANAGEMENT =====
     async function loadMyBusinessLinks() {
       if (!currentUser) return;
-      const { data } = await sb.from('business_links').select('*').eq('creator_id', currentUser.id).order('sort_order', { ascending: true });
+      const { data } = await sb.from('business_links').select('*').eq('creator_id', currentUser.id).order('sort_order', { ascending: true }).limit(50);
       const list = document.getElementById('my-biz-list');
       if (!data || data.length === 0) { myBizLinksCache = []; list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">🔗 No tienes enlaces de negocio aún.</p>'; return; }
       myBizLinksCache = data;
@@ -4854,8 +4854,8 @@
         document.getElementById('earnings-month-label').textContent = monthName;
 
         const [tipsRes, subsRes, myMetasRes] = await Promise.all([
-          sb.from('tips').select('id, amount_cents, platform_fee_cents, stripe_surcharge_cents, tipper_name, created_at').eq('creator_id', userId).order('created_at', { ascending: false }),
-          sb.from('subscriptions').select('id, amount_cents, platform_fee_cents, stripe_surcharge_cents, subscriber_name, status, created_at').eq('creator_id', userId).order('created_at', { ascending: false }),
+          sb.from('tips').select('id, amount_cents, platform_fee_cents, stripe_surcharge_cents, tipper_name, created_at').eq('creator_id', userId).order('created_at', { ascending: false }).limit(500),
+          sb.from('subscriptions').select('id, amount_cents, platform_fee_cents, stripe_surcharge_cents, subscriber_name, status, created_at').eq('creator_id', userId).order('created_at', { ascending: false }).limit(500),
           sb.from('metas').select('id').eq('creator_id', userId)
         ]);
 
@@ -4865,7 +4865,7 @@
 
         let metas = [];
         if (myMetaIds.length > 0) {
-          const { data: metaContribs } = await sb.from('meta_contributions').select('id, amount_cents, platform_fee_cents, stripe_surcharge_cents, contributor_name, created_at, meta_id').in('meta_id', myMetaIds).order('created_at', { ascending: false });
+          const { data: metaContribs } = await sb.from('meta_contributions').select('id, amount_cents, platform_fee_cents, stripe_surcharge_cents, contributor_name, created_at, meta_id').in('meta_id', myMetaIds).order('created_at', { ascending: false }).limit(500);
           metas = metaContribs || [];
         }
 

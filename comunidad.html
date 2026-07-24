@@ -614,7 +614,7 @@
     }
 
     async function openReactions(postId) {
-      const { data } = await sb.from('community_likes').select('reaction_type, user:user_id(id, username, display_name, avatar_url)').eq('post_id', postId).order('created_at', { ascending: false });
+      const { data } = await sb.from('community_likes').select('reaction_type, user:user_id(id, username, display_name, avatar_url)').eq('post_id', postId).order('created_at', { ascending: false }).limit(200);
       if (!data || !data.length) { showToast(t('reaccion'), 'info'); return; }
       const grouped = {};
       data.forEach(r => { const t = r.reaction_type || '❤️'; if (!grouped[t]) grouped[t] = []; grouped[t].push(r.user); });

@@ -1630,6 +1630,9 @@ function showCreoIdModal() {
   modal = document.createElement('div');
   modal.id = 'creo-id-modal';
   modal.className = 'fixed inset-0 z-[300] flex items-center justify-center p-4';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-label', 'CREO ID Verification');
   modal.innerHTML = `
     <div class="absolute inset-0 bg-black/60 backdrop-filter backdrop-blur-sm" onclick="closeCreoIdModal()"></div>
     <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
@@ -1679,6 +1682,8 @@ function showCreoIdModal() {
       </div>
     </div>`;
   document.body.appendChild(modal);
+  trapFocus(modal);
+  modal.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCreoIdModal(); });
 }
 
 function closeCreoIdModal() {
@@ -1747,6 +1752,20 @@ function esc(str) {
   return d.innerHTML;
 }
 window.escapeHtml = esc;
+
+function trapFocus(modal) {
+  const focusable = modal.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])');
+  if (!focusable.length) return;
+  const first = focusable[0], last = focusable[focusable.length - 1];
+  first.focus();
+  modal._trapHandler = (e) => {
+    if (e.key !== 'Tab') return;
+    if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
+    else { if (document.activeElement === last) { e.preventDefault(); first.focus(); } }
+  };
+  modal.addEventListener('keydown', modal._trapHandler);
+}
+window.trapFocus = trapFocus;
 
 // Video embed helpers
 function extractVideoId(url, type) {
@@ -2680,6 +2699,9 @@ function showOnboardingModal(user, profile) {
   modal.id = 'creo-onboarding-modal';
   modal.className = 'fixed inset-0 z-[400] flex items-center justify-center p-4';
   modal.style.cssText = 'animation: onboard-fade-in 0.4s ease';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-label', 'Onboarding');
 
   const steps = [
     { id: 'welcome', render: renderWelcomeStep },
@@ -2755,6 +2777,7 @@ function showOnboardingModal(user, profile) {
 
   render();
   document.body.appendChild(modal);
+  trapFocus(modal);
 }
 
 function renderWelcomeStep(container) {
@@ -3013,6 +3036,10 @@ function showInstallBanner() {
     banner.remove();
   });
 }
+
+// ========== OFFLINE DETECTION ==========
+window.addEventListener('offline', () => showToast('Sin conexión a internet', 'error'));
+window.addEventListener('online', () => showToast('Conexión restaurada', 'success'));
 
 // ========== ACCOUNT DELETION ==========
 async function requestAccountDeletion() {
