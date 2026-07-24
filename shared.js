@@ -118,7 +118,7 @@ const CREO_TRANSLATIONS = {
   es: {
     // Nav & sidebar
     comunidad: 'Comunidad', explorar: 'Explorar', creadores: 'Creadores', mensajes: 'Mensajes', perfil: 'Perfil',
-    brandDeals: 'Brand Deals', panel: 'Panel', admin: 'Admin', tema: 'Tema', salir: 'Salir', creoFuturoHoy: 'Creo Futuro Hoy',
+    brandDeals: 'Brand Deals', panel: 'Panel', admin: 'Admin', tema: 'Tema', salir: 'Salir', creoFuturoHoy: 'El Futuro Hoy',
     cfhMusic: 'Creo Music', cfhBooks: 'Creo Books', cfhFood: 'Creo Food', cfhHealth: 'Creo Health', cfhFitness: 'Creo Fitness', cfhEducation: 'Creo Education', cfhFaith: 'Creo en Dios',
     cfhFree: 'Gratis', cfhPaid: 'Premium', cfhSubscribe: 'Suscribirse', cfhUnlocked: 'Desbloqueado', cfhLocked: 'Contenido Premium', cfhDownload: 'Descargar', cfhReadNow: 'Leer Ahora',
     cfhNoContent: 'Aún no hay contenido en esta categoría', cfhHealthDisclaimer: 'Contenido educativo únicamente. No constituye consejo médico profesional.',
@@ -806,7 +806,7 @@ const CREO_TRANSLATIONS = {
   en: {
     // Nav & sidebar
     comunidad: 'Community', explorar: 'Explore', creadores: 'Creators', mensajes: 'Messages', perfil: 'Profile',
-    brandDeals: 'Brand Deals', panel: 'Dashboard', admin: 'Admin', tema: 'Theme', salir: 'Sign Out', creoFuturoHoy: 'Creo Futuro Hoy',
+    brandDeals: 'Brand Deals', panel: 'Dashboard', admin: 'Admin', tema: 'Theme', salir: 'Sign Out', creoFuturoHoy: 'El Futuro Hoy',
     cfhMusic: 'Creo Music', cfhBooks: 'Creo Books', cfhFood: 'Creo Food', cfhHealth: 'Creo Health', cfhFitness: 'Creo Fitness', cfhEducation: 'Creo Education', cfhFaith: 'Creo en Dios',
     cfhFree: 'Free', cfhPaid: 'Premium', cfhSubscribe: 'Subscribe', cfhUnlocked: 'Unlocked', cfhLocked: 'Premium Content', cfhDownload: 'Download', cfhReadNow: 'Read Now',
     cfhNoContent: 'No content in this category yet', cfhHealthDisclaimer: 'Educational content only. This does not constitute professional medical advice.',
