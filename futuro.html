@@ -20,14 +20,14 @@
   <link rel="stylesheet" href="tailwind.min.css?v=20260719">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    body { overscroll-behavior: contain; }
+    body { overscroll-behavior: contain; background: #0a0a0a !important; }
     input, select, textarea { font-size: max(16px, 1em) !important; }
     .glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
-    .cfh-hero { background: linear-gradient(135deg, #1a0a3e 0%, #2d1b69 40%, #0d0d0d 100%); }
-    .cfh-card { position: relative; border-radius: 8px; overflow: hidden; background: #111; aspect-ratio: 16/9; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
-    .cfh-card:hover { transform: scale(1.05); box-shadow: 0 8px 30px rgba(108,58,237,0.3); z-index: 5; }
+    .cfh-hero { background: linear-gradient(135deg, #0a0a0a 0%, #141414 50%, #0a0a0a 100%); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .cfh-card { position: relative; border-radius: 6px; overflow: hidden; background: #181818; aspect-ratio: 16/9; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .cfh-card:hover { transform: scale(1.08); box-shadow: 0 12px 40px rgba(0,0,0,0.7); z-index: 5; }
     .cfh-card img, .cfh-card video { width: 100%; height: 100%; object-fit: cover; }
-    .cfh-card .card-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 40%, rgba(0,0,0,0.85)); pointer-events: none; }
+    .cfh-card .card-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 40%, rgba(0,0,0,0.9)); pointer-events: none; }
     .cfh-card .card-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px; z-index: 2; }
     .cfh-card .lock-badge { position: absolute; top: 8px; right: 8px; z-index: 3; }
     .cfh-row { display: flex; gap: 10px; overflow-x: auto; padding: 0 16px 12px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
@@ -35,8 +35,8 @@
     .cfh-row .cfh-card { flex-shrink: 0; width: 260px; scroll-snap-align: start; }
     @media (min-width: 768px) { .cfh-row .cfh-card { width: 300px; } }
     .cfh-book-card { aspect-ratio: 2/3; }
-    .cat-tab { white-space: nowrap; transition: all 0.2s; }
-    .cat-tab.active { color: #33f0b0; border-bottom: 2px solid #33f0b0; }
+    .cat-tab { white-space: nowrap; transition: all 0.2s; border-bottom: 2px solid transparent; }
+    .cat-tab.active { color: #e50914; border-bottom: 2px solid #e50914; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { scrollbar-width: none; }
     /* Video player modal */
@@ -48,11 +48,47 @@
     .reader-light { background: #faf8f5; color: #1a1a1a; }
     .reader-dark { background: #1a1a1a; color: #e0dcd4; }
     .subcat-pill { transition: all 0.15s; }
-    .subcat-pill.active { background: #6C3AED; color: white; }
+    .subcat-pill.active { background: #e50914; color: white; }
+    /* Sidebar auto-hide on El Futuro Hoy */
+    body.futuro-immersive { padding-left: 0 !important; }
+    body.futuro-immersive #creo-sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body.futuro-immersive #creo-sidebar:hover,
+    body.futuro-immersive #creo-sidebar.sidebar-pinned {
+      transform: translateX(0);
+    }
+    body.futuro-immersive #creo-mobile-header {
+      background: rgba(10,10,10,0.9) !important;
+      border-color: rgba(255,255,255,0.06) !important;
+    }
+    body.futuro-immersive #creo-mobile-header span { color: #fff !important; }
+    body.futuro-immersive #creo-mobile-header svg { color: #ccc !important; }
+    /* Sidebar trigger strip on desktop */
+    .sidebar-trigger {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 6px; z-index: 39;
+      cursor: pointer;
+    }
+    /* Subcategory tree */
+    .subcat-tree { margin-left: 12px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 10px; }
+    .subcat-tree button { opacity: 0.8; }
+    .subcat-tree button.active { opacity: 1; }
+    /* Manage subcategories modal */
+    .manage-subcat-modal { position: fixed; inset: 0; z-index: 80; display: none; }
+    .manage-subcat-modal.show { display: flex; }
+    /* Netflix-style section titles */
+    .section-title { color: #e5e5e5; font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; }
+    /* Search on dark bg */
+    #cfh-search { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); }
+    #cfh-search:focus { border-color: rgba(229,9,20,0.5); }
   </style>
 </head>
 <body class="bg-gray-950 text-white min-h-screen" style="font-family:Inter,system-ui,-apple-system,sans-serif;font-style:normal;">
   <script src="shared.js?v=2"></script>
+
+  <!-- Sidebar trigger strip (desktop: hover to reveal sidebar) -->
+  <div class="sidebar-trigger hidden lg:block" id="sidebar-trigger"></div>
 
   <!-- Hero Banner -->
   <div class="cfh-hero px-4 pt-6 pb-4 lg:pt-8 lg:pb-6">
@@ -60,12 +96,12 @@
       <h1 class="text-2xl lg:text-3xl font-black tracking-tight text-white" style="font-family:Inter,system-ui,-apple-system,sans-serif;font-style:normal;">
         El Futuro Hoy
       </h1>
-      <p class="text-gray-400 text-sm mt-1 max-w-xl">Contenido educativo y creativo para construir un futuro sostenible. Música, libros, recetas, salud, fitness, educación y fe.</p>
+      <p id="cfh-description" class="text-gray-400 text-sm mt-1 max-w-xl transition-opacity duration-300">Descubre, escucha y siente la música que inspira un futuro sostenible.</p>
     </div>
   </div>
 
   <!-- Category Tabs -->
-  <div class="sticky top-0 z-30 bg-gray-950/95 backdrop-blur-lg border-b border-gray-800">
+  <div class="sticky top-0 z-30 bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-white/5">
     <div class="max-w-7xl mx-auto flex gap-1 overflow-x-auto no-scrollbar px-4 py-2" id="category-tabs">
       <button onclick="switchCategory('music')" data-cat="music" class="cat-tab px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-lg active">🎵 <span data-i18n="cfhMusic">Creo Music</span></button>
       <button onclick="switchCategory('books')" data-cat="books" class="cat-tab px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-lg">📚 <span data-i18n="cfhBooks">Creo Books</span></button>
@@ -87,8 +123,18 @@
 
   <!-- Subcategory Filter -->
   <div class="max-w-7xl mx-auto px-4 pt-3 pb-2">
-    <div class="flex gap-2 overflow-x-auto no-scrollbar" id="subcategory-pills">
-      <button onclick="filterSubcategory(null)" class="subcat-pill active px-3 py-1.5 text-xs font-semibold rounded-full bg-gray-800 text-gray-300 hover:bg-gray-700">Todos</button>
+    <div class="flex items-center gap-2">
+      <div class="flex-1 overflow-x-auto no-scrollbar" id="subcategory-area">
+        <div class="flex gap-2" id="subcategory-pills">
+          <button onclick="filterSubcategory(null)" class="subcat-pill active px-3 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-gray-300 hover:bg-white/15">Todos</button>
+        </div>
+        <div id="sub-subcategory-pills" class="subcat-tree mt-2 hidden">
+          <!-- Child subcategories render here -->
+        </div>
+      </div>
+      <button onclick="openManageSubcategories()" id="manage-subcat-btn" class="hidden flex-shrink-0 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-gray-400 hover:text-white transition" title="Gestionar categorías">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+      </button>
     </div>
   </div>
 
@@ -96,23 +142,49 @@
   <div class="max-w-7xl mx-auto px-4 pb-3">
     <div class="relative">
       <svg class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-      <input id="cfh-search" type="text" placeholder="Buscar contenido..." class="w-full bg-gray-800/80 text-white rounded-full pl-10 pr-4 py-2.5 text-sm outline-none border border-gray-700 focus:border-creo-mint/50 transition" oninput="debounceSearch(this.value)">
+      <input id="cfh-search" type="text" placeholder="Buscar contenido..." class="w-full text-white rounded-full pl-10 pr-4 py-2.5 text-sm outline-none transition" oninput="debounceSearch(this.value)">
     </div>
   </div>
 
   <!-- Content Area -->
-  <div id="cfh-content-area" class="max-w-7xl mx-auto pb-24 space-y-6">
-    <!-- Populated by JS: rows of content grouped by subcategory or trending -->
+  <div id="cfh-content-area" class="max-w-7xl mx-auto pb-24 space-y-8">
     <div class="px-4 py-12 text-center">
-      <div class="animate-pulse text-gray-500">Cargando contenido...</div>
+      <div class="animate-pulse text-gray-600">Cargando contenido...</div>
     </div>
   </div>
 
   <!-- Empty State -->
   <div id="cfh-empty" class="hidden max-w-7xl mx-auto px-4 py-16 text-center">
     <p class="text-4xl mb-3">🌱</p>
-    <p class="text-gray-400 text-sm" data-i18n="cfhNoContent">Aún no hay contenido en esta categoría</p>
-    <p class="text-gray-500 text-xs mt-1">Sé el primero en publicar desde tu Panel de Creador</p>
+    <p class="text-gray-500 text-sm" data-i18n="cfhNoContent">Aún no hay contenido en esta categoría</p>
+    <p class="text-gray-600 text-xs mt-1">Sé el primero en publicar desde tu Panel de Creador</p>
+  </div>
+
+  <!-- ===== MANAGE SUBCATEGORIES MODAL ===== -->
+  <div id="manage-subcat-modal" class="manage-subcat-modal" onclick="if(event.target===this)closeManageSubcategories()">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+    <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 max-w-lg mx-auto bg-[#1a1a1a] rounded-2xl border border-white/10 overflow-hidden z-10">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
+        <h3 class="font-bold text-white text-base">Gestionar Categorías — <span id="manage-subcat-cat-label"></span></h3>
+        <button onclick="closeManageSubcategories()" class="p-1.5 rounded-lg hover:bg-white/10 transition text-gray-400 hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <!-- Add new subcategory -->
+      <div class="px-5 py-3 border-b border-white/5">
+        <div class="flex gap-2">
+          <select id="manage-subcat-parent" class="bg-white/10 text-white text-sm rounded-lg px-3 py-2 border border-white/10 outline-none flex-shrink-0">
+            <option value="">Raíz (principal)</option>
+          </select>
+          <input id="manage-subcat-name" type="text" placeholder="Nombre de categoría..." class="flex-1 bg-white/10 text-white text-sm rounded-lg px-3 py-2 border border-white/10 outline-none focus:border-red-500/50" maxlength="60">
+          <button onclick="addSubcategory()" class="px-4 py-2 bg-[#e50914] text-white text-sm font-semibold rounded-lg hover:bg-[#f40612] transition flex-shrink-0">Crear</button>
+        </div>
+      </div>
+      <!-- Existing subcategories list -->
+      <div id="manage-subcat-list" class="max-h-[50vh] overflow-y-auto p-5 space-y-1">
+        <p class="text-gray-600 text-sm text-center py-4">Cargando...</p>
+      </div>
+    </div>
   </div>
 
   <!-- ===== VIDEO PLAYER MODAL ===== -->
@@ -227,14 +299,32 @@
     let currentUser = null;
     let activeCategory = 'music';
     let activeSubcategoryId = null;
+    let activeSubSubcategoryId = null;
     let currentContentItem = null;
     let searchTimeout = null;
     let allContent = [];
     let readerDark = false;
+    let subcategoryTree = [];
 
     const CATEGORY_ICONS = {
       music: '🎵', books: '📚', food: '🍽️', health: '🏥',
       fitness: '💪', education: '🎓', faith: '✝️'
+    };
+
+    const CATEGORY_DESCRIPTIONS = {
+      music: 'Descubre, escucha y siente la música que inspira un futuro sostenible.',
+      books: 'Lee, aprende y crece con libros y escritos que transforman mentes.',
+      food: 'Recetas, nutrición y cultura culinaria para alimentar cuerpo y alma.',
+      health: 'Bienestar integral: salud mental, medicina preventiva y vida consciente.',
+      fitness: 'Entrena tu cuerpo y fortalece tu disciplina con rutinas que transforman.',
+      education: 'Cursos, tutoriales y conocimiento para construir el futuro que mereces.',
+      faith: 'Reflexiones, testimonios y contenido espiritual para nutrir tu fe.'
+    };
+
+    const CATEGORY_LABELS = {
+      music: 'Creo Music', books: 'Creo Books', food: 'Creo Food',
+      health: 'Creo Health', fitness: 'Creo Fitness', education: 'Creo Education',
+      faith: 'Creo en Dios'
     };
 
     // ===== INIT =====
@@ -242,26 +332,66 @@
       const { data: { session } } = await sb.auth.getSession();
       currentUser = session?.user || null;
       renderBottomNav('futuro');
+      initImmersiveMode();
       updateNavAuth();
       loadNotificationBell();
       translatePage();
+      updateDescription(activeCategory);
       await loadCategory(activeCategory);
+      showManageBtnIfCreator();
     };
+
+    // ===== IMMERSIVE SIDEBAR HIDE =====
+    function initImmersiveMode() {
+      document.body.classList.add('futuro-immersive');
+      const trigger = document.getElementById('sidebar-trigger');
+      if (trigger) {
+        trigger.addEventListener('mouseenter', () => {
+          const sidebar = document.getElementById('creo-sidebar');
+          if (sidebar) sidebar.classList.add('sidebar-pinned');
+        });
+      }
+      const sidebar = document.getElementById('creo-sidebar');
+      if (sidebar) {
+        sidebar.addEventListener('mouseleave', () => {
+          sidebar.classList.remove('sidebar-pinned');
+        });
+      }
+      // Dark theme for mobile header on this page
+      const mobileHeader = document.getElementById('creo-mobile-header');
+      if (mobileHeader) {
+        mobileHeader.style.background = 'rgba(10,10,10,0.95)';
+        mobileHeader.style.borderColor = 'rgba(255,255,255,0.06)';
+      }
+    }
+
+    // ===== DYNAMIC DESCRIPTION =====
+    function updateDescription(cat) {
+      const el = document.getElementById('cfh-description');
+      el.style.opacity = '0';
+      setTimeout(() => {
+        el.textContent = CATEGORY_DESCRIPTIONS[cat] || '';
+        el.style.opacity = '1';
+      }, 150);
+    }
 
     // ===== CATEGORY SWITCHING =====
     function switchCategory(cat) {
       activeCategory = cat;
       activeSubcategoryId = null;
+      activeSubSubcategoryId = null;
       document.querySelectorAll('.cat-tab').forEach(t => {
         t.classList.toggle('active', t.dataset.cat === cat);
       });
       document.getElementById('health-disclaimer').classList.toggle('hidden', cat !== 'health');
+      document.getElementById('sub-subcategory-pills').classList.add('hidden');
+      updateDescription(cat);
       loadCategory(cat);
     }
 
     async function loadCategory(cat) {
       const area = document.getElementById('cfh-content-area');
-      area.innerHTML = '<div class="px-4 py-12 text-center"><div class="animate-pulse text-gray-500">Cargando...</div></div>';
+      area.innerHTML = '<div class="px-4 py-12 text-center"><div class="animate-pulse text-gray-600">Cargando...</div></div>';
       document.getElementById('cfh-empty').classList.add('hidden');
 
       // Load subcategories
@@ -273,6 +403,8 @@
 
     async function loadSubcategories(cat) {
       const container = document.getElementById('subcategory-pills');
+      const subSubContainer = document.getElementById('sub-subcategory-pills');
+      subSubContainer.classList.add('hidden');
       try {
         const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
           method: 'POST',
@@ -280,21 +412,164 @@
           body: JSON.stringify({ action: 'list-subcategories', category: cat })
         });
         const { data } = await res.json();
-        const pills = (data || []).map(sc =>
-          `<button onclick="filterSubcategory('${sc.id}')" data-subid="${sc.id}" class="subcat-pill px-3 py-1.5 text-xs font-semibold rounded-full bg-gray-800 text-gray-300 hover:bg-gray-700 whitespace-nowrap">${escapeHtml(sc.name)}</button>`
-        ).join('');
-        container.innerHTML = `<button onclick="filterSubcategory(null)" class="subcat-pill active px-3 py-1.5 text-xs font-semibold rounded-full bg-gray-800 text-gray-300 hover:bg-gray-700">Todos</button>${pills}`;
+        subcategoryTree = data || [];
+        const topLevel = subcategoryTree.filter(sc => !sc.parent_id);
+        const pills = topLevel.map(sc => {
+          const hasChildren = subcategoryTree.some(c => c.parent_id === sc.id);
+          return `<button onclick="filterSubcategory('${sc.id}')" data-subid="${sc.id}" class="subcat-pill px-3 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-gray-300 hover:bg-white/15 whitespace-nowrap">${escapeHtml(sc.name)}${hasChildren ? ' ▾' : ''}</button>`;
+        }).join('');
+        container.innerHTML = `<button onclick="filterSubcategory(null)" class="subcat-pill active px-3 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-gray-300 hover:bg-white/15">Todos</button>${pills}`;
       } catch (e) {
-        container.innerHTML = '<button class="subcat-pill active px-3 py-1.5 text-xs font-semibold rounded-full bg-gray-800 text-gray-300">Todos</button>';
+        subcategoryTree = [];
+        container.innerHTML = '<button class="subcat-pill active px-3 py-1.5 text-xs font-semibold rounded-full bg-white/10 text-gray-300">Todos</button>';
       }
     }
 
     function filterSubcategory(id) {
       activeSubcategoryId = id;
-      document.querySelectorAll('.subcat-pill').forEach(p => {
+      activeSubSubcategoryId = null;
+      document.querySelectorAll('#subcategory-pills .subcat-pill').forEach(p => {
         p.classList.toggle('active', id ? p.dataset.subid === id : !p.dataset.subid);
       });
+      // Show child subcategories if they exist
+      const subSubContainer = document.getElementById('sub-subcategory-pills');
+      if (id) {
+        const children = subcategoryTree.filter(sc => sc.parent_id === id);
+        if (children.length > 0) {
+          subSubContainer.innerHTML = `<button onclick="filterSubSubcategory(null)" class="subcat-pill active px-2.5 py-1 text-[11px] font-semibold rounded-full bg-white/8 text-gray-400 hover:bg-white/12 whitespace-nowrap">Todos</button>` +
+            children.map(sc => `<button onclick="filterSubSubcategory('${sc.id}')" data-subsubid="${sc.id}" class="subcat-pill px-2.5 py-1 text-[11px] font-semibold rounded-full bg-white/8 text-gray-400 hover:bg-white/12 whitespace-nowrap">${escapeHtml(sc.name)}</button>`).join('');
+          subSubContainer.classList.remove('hidden');
+        } else {
+          subSubContainer.classList.add('hidden');
+        }
+      } else {
+        subSubContainer.classList.add('hidden');
+      }
       loadContent(activeCategory, id);
+    }
+
+    function filterSubSubcategory(id) {
+      activeSubSubcategoryId = id;
+      document.querySelectorAll('#sub-subcategory-pills .subcat-pill').forEach(p => {
+        p.classList.toggle('active', id ? p.dataset.subsubid === id : !p.dataset.subsubid);
+      });
+      loadContent(activeCategory, id || activeSubcategoryId);
+    }
+
+    // ===== MANAGE SUBCATEGORIES (Creator only) =====
+    async function showManageBtnIfCreator() {
+      if (!currentUser) return;
+      const btn = document.getElementById('manage-subcat-btn');
+      if (btn) btn.classList.remove('hidden');
+    }
+
+    function openManageSubcategories() {
+      const modal = document.getElementById('manage-subcat-modal');
+      document.getElementById('manage-subcat-cat-label').textContent = CATEGORY_LABELS[activeCategory] || activeCategory;
+      modal.classList.add('show');
+      loadManageSubcategories();
+    }
+
+    function closeManageSubcategories() {
+      document.getElementById('manage-subcat-modal').classList.remove('show');
+    }
+
+    async function loadManageSubcategories() {
+      const list = document.getElementById('manage-subcat-list');
+      const parentSelect = document.getElementById('manage-subcat-parent');
+      list.innerHTML = '<p class="text-gray-600 text-sm text-center py-4 animate-pulse">Cargando...</p>';
+      try {
+        const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'list-subcategories', category: activeCategory })
+        });
+        const { data } = await res.json();
+        const subs = data || [];
+        const topLevel = subs.filter(s => !s.parent_id);
+
+        // Update parent selector
+        parentSelect.innerHTML = '<option value="">Raíz (principal)</option>' +
+          topLevel.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+
+        if (subs.length === 0) {
+          list.innerHTML = '<p class="text-gray-600 text-sm text-center py-8">No hay categorías creadas aún</p>';
+          return;
+        }
+
+        let html = '';
+        topLevel.forEach(parent => {
+          html += renderManageSubcatItem(parent, 0);
+          const children = subs.filter(s => s.parent_id === parent.id);
+          children.forEach(child => {
+            html += renderManageSubcatItem(child, 1);
+          });
+        });
+        // Orphan subcategories (parent_id set but parent missing)
+        const orphans = subs.filter(s => s.parent_id && !topLevel.find(t => t.id === s.parent_id));
+        orphans.forEach(o => { html += renderManageSubcatItem(o, 1); });
+
+        list.innerHTML = html;
+      } catch (e) {
+        list.innerHTML = '<p class="text-red-400 text-sm text-center py-4">Error al cargar</p>';
+      }
+    }
+
+    function renderManageSubcatItem(item, depth) {
+      const indent = depth > 0 ? 'ml-6 border-l border-white/10 pl-3' : '';
+      const isOwn = currentUser && item.created_by === currentUser.id;
+      return `<div class="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-white/5 group ${indent}">
+        <span class="text-sm text-gray-300 flex-1 truncate">${depth > 0 ? '↳ ' : ''}${escapeHtml(item.name)}</span>
+        <span class="text-[10px] text-gray-600">${item.content_count || 0} items</span>
+        ${isOwn ? `<button onclick="deleteSubcategory('${item.id}')" class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-gray-500 hover:text-red-400 transition" title="Eliminar">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </button>` : ''}
+      </div>`;
+    }
+
+    async function addSubcategory() {
+      if (!currentUser) { showToast('Inicia sesión primero', 'info'); return; }
+      const nameInput = document.getElementById('manage-subcat-name');
+      const parentSelect = document.getElementById('manage-subcat-parent');
+      const name = nameInput.value.trim();
+      if (!name) { showToast('Escribe un nombre', 'info'); return; }
+
+      try {
+        const session = (await sb.auth.getSession()).data.session;
+        const body = { action: 'create-subcategory', category: activeCategory, name };
+        if (parentSelect.value) body.parent_id = parentSelect.value;
+
+        const res = await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify(body)
+        });
+        const result = await res.json();
+        if (result.error) { showToast(result.error, 'error'); return; }
+        nameInput.value = '';
+        showToast('Categoría creada', 'success');
+        loadManageSubcategories();
+        loadSubcategories(activeCategory);
+      } catch (e) {
+        showToast('Error al crear categoría', 'error');
+      }
+    }
+
+    async function deleteSubcategory(id) {
+      if (!confirm('¿Eliminar esta categoría?')) return;
+      try {
+        const session = (await sb.auth.getSession()).data.session;
+        await fetch(SUPABASE_FN_URL + '/cfh-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+          body: JSON.stringify({ action: 'delete-subcategory', id })
+        });
+        showToast('Categoría eliminada', 'success');
+        loadManageSubcategories();
+        loadSubcategories(activeCategory);
+      } catch (e) {
+        showToast('Error al eliminar', 'error');
+      }
     }
 
     async function loadContent(cat, subcategoryId = null, search = null) {
@@ -378,8 +653,8 @@
     function renderRow(title, items, isBooks) {
       const cards = items.map(item => renderCard(item, isBooks)).join('');
       return `
-        <div class="space-y-2">
-          <h3 class="px-4 text-sm font-bold text-gray-300 tracking-wide">${title}</h3>
+        <div class="space-y-3">
+          <h3 class="px-4 section-title">${title}</h3>
           <div class="cfh-row">${cards}</div>
         </div>`;
     }
@@ -402,7 +677,7 @@
 
       const imgHtml = thumb
         ? `<img src="${escapeHtml(thumb)}" alt="${escapeHtml(item.title)}" loading="lazy">`
-        : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-creo-purple/40 to-gray-900"><span class="text-4xl">${CATEGORY_ICONS[item.category] || '📁'}</span></div>`;
+        : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a]"><span class="text-4xl">${CATEGORY_ICONS[item.category] || '📁'}</span></div>`;
 
       return `
         <div class="${cardClass}" onclick="openContent('${item.id}')">

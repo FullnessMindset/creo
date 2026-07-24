@@ -32,6 +32,18 @@ serve(async (req: Request) => {
   try {
     const { action, ...params } = await req.json();
 
+    // Rate limit public endpoints by IP
+    const publicActions = ["list", "get", "list-subcategories", "list-comments"];
+    if (publicActions.includes(action)) {
+      const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+      const { data: rl } = await supabaseAdmin.rpc("check_rate_limit", {
+        p_key: `cfh_public:${ip}`,
+        p_limit: 60,
+        p_window_seconds: 60,
+      });
+      if (rl === false) return json({ error: "Rate limit exceeded" }, 429);
+    }
+
     // ─── PUBLIC: List content (no auth required) ───
     if (action === "list") {
       const { category, subcategory_id, creator_id, is_free, page = 1, limit = 24, search } = params;
@@ -49,7 +61,10 @@ serve(async (req: Request) => {
       if (subcategory_id) query = query.eq("subcategory_id", subcategory_id);
       if (creator_id) query = query.eq("creator_id", creator_id);
       if (is_free !== undefined) query = query.eq("is_free", is_free);
-      if (search) query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%,tags.cs.{${search}}`);
+      if (search) {
+        const s = String(search).replace(/[%_(),.{}\\]/g, "").trim().slice(0, 100);
+        if (s) query = query.or(`title.ilike.%${s}%,description.ilike.%${s}%,tags.cs.{${s}}`);
+      }
 
       const { data, count, error } = await query;
       if (error) return json({ error: error.message }, 400);
@@ -196,15 +211,17 @@ serve(async (req: Request) => {
         return json({ error: "Not found or not authorized" }, 403);
       }
 
-      delete updates.action;
-      delete updates.creator_id;
-      delete updates.view_count;
-      delete updates.like_count;
-      delete updates.comment_count;
+      const allowed = ["title","description","category","subcategory_id","content_type",
+        "video_url","video_type","thumbnail_url","duration_seconds",
+        "book_file_url","book_format","allow_download","downloadable_urls",
+        "is_free","tags","co_creators","brand_deal_id","status"];
+      const safe: Record<string,unknown> = {};
+      for (const k of allowed) { if (k in updates) safe[k] = updates[k]; }
+      if (Object.keys(safe).length === 0) return json({ error: "No valid fields to update" }, 400);
 
       const { data, error } = await supabaseAdmin
         .from("cfh_content")
-        .update(updates)
+        .update(safe)
         .eq("id", id)
         .select()
         .single();
@@ -230,12 +247,15 @@ serve(async (req: Request) => {
 
     // ─── Create subcategory ───
     if (action === "create-subcategory") {
-      const { category, name, description, cover_url, sort_order } = params;
+      const { category, name, description, cover_url, sort_order, parent_id } = params;
       if (!category || !name) return json({ error: "category and name required" }, 400);
+
+      const row: Record<string, unknown> = { creator_id: user.id, category, name, description, cover_url, sort_order: sort_order ?? 0 };
+      if (parent_id) row.parent_id = parent_id;
 
       const { data, error } = await supabaseAdmin
         .from("cfh_subcategories")
-        .insert({ creator_id: user.id, category, name, description, cover_url, sort_order: sort_order ?? 0 })
+        .insert(row)
         .select()
         .single();
 
