@@ -73,7 +73,7 @@ async function getCachedProfile(userId) {
   const key = 'profile:' + userId;
   const cached = cacheGet(key);
   if (cached) return cached;
-  const { data } = await sb.from('profiles').select('*').eq('id', userId).single();
+  const { data } = await sb.from('profiles').select('id,username,display_name,avatar_url,bio,cover_url,social_links,stripe_onboarded,mecenas_settings,meta_fixed_price_cents,role,is_verified,badge_type').eq('id', userId).single();
   if (data) cacheSet(key, data, 'profile');
   return data;
 }
@@ -1746,6 +1746,7 @@ function esc(str) {
   d.textContent = str || '';
   return d.innerHTML;
 }
+window.escapeHtml = esc;
 
 // Video embed helpers
 function extractVideoId(url, type) {
@@ -2029,8 +2030,9 @@ async function toggleNotifPanel() {
     const priorityBg = { urgent: 'bg-red-50', high: 'bg-yellow-50', normal: '', low: '' };
     panel.innerHTML = `<div class="p-3 border-b border-gray-200 flex justify-between items-center"><span class="font-bold text-sm text-gray-900">${t('notificaciones')}</span><button onclick="markAllRead()" class="text-xs text-creo-mint hover:underline">${t('marcarLeidasFull')}</button></div>` +
       data.map(n => {
-        const link = n.action_url || n.link || getNotifDefaultLink(n);
-        const icon = n.icon || defaultIcons[n.type] || '🔔';
+        const rawLink = n.action_url || n.link || getNotifDefaultLink(n);
+        const link = rawLink && /^(\/|https?:\/\/fullnessmindset\.github\.io)/.test(rawLink) ? rawLink : '';
+        const icon = esc(n.icon || defaultIcons[n.type] || '🔔');
         const catClass = categoryColors[n.category] || 'border-l-gray-300';
         const priBg = priorityBg[n.priority] || '';
         const safeLink = link ? link.replace(/['"<>&]/g, c => ({'\'':'&#39;','"':'&quot;','<':'&lt;','>':'&gt;','&':'&amp;'}[c])) : '';
@@ -2255,7 +2257,7 @@ function getNotifSoundPrefs() {
   try {
     const saved = localStorage.getItem('creo_sound_prefs');
     if (saved) return JSON.parse(saved);
-  } catch(e) {}
+  } catch(e) { console.error('[CREO]', e); }
   return { soundId: 'creo-default', volume: 0.7, enabled: true };
 }
 
@@ -2270,7 +2272,7 @@ function _playCreoMp3(volume) {
     _creoAudio = new Audio('assets/sounds/creo-default.mp3');
     _creoAudio.volume = Math.min(1, Math.max(0, volume));
     _creoAudio.play().catch(() => {});
-  } catch(e) {}
+  } catch(e) { console.error('[CREO]', e); }
 }
 
 function playNotificationSound() {
@@ -2371,7 +2373,7 @@ async function pollNotifications() {
       loadNotificationBell();
     }
     _lastNotifCount = count || 0;
-  } catch(e) {}
+  } catch(e) { console.error('[CREO]', e); }
 }
 
 function startNotifPolling() {
@@ -2439,7 +2441,7 @@ function recordAnnView(id) {
 async function loadAnnouncementBar() {
   try {
     const user = await getCachedUser();
-    const { data: anns } = await sb.from('announcements').select('*').eq('is_active', true).order('created_at', { ascending: false });
+    const { data: anns } = await sb.from('announcements').select('*').eq('is_active', true).order('created_at', { ascending: false }).limit(10);
     if (!anns || !anns.length) return;
     let profile = null;
     if (user) profile = await getCachedProfile(user.id);
@@ -2564,7 +2566,7 @@ async function showVerificationReminder() {
     const existing = document.getElementById('announcement-bar');
     if (existing) existing.after(bar);
     else document.body.prepend(bar);
-  } catch(e) {}
+  } catch(e) { console.error('[CREO]', e); }
 }
 function dismissVerifyBar() {
   localStorage.setItem('creo_dismiss_verify_bar', '1');

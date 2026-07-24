@@ -801,12 +801,7 @@
       return '📁';
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      const d = document.createElement('div');
-      d.textContent = str;
-      return d.innerHTML;
-    }
+    // escapeHtml provided by shared.js as window.escapeHtml
 
     // ===== URL params: deep-link to content =====
     (function() {

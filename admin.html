@@ -1249,7 +1249,7 @@
       if (p.stripe_connect_id) {
         try {
           stripeLiveInfo = await apiCall('stripe-account-status', { connect_id: p.stripe_connect_id });
-        } catch(e) {}
+        } catch(e) { console.error('[CREO]', e); }
       }
 
       let docsHtml = '';

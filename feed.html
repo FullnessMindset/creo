@@ -367,7 +367,7 @@
         av.innerHTML = c.avatar_url
           ? `<img src="${esc(c.avatar_url)}" class="w-full h-full object-cover">`
           : `<span class="text-sm font-bold text-creo-purple">${esc((c.display_name || c.username || '?')[0].toUpperCase())}</span>`;
-        if (c.cover_url) document.getElementById('rec-popup-cover').style.backgroundImage = `url(${c.cover_url})`;
+        if (c.cover_url && /^https?:\/\//.test(c.cover_url)) document.getElementById('rec-popup-cover').style.backgroundImage = `url(${CSS.escape(c.cover_url)})`;
         document.getElementById('rec-popup-name').textContent = c.display_name || c.username;
         document.getElementById('rec-popup-username').textContent = '@' + c.username;
         document.getElementById('rec-popup-bio').textContent = c.bio || 'Creador en CREO';
@@ -531,7 +531,7 @@
         const author = c.profiles || {};
         const av = author.avatar_url
           ? `<img src="${esc(author.avatar_url)}" class="w-7 h-7 rounded-full object-cover">`
-          : `<div class="w-7 h-7 rounded-full bg-creo-purple/10 flex items-center justify-center text-[10px] text-creo-purple font-bold">${(author.display_name || '?')[0].toUpperCase()}</div>`;
+          : `<div class="w-7 h-7 rounded-full bg-creo-purple/10 flex items-center justify-center text-[10px] text-creo-purple font-bold">${esc((author.display_name || '?')[0]).toUpperCase()}</div>`;
         const date = new Date(c.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
         return `<div class="flex gap-2">
           ${av}
@@ -583,12 +583,7 @@
       return { music: '🎵', books: '📚', food: '🍽️', health: '🏥', fitness: '💪', education: '🎓', faith: '✝️' }[cat] || '📁';
     }
 
-    function esc(str) {
-      if (!str) return '';
-      const d = document.createElement('div');
-      d.textContent = String(str);
-      return d.innerHTML;
-    }
+    // esc() provided by shared.js
   </script>
   <script>renderBottomNav('feed');</script>
 </body>

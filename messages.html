@@ -695,7 +695,7 @@
           if (gr) gr.innerHTML = (json.data || []).map(g =>
             `<img src="${g.images.fixed_width_small.url}" class="w-full h-16 object-cover rounded cursor-pointer hover:opacity-80 transition" onclick="sendGif('${g.images.fixed_width.url}')" alt="GIF" loading="lazy">`
           ).join('');
-        } catch(e) {}
+        } catch(e) { console.error('[CREO]', e); }
       }, 300);
     }
 
