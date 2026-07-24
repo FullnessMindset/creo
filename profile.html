@@ -2807,6 +2807,7 @@
 
     // ===== BRANDING COLOR SYSTEM =====
     function getLuminance(hex) {
+      hex = normalizeHex(hex);
       const r = parseInt(hex.slice(1,3), 16) / 255;
       const g = parseInt(hex.slice(3,5), 16) / 255;
       const b = parseInt(hex.slice(5,7), 16) / 255;
@@ -2814,20 +2815,54 @@
       return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
     }
 
+    function normalizeHex(c) {
+      if (!c || typeof c !== 'string') return '#808080';
+      c = c.trim();
+      if (/^#[0-9a-fA-F]{3}$/.test(c)) return '#' + c[1]+c[1]+c[2]+c[2]+c[3]+c[3];
+      if (/^#[0-9a-fA-F]{6}$/.test(c)) return c;
+      if (/^rgb/i.test(c)) {
+        const m = c.match(/(\d+)/g);
+        if (m && m.length >= 3) return '#' + [m[0],m[1],m[2]].map(x => parseInt(x).toString(16).padStart(2,'0')).join('');
+      }
+      return '#808080';
+    }
+
+    function getContrastRatio(hex1, hex2) {
+      const l1 = getLuminance(hex1);
+      const l2 = getLuminance(hex2);
+      const lighter = Math.max(l1, l2);
+      const darker = Math.min(l1, l2);
+      return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    function ensureContrast(textHex, bgHex, minRatio) {
+      minRatio = minRatio || 4.5;
+      textHex = normalizeHex(textHex);
+      bgHex = normalizeHex(bgHex);
+      if (getContrastRatio(textHex, bgHex) >= minRatio) return textHex;
+      const bgLum = getLuminance(bgHex);
+      return bgLum > 0.4 ? '#111111' : '#f5f5f5';
+    }
+
+    function ensureBtnContrast(textHex, btnBgHex) {
+      return ensureContrast(textHex, btnBgHex, 3);
+    }
+
     function suggestTextColor(bgHex) {
       const lum = getLuminance(bgHex);
-      return lum > 0.5 ? '#1a1a2e' : '#f5f5f5';
+      return lum > 0.4 ? '#111111' : '#f5f5f5';
     }
 
     function applyBranding(colors) {
       if (!colors) return;
       const isDark = (colors.theme || 'light') === 'dark';
-      const textColor = colors.textColor || (isDark ? '#e0e0e0' : '#1f2937');
-      const titleColor = colors.titleColor || (isDark ? '#ffffff' : '#111827');
-      const btnTextColor = colors.btnTextColor || '#ffffff';
-      const sectionBg = colors.sectionBg || (isDark ? '#1e1e1e' : '#ffffff');
-      const buttonColor = colors.buttonColor || '#1a0a3e';
-      const bgColor = colors.bgColor || (isDark ? '#121212' : '#f9fafb');
+      const bgColor = normalizeHex(colors.bgColor || (isDark ? '#121212' : '#f9fafb'));
+      const sectionBg = normalizeHex(colors.sectionBg || (isDark ? '#1e1e1e' : '#ffffff'));
+      const buttonColor = normalizeHex(colors.buttonColor || '#1a0a3e');
+
+      const textColor = ensureContrast(colors.textColor || (isDark ? '#e0e0e0' : '#1f2937'), sectionBg);
+      const titleColor = ensureContrast(colors.titleColor || (isDark ? '#ffffff' : '#111827'), sectionBg);
+      const btnTextColor = ensureBtnContrast(colors.btnTextColor || '#ffffff', buttonColor);
       const font = colors.font || 'Inter';
       const bgMedia = colors.bgMedia || '';
       const bgOpacity = (colors.bgOpacity != null ? colors.bgOpacity : 20) / 100;
@@ -2900,9 +2935,15 @@
         el.style.color = '#ffffff';
       });
 
-      // Regular text — apply in both light and dark mode
+      // Regular text — apply in both light and dark mode, skip form inputs (they have their own bg)
       document.querySelectorAll('#profile-bio, #profile-username, .text-gray-900, .text-gray-700').forEach(el => {
-        el.style.color = textColor;
+        const tag = el.tagName;
+        if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') {
+          const inputBg = isDark ? '#2a2a2a' : '#ffffff';
+          el.style.color = ensureContrast(textColor, inputBg);
+        } else {
+          el.style.color = textColor;
+        }
       });
 
       // Payment buttons ONLY — Follow/Message/Share stay default
@@ -2921,20 +2962,22 @@
       });
 
       // Payment tab buttons
+      const inactiveTab = ensureContrast(isDark ? '#a0a0b8' : '#6b7280', sectionBg, 3);
       document.querySelectorAll('[id^="pay-tab-"]').forEach(el => {
-        el.style.color = el.classList.contains('pay-tab-active') ? titleColor : (isDark ? '#a0a0b8' : '#6b7280');
+        el.style.color = el.classList.contains('pay-tab-active') ? titleColor : inactiveTab;
       });
 
-      // Secondary text
+      // Secondary text — ensure readable on section bg
+      const secondaryColor = ensureContrast(isDark ? '#a0a0b8' : '#6b7280', sectionBg, 3);
       document.querySelectorAll('.text-gray-400, .text-gray-500').forEach(el => {
-        el.style.color = isDark ? '#a0a0b8' : '';
+        el.style.color = secondaryColor;
       });
 
-      // Input fields in dark mode
+      // Input fields
       if (isDark) {
         document.querySelectorAll('input[type="number"], select').forEach(el => {
           el.style.backgroundColor = '#2a2a2a';
-          el.style.color = textColor;
+          el.style.color = ensureContrast(textColor, '#2a2a2a');
           el.style.borderColor = 'rgba(255,255,255,0.15)';
         });
       }
@@ -2946,7 +2989,28 @@
 
       // Footer text
       const footer = document.querySelector('footer');
-      if (footer && isDark) footer.style.color = '#a0a0b8';
+      if (footer) footer.style.color = secondaryColor;
+
+      // Creo en Ellos cards — override hardcoded grays
+      document.querySelectorAll('.creo-ellos-card').forEach(el => {
+        el.style.background = sectionBg;
+        const nameEl = el.querySelector('.text-gray-900, .font-bold');
+        if (nameEl) nameEl.style.color = titleColor;
+        const bioEl = el.querySelector('.text-gray-400');
+        if (bioEl) bioEl.style.color = secondaryColor;
+      });
+
+      // Progress bar text in metas — ensure readable on colored bars
+      document.querySelectorAll('.meta-progress-text, .meta-goal-text').forEach(el => {
+        el.style.color = textColor;
+      });
+
+      // All remaining hardcoded dark text that could clash
+      document.querySelectorAll('.text-gray-800, .text-gray-600').forEach(el => {
+        if (!el.closest('button') && !el.closest('.meta-media-card')) {
+          el.style.color = textColor;
+        }
+      });
     }
 
     // ===== LAYOUT & THEME ENGINE =====
@@ -3117,10 +3181,10 @@
       const dataAttrs = `data-creo-user="${esc(p.username)}" data-creo-name="${esc(name)}" data-creo-avatar="${esc(avatar || '')}" data-creo-bio="${esc(p.bio || p.content || '')}" data-creo-cover="${esc(cover)}" data-creo-dummy="${isDummy}"`;
 
       return `<div class="creo-ellos-card flex items-center gap-2 px-3 py-2 rounded-xl glass hover:shadow-md transition-all" ${dataAttrs} onmouseenter="showCreoPopup(event,this)" onmouseleave="hideCreoPopup()" onclick="${isDummy ? "event.preventDefault();showToast('Demo: perfil de ejemplo','info')" : "window.location.href='profile.html?u='+encodeURIComponent('"+esc(p.username)+"')"}">
-        ${avatar ? `<img src="${esc(avatar)}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">` : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center flex-shrink-0 text-xs font-bold text-creo-purple">${esc(initials)}</div>`}
+        ${avatar ? `<img src="${esc(avatar)}" class="w-8 h-8 rounded-full object-cover flex-shrink-0" alt="${esc(name)}">` : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center flex-shrink-0 text-xs font-bold text-creo-purple">${esc(initials)}</div>`}
         <div class="min-w-0">
-          <p class="text-[11px] font-bold text-gray-900 truncate leading-tight">${esc(name)}${badge}</p>
-          <p class="text-[9px] text-gray-400 truncate leading-tight">${esc(bio)}</p>
+          <p class="creo-ellos-name text-[11px] font-bold truncate leading-tight" style="color:var(--brand-text-color, #1f2937)">${esc(name)}${badge}</p>
+          <p class="creo-ellos-bio text-[9px] truncate leading-tight" style="color:var(--brand-text-color, #6b7280); opacity:0.6">${esc(bio)}</p>
         </div>
       </div>`;
     }

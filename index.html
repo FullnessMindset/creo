@@ -1734,7 +1734,7 @@
     }
 
     function suggestTextColor(bgHex) {
-      return getLuminance(bgHex) > 0.5 ? '#1a1a2e' : '#f5f5f5';
+      return getLuminance(bgHex) > 0.4 ? '#111111' : '#f5f5f5';
     }
 
     function loadBrandingPanel() {
@@ -1813,21 +1813,30 @@
       document.getElementById('brand-button-hex').textContent = buttonColor;
       document.getElementById('brand-bg-hex').textContent = bgColor;
 
-      // Contrast warnings
+      // Contrast warnings — WCAG AA requires 4.5:1 for text, 3:1 for large text/buttons
       const warnText = document.getElementById('brand-warn-text');
       const textVsSection = getContrast(textColor, sectionBg);
-      if (textVsSection < 3) {
+      if (textVsSection < 4.5) {
         const fix = suggestTextColor(sectionBg);
-        warnText.innerHTML = 'Texto invisible. <span class="underline cursor-pointer font-bold" onclick="document.getElementById(\'brand-text-color\').value=\'' + fix + '\';updateBrandingPreview()">Usar ' + fix + '</span>';
+        warnText.innerHTML = 'Bajo contraste (' + textVsSection.toFixed(1) + ':1). <span class="underline cursor-pointer font-bold" onclick="document.getElementById(\'brand-text-color\').value=\'' + fix + '\';updateBrandingPreview()">Corregir a ' + fix + '</span>';
         warnText.classList.remove('hidden');
       } else { warnText.classList.add('hidden'); }
 
       const warnBtn = document.getElementById('brand-warn-btn');
       const btnContrast = getContrast(btnTextColor, buttonColor);
-      if (btnContrast < 2.5) {
-        warnBtn.textContent = 'Texto de botón poco visible sobre el fondo';
+      if (btnContrast < 3) {
+        const btnFix = suggestTextColor(buttonColor);
+        warnBtn.innerHTML = 'Texto de botón poco visible (' + btnContrast.toFixed(1) + ':1). <span class="underline cursor-pointer font-bold" onclick="document.getElementById(\'brand-btn-text-color\').value=\'' + btnFix + '\';updateBrandingPreview()">Corregir</span>';
         warnBtn.classList.remove('hidden');
       } else { warnBtn.classList.add('hidden'); }
+
+      // Title contrast warning
+      const titleVsSection = getContrast(titleColor, sectionBg);
+      if (titleVsSection < 4.5) {
+        const fix = suggestTextColor(sectionBg);
+        document.getElementById('brand-title-color').value = fix;
+        brandState.titleColor = fix;
+      }
 
       // Font preview
       const fontPreview = document.getElementById('brand-font-preview');
@@ -1886,12 +1895,23 @@
 
     async function saveBrandingFromPanel() {
       if (!currentProfile) return;
-      const { textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, theme } = brandState;
+      let { textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, theme } = brandState;
 
-      // Block save if text invisible on sections
-      if (getContrast(textColor, sectionBg) < 3) {
-        showToast('El texto no es visible sobre el fondo de secciones. Ajusta los colores.', 'error');
-        return;
+      // Auto-correct contrast before saving — never persist unreadable combos
+      if (getContrast(textColor, sectionBg) < 4.5) {
+        textColor = suggestTextColor(sectionBg);
+        brandState.textColor = textColor;
+        document.getElementById('brand-text-color').value = textColor;
+      }
+      if (getContrast(titleColor, sectionBg) < 4.5) {
+        titleColor = suggestTextColor(sectionBg);
+        brandState.titleColor = titleColor;
+        document.getElementById('brand-title-color').value = titleColor;
+      }
+      if (getContrast(btnTextColor, buttonColor) < 3) {
+        btnTextColor = suggestTextColor(buttonColor);
+        brandState.btnTextColor = btnTextColor;
+        document.getElementById('brand-btn-text-color').value = btnTextColor;
       }
 
       const colors = { theme, textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia };
