@@ -56,7 +56,7 @@
             <span>Continuar con Google</span>
           </button>
           <div class="bg-green-50 border border-green-200 rounded-lg p-3 flex gap-2 items-start">
-            <span class="text-lg">🛡️</span>
+            <svg class="w-5 h-5 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
             <p class="text-xs text-green-700">Solo el email del administrador autorizado puede acceder a este panel.</p>
           </div>
         </div>
@@ -128,7 +128,7 @@
           <p id="stat-verified" class="text-3xl font-bold text-green-600 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors cursor-pointer" onclick="showTab('reports')">
-          <p class="text-gray-500 text-xs uppercase tracking-wider"><span aria-label="alerta">⚠️</span> Open Reports</p>
+          <p class="text-gray-500 text-xs uppercase tracking-wider"><svg class="w-4 h-4 inline text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> Open Reports</p>
           <p id="stat-reports" class="text-3xl font-bold text-red-500 mt-1">-</p>
         </div>
         <div class="stat-card bg-white border border-gray-200 rounded-xl p-5 transition-colors">
@@ -143,7 +143,7 @@
 
       <!-- Tabs -->
       <div class="flex space-x-1 bg-gray-100 p-1 rounded-xl border border-gray-200 transition-colors overflow-x-auto max-w-full sticky top-[57px] z-[5]" style="scrollbar-width:thin;-webkit-overflow-scrolling:touch">
-        <button onclick="showTab('verification')" id="tab-verification" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-creo-purple text-white transition relative">🛡️ Verification<span id="badge-verification" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('verification')" id="tab-verification" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-creo-purple text-white transition relative"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> Verification<span id="badge-verification" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
         <button onclick="showTab('creators')" id="tab-creators" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">👥 Creators</button>
         <button onclick="showTab('transactions')" id="tab-transactions" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">💳 Transactions</button>
         <button onclick="showTab('accounts')" id="tab-accounts" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">Stripe Accounts</button>
@@ -153,9 +153,9 @@
         <button onclick="showTab('dealpayouts')" id="tab-dealpayouts" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">💰 Deal Payouts<span id="badge-dealpayouts" class="hidden absolute -top-1 -right-1 bg-yellow-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
         <button onclick="showTab('reports')" id="tab-reports" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">🚩 Reports<span id="badge-reports" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
         <button onclick="showTab('announcements')" id="tab-announcements" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">📢 Announcements</button>
-        <button onclick="showTab('moderation')" id="tab-moderation" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">⚖️ Moderation<span id="badge-moderation" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('manipulation')" id="tab-manipulation" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative">🛡️ Anti-Abuse<span id="badge-manipulation" class="hidden absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
-        <button onclick="showTab('fairness')" id="tab-fairness" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">⚖️ Fairness</button>
+        <button onclick="showTab('moderation')" id="tab-moderation" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg> Moderation<span id="badge-moderation" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('manipulation')" id="tab-manipulation" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition relative"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> Anti-Abuse<span id="badge-manipulation" class="hidden absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span></button>
+        <button onclick="showTab('fairness')" id="tab-fairness" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg> Fairness</button>
         <button onclick="showTab('featureflags')" id="tab-featureflags" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">🚩 Feature Flags</button>
         <button onclick="showTab('monitoring')" id="tab-monitoring" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition">📊 Monitoring</button>
         <button onclick="showTab('stripe')" id="tab-stripe" class="tab-btn flex-shrink-0 px-5 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:text-gray-800 transition flex items-center gap-1.5">
@@ -1087,7 +1087,7 @@
       }
       const opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken } };
       if (body) opts.body = JSON.stringify(body);
-      const res = await fetch(SUPABASE_URL + '/functions/v1/admin-api?action=' + action, opts);
+      const res = await fetch(SUPABASE_URL + '/functions/v1/admin-api?action=' + encodeURIComponent(action), opts);
       return res.json();
     }
 
@@ -2153,7 +2153,7 @@
       if (activeReportHistory.length === 0) { section.classList.add('hidden'); return; }
       section.classList.remove('hidden');
 
-      const sanctionIcons = { warning: '⚠️', partial_lock: '🔒', temporary_lock: '🚫', life_ban: '⛔' };
+      const sanctionIcons = { warning: '<svg class="w-4 h-4 inline text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>', partial_lock: '<svg class="w-4 h-4 inline text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>', temporary_lock: '<svg class="w-4 h-4 inline text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>', life_ban: '<svg class="w-4 h-4 inline text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' };
       const sanctionLabels = { warning: 'Warning', partial_lock: 'Partial Lock', temporary_lock: 'Temp Lock', life_ban: 'Life Ban' };
 
       list.innerHTML = activeReportHistory.map(h => {
@@ -2167,7 +2167,7 @@
           </div>`;
         } else {
           return `<div class="flex items-center gap-2 text-xs p-2 rounded-lg bg-orange-50">
-            <span>${sanctionIcons[h.sanction_type] || '⚠️'}</span>
+            <span>${sanctionIcons[h.sanction_type] || '<svg class="w-4 h-4 inline text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>'}</span>
             <span class="text-gray-700 flex-1"><strong>${sanctionLabels[h.sanction_type] || h.sanction_type}</strong>${h.reason ? ': ' + esc(h.reason) : ''}</span>
             <span class="text-xs px-1.5 py-0.5 rounded-full ${h.is_active ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-500'}">${h.is_active ? 'Active' : 'Expired'}</span>
             <span class="text-gray-400">${new Date(h.created_at).toLocaleDateString()}</span>
@@ -2193,7 +2193,7 @@
         const isSystem = m.message_type === 'system' || m.message_type === 'action';
         const isWarning = m.message_type === 'warning';
         const bg = isSystem ? 'bg-gray-200 text-gray-600' : isWarning ? 'bg-orange-100 text-orange-800 border border-orange-200' : 'bg-creo-purple text-white';
-        const icon = isWarning ? '⚠️ ' : isSystem ? '⚙️ ' : '';
+        const icon = isWarning ? '<svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> ' : isSystem ? '<svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg> ' : '';
         return `<div class="flex ${isSystem ? 'justify-center' : 'justify-end'}">
           <div class="${bg} px-3 py-2 rounded-lg max-w-[80%] text-xs ${isSystem ? 'rounded-full' : ''}">
             ${icon}${esc(m.content)}
@@ -2249,7 +2249,7 @@
         link: 'messages.html',
         category: 'admin',
         priority: 'high',
-        icon: '⚠️'
+        icon: 'warning'
       });
     }
 
@@ -2302,7 +2302,7 @@
       if (!reported?.id) return;
       const name = reported.display_name || reported.username || 'usuario';
       const warningNum = (activeReport.warning_count || 0) + 1;
-      const msg = `⚠️ Advertencia ${warningNum}: Hola ${name}, has recibido una advertencia oficial por: "${activeReport.reason}". ${warningNum >= 3 ? 'Esta es tu última advertencia antes de acciones más severas.' : 'Por favor respeta las normas de la comunidad.'} — Admin CREO`;
+      const msg = `Advertencia ${warningNum}: Hola ${name}, has recibido una advertencia oficial por: "${activeReport.reason}". ${warningNum >= 3 ? 'Esta es tu última advertencia antes de acciones más severas.' : 'Por favor respeta las normas de la comunidad.'} — Admin CREO`;
 
       await sendPrivateMessageToUser(reported.id, msg);
       await sendPushNotification(reported.id, `Advertencia ${warningNum}`, msg);
@@ -3032,7 +3032,7 @@
       }
 
       const label = failed > 0 ? `Sent ${sent}/${total} (${failed} failed)` : (total > 1 ? `All ${total} sent!` : 'Sent!');
-      btn.innerHTML = (failed > 0 ? '⚠️ ' : '✅ ') + label;
+      btn.innerHTML = (failed > 0 ? '<svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> ' : '<svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> ') + label;
       btn.classList.remove('bg-creo-purple');
       btn.classList.add(failed > 0 ? 'bg-yellow-500' : 'bg-green-600');
       setTimeout(() => {
@@ -3480,7 +3480,7 @@
 
       if (meta.fund_status === 'cancelled_review') {
         html += `<div class="bg-red-50 rounded-xl p-4 space-y-3 border border-red-200">
-          <h4 class="font-semibold text-red-800 text-sm">⚠️ Cancelación de Meta</h4>
+          <h4 class="font-semibold text-red-800 text-sm"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> Cancelación de Meta</h4>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Razón del creador:</p>
             <p class="text-sm bg-white p-3 rounded-lg border">${esc(meta.cancellation_reason || 'Sin razón proporcionada')}</p>
@@ -3546,7 +3546,7 @@
           }
           updateData.last_payout_transfer_id = payoutRes.transfer_id;
         } else {
-          if (!confirm('⚠️ Creator has no Stripe account connected.\nApprove without payout? (You can manually transfer later)')) return;
+          if (!confirm('Creator has no Stripe account connected.\nApprove without payout? (You can manually transfer later)')) return;
         }
       }
 

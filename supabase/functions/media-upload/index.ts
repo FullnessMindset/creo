@@ -140,6 +140,13 @@ serve(async (req) => {
       const { receiver_id, body: msgBody, attachment_id, media_url, media_type } = body;
       if (!receiver_id) return json({ error: "receiver_id required" }, 400);
 
+      const { data: receiver } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("id", receiver_id)
+        .single();
+      if (!receiver) return json({ error: "Receiver not found" }, 404);
+
       const messageData: Record<string, unknown> = {
         sender_id: user.id,
         receiver_id,

@@ -178,13 +178,21 @@ serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("Authorization");
-    const isServiceCall = req.headers.get("X-Service-Key") === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const internalKey = Deno.env.get("INTERNAL_API_KEY") || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const isServiceCall = req.headers.get("X-Service-Key") === internalKey;
 
     if (!isServiceCall && !authHeader) return json({ error: "Unauthorized" }, 401);
 
     if (!isServiceCall) {
+      const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+      const { data: emailRl } = await supabase.rpc("check_rate_limit", {
+        p_key: `send-email:${ip}`,
+        p_max_requests: 20,
+        p_window_seconds: 60,
+      });
+      if (emailRl === false) return json({ error: "Rate limit exceeded" }, 429);
       const { data: { user } } = await supabase.auth.getUser(authHeader!.replace("Bearer ", ""));
-      if (!user || user.email !== Deno.env.get("ADMIN_EMAIL")) return json({ error: "Admin only" }, 403);
+      if (!user || user.email !== (Deno.env.get("ADMIN_EMAIL") || "fullnessmindset@gmail.com")) return json({ error: "Admin only" }, 403);
     }
 
     const { type, to, data } = await req.json();

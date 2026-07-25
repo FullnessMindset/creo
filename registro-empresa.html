@@ -6,6 +6,9 @@
   <title>CREO — Registro de Empresa</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a0a3e">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="icon" href="assets/logo-icon.png" type="image/png">
   <link rel="stylesheet" href="tailwind.min.css?v=20260719">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -168,7 +171,7 @@
       bizUser = data.user;
       await sb.from('profiles').insert([{
         id: bizUser.id,
-        username: 'biz_' + Math.floor(Math.random() * 100000),
+        username: 'biz_' + crypto.randomUUID().slice(0, 12),
         account_type: 'brand',
         accepted_terms: true,
         accepted_conduct: true

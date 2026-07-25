@@ -38,7 +38,7 @@ serve(async (req: Request) => {
       const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
       const { data: rl } = await supabaseAdmin.rpc("check_rate_limit", {
         p_key: `cfh_public:${ip}`,
-        p_limit: 60,
+        p_max_requests: 60,
         p_window_seconds: 60,
       });
       if (rl === false) return json({ error: "Rate limit exceeded" }, 429);
@@ -62,7 +62,7 @@ serve(async (req: Request) => {
       if (creator_id) query = query.eq("creator_id", creator_id);
       if (is_free !== undefined) query = query.eq("is_free", is_free);
       if (search) {
-        const s = String(search).replace(/[%_(),.{}\\]/g, "").trim().slice(0, 100);
+        const s = String(search).replace(/[%_(),.{}\\:'"\.]/g, "").trim().slice(0, 100);
         if (s) query = query.or(`title.ilike.%${s}%,description.ilike.%${s}%,tags.cs.{${s}}`);
       }
 
@@ -78,7 +78,7 @@ serve(async (req: Request) => {
 
       const { data, error } = await supabaseAdmin
         .from("cfh_content")
-        .select("*, creator:creator_id(id, username, display_name, avatar_url, bio, stripe_onboarded, stripe_connect_id, mecenas_settings, meta_fixed_price_cents), subcategory:subcategory_id(id, name)")
+        .select("*, creator:creator_id(id, username, display_name, avatar_url, bio, stripe_onboarded, mecenas_settings, meta_fixed_price_cents), subcategory:subcategory_id(id, name)")
         .eq("id", id)
         .single();
 
@@ -125,6 +125,13 @@ serve(async (req: Request) => {
     // ─── AUTH REQUIRED below ───
     const user = await getUser(req);
     if (!user) return json({ error: "Authentication required" }, 401);
+
+    const { data: authRl } = await supabaseAdmin.rpc("check_rate_limit", {
+      p_key: `cfh_auth:${user.id}`,
+      p_max_requests: 30,
+      p_window_seconds: 60,
+    });
+    if (authRl === false) return json({ error: "Rate limit exceeded" }, 429);
 
     // ─── Check subscription access ───
     if (action === "check-access") {
@@ -265,14 +272,20 @@ serve(async (req: Request) => {
 
     // ─── Update subcategory ───
     if (action === "update-subcategory") {
-      const { id, ...updates } = params;
+      const { id, name, description, cover_url, sort_order, category, parent_id } = params;
       if (!id) return json({ error: "id required" }, 400);
-      delete updates.action;
-      delete updates.creator_id;
+      const safe: Record<string, unknown> = {};
+      if (name !== undefined) safe.name = name;
+      if (description !== undefined) safe.description = description;
+      if (cover_url !== undefined) safe.cover_url = cover_url;
+      if (sort_order !== undefined) safe.sort_order = sort_order;
+      if (category !== undefined) safe.category = category;
+      if (parent_id !== undefined) safe.parent_id = parent_id;
+      if (Object.keys(safe).length === 0) return json({ error: "No fields to update" }, 400);
 
       const { data, error } = await supabaseAdmin
         .from("cfh_subcategories")
-        .update(updates)
+        .update(safe)
         .eq("id", id)
         .eq("creator_id", user.id)
         .select()

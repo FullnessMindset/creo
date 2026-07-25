@@ -430,16 +430,16 @@
       await sb.from('story_comments').insert([{ story_id: s.id, user_id: exploreUser.id, body }]);
       input.value = '';
       loadStoryCommentsList();
-      const el = document.getElementById('sv-comment-count');
-      el.textContent = parseInt(el.textContent) + 1;
+      const el = document.querySelector('.story-slide[data-story-idx="'+currentStoryIdx+'"] .sv-comment-count');
+      if (el) el.textContent = parseInt(el.textContent) + 1;
     }
 
     async function deleteStoryComment(commentId) {
       if (!confirm(t('confirmarEliminar'))) return;
       await sb.from('story_comments').delete().eq('id', commentId);
       loadStoryCommentsList();
-      const el = document.getElementById('sv-comment-count');
-      el.textContent = Math.max(0, parseInt(el.textContent) - 1);
+      const el = document.querySelector('.story-slide[data-story-idx="'+currentStoryIdx+'"] .sv-comment-count');
+      if (el) el.textContent = Math.max(0, parseInt(el.textContent) - 1);
     }
 
     async function shareStory() {
@@ -476,7 +476,7 @@
       const verified = p.verification_status === 'approved' ? '<svg class="w-4 h-4 text-creo-mint flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' : '';
       const dk = isDark();
       const isAdm = exploreUser && exploreUser.email === ADMIN_EMAIL;
-      const impBtn = isAdm ? `<button onclick="event.preventDefault();event.stopPropagation();sessionStorage.setItem('creo-impersonate',JSON.stringify({id:'${p.id}',username:'${esc(p.username)}',display_name:'${esc(p.display_name||p.username)}'}));window.location='index.html'" class="hidden group-hover:flex items-center gap-1 text-[9px] bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-semibold whitespace-nowrap">🔑 Admin</button>` : '';
+      const impBtn = isAdm ? `<button onclick="event.preventDefault();event.stopPropagation();sessionStorage.setItem('creo-impersonate',JSON.stringify({id:${JSON.stringify(p.id)},username:${JSON.stringify(p.username)},display_name:${JSON.stringify(p.display_name||p.username)}}));window.location='index.html'" class="hidden group-hover:flex items-center gap-1 text-[9px] bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-semibold whitespace-nowrap"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg> Admin</button>` : '';
 
       return `<a href="profile.html?u=${esc(p.username)}" class="flex items-center gap-3 p-3 ${dk ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-xl border hover:border-creo-mint transition group">
         ${avatar}

@@ -61,12 +61,17 @@ function cacheClear() { _cache.clear(); }
 
 let _cachedUser = null;
 let _cachedUserTs = 0;
+let _cachedUserPending = null;
 async function getCachedUser() {
   if (_cachedUser && Date.now() - _cachedUserTs < CACHE_TTL.auth_user) return _cachedUser;
-  const { data: { user } } = await sb.auth.getUser();
-  _cachedUser = user;
-  _cachedUserTs = Date.now();
-  return user;
+  if (_cachedUserPending) return _cachedUserPending;
+  _cachedUserPending = sb.auth.getUser().then(({ data: { user } }) => {
+    _cachedUser = user;
+    _cachedUserTs = Date.now();
+    _cachedUserPending = null;
+    return user;
+  }).catch(() => { _cachedUserPending = null; return null; });
+  return _cachedUserPending;
 }
 
 async function getCachedProfile(userId) {
@@ -1646,7 +1651,7 @@ function showCreoIdModal() {
 
       <div class="space-y-3">
         <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex gap-3">
-          <span class="text-2xl flex-shrink-0">🛡️</span>
+          <span class="flex-shrink-0 text-green-700"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></span>
           <div>
             <p class="text-sm font-bold text-green-800">${t('personasReales')}</p>
             <p class="text-xs text-green-700">${t('personasRealesDesc')}</p>
@@ -1654,7 +1659,7 @@ function showCreoIdModal() {
         </div>
 
         <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
-          <span class="text-2xl flex-shrink-0">🎓</span>
+          <span class="flex-shrink-0"><svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg></span>
           <div>
             <p class="text-sm font-bold text-blue-800">${t('sinMenores')}</p>
             <p class="text-xs text-blue-700">${t('sinMenoresDesc')}</p>
@@ -1662,7 +1667,7 @@ function showCreoIdModal() {
         </div>
 
         <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 flex gap-3">
-          <span class="text-2xl flex-shrink-0">🔒</span>
+          <span class="flex-shrink-0"><svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></span>
           <div>
             <p class="text-sm font-bold text-purple-800">${t('tuIdSeguridad')}</p>
             <p class="text-xs text-purple-700">${t('tuIdSeguridadDesc')}</p>
@@ -1800,7 +1805,7 @@ function getEmbedHTML(url, type, aspectClass) {
     return `<iframe src="https://www.tiktok.com/embed/v2/${id}" class="w-full ${cls} rounded-xl" frameborder="0" allowfullscreen></iframe>`;
   }
   if (type === 'instagram') {
-    return `<iframe src="${url.replace(/\/$/, '')}/embed" class="w-full ${cls} rounded-xl" frameborder="0" allowfullscreen></iframe>`;
+    return `<iframe src="${esc(url.replace(/\/$/, ''))}/embed" class="w-full ${cls} rounded-xl" frameborder="0" allowfullscreen></iframe>`;
   }
   return `<video src="${esc(url)}" class="w-full ${cls} rounded-xl object-cover" controls></video>`;
 }
@@ -1810,14 +1815,22 @@ function showToast(message, type) {
   const existing = document.getElementById('creo-toast');
   if (existing) existing.remove();
   const colors = { success: 'bg-green-600', error: 'bg-red-600', info: 'bg-creo-purple', warning: 'bg-amber-600' };
-  const emojis = { success: '✅ ', error: '❌ ', info: 'ℹ️ ', warning: '⚠️ ' };
-  const prefix = emojis[type] || '';
+  const toastIcons = {
+    success: '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+    error: '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+    info: '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+    warning: '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>'
+  };
+  const iconSvg = toastIcons[type] || '';
   const toast = document.createElement('div');
   toast.id = 'creo-toast';
-  toast.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[500] px-6 py-3 rounded-xl text-white text-sm font-semibold shadow-xl transition-all duration-300 ${colors[type] || colors.info}`;
+  toast.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[500] px-6 py-3 rounded-xl text-white text-sm font-semibold shadow-xl transition-all duration-300 flex items-center gap-2 ${colors[type] || colors.info}`;
   toast.setAttribute('role', 'status');
   toast.setAttribute('aria-live', 'polite');
-  toast.textContent = prefix + message;
+  const msgSpan = document.createElement('span');
+  msgSpan.textContent = message;
+  toast.innerHTML = iconSvg;
+  toast.appendChild(msgSpan);
   document.body.appendChild(toast);
   setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
 }
@@ -2034,7 +2047,7 @@ async function loadNotificationBell() {
 
 async function toggleNotifPanel() {
   let panel = document.getElementById('notif-panel');
-  if (panel) { panel.remove(); return; }
+  if (panel) { panel.remove(); document.removeEventListener('click', closeNotifOnClickOutside); return; }
   const user = await getCachedUser();
   if (!user) return;
   const { data } = await sb.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20);
@@ -2044,14 +2057,26 @@ async function toggleNotifPanel() {
   if (!data || data.length === 0) {
     panel.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">' + t('sinNotificaciones') + '</p>';
   } else {
-    const defaultIcons = { like: '❤️', comment: '💬', payment: '💰', approval: '✅', rejection: '❌', invite: '🤝', share: '🔗', meta_like: '❤️', meta_comment: '💬', follow: '👤', message: '✉️' };
+    const defaultIcons = {
+      like: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>',
+      comment: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>',
+      payment: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+      approval: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+      rejection: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+      invite: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>',
+      share: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>',
+      meta_like: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>',
+      meta_comment: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>',
+      follow: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>',
+      message: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>'
+    };
     const categoryColors = { verification: 'border-l-purple-500', payment: 'border-l-creo-mint', admin: 'border-l-blue-500', warning: 'border-l-red-500', general: 'border-l-gray-300' };
     const priorityBg = { urgent: 'bg-red-50', high: 'bg-yellow-50', normal: '', low: '' };
     panel.innerHTML = `<div class="p-3 border-b border-gray-200 flex justify-between items-center"><span class="font-bold text-sm text-gray-900">${t('notificaciones')}</span><button onclick="markAllRead()" class="text-xs text-creo-mint hover:underline">${t('marcarLeidasFull')}</button></div>` +
       data.map(n => {
         const rawLink = n.action_url || n.link || getNotifDefaultLink(n);
         const link = rawLink && /^(\/|https?:\/\/fullnessmindset\.github\.io)/.test(rawLink) ? rawLink : '';
-        const icon = esc(n.icon || defaultIcons[n.type] || '🔔');
+        const icon = n.icon ? esc(n.icon) : (defaultIcons[n.type] || '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>');
         const catClass = categoryColors[n.category] || 'border-l-gray-300';
         const priBg = priorityBg[n.priority] || '';
         const safeLink = link ? link.replace(/['"<>&]/g, c => ({'\'':'&#39;','"':'&quot;','<':'&lt;','>':'&gt;','&':'&amp;'}[c])) : '';
@@ -2306,10 +2331,23 @@ function previewNotificationSound(soundId) {
 }
 
 // Real-time notification system via Supabase Realtime
-const NOTIF_ICONS = { like: '❤️', comment: '💬', payment: '💰', approval: '✅', rejection: '❌', invite: '🤝', share: '🔗', meta_like: '❤️', meta_comment: '💬', follow: '👤', message: '✉️' };
+const NOTIF_ICONS = {
+  like: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>',
+  comment: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>',
+  payment: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+  approval: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+  rejection: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+  invite: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>',
+  share: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>',
+  meta_like: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>',
+  meta_comment: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>',
+  follow: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>',
+  message: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>'
+};
 
 function showNotifBubble(notif) {
-  const icon = notif.icon || NOTIF_ICONS[notif.type] || '🔔';
+  const defaultSvg = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>';
+  const icon = NOTIF_ICONS[notif.type] || (notif.icon ? esc(notif.icon) : defaultSvg);
   const catBorders = { verification: '#8b5cf6', payment: '#33f0b0', admin: '#3b82f6', warning: '#ef4444' };
   const borderColor = catBorders[notif.category] || '#33f0b0';
   const bubble = document.createElement('div');
@@ -2319,7 +2357,7 @@ function showNotifBubble(notif) {
     <div class="flex items-center gap-2.5">
       <span class="text-lg flex-shrink-0">${icon}</span>
       <div class="flex-1 min-w-0">
-        <p class="text-sm font-semibold text-white truncate">${esc(notif.title || 'Nueva notificación')}${notif.priority === 'urgent' ? ' ⚠️' : ''}</p>
+        <p class="text-sm font-semibold text-white truncate">${esc(notif.title || 'Nueva notificación')}${notif.priority === 'urgent' ? ' <svg class="w-4 h-4 inline-block align-text-bottom" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>' : ''}</p>
         ${notif.body ? `<p class="text-xs text-white/70 truncate">${esc(notif.body)}</p>` : ''}
       </div>
     </div>`;
@@ -2811,21 +2849,21 @@ function renderCreoIdStep(container) {
       </div>
       <div class="space-y-3">
         <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex gap-3">
-          <span class="text-xl flex-shrink-0">🛡️</span>
+          <span class="flex-shrink-0 text-green-700"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></span>
           <div>
             <p class="text-sm font-bold text-green-800">Personas Reales</p>
             <p class="text-xs text-green-700">La verificación de identidad confirma que cada usuario es una persona real. Esto protege a toda la comunidad.</p>
           </div>
         </div>
         <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
-          <span class="text-xl flex-shrink-0">🔒</span>
+          <span class="text-xl flex-shrink-0"><svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></span>
           <div>
             <p class="text-sm font-bold text-blue-800">Protección de Datos</p>
             <p class="text-xs text-blue-700">CREO <strong>nunca almacena</strong> tus documentos de identidad. La verificación es realizada de forma segura por <strong>Stripe Identity</strong>.</p>
           </div>
         </div>
         <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 flex gap-3">
-          <span class="text-xl flex-shrink-0">✅</span>
+          <span class="text-xl flex-shrink-0"><svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>
           <div>
             <p class="text-sm font-bold text-purple-800">Comunidad Protegida</p>
             <p class="text-xs text-purple-700">La verificación protege a creadores, apoyadores y marcas contra fraude y actividad maliciosa.</p>
@@ -2852,16 +2890,16 @@ function renderStripeStep(container) {
         </div>
         <p class="text-sm text-indigo-800">Stripe es nuestra infraestructura de pagos segura. Protege:</p>
         <div class="grid grid-cols-2 gap-2">
-          <div class="flex items-center gap-2 text-xs text-indigo-700"><span>💳</span> Pagos</div>
-          <div class="flex items-center gap-2 text-xs text-indigo-700"><span>💚</span> Tips</div>
-          <div class="flex items-center gap-2 text-xs text-indigo-700"><span>⭐</span> Suscripciones</div>
-          <div class="flex items-center gap-2 text-xs text-indigo-700"><span>🤝</span> Brand Deals</div>
-          <div class="flex items-center gap-2 text-xs text-indigo-700"><span>🪪</span> Verificación de Identidad</div>
-          <div class="flex items-center gap-2 text-xs text-indigo-700"><span>🔒</span> Datos Bancarios</div>
+          <div class="flex items-center gap-2 text-xs text-indigo-700"><span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg></span> Pagos</div>
+          <div class="flex items-center gap-2 text-xs text-indigo-700"><span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg></span> Tips</div>
+          <div class="flex items-center gap-2 text-xs text-indigo-700"><span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></span> Suscripciones</div>
+          <div class="flex items-center gap-2 text-xs text-indigo-700"><span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span> Brand Deals</div>
+          <div class="flex items-center gap-2 text-xs text-indigo-700"><span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg></span> Verificación de Identidad</div>
+          <div class="flex items-center gap-2 text-xs text-indigo-700"><span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></span> Datos Bancarios</div>
         </div>
       </div>
       <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 flex gap-3">
-        <span class="text-xl flex-shrink-0">🔐</span>
+        <span class="text-xl flex-shrink-0"><svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></span>
         <div>
           <p class="text-sm font-bold text-gray-800">Tu información está segura</p>
           <p class="text-xs text-gray-600">CREO <strong>nunca almacena</strong> información bancaria. Toda la información sensible de pago permanece con Stripe.</p>
@@ -3122,8 +3160,14 @@ const MediaUploadService = (function() {
   ]);
 
   const MIME_ICONS = {
-    image: '📷', video: '🎥', audio: '🎤', document: '📄',
-    archive: '📦', code: '💻', file: '📎', other: '📎',
+    image: '<svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>',
+    video: '<svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>',
+    audio: '<svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>',
+    document: '<svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>',
+    archive: '<svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>',
+    code: '<svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>',
+    file: '<svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>',
+    other: '<svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>',
   };
 
   const CATEGORY_MAP = {
@@ -3148,7 +3192,7 @@ const MediaUploadService = (function() {
     return 'file';
   }
 
-  function getIcon(category) { return MIME_ICONS[category] || '📎'; }
+  function getIcon(category) { return MIME_ICONS[category] || MIME_ICONS.file; }
 
   function sanitizeName(name) {
     return name.replace(/[^\w.\-]/g, '_').replace(/\.{2,}/g, '.').replace(/^\./, '_').slice(-200);
@@ -3203,9 +3247,10 @@ const MediaUploadService = (function() {
         }
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(img.src);
         resolve({ url: canvas.toDataURL('image/jpeg', 0.7), width: img.width, height: img.height });
       };
-      img.onerror = () => resolve(null);
+      img.onerror = () => { URL.revokeObjectURL(img.src); resolve(null); };
       img.src = URL.createObjectURL(file);
     });
   }
