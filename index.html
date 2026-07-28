@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -30,6 +30,8 @@
     .glass-dark { background: rgba(26,10,62,0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
     .float-anim { animation: float 3s ease-in-out infinite; }
+    .brand-swatch { width:36px; height:36px; border-radius:8px; overflow:hidden; border:2px solid rgba(0,0,0,0.1); flex-shrink:0; }
+    .brand-swatch input[type=color] { width:150%; height:150%; margin:-25%; padding:0; border:none; cursor:pointer; }
   </style>
 </head>
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300">
@@ -53,7 +55,7 @@
         <span data-i18n="continuarConGoogle">Continuar con Google</span>
       </button>
       <div class="bg-green-50 border border-green-200 rounded-lg p-3 flex gap-2 items-start">
-        <span class="text-lg">🛡️</span>
+        <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
         <p class="text-xs text-green-700" data-i18n="authSecurityNote">CREO usa exclusivamente Google para inicio de sesión. Tu cuenta está protegida por la autenticación de Google.</p>
       </div>
       <div class="text-center pt-2 border-t border-gray-200">
@@ -99,40 +101,39 @@
 
       <!-- TABS — main row (matches public profile section order) -->
       <div class="flex glass rounded-xl overflow-x-auto text-[11px] no-scrollbar md:flex-wrap">
-        <button onclick="showTab('profile')" id="tab-profile" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition tab-active">👤 <span data-i18n="tabPerfil">Perfil</span></button>
-        <button onclick="showTab('story')" id="tab-story" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">📖 <span data-i18n="tabHistoria">Historia</span></button>
-        <button onclick="showTab('posts')" id="tab-posts" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">📸 <span data-i18n="tabPosts">Posts</span></button>
+        <button onclick="showTab('profile')" id="tab-profile" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition tab-active flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> <span data-i18n="tabPerfil">Perfil</span></button>
+        <button onclick="showTab('story')" id="tab-story" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> <span data-i18n="tabHistoria">Historia</span></button>
+        <button onclick="showTab('posts')" id="tab-posts" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg> <span data-i18n="tabPosts">Posts</span></button>
         <button onclick="toggleMetasDropdown()" id="tab-metas-group" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1">
-          🎯 <span data-i18n="tabMetas">Metas</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> <span data-i18n="tabMetas">Metas</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
         <button onclick="showTab('cfh')" id="tab-cfh" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1"><img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="CFH"> El Futuro Hoy</button>
-        <button onclick="showTab('business')" id="tab-business" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400">💼 <span data-i18n="tabCreaciones">Creaciones</span></button>
+        <button onclick="showTab('business')" id="tab-business" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> <span data-i18n="tabCreaciones">Creaciones</span></button>
         <button onclick="showTab('creoellos')" id="tab-creoellos" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1"><img src="assets/logo-icon.png" class="w-4 h-4 rounded-full" alt="CREO"> <span data-i18n="tabCreoEnEllos">Creo en Ellos</span></button>
 
         <button onclick="toggleHerramientas()" id="tab-herramientas" class="flex-shrink-0 px-2 py-3 font-semibold text-center transition text-gray-400 flex items-center gap-1">
-          🛠️ <span data-i18n="tabHerramientas">Herramientas</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg> <span data-i18n="tabHerramientas">Herramientas</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
       </div>
       <!-- Metas dropdown -->
       <div id="metas-dropdown" class="hidden bg-white rounded-xl shadow-xl border border-gray-200 z-50 py-1 text-[12px]">
-        <button onclick="showTab('metas');closeMetasDropdown()" id="tab-metas" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎯 <span data-i18n="tabMisMetas">Mis Metas</span></button>
+        <button onclick="showTab('metas');closeMetasDropdown()" id="tab-metas" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> <span data-i18n="tabMisMetas">Mis Metas</span></button>
         <div class="border-t border-gray-100 my-1"></div>
         <p class="px-4 py-1 text-[10px] text-gray-400 font-semibold uppercase tracking-wider" data-i18n="tabMecenas">Mecenas</p>
-        <button onclick="showTab('mecenas-tip');closeMetasDropdown()" id="tab-mecenas-tip" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💚 <span data-i18n="tabYoCreoEnTi">Yo Creo en Ti</span></button>
-        <button onclick="showTab('mecenas-sub');closeMetasDropdown()" id="tab-mecenas-sub" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">⭐ <span data-i18n="tabApoyoFull">Apoyo Full</span></button>
+        <button onclick="showTab('mecenas-tip');closeMetasDropdown()" id="tab-mecenas-tip" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg> <span data-i18n="tabYoCreoEnTi">Yo Creo en Ti</span></button>
+        <button onclick="showTab('mecenas-sub');closeMetasDropdown()" id="tab-mecenas-sub" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg> <span data-i18n="tabApoyoFull">Apoyo Full</span></button>
         <div class="border-t border-gray-100 my-1"></div>
-        <button onclick="showTab('my-subs');closeMetasDropdown()" id="tab-my-subs" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💜 Mis Suscripciones</button>
-        <button onclick="showTab('my-payments');closeMetasDropdown()" id="tab-my-payments" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">📋 Mis Pagos</button>
+        <button onclick="showTab('my-subs');closeMetasDropdown()" id="tab-my-subs" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg> Mis Suscripciones</button>
+        <button onclick="showTab('my-payments');closeMetasDropdown()" id="tab-my-payments" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg> Mis Pagos</button>
       </div>
       <!-- Herramientas dropdown — outside the overflow container -->
       <div id="herramientas-menu" class="hidden bg-white rounded-xl shadow-xl border border-gray-200 z-50 py-1 text-[12px]">
-        <button onclick="showTab('verify');closeHerramientas()" id="tab-verify" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">✅ <span data-i18n="tabVerificacion">Verificación</span></button>
-        <button onclick="showTab('stripe');closeHerramientas()" id="tab-stripe" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💳 <span data-i18n="tabStripe">Stripe</span></button>
-        <button onclick="showTab('branding');closeHerramientas()" id="tab-branding" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🎨 <span data-i18n="tabBranding">Personalización</span></button>
-        <button onclick="showTab('sounds');closeHerramientas()" id="tab-sounds" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">🔔 <span data-i18n="tabSonidos">Sonidos</span></button>
-        <button onclick="showTab('earnings');closeHerramientas()" id="tab-earnings" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">💰 Ingresos</button>
-        <button onclick="showTab('subscribers');closeHerramientas()" id="tab-subscribers" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">👥 Suscriptores</button>
-        <button onclick="showTab('account');closeHerramientas()" id="tab-account" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium">⚙️ Mi Cuenta</button>
+        <button onclick="showTab('verify');closeHerramientas()" id="tab-verify" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> <span data-i18n="tabVerificacion">Verificación</span></button>
+        <button onclick="showTab('stripe');closeHerramientas()" id="tab-stripe" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg> <span data-i18n="tabStripe">Stripe</span></button>
+        <button onclick="showTab('sounds');closeHerramientas()" id="tab-sounds" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg> <span data-i18n="tabSonidos">Sonidos</span></button>
+        <button onclick="showTab('earnings');closeHerramientas()" id="tab-earnings" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Ingresos</button>
+        <button onclick="showTab('subscribers');closeHerramientas()" id="tab-subscribers" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg> Suscriptores</button>
+        <button onclick="showTab('account');closeHerramientas()" id="tab-account" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 transition text-gray-600 font-medium flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg> Mi Cuenta</button>
       </div>
 
       <!-- TAB: Profile -->
@@ -198,8 +199,8 @@
             <div class="flex gap-2">
               <input id="contact-phone" type="tel" placeholder="Teléfono o WhatsApp" data-i18n-placeholder="telefonoWhatsapp" class="flex-1 border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
               <select id="contact-type" class="border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
-                <option value="phone" data-i18n="telefono">📞 Teléfono</option>
-                <option value="whatsapp" data-i18n="whatsapp">💬 WhatsApp</option>
+                <option value="phone" data-i18n="telefono">Teléfono</option>
+                <option value="whatsapp" data-i18n="whatsapp">WhatsApp</option>
               </select>
             </div>
             <input id="contact-website" type="url" placeholder="Sitio web (https://...)" data-i18n-placeholder="sitioWeb" class="w-full border border-gray-300 bg-gray-50 p-2 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
@@ -378,7 +379,7 @@
         <!-- Incoming Meta Invites -->
         <div id="meta-invites-section" class="hidden space-y-3">
           <h3 class="font-bold text-gray-900 flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-creo-mint/20 flex items-center justify-center text-sm">🤝</span>
+            <span class="w-6 h-6 rounded-full bg-creo-mint/20 flex items-center justify-center"><svg class="w-3.5 h-3.5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></span>
             Invitaciones a Metas
           </h3>
           <div id="meta-invites-list" class="space-y-2"></div>
@@ -432,8 +433,8 @@
           <!-- Post type selector -->
           <div class="flex gap-2 flex-wrap">
             <button onclick="setDashPostType('normal')" class="dash-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-creo-purple text-white" data-type="normal">Normal</button>
-            <button onclick="setDashPostType('evento')" class="dash-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="evento">📅 Evento</button>
-            <button onclick="setDashPostType('en_vivo')" class="dash-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200" data-type="en_vivo">📡 En Vivo</button>
+            <button onclick="setDashPostType('evento')" class="dash-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center gap-1" data-type="evento"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> Evento</button>
+            <button onclick="setDashPostType('en_vivo')" class="dash-post-type-pill px-3 py-1.5 rounded-full text-xs font-semibold transition bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center gap-1" data-type="en_vivo"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728M9.172 15.828a5 5 0 010-7.072m5.656 0a5 5 0 010 7.072M12 12h.01"/></svg> En Vivo</button>
           </div>
           <div id="dash-evento-fields" class="hidden space-y-2">
             <div class="grid grid-cols-2 gap-2">
@@ -498,14 +499,14 @@
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">📹 Video Principal</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg> Video Principal</label>
             <input type="file" id="story-main-video-file" accept="video/*" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
             <p class="text-[10px] text-gray-400 mt-1">Explícale al mundo tu historia en no más de 5 minutos. Comparte cómo has llegado hasta aquí y luego di tu meta. (Máx 50MB)</p>
             <div id="story-video-preview" class="hidden mt-2"><video class="w-full rounded-lg" controls></video></div>
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">📎 Imágenes y Audios Adicionales</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg> Imágenes y Audios Adicionales</label>
             <input type="file" id="story-media-files" accept="image/*,audio/*,video/*" multiple class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
             <p class="text-[10px] text-gray-400 mt-1">Sube fotos de cartas escritas a mano, fotos de equipos antiguos, o graba un audio con tu historia. (Máx 10MB c/u)</p>
             <div id="story-media-preview" class="flex flex-wrap gap-2 mt-2"></div>
@@ -619,476 +620,7 @@
         </div>
       </div>
 
-    </div><!-- /max-w-2xl wrapper — close so branding panel gets full width -->
 
-    <!-- TAB: Personalización — full-width for side-by-side preview + editor -->
-    <div id="panel-branding" class="tab-panel hidden px-4">
-      <!-- Split-screen: Editor (left) + Preview (right) on desktop -->
-      <div class="flex flex-col lg:flex-row gap-4 lg:gap-6 lg:items-start max-w-5xl mx-auto">
-
-          <!-- LIVE PREVIEW — sticky on desktop, collapsible on mobile -->
-          <div class="lg:sticky lg:top-4 lg:w-[380px] lg:flex-shrink-0 order-2 lg:order-2">
-            <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
-              <div class="flex items-center justify-between px-4 py-2.5 bg-gray-50 border-b border-gray-100">
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
-                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
-                  <span class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
-                </div>
-                <span class="text-[10px] text-gray-400 font-mono truncate max-w-[180px]" id="preview-url-bar">creo/profile.html</span>
-                <div class="flex items-center gap-1">
-                  <button onclick="setPreviewDevice('mobile')" id="preview-dev-mobile" class="p-1 rounded text-gray-400 hover:text-creo-purple transition" title="Móvil">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                  </button>
-                  <button onclick="setPreviewDevice('desktop')" id="preview-dev-desktop" class="p-1 rounded text-creo-purple transition" title="Escritorio">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                  </button>
-                  <button onclick="refreshPreview()" class="p-1 rounded text-gray-400 hover:text-creo-purple transition" title="Recargar">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                  </button>
-                </div>
-              </div>
-              <div id="preview-frame-wrapper" class="relative bg-gray-100 transition-all" style="height:580px">
-                <iframe id="persona-preview-iframe" class="w-full h-full border-0 transition-transform origin-top-left" sandbox="allow-scripts allow-same-origin" style="pointer-events:none"></iframe>
-                <div id="preview-loading" class="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
-                  <div class="text-center space-y-2">
-                    <div class="w-8 h-8 border-2 border-creo-purple border-t-transparent rounded-full animate-spin mx-auto"></div>
-                    <p class="text-xs text-gray-400">Cargando vista previa...</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Toggle preview on mobile -->
-            <button onclick="toggleMobilePreview()" id="mobile-preview-toggle" class="lg:hidden w-full mt-2 py-2.5 rounded-xl bg-creo-purple/10 text-creo-purple text-xs font-semibold flex items-center justify-center gap-2 transition hover:bg-creo-purple/20">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-              <span id="mobile-preview-text">Ocultar vista previa</span>
-            </button>
-          </div>
-
-          <!-- EDITOR PANEL -->
-          <div class="flex-1 order-1 lg:order-1 space-y-4 min-w-0">
-        <div class="bg-white p-5 rounded-xl shadow border border-gray-200 space-y-5">
-          <div>
-            <h3 class="font-bold text-gray-900 flex items-center gap-2">
-              <svg class="w-5 h-5 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
-              Personalización
-            </h3>
-            <p class="text-xs text-gray-500 mt-1">Edita tu perfil en tiempo real. Los cambios se reflejan al instante.</p>
-          </div>
-
-          <!-- Sub-navigation tabs -->
-          <div class="flex gap-1 bg-gray-50 rounded-xl p-1 overflow-x-auto no-scrollbar text-[11px]">
-            <button onclick="switchPersonaTab('images')" id="persona-tab-images" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition bg-creo-purple text-white">Imágenes</button>
-            <button onclick="switchPersonaTab('sections')" id="persona-tab-sections" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Secciones</button>
-            <button onclick="switchPersonaTab('colors')" id="persona-tab-colors" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Colores</button>
-            <button onclick="switchPersonaTab('typography')" id="persona-tab-typography" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Tipografía</button>
-            <button onclick="switchPersonaTab('cards')" id="persona-tab-cards" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Tarjetas</button>
-            <button onclick="switchPersonaTab('buttons')" id="persona-tab-buttons" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Botones</button>
-            <button onclick="switchPersonaTab('mecenas-inline')" id="persona-tab-mecenas-inline" class="flex-shrink-0 px-3 py-2 rounded-lg font-semibold transition text-gray-500 hover:bg-gray-200">Mecenas</button>
-          </div>
-
-          <!-- Undo / Redo -->
-          <div class="flex items-center justify-between">
-            <div class="flex gap-1">
-              <button onclick="personaUndo()" id="persona-undo-btn" class="p-1.5 rounded-lg bg-gray-100 text-gray-400 hover:text-gray-700 transition disabled:opacity-30" disabled title="Deshacer">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a4 4 0 010 8H9m-6-8l4-4m-4 4l4 4"/></svg>
-              </button>
-              <button onclick="personaRedo()" id="persona-redo-btn" class="p-1.5 rounded-lg bg-gray-100 text-gray-400 hover:text-gray-700 transition disabled:opacity-30" disabled title="Rehacer">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a4 4 0 000 8h4m6-8l-4-4m4 4l-4 4"/></svg>
-              </button>
-            </div>
-            <span id="persona-autosave-status" class="text-[10px] text-gray-400"></span>
-          </div>
-
-          <!-- ========== SUB-PANEL: Images ========== -->
-          <div id="persona-panel-images" class="persona-sub">
-
-          <!-- Info card -->
-          <div class="flex gap-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
-            <svg class="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <div>
-              <p class="text-[11px] font-semibold text-blue-800">Imágenes de perfil</p>
-              <p class="text-[10px] text-blue-600 mt-0.5">Sube tu foto de perfil y portada. Puedes ajustar la forma (redondo, cuadrado) y el tamaño del avatar. Formatos: JPG, PNG, GIF. Máx 5MB.</p>
-            </div>
-          </div>
-
-          <!-- Profile & Cover Images -->
-          <div class="space-y-4 pb-4 border-b border-gray-200">
-            <h4 class="text-xs font-semibold text-gray-700">Imágenes de perfil</h4>
-            <div class="flex gap-4 items-start">
-              <div class="text-center space-y-2">
-                <div id="brand-avatar-preview" class="w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden mx-auto">
-                  <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                </div>
-                <label class="block">
-                  <span class="text-[10px] text-creo-purple font-semibold cursor-pointer hover:underline">Cambiar foto</span>
-                  <input type="file" id="brand-avatar-file" accept="image/*,image/gif" onchange="uploadBrandAvatar()" class="hidden">
-                </label>
-                <p class="text-[9px] text-gray-400">JPG, PNG o GIF</p>
-              </div>
-              <div class="flex-1 space-y-2">
-                <div id="brand-cover-preview" class="w-full h-20 rounded-xl bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
-                  <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                </div>
-                <label class="block">
-                  <span class="text-[10px] text-creo-purple font-semibold cursor-pointer hover:underline">Cambiar portada</span>
-                  <input type="file" id="brand-cover-file" accept="image/*" onchange="uploadBrandCover()" class="hidden">
-                </label>
-              </div>
-            </div>
-
-            <!-- Profile Image Size & Shape -->
-            <div class="pt-3 border-t border-gray-100 space-y-3">
-              <h4 class="text-xs font-semibold text-gray-700">Forma y tamaño del avatar</h4>
-              <div class="flex gap-2">
-                <button onclick="setProfileShape('round')" id="pshape-round" class="flex-1 py-2 rounded-lg text-xs font-semibold border-2 border-creo-purple text-creo-purple transition text-center">Redondo</button>
-                <button onclick="setProfileShape('square')" id="pshape-square" class="flex-1 py-2 rounded-lg text-xs font-semibold border-2 border-gray-200 text-gray-500 transition text-center">Cuadrado</button>
-                <button onclick="setProfileShape('rounded')" id="pshape-rounded" class="flex-1 py-2 rounded-lg text-xs font-semibold border-2 border-gray-200 text-gray-500 transition text-center">Redondeado</button>
-              </div>
-              <div>
-                <label class="text-[10px] text-gray-500">Tamaño: <span id="psize-label">Mediano</span></label>
-                <input type="range" id="psize-range" min="0" max="3" value="1" step="1" class="w-full accent-creo-mint" oninput="setProfileSize(['sm','md','lg','xl'][this.value])">
-                <div class="flex justify-between text-[9px] text-gray-400"><span>Pequeño</span><span>Mediano</span><span>Grande</span></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Background image/video -->
-          <div class="space-y-3">
-            <label class="text-xs font-semibold text-gray-700 block">Imagen o video de fondo</label>
-            <input type="file" id="brand-bg-media-file" accept="image/*,video/mp4,video/webm" onchange="uploadBrandBgMedia()" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
-            <p class="text-[10px] text-gray-400">O pega un enlace directo:</p>
-            <input type="url" id="brand-bg-media" placeholder="https://ejemplo.com/mi-fondo.jpg" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-xl text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple" oninput="updateBrandingPreview()">
-            <div>
-              <label class="text-[10px] text-gray-500">Opacidad del fondo: <span id="bg-opacity-label">20</span>%</label>
-              <input type="range" id="bg-opacity-range" min="5" max="50" value="20" step="5" class="w-full accent-creo-mint" oninput="document.getElementById('bg-opacity-label').textContent=this.value;updateBrandingPreview();personaTrack()">
-            </div>
-          </div>
-
-          </div><!-- /persona-panel-images -->
-
-          <!-- ========== SUB-PANEL: Sections (drag-and-drop reorder + visibility) ========== -->
-          <div id="persona-panel-sections" class="persona-sub hidden space-y-4">
-            <div class="flex gap-3 p-3 bg-amber-50 rounded-xl border border-amber-100">
-              <svg class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-              <div>
-                <p class="text-[11px] font-semibold text-amber-800">Orden de secciones</p>
-                <p class="text-[10px] text-amber-600 mt-0.5">Arrastra las secciones para reordenar tu perfil. Toca el botón de visibilidad para ocultar secciones que no quieras mostrar. Los visitantes verán el orden que configures aquí.</p>
-              </div>
-            </div>
-            <div id="section-sortable" class="space-y-2"></div>
-          </div><!-- /persona-panel-sections -->
-
-          <!-- ========== SUB-PANEL: Colors ========== -->
-          <div id="persona-panel-colors" class="persona-sub hidden">
-
-          <!-- Info card -->
-          <div class="flex gap-3 p-3 bg-purple-50 rounded-xl border border-purple-100 mb-4">
-            <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
-            <div>
-              <p class="text-[11px] font-semibold text-purple-800">Colores y tema</p>
-              <p class="text-[10px] text-purple-600 mt-0.5">Cada color que cambies se refleja al instante en la vista previa. Elige tema claro u oscuro como base, luego ajusta cada color individualmente. Asegúrate de que el texto sea legible sobre el fondo.</p>
-            </div>
-          </div>
-
-          <!-- Theme toggle -->
-          <div>
-            <label class="text-xs font-semibold text-gray-700 block mb-2">Tema del perfil</label>
-            <div class="flex gap-2">
-              <button onclick="setBrandTheme('light')" id="brand-theme-light" class="flex-1 py-3 rounded-xl text-sm font-semibold transition border-2 flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                Claro
-              </button>
-              <button onclick="setBrandTheme('dark')" id="brand-theme-dark" class="flex-1 py-3 rounded-xl text-sm font-semibold transition border-2 flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                Oscuro
-              </button>
-            </div>
-          </div>
-
-          <!-- Colors grid -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Texto principal</label>
-              <div class="flex items-center gap-2">
-                <div class="brand-swatch"><input type="color" id="brand-text-color" value="#1f2937" oninput="updateBrandingPreview()"></div>
-                <span class="text-[10px] text-gray-400 font-mono" id="brand-text-hex">#1f2937</span>
-              </div>
-              <div id="brand-warn-text" class="hidden text-[10px] text-amber-700 bg-amber-50 rounded px-2 py-1 mt-1"></div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Títulos</label>
-              <div class="flex items-center gap-2">
-                <div class="brand-swatch"><input type="color" id="brand-title-color" value="#111827" oninput="updateBrandingPreview()"></div>
-                <span class="text-[10px] text-gray-400 font-mono" id="brand-title-hex">#111827</span>
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Texto de botones</label>
-              <div class="flex items-center gap-2">
-                <div class="brand-swatch"><input type="color" id="brand-btn-text-color" value="#ffffff" oninput="updateBrandingPreview()"></div>
-                <span class="text-[10px] text-gray-400 font-mono" id="brand-btn-text-hex">#ffffff</span>
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Fondo de secciones</label>
-              <div class="flex items-center gap-2">
-                <div class="brand-swatch"><input type="color" id="brand-section-bg" value="#ffffff" oninput="updateBrandingPreview()"></div>
-                <span class="text-[10px] text-gray-400 font-mono" id="brand-section-hex">#ffffff</span>
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Fondo de botones</label>
-              <div class="flex items-center gap-2">
-                <div class="brand-swatch"><input type="color" id="brand-button-color" value="#1a0a3e" oninput="updateBrandingPreview()"></div>
-                <span class="text-[10px] text-gray-400 font-mono" id="brand-button-hex">#1a0a3e</span>
-              </div>
-              <div id="brand-warn-btn" class="hidden text-[10px] text-amber-700 bg-amber-50 rounded px-2 py-1 mt-1"></div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Fondo de página</label>
-              <div class="flex items-center gap-2">
-                <div class="brand-swatch"><input type="color" id="brand-bg-color" value="#f9fafb" oninput="updateBrandingPreview()"></div>
-                <span class="text-[10px] text-gray-400 font-mono" id="brand-bg-hex">#f9fafb</span>
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Color de acento</label>
-              <div class="flex items-center gap-2">
-                <div class="brand-swatch"><input type="color" id="brand-accent-color" value="#33f0b0" oninput="updateBrandingPreview()"></div>
-                <span class="text-[10px] text-gray-400 font-mono" id="brand-accent-hex">#33f0b0</span>
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Color de enlaces</label>
-              <div class="flex items-center gap-2">
-                <div class="brand-swatch"><input type="color" id="brand-link-color" value="#6C3AED" oninput="updateBrandingPreview()"></div>
-                <span class="text-[10px] text-gray-400 font-mono" id="brand-link-hex">#6C3AED</span>
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Bordes</label>
-              <div class="flex items-center gap-2">
-                <div class="brand-swatch"><input type="color" id="brand-border-color" value="#e5e7eb" oninput="updateBrandingPreview()"></div>
-                <span class="text-[10px] text-gray-400 font-mono" id="brand-border-hex">#e5e7eb</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Preview -->
-          <div>
-            <label class="text-xs font-semibold text-gray-700 block mb-2">Vista previa</label>
-            <div id="brand-preview-card" class="relative p-5 rounded-2xl border border-gray-200 overflow-hidden" style="min-height:140px">
-              <div id="brand-preview-bg-media" class="absolute inset-0 z-0"></div>
-              <div class="relative z-10 space-y-3">
-                <p id="brand-preview-text" class="text-sm font-semibold">Así se verá tu perfil</p>
-                <p id="brand-preview-subtext" class="text-xs opacity-70">Los textos y secciones reflejan tus colores</p>
-                <div class="flex gap-2">
-                  <button id="brand-preview-pay-btn" class="px-4 py-2 rounded-full text-xs font-semibold">Creo en Ti</button>
-                  <button id="brand-preview-sub-btn" class="px-4 py-2 rounded-full text-xs font-semibold">Apoyo Full</button>
-                </div>
-              </div>
-            </div>
-          </div><!-- /persona-panel-colors -->
-
-          <!-- ========== SUB-PANEL: Typography ========== -->
-          <div id="persona-panel-typography" class="persona-sub hidden space-y-4">
-            <div class="flex gap-3 p-3 bg-green-50 rounded-xl border border-green-100">
-              <svg class="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-              <div>
-                <p class="text-[11px] font-semibold text-green-800">Tipografía</p>
-                <p class="text-[10px] text-green-600 mt-0.5">Elige la fuente principal para el texto del cuerpo y opcionalmente una fuente diferente para los títulos. La vista previa de abajo muestra cómo se verá en tu perfil.</p>
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Fuente principal</label>
-              <select id="brand-font" onchange="updateBrandingPreview();updateTypographyPreview();personaTrack()" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-xl text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
-                <option value="Inter">Inter (Default)</option>
-                <option value="Poppins">Poppins</option>
-                <option value="Montserrat">Montserrat</option>
-                <option value="Roboto">Roboto</option>
-                <option value="Open Sans">Open Sans</option>
-                <option value="Lato">Lato</option>
-                <option value="Playfair Display">Playfair Display</option>
-                <option value="Merriweather">Merriweather</option>
-                <option value="Raleway">Raleway</option>
-                <option value="Oswald">Oswald</option>
-                <option value="DM Sans">DM Sans</option>
-                <option value="Nunito">Nunito</option>
-                <option value="Quicksand">Quicksand</option>
-                <option value="Comfortaa">Comfortaa</option>
-              </select>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Fuente de títulos</label>
-              <select id="brand-heading-font" onchange="updateTypographyPreview();personaTrack()" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-xl text-sm text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple">
-                <option value="">(Misma que principal)</option>
-                <option value="Playfair Display">Playfair Display</option>
-                <option value="Merriweather">Merriweather</option>
-                <option value="Oswald">Oswald</option>
-                <option value="Montserrat">Montserrat</option>
-                <option value="Poppins">Poppins</option>
-                <option value="Raleway">Raleway</option>
-                <option value="DM Serif Display">DM Serif Display</option>
-                <option value="Libre Baskerville">Libre Baskerville</option>
-              </select>
-            </div>
-            <p id="brand-font-preview" class="text-sm text-gray-600 p-4 bg-gray-50 rounded-lg border border-gray-100">
-              <span class="block text-lg font-bold mb-1" id="brand-heading-preview">Vista previa de títulos</span>
-              Vista previa del texto del cuerpo con la tipografía seleccionada
-            </p>
-          </div><!-- /persona-panel-typography -->
-
-          <!-- ========== SUB-PANEL: Cards ========== -->
-          <div id="persona-panel-cards" class="persona-sub hidden space-y-4">
-            <div class="flex gap-3 p-3 bg-rose-50 rounded-xl border border-rose-100">
-              <svg class="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-              <div>
-                <p class="text-[11px] font-semibold text-rose-800">Estilo de tarjetas</p>
-                <p class="text-[10px] text-rose-600 mt-0.5">Controla las esquinas, sombras, efecto glass y bordes de todas las tarjetas de tu perfil. La vista previa de abajo muestra el resultado exacto.</p>
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Esquinas de tarjetas</label>
-              <div class="grid grid-cols-4 gap-2">
-                <button onclick="setCardRadius('none')" id="crad-none" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Ninguno</button>
-                <button onclick="setCardRadius('md')" id="crad-md" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Medio</button>
-                <button onclick="setCardRadius('xl')" id="crad-xl" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-creo-purple text-creo-purple transition">Grande</button>
-                <button onclick="setCardRadius('2xl')" id="crad-2xl" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">XL</button>
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Sombra</label>
-              <div class="grid grid-cols-3 gap-2">
-                <button onclick="setCardShadow('none')" id="cshad-none" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Ninguna</button>
-                <button onclick="setCardShadow('md')" id="cshad-md" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Media</button>
-                <button onclick="setCardShadow('lg')" id="cshad-lg" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-creo-purple text-creo-purple transition">Grande</button>
-              </div>
-            </div>
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-semibold text-gray-700">Efecto glass</label>
-              <button onclick="toggleCardGlass()" id="card-glass-toggle" class="relative w-11 h-6 rounded-full transition-colors bg-creo-mint">
-                <span id="card-glass-dot" class="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform" style="left:0.5px;transform:translateX(20px)"></span>
-              </button>
-            </div>
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-semibold text-gray-700">Borde visible</label>
-              <button onclick="toggleCardBorder()" id="card-border-toggle" class="relative w-11 h-6 rounded-full transition-colors bg-gray-300">
-                <span id="card-border-dot" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"></span>
-              </button>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Vista previa</label>
-              <div id="card-style-preview" class="glass p-5 rounded-2xl shadow-xl space-y-2 transition-all">
-                <h4 class="font-bold text-gray-900 text-sm">Sección de ejemplo</h4>
-                <p class="text-xs text-gray-500">Así se verán las tarjetas de tu perfil público.</p>
-              </div>
-            </div>
-          </div><!-- /persona-panel-cards -->
-
-          <!-- ========== SUB-PANEL: Buttons ========== -->
-          <div id="persona-panel-buttons" class="persona-sub hidden space-y-4">
-            <div class="flex gap-3 p-3 bg-cyan-50 rounded-xl border border-cyan-100">
-              <svg class="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
-              <div>
-                <p class="text-[11px] font-semibold text-cyan-800">Estilo de botones</p>
-                <p class="text-[10px] text-cyan-600 mt-0.5">Personaliza la forma, sombra y animación hover de los botones de tu perfil. Prueba pasar el mouse sobre la vista previa para ver las animaciones.</p>
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Forma de botones</label>
-              <div class="grid grid-cols-3 gap-2">
-                <button onclick="setButtonShape('rounded')" id="bshape-rounded" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-creo-purple text-creo-purple transition">Redondeado</button>
-                <button onclick="setButtonShape('pill')" id="bshape-pill" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Pastilla</button>
-                <button onclick="setButtonShape('square')" id="bshape-square" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Cuadrado</button>
-              </div>
-            </div>
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-semibold text-gray-700">Sombra en botones</label>
-              <button onclick="toggleBtnShadow()" id="btn-shadow-toggle" class="relative w-11 h-6 rounded-full transition-colors bg-gray-300">
-                <span id="btn-shadow-dot" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"></span>
-              </button>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Animación al hover</label>
-              <div class="grid grid-cols-3 gap-2">
-                <button onclick="setButtonAnim('none')" id="banim-none" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-creo-purple text-creo-purple transition">Ninguna</button>
-                <button onclick="setButtonAnim('lift')" id="banim-lift" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Elevar</button>
-                <button onclick="setButtonAnim('glow')" id="banim-glow" class="py-2 rounded-lg text-[10px] font-semibold border-2 border-gray-200 text-gray-500 transition">Brillo</button>
-              </div>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-gray-700 block mb-2">Vista previa</label>
-              <div class="flex gap-3 justify-center py-4 bg-gray-50 rounded-xl">
-                <button id="btn-preview-primary" class="bg-creo-purple text-white px-5 py-2.5 font-semibold text-sm transition-all rounded-xl">Contribuir</button>
-                <button id="btn-preview-secondary" class="bg-creo-mint/20 text-creo-purple px-5 py-2.5 font-semibold text-sm transition-all rounded-xl">Seguir</button>
-              </div>
-            </div>
-          </div><!-- /persona-panel-buttons -->
-
-          <!-- Section: Metas Branding (visible in all sub-tabs) -->
-          <div class="pt-4 border-t border-gray-200 space-y-4 persona-sub hidden" id="persona-panel-mecenas-inline">
-            <div class="flex items-center gap-2">
-              <span class="text-lg">🎯</span>
-              <div>
-                <h4 class="text-sm font-bold text-gray-900">Sección de Metas</h4>
-                <p class="text-[10px] text-gray-500">Personaliza cómo se ven las metas en tu perfil</p>
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">Título de la sección</label>
-              <input id="mec-meta-title" type="text" placeholder="Mi Meta" maxlength="60" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
-              <textarea id="mec-meta-desc" rows="2" maxlength="200" placeholder="Apoya mis metas como creador" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm"></textarea>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-gray-500 mb-1">Imagen o Video</label>
-              <input type="file" id="mec-meta-media" accept="image/*,video/*" class="block w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-creo-purple/10 file:text-creo-purple cursor-pointer">
-              <div id="mec-meta-media-preview" class="mt-2 hidden"><img class="w-full h-32 object-cover rounded-lg border border-gray-200" alt=""></div>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Color del botón</label>
-                <div class="flex items-center gap-2">
-                  <div class="brand-swatch"><input type="color" id="mec-meta-btn-color" value="#1a0a3e"></div>
-                  <span class="text-[10px] text-gray-400 font-mono" id="mec-meta-btn-hex">#1a0a3e</span>
-                </div>
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Color de la tarjeta</label>
-                <div class="flex items-center gap-2">
-                  <div class="brand-swatch"><input type="color" id="mec-meta-card-color" value="#ffffff"></div>
-                  <span class="text-[10px] text-gray-400 font-mono" id="mec-meta-card-hex">#ffffff</span>
-                </div>
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-gray-500 mb-2">Vista previa</label>
-              <div id="mec-meta-preview" class="p-5 rounded-2xl border border-gray-200 space-y-3 transition-all" style="background:#ffffff">
-                <div class="text-center">
-                  <h3 class="text-lg font-bold" style="color:#1f2937">Mi Meta</h3>
-                  <p class="text-xs mt-1" style="color:#6b7280">Apoya mis metas como creador</p>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-gradient-to-r from-creo-purple to-creo-mint h-full rounded-full" style="width:45%"></div></div>
-                <button class="w-full py-3 rounded-xl font-bold text-white text-sm transition" style="background:#1a0a3e">Contribuir</button>
-              </div>
-            </div>
-            <button onclick="saveMecenasSettings('meta')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-xl font-semibold text-sm transition">Guardar Metas Branding</button>
-          </div>
-
-          <!-- Save All Branding -->
-          <button onclick="savePersonalizacion()" class="w-full bg-creo-purple hover:bg-creo-light text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
-            <img src="assets/logo-icon.png" class="w-5 h-5 rounded-full" alt="">
-            Guardar Personalización
-          </button>
-        </div>
-          </div><!-- /editor panel -->
-        </div><!-- /split-screen flex -->
-    </div><!-- /panel-branding -->
-
-    <div class="max-w-2xl mx-auto px-4 pb-24 space-y-6">
       <!-- TAB: Sounds -->
       <div id="panel-sounds" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
@@ -1135,8 +667,8 @@
             <h4 class="text-sm font-semibold text-gray-700 mb-3">Creadores destacados (<span id="creoellos-count">0</span>/10)</h4>
             <div id="creoellos-selected" class="space-y-2"></div>
             <div id="creoellos-empty" class="text-center py-6">
-              <p class="text-xs text-gray-400">🤝 No has seleccionado ningún creador aún.</p>
-              <p class="text-xs text-gray-400 mt-1">🔍 Busca arriba para agregar creadores a tu sección.</p>
+              <p class="text-xs text-gray-400">No has seleccionado ningún creador aún.</p>
+              <p class="text-xs text-gray-400 mt-1">Busca arriba para agregar creadores a tu sección.</p>
             </div>
           </div>
         </div>
@@ -1146,7 +678,7 @@
       <div id="panel-mecenas-tip" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center text-lg">💚</div>
+            <div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg></div>
             <div>
               <h3 class="font-bold text-gray-900">Yo Creo en Ti</h3>
               <p class="text-xs text-gray-500">Personaliza cómo se ve la sección de tips en tu perfil</p>
@@ -1200,7 +732,7 @@
       <div id="panel-mecenas-sub" class="tab-panel hidden space-y-4">
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-5">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-lg">⭐</div>
+            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center"><svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></div>
             <div>
               <h3 class="font-bold text-gray-900">Apoyo Full</h3>
               <p class="text-xs text-gray-500">Personaliza la sección de suscripciones mensuales</p>
@@ -1380,13 +912,13 @@
 
           <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-[11px]">
             <button onclick="cfhFilterCat(null)" data-cfhcat="" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-creo-purple text-white font-semibold whitespace-nowrap">Todos</button>
-            <button onclick="cfhFilterCat('music')" data-cfhcat="music" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">🎵 Music</button>
-            <button onclick="cfhFilterCat('books')" data-cfhcat="books" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">📚 Books</button>
-            <button onclick="cfhFilterCat('food')" data-cfhcat="food" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">🍽️ Food</button>
-            <button onclick="cfhFilterCat('health')" data-cfhcat="health" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">🏥 Health</button>
-            <button onclick="cfhFilterCat('fitness')" data-cfhcat="fitness" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">💪 Fitness</button>
-            <button onclick="cfhFilterCat('education')" data-cfhcat="education" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">🎓 Education</button>
-            <button onclick="cfhFilterCat('faith')" data-cfhcat="faith" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap">✝️ Fe</button>
+            <button onclick="cfhFilterCat('music')" data-cfhcat="music" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg> Music</button>
+            <button onclick="cfhFilterCat('books')" data-cfhcat="books" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> Books</button>
+            <button onclick="cfhFilterCat('food')" data-cfhcat="food" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg> Food</button>
+            <button onclick="cfhFilterCat('health')" data-cfhcat="health" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg> Health</button>
+            <button onclick="cfhFilterCat('fitness')" data-cfhcat="fitness" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Fitness</button>
+            <button onclick="cfhFilterCat('education')" data-cfhcat="education" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg> Education</button>
+            <button onclick="cfhFilterCat('faith')" data-cfhcat="faith" class="cfh-cat-btn px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 font-semibold whitespace-nowrap flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg> Fe</button>
           </div>
 
           <div id="cfh-stats" class="grid grid-cols-3 gap-2 text-center">
@@ -1402,7 +934,7 @@
 
         <div class="bg-white p-6 rounded-xl shadow border border-gray-200 space-y-4">
           <div class="flex items-center justify-between">
-            <h4 class="font-bold text-gray-900 text-sm flex items-center gap-2">📂 Mis Subcategorías</h4>
+            <h4 class="font-bold text-gray-900 text-sm flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> Mis Subcategorías</h4>
             <button onclick="showCfhSubcatForm()" class="text-xs text-creo-purple font-semibold hover:underline">+ Agregar</button>
           </div>
           <div id="cfh-my-subcats" class="space-y-2">
@@ -1427,23 +959,23 @@
               <div>
                 <label class="block text-xs font-medium text-gray-500 mb-1">Categoría <span class="text-red-500">*</span></label>
                 <select id="cfh-category" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" onchange="loadCfhSubcatsForForm()">
-                  <option value="music">🎵 Music</option>
-                  <option value="books">📚 Books</option>
-                  <option value="food">🍽️ Food</option>
-                  <option value="health">🏥 Health</option>
-                  <option value="fitness">💪 Fitness</option>
-                  <option value="education">🎓 Education</option>
-                  <option value="faith">✝️ Fe</option>
+                  <option value="music">Music</option>
+                  <option value="books">Books</option>
+                  <option value="food">Food</option>
+                  <option value="health">Health</option>
+                  <option value="fitness">Fitness</option>
+                  <option value="education">Education</option>
+                  <option value="faith">Fe</option>
                 </select>
               </div>
               <div>
                 <label class="block text-xs font-medium text-gray-500 mb-1">Tipo <span class="text-red-500">*</span></label>
                 <select id="cfh-content-type" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple" onchange="toggleCfhTypeFields()">
-                  <option value="video">▶️ Video</option>
-                  <option value="book">📖 Libro</option>
-                  <option value="recipe">🍳 Receta</option>
-                  <option value="course">🎓 Curso</option>
-                  <option value="article">📝 Artículo</option>
+                  <option value="video">Video</option>
+                  <option value="book">Libro</option>
+                  <option value="recipe">Receta</option>
+                  <option value="course">Curso</option>
+                  <option value="article">Artículo</option>
                 </select>
               </div>
             </div>
@@ -1504,16 +1036,16 @@
             <div class="flex items-center gap-4 bg-gray-50 rounded-xl p-3">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input type="radio" name="cfh-access" id="cfh-free" value="true" checked class="accent-creo-purple">
-                <span class="text-sm text-gray-700">🆓 Gratis</span>
+                <span class="text-sm text-gray-700">Gratis</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input type="radio" name="cfh-access" id="cfh-paid" value="false" class="accent-creo-purple">
-                <span class="text-sm text-gray-700">⭐ Premium (Apoyo Full)</span>
+                <span class="text-sm text-gray-700 flex items-center gap-1"><svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg> Premium (Apoyo Full)</span>
               </label>
             </div>
             <label class="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" id="cfh-allow-download" class="accent-creo-purple">
-              <span class="text-sm text-gray-700">📥 Permitir descarga</span>
+              <span class="text-sm text-gray-700 flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg> Permitir descarga</span>
             </label>
             <div>
               <label class="block text-xs font-medium text-gray-500 mb-1">Tags (separados por coma)</label>
@@ -1527,13 +1059,13 @@
             <div>
               <label class="block text-xs font-medium text-gray-500 mb-1">Estado</label>
               <select id="cfh-status" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
-                <option value="published">✅ Publicado</option>
-                <option value="draft">📝 Borrador</option>
-                <option value="archived">📦 Archivado</option>
+                <option value="published">Publicado</option>
+                <option value="draft">Borrador</option>
+                <option value="archived">Archivado</option>
               </select>
             </div>
-            <button onclick="saveCfhContent()" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 rounded-xl transition text-sm">
-              💾 Guardar Contenido
+            <button onclick="saveCfhContent()" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg> Guardar Contenido
             </button>
           </div>
         </div>
@@ -1548,13 +1080,13 @@
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Categoría</label>
             <select id="cfh-subcat-category" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
-              <option value="music">🎵 Music</option>
-              <option value="books">📚 Books</option>
-              <option value="food">🍽️ Food</option>
-              <option value="health">🏥 Health</option>
-              <option value="fitness">💪 Fitness</option>
-              <option value="education">🎓 Education</option>
-              <option value="faith">✝️ Fe</option>
+              <option value="music">Music</option>
+              <option value="books">Books</option>
+              <option value="food">Food</option>
+              <option value="health">Health</option>
+              <option value="fitness">Fitness</option>
+              <option value="education">Education</option>
+              <option value="faith">Fe</option>
             </select>
           </div>
           <div>
@@ -1565,7 +1097,7 @@
             <label class="block text-xs font-medium text-gray-500 mb-1">Descripción (opcional)</label>
             <input id="cfh-subcat-desc" type="text" placeholder="Breve descripción" class="w-full border border-gray-300 bg-gray-50 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-creo-purple">
           </div>
-          <button onclick="saveCfhSubcat()" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 rounded-xl transition text-sm">💾 Guardar</button>
+          <button onclick="saveCfhSubcat()" class="w-full bg-creo-purple hover:bg-creo-light text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg> Guardar</button>
         </div>
       </div>
 
@@ -1580,16 +1112,16 @@
             <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
               <h4 class="font-semibold text-sm text-blue-900 mb-1">Descargar mis datos</h4>
               <p class="text-xs text-blue-700 mb-3">Descarga una copia de todos tus datos en CREO (perfil, posts, metas, mensajes, etc.) en formato JSON.</p>
-              <button onclick="requestDataExport()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl transition">
-                📥 Descargar mis datos
+              <button onclick="requestDataExport()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg> Descargar mis datos
               </button>
             </div>
 
             <div class="p-4 bg-red-50 rounded-xl border border-red-200">
               <h4 class="font-semibold text-sm text-red-900 mb-1">Eliminar mi cuenta</h4>
               <p class="text-xs text-red-700 mb-3">Esta acción es irreversible. Todos tus datos, posts, metas y mensajes serán eliminados permanentemente.</p>
-              <button onclick="requestAccountDeletion()" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl transition">
-                🗑️ Eliminar mi cuenta
+              <button onclick="requestAccountDeletion()" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2.5 px-5 rounded-xl transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> Eliminar mi cuenta
               </button>
             </div>
           </div>
@@ -1601,13 +1133,6 @@
 
   <style>
     .tab-active { color: #1a0a3e; border-bottom: 2px solid #33f0b0; background: rgba(51,240,176,0.05); }
-    .brand-swatch {
-      width: 36px; height: 36px; border-radius: 10px; border: 2px solid rgba(0,0,0,0.1);
-      cursor: pointer; position: relative; overflow: hidden;
-    }
-    .brand-swatch input[type="color"] {
-      position: absolute; inset: -4px; width: 140%; height: 140%; cursor: pointer; border: none;
-    }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     @keyframes slide-up { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -1626,7 +1151,7 @@
       if (!e.target.closest('#tab-metas-group') && !e.target.closest('#metas-dropdown')) closeMetasDropdown();
     });
 
-    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'branding', 'sounds', 'earnings', 'subscribers'];
+    const HERRAMIENTAS_TABS = ['verify', 'stripe', 'sounds', 'earnings', 'subscribers'];
     const METAS_TABS = ['metas', 'mecenas-tip', 'mecenas-sub', 'my-subs', 'my-payments'];
 
     function toggleMetasDropdown() {
@@ -1661,7 +1186,6 @@
       }
       if (tab === 'story') loadMyStories();
       if (tab === 'business') loadMyBusinessLinks();
-      if (tab === 'branding') { loadBrandingPanel(); loadPersonalizacion(); loadMecenasPanel('mecenas-meta'); initPersonaPreview(); }
       if (tab === 'creoellos') loadCreoEllosPanel();
       if (tab === 'sounds') renderSoundSettings();
       if (tab === 'cfh') loadCfhPanel();
@@ -1717,941 +1241,6 @@
       document.getElementById('volume-label').textContent = val;
     }
 
-    // ===== BRANDING PANEL =====
-    let brandState = { theme: 'light', textColor: '#1f2937', titleColor: '#111827', btnTextColor: '#ffffff', sectionBg: '#ffffff', buttonColor: '#1a0a3e', bgColor: '#f9fafb', font: 'Inter', bgMedia: '', bgOpacity: 20 };
-
-    function getLuminance(hex) {
-      const r = parseInt(hex.slice(1,3), 16) / 255;
-      const g = parseInt(hex.slice(3,5), 16) / 255;
-      const b = parseInt(hex.slice(5,7), 16) / 255;
-      const toLinear = c => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-      return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
-    }
-
-    function getContrast(hex1, hex2) {
-      const l1 = getLuminance(hex1), l2 = getLuminance(hex2);
-      return (Math.max(l1,l2) + 0.05) / (Math.min(l1,l2) + 0.05);
-    }
-
-    function suggestTextColor(bgHex) {
-      return getLuminance(bgHex) > 0.4 ? '#111111' : '#f5f5f5';
-    }
-
-    function loadBrandingPanel() {
-      if (!currentProfile) return;
-      const c = currentProfile.profile_colors || {};
-      const isDark = (c.theme || 'light') === 'dark';
-      brandState.theme = c.theme || 'light';
-      brandState.textColor = c.textColor || (isDark ? '#e0e0e0' : '#1f2937');
-      brandState.titleColor = c.titleColor || (isDark ? '#ffffff' : '#111827');
-      brandState.btnTextColor = c.btnTextColor || '#ffffff';
-      brandState.sectionBg = c.sectionBg || (isDark ? '#1e1e1e' : '#ffffff');
-      brandState.buttonColor = c.buttonColor || '#1a0a3e';
-      brandState.bgColor = c.bgColor || (isDark ? '#121212' : '#f9fafb');
-      brandState.font = c.font || 'Inter';
-      brandState.bgMedia = c.bgMedia || '';
-      brandState.bgOpacity = c.bgOpacity != null ? c.bgOpacity : 20;
-
-      document.getElementById('brand-text-color').value = brandState.textColor;
-      document.getElementById('brand-title-color').value = brandState.titleColor;
-      document.getElementById('brand-btn-text-color').value = brandState.btnTextColor;
-      document.getElementById('brand-section-bg').value = brandState.sectionBg;
-      document.getElementById('brand-button-color').value = brandState.buttonColor;
-      document.getElementById('brand-bg-color').value = brandState.bgColor;
-      document.getElementById('brand-font').value = brandState.font;
-      document.getElementById('brand-bg-media').value = brandState.bgMedia;
-      const opRange = document.getElementById('bg-opacity-range');
-      if (opRange) { opRange.value = brandState.bgOpacity; document.getElementById('bg-opacity-label').textContent = brandState.bgOpacity; }
-      updateThemeButtons();
-      updateBrandingPreview();
-      loadBrandImagePreviews();
-    }
-
-    function setBrandTheme(theme) {
-      brandState.theme = theme;
-      const isDark = theme === 'dark';
-      brandState.textColor = isDark ? '#e0e0e0' : '#1f2937';
-      brandState.sectionBg = isDark ? '#1e1e1e' : '#ffffff';
-      brandState.bgColor = isDark ? '#121212' : '#f9fafb';
-      document.getElementById('brand-text-color').value = brandState.textColor;
-      document.getElementById('brand-section-bg').value = brandState.sectionBg;
-      document.getElementById('brand-bg-color').value = brandState.bgColor;
-      updateThemeButtons();
-      updateBrandingPreview();
-    }
-
-    function updateThemeButtons() {
-      const lightBtn = document.getElementById('brand-theme-light');
-      const darkBtn = document.getElementById('brand-theme-dark');
-      if (brandState.theme === 'light') {
-        lightBtn.className = 'flex-1 py-3 rounded-xl text-sm font-semibold transition border-2 flex items-center justify-center gap-2 border-creo-mint bg-creo-mint/10 text-creo-purple';
-        darkBtn.className = 'flex-1 py-3 rounded-xl text-sm font-semibold transition border-2 flex items-center justify-center gap-2 border-gray-200 text-gray-400';
-      } else {
-        darkBtn.className = 'flex-1 py-3 rounded-xl text-sm font-semibold transition border-2 flex items-center justify-center gap-2 border-creo-purple bg-creo-purple text-white';
-        lightBtn.className = 'flex-1 py-3 rounded-xl text-sm font-semibold transition border-2 flex items-center justify-center gap-2 border-gray-200 text-gray-400';
-      }
-    }
-
-    function updateBrandingPreview() {
-      const textColor = document.getElementById('brand-text-color').value;
-      const titleColor = document.getElementById('brand-title-color').value;
-      const btnTextColor = document.getElementById('brand-btn-text-color').value;
-      const sectionBg = document.getElementById('brand-section-bg').value;
-      const buttonColor = document.getElementById('brand-button-color').value;
-      const bgColor = document.getElementById('brand-bg-color').value;
-      const font = document.getElementById('brand-font').value;
-      const bgMedia = document.getElementById('brand-bg-media').value.trim();
-      const bgOpacity = parseInt(document.getElementById('bg-opacity-range')?.value || '20', 10);
-
-      brandState = { ...brandState, textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, bgOpacity };
-
-      // Update hex displays
-      document.getElementById('brand-text-hex').textContent = textColor;
-      document.getElementById('brand-title-hex').textContent = titleColor;
-      document.getElementById('brand-btn-text-hex').textContent = btnTextColor;
-      document.getElementById('brand-section-hex').textContent = sectionBg;
-      document.getElementById('brand-button-hex').textContent = buttonColor;
-      document.getElementById('brand-bg-hex').textContent = bgColor;
-
-      // Contrast warnings — WCAG AA requires 4.5:1 for text, 3:1 for large text/buttons
-      const warnText = document.getElementById('brand-warn-text');
-      const textVsSection = getContrast(textColor, sectionBg);
-      if (textVsSection < 4.5) {
-        const fix = suggestTextColor(sectionBg);
-        warnText.innerHTML = 'Bajo contraste (' + textVsSection.toFixed(1) + ':1). <span class="underline cursor-pointer font-bold" onclick="document.getElementById(\'brand-text-color\').value=\'' + fix + '\';updateBrandingPreview()">Corregir a ' + fix + '</span>';
-        warnText.classList.remove('hidden');
-      } else { warnText.classList.add('hidden'); }
-
-      const warnBtn = document.getElementById('brand-warn-btn');
-      const btnContrast = getContrast(btnTextColor, buttonColor);
-      if (btnContrast < 3) {
-        const btnFix = suggestTextColor(buttonColor);
-        warnBtn.innerHTML = 'Texto de botón poco visible (' + btnContrast.toFixed(1) + ':1). <span class="underline cursor-pointer font-bold" onclick="document.getElementById(\'brand-btn-text-color\').value=\'' + btnFix + '\';updateBrandingPreview()">Corregir</span>';
-        warnBtn.classList.remove('hidden');
-      } else { warnBtn.classList.add('hidden'); }
-
-      // Title contrast warning
-      const titleVsSection = getContrast(titleColor, sectionBg);
-      if (titleVsSection < 4.5) {
-        const fix = suggestTextColor(sectionBg);
-        document.getElementById('brand-title-color').value = fix;
-        brandState.titleColor = fix;
-      }
-
-      // Font preview
-      const fontPreview = document.getElementById('brand-font-preview');
-      fontPreview.style.fontFamily = font + ', sans-serif';
-      fontPreview.textContent = 'Vista previa: ' + font;
-
-      // Preview card
-      const card = document.getElementById('brand-preview-card');
-      card.style.backgroundColor = bgColor;
-
-      // Background media in preview — safe DOM construction
-      const mediaCont = document.getElementById('brand-preview-bg-media');
-      mediaCont.innerHTML = '';
-      if (bgMedia && /^https?:\/\//i.test(bgMedia)) {
-        const isVideo = /\.(mp4|webm|ogg)(\?|$)/i.test(bgMedia);
-        if (isVideo) {
-          const vid = document.createElement('video');
-          vid.src = bgMedia;
-          vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true;
-          vid.className = 'w-full h-full object-cover absolute inset-0';
-          vid.style.opacity = '0.3';
-          mediaCont.appendChild(vid);
-        } else {
-          const img = document.createElement('img');
-          img.src = bgMedia;
-          img.className = 'w-full h-full object-cover absolute inset-0';
-          img.style.opacity = '0.3';
-          mediaCont.appendChild(img);
-        }
-      }
-
-      const previewText = document.getElementById('brand-preview-text');
-      const previewSub = document.getElementById('brand-preview-subtext');
-      previewText.style.color = titleColor;
-      previewText.style.fontFamily = font + ', sans-serif';
-      previewSub.style.color = textColor;
-
-      const payBtn = document.getElementById('brand-preview-pay-btn');
-      const subBtn = document.getElementById('brand-preview-sub-btn');
-      payBtn.style.backgroundColor = buttonColor;
-      payBtn.style.color = btnTextColor;
-      subBtn.style.backgroundColor = buttonColor;
-      subBtn.style.color = btnTextColor;
-      subBtn.style.opacity = '0.85';
-
-      // Update extended color hex displays
-      const accentEl = document.getElementById('brand-accent-hex');
-      const linkEl = document.getElementById('brand-link-hex');
-      const borderEl = document.getElementById('brand-border-hex');
-      if (accentEl) accentEl.textContent = document.getElementById('brand-accent-color')?.value || '#33f0b0';
-      if (linkEl) linkEl.textContent = document.getElementById('brand-link-color')?.value || '#6C3AED';
-      if (borderEl) borderEl.textContent = document.getElementById('brand-border-color')?.value || '#e5e7eb';
-
-      schedulePreviewUpdate();
-    }
-
-    async function saveBrandingFromPanel() {
-      if (!currentProfile) return;
-      let { textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, theme } = brandState;
-
-      // Auto-correct contrast before saving — never persist unreadable combos
-      if (getContrast(textColor, sectionBg) < 4.5) {
-        textColor = suggestTextColor(sectionBg);
-        brandState.textColor = textColor;
-        document.getElementById('brand-text-color').value = textColor;
-      }
-      if (getContrast(titleColor, sectionBg) < 4.5) {
-        titleColor = suggestTextColor(sectionBg);
-        brandState.titleColor = titleColor;
-        document.getElementById('brand-title-color').value = titleColor;
-      }
-      if (getContrast(btnTextColor, buttonColor) < 3) {
-        btnTextColor = suggestTextColor(buttonColor);
-        brandState.btnTextColor = btnTextColor;
-        document.getElementById('brand-btn-text-color').value = btnTextColor;
-      }
-
-      const colors = { theme, textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia };
-      const { error } = await sb.from('profiles').update({ profile_colors: colors }).eq('id', currentProfile.id);
-      if (error) { showToast('Error al guardar', 'error'); return; }
-      currentProfile.profile_colors = colors;
-      showToast('Branding guardado. Visita tu perfil para verlo.', 'success');
-    }
-
-    // ===== LIVE PREVIEW ENGINE =====
-    let previewReady = false;
-    let previewDebounce = null;
-
-    function initPersonaPreview() {
-      const iframe = document.getElementById('persona-preview-iframe');
-      if (!iframe || !currentProfile) return;
-      const username = currentProfile.username;
-      if (!username) return;
-      const url = 'profile.html?u=' + encodeURIComponent(username);
-      document.getElementById('preview-url-bar').textContent = 'creo/' + username;
-      iframe.onload = function() {
-        previewReady = true;
-        document.getElementById('preview-loading').classList.add('hidden');
-        pushStylesToPreview();
-      };
-      iframe.src = url;
-    }
-
-    function pushStylesToPreview() {
-      const iframe = document.getElementById('persona-preview-iframe');
-      if (!iframe || !previewReady) return;
-      try {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        if (!doc || !doc.body) return;
-
-        const { textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, theme } = brandState;
-        const isDark = theme === 'dark';
-
-        // Page background
-        doc.body.style.backgroundColor = bgColor;
-        doc.body.style.color = textColor;
-
-        // Font
-        if (font !== 'Inter') {
-          let fLink = doc.getElementById('brand-font-link');
-          const fUrl = 'https://fonts.googleapis.com/css2?family=' + font.replace(/ /g, '+') + ':wght@400;600;700&display=swap';
-          if (!fLink) { fLink = doc.createElement('link'); fLink.id = 'brand-font-link'; fLink.rel = 'stylesheet'; doc.head.appendChild(fLink); }
-          fLink.href = fUrl;
-        }
-        doc.body.style.fontFamily = font + ', sans-serif';
-
-        // Heading font
-        const headingFont = document.getElementById('brand-heading-font')?.value || '';
-        if (headingFont) {
-          let hLink = doc.getElementById('brand-heading-font-link');
-          const hUrl = 'https://fonts.googleapis.com/css2?family=' + headingFont.replace(/ /g, '+') + ':wght@400;600;700&display=swap';
-          if (!hLink) { hLink = doc.createElement('link'); hLink.id = 'brand-heading-font-link'; hLink.rel = 'stylesheet'; doc.head.appendChild(hLink); }
-          hLink.href = hUrl;
-          doc.querySelectorAll('.section-title, #profile-name, h1, h2, h3').forEach(el => { el.style.fontFamily = headingFont + ', sans-serif'; });
-        }
-
-        // CSS custom properties
-        doc.documentElement.style.setProperty('--brand-section-bg', sectionBg);
-        doc.documentElement.style.setProperty('--brand-text-color', textColor);
-        doc.documentElement.style.setProperty('--brand-button-color', buttonColor);
-        doc.documentElement.style.setProperty('--brand-btn-text-color', btnTextColor);
-
-        // Extended theme colors
-        const accentColor = document.getElementById('brand-accent-color')?.value || '#33f0b0';
-        const linkColor = document.getElementById('brand-link-color')?.value || '#6C3AED';
-        const borderColor = document.getElementById('brand-border-color')?.value || '#e5e7eb';
-        doc.documentElement.style.setProperty('--brand-accent-color', accentColor);
-        doc.documentElement.style.setProperty('--brand-link-color', linkColor);
-        doc.documentElement.style.setProperty('--brand-border-color', borderColor);
-
-        // Section cards
-        doc.querySelectorAll('.glass, .glass-dark, #profile-header-card, .pay-panel > div, #payment-tabs').forEach(el => {
-          el.style.background = sectionBg;
-          el.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : '';
-        });
-
-        // Titles
-        doc.querySelectorAll('.section-title, #profile-name, .meta-media-card h3, h3.text-lg, h2.section-title').forEach(el => { el.style.color = titleColor; });
-
-        // Text
-        doc.querySelectorAll('#profile-bio, #profile-username, .text-gray-900, .text-gray-700').forEach(el => { el.style.color = textColor; });
-
-        // Buttons
-        doc.querySelectorAll('#tip-btn, #sub-btn, #meta-support-btn, [id^="meta-btn-"], .creamos-btn').forEach(el => {
-          if (!el.disabled) { el.style.backgroundColor = buttonColor; el.style.color = btnTextColor; }
-        });
-
-        // Link colors
-        doc.querySelectorAll('a.text-creo-purple, .text-creo-purple').forEach(el => {
-          if (!el.closest('button') && !el.closest('[id^="pay-tab"]')) el.style.color = linkColor;
-        });
-
-        // Card styles
-        const cs = personaLayout.cardStyle;
-        const radiusMap = { none: '0', md: '0.75rem', xl: '1rem', '2xl': '1.5rem' };
-        const shadowMap = { none: 'none', md: '0 4px 6px rgba(0,0,0,0.1)', lg: '0 10px 25px rgba(0,0,0,0.15)' };
-        doc.querySelectorAll('.glass, .glass-dark, #profile-header-card, .pay-panel > div, .meta-media-card').forEach(el => {
-          el.style.borderRadius = radiusMap[cs.radius] || '1rem';
-          el.style.boxShadow = shadowMap[cs.shadow] || 'none';
-          if (cs.border) el.style.border = '1px solid ' + borderColor;
-          el.style.backdropFilter = cs.glass ? 'blur(16px)' : 'none';
-        });
-
-        // Button styles
-        const bs = personaLayout.buttonStyle;
-        const bShapeMap = { rounded: '0.75rem', pill: '9999px', square: '0.25rem' };
-        doc.querySelectorAll('#tip-btn, #sub-btn, #meta-support-btn, [id^="meta-btn-"], .creamos-btn').forEach(btn => {
-          btn.style.borderRadius = bShapeMap[bs.shape] || '0.75rem';
-          btn.style.boxShadow = bs.shadow ? '0 4px 12px rgba(0,0,0,0.2)' : 'none';
-        });
-
-        // Profile image
-        const pi = personaLayout.profileImage;
-        const avatarC = doc.getElementById('avatar-container');
-        if (avatarC) {
-          const sizeMap = { sm: '5rem', md: '7rem', lg: '9rem', xl: '11rem' };
-          const szPxMap = { sm: 80, md: 112, lg: 144, xl: 176 };
-          const sz = sizeMap[pi.size] || '7rem';
-          const szPx = szPxMap[pi.size] || 112;
-          avatarC.style.width = sz; avatarC.style.height = sz;
-          const aw = doc.getElementById('avatar-wrapper');
-          if (aw) { aw.style.width = sz; aw.style.height = sz; }
-          const hc = doc.getElementById('profile-header-card');
-          if (hc) {
-            hc.style.paddingTop = (szPx * 0.4 + 12) + 'px';
-            // marginTop set after section ordering below
-            hc.dataset.szPx = szPx;
-          }
-          const shapeMap = { round: '50%', square: '0.5rem', rounded: '1.5rem' };
-          avatarC.style.borderRadius = shapeMap[pi.shape] || '50%';
-        }
-
-        // Section visibility + order
-        const container = doc.getElementById('profile-sections-container');
-        if (container && personaLayout.sections) {
-          const sorted = [...personaLayout.sections].sort((a, b) => a.order - b.order);
-          let coverVis = true;
-          sorted.forEach((sec) => {
-            const el = container.querySelector('[data-section="' + sec.id + '"]');
-            if (!el) return;
-            container.appendChild(el);
-            if (!sec.visible && el.style.display !== 'none') el.setAttribute('data-hidden-by-layout', '1');
-            if (!sec.visible) el.style.display = 'none';
-            if (sec.visible && el.getAttribute('data-hidden-by-layout')) { el.removeAttribute('data-hidden-by-layout'); el.style.display = ''; }
-            if (sec.id === 'cover' && !sec.visible) coverVis = false;
-            if (sec.id === 'payments') {
-              doc.querySelectorAll('.pay-panel').forEach(p => { container.appendChild(p); if (!sec.visible) p.style.display = 'none'; else p.style.display = ''; });
-            }
-          });
-          // Determine cover/header position and set marginTop
-          const visOrder = sorted.filter(s => s.visible);
-          const hIdx = visOrder.findIndex(s => s.id === 'header');
-          const cIdx = visOrder.findIndex(s => s.id === 'cover');
-          const coverAbove = coverVis && hIdx > 0 && cIdx === hIdx - 1;
-          const hc2 = doc.getElementById('profile-header-card');
-          if (hc2) {
-            const szPx2 = parseFloat(hc2.dataset.szPx) || 112;
-            hc2.style.paddingTop = (szPx2 * 0.4 + 12) + 'px';
-            hc2.style.marginTop = coverAbove ? -(szPx2 * 0.35) + 'px' : (szPx2 * 0.6) + 'px';
-          }
-        }
-
-        // Background media
-        let bgC = doc.getElementById('brand-bg-media-container');
-        if (bgMedia && /^https?:\/\//i.test(bgMedia)) {
-          if (!bgC) { bgC = doc.createElement('div'); bgC.id = 'brand-bg-media-container'; bgC.style.cssText = 'position:fixed;inset:0;z-index:-1;overflow:hidden;'; doc.body.prepend(bgC); }
-          const opacity = (document.getElementById('bg-opacity-range')?.value || 20) / 100;
-          bgC.innerHTML = '';
-          const isVid = /\.(mp4|webm|ogg)(\?|$)/i.test(bgMedia);
-          if (isVid) {
-            const v = doc.createElement('video'); v.src = bgMedia; v.autoplay = true; v.muted = true; v.loop = true; v.playsInline = true;
-            v.style.cssText = 'width:100%;height:100%;object-fit:cover;opacity:' + opacity; bgC.appendChild(v);
-          } else {
-            const img = doc.createElement('img'); img.src = bgMedia;
-            img.style.cssText = 'width:100%;height:100%;object-fit:cover;opacity:' + opacity; bgC.appendChild(img);
-          }
-        } else if (bgC) { bgC.remove(); }
-
-        // Secondary text in dark
-        if (isDark) {
-          doc.querySelectorAll('.text-gray-400, .text-gray-500').forEach(el => { el.style.color = '#a0a0b8'; });
-          doc.querySelectorAll('input[type="number"], select').forEach(el => {
-            el.style.backgroundColor = '#2a2a2a'; el.style.color = textColor; el.style.borderColor = 'rgba(255,255,255,0.15)';
-          });
-        }
-      } catch(e) { /* cross-origin or not ready */ }
-    }
-
-    function schedulePreviewUpdate() {
-      clearTimeout(previewDebounce);
-      previewDebounce = setTimeout(pushStylesToPreview, 80);
-    }
-
-    function setPreviewDevice(device) {
-      const wrapper = document.getElementById('preview-frame-wrapper');
-      const iframe = document.getElementById('persona-preview-iframe');
-      const mBtn = document.getElementById('preview-dev-mobile');
-      const dBtn = document.getElementById('preview-dev-desktop');
-      if (!wrapper || !iframe) return;
-      if (device === 'mobile') {
-        wrapper.style.width = '375px';
-        wrapper.style.height = '667px';
-        wrapper.style.margin = '0 auto';
-        iframe.style.transform = 'none';
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        mBtn.classList.add('text-creo-purple'); mBtn.classList.remove('text-gray-400');
-        dBtn.classList.remove('text-creo-purple'); dBtn.classList.add('text-gray-400');
-      } else {
-        wrapper.style.width = '100%';
-        wrapper.style.height = '580px';
-        wrapper.style.margin = '0';
-        iframe.style.transform = 'none';
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        dBtn.classList.add('text-creo-purple'); dBtn.classList.remove('text-gray-400');
-        mBtn.classList.remove('text-creo-purple'); mBtn.classList.add('text-gray-400');
-      }
-    }
-
-    function refreshPreview() {
-      previewReady = false;
-      document.getElementById('preview-loading').classList.remove('hidden');
-      const iframe = document.getElementById('persona-preview-iframe');
-      if (iframe) iframe.src = iframe.src;
-    }
-
-    function toggleMobilePreview() {
-      const wrapper = document.getElementById('preview-frame-wrapper');
-      const text = document.getElementById('mobile-preview-text');
-      if (!wrapper) return;
-      const hidden = wrapper.style.display === 'none';
-      wrapper.style.display = hidden ? '' : 'none';
-      if (text) text.textContent = hidden ? 'Ocultar vista previa' : 'Mostrar vista previa';
-    }
-
-    // ===== PERSONALIZACIÓN EDITOR =====
-    let personaLayout = {
-      sections: [
-        {id:'cover',visible:true,order:0},{id:'header',visible:true,order:1},
-        {id:'story',visible:true,order:2},{id:'creo-en-ellos',visible:true,order:3},
-        {id:'metas',visible:true,order:4},{id:'completed-metas',visible:true,order:5},
-        {id:'posts',visible:true,order:6},{id:'business',visible:true,order:7},
-        {id:'payments',visible:true,order:8}
-      ],
-      profileImage:{size:'md',shape:'round'},
-      banner:{type:'gradient',value:''},
-      cardStyle:{radius:'xl',shadow:'lg',glass:true,border:false},
-      buttonStyle:{shape:'rounded',shadow:false,animation:'none'}
-    };
-    let personaTheme = {};
-    let personaHistory = [];
-    let personaHistoryIdx = -1;
-    let personaAutosaveTimer = null;
-
-    const sectionLabels = {
-      'cover':'Portada','header':'Encabezado','story':'Historia',
-      'creo-en-ellos':'Creo en Ellos','metas':'Metas Activas',
-      'completed-metas':'Metas Completadas','posts':'Publicaciones',
-      'business':'Negocio','payments':'Pagos'
-    };
-
-    function switchPersonaTab(tab) {
-      document.querySelectorAll('.persona-sub').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('[id^="persona-tab-"]').forEach(btn => {
-        btn.classList.remove('bg-creo-purple','text-white');
-        btn.classList.add('text-gray-500');
-      });
-      const panel = document.getElementById('persona-panel-' + tab);
-      const tabBtn = document.getElementById('persona-tab-' + tab);
-      if (panel) { panel.classList.remove('hidden'); panel.style.display = ''; }
-      if (tabBtn) { tabBtn.classList.add('bg-creo-purple','text-white'); tabBtn.classList.remove('text-gray-500'); }
-      if (tab === 'mecenas-inline') {
-        loadMecenasPanel('mecenas-meta');
-      }
-    }
-
-    function personaTrack() {
-      const snapshot = JSON.stringify({ layout: personaLayout, theme: personaTheme, brandState });
-      if (personaHistory.length > 0 && personaHistory[personaHistoryIdx] === snapshot) return;
-      personaHistory = personaHistory.slice(0, personaHistoryIdx + 1);
-      personaHistory.push(snapshot);
-      if (personaHistory.length > 50) personaHistory.shift();
-      personaHistoryIdx = personaHistory.length - 1;
-      updateUndoRedoBtns();
-      personaAutosave();
-      schedulePreviewUpdate();
-    }
-
-    function personaUndo() {
-      if (personaHistoryIdx <= 0) return;
-      personaHistoryIdx--;
-      applyPersonaSnapshot(JSON.parse(personaHistory[personaHistoryIdx]));
-      updateUndoRedoBtns();
-    }
-
-    function personaRedo() {
-      if (personaHistoryIdx >= personaHistory.length - 1) return;
-      personaHistoryIdx++;
-      applyPersonaSnapshot(JSON.parse(personaHistory[personaHistoryIdx]));
-      updateUndoRedoBtns();
-    }
-
-    function updateUndoRedoBtns() {
-      const undo = document.getElementById('persona-undo-btn');
-      const redo = document.getElementById('persona-redo-btn');
-      if (undo) undo.disabled = personaHistoryIdx <= 0;
-      if (redo) redo.disabled = personaHistoryIdx >= personaHistory.length - 1;
-    }
-
-    function applyPersonaSnapshot(snap) {
-      personaLayout = snap.layout;
-      personaTheme = snap.theme;
-      Object.assign(brandState, snap.brandState);
-      refreshPersonaUI();
-    }
-
-    function personaAutosave() {
-      clearTimeout(personaAutosaveTimer);
-      const status = document.getElementById('persona-autosave-status');
-      if (status) status.textContent = 'Sin guardar';
-      personaAutosaveTimer = setTimeout(async () => {
-        await savePersonalizacion(true);
-      }, 3000);
-    }
-
-    function setProfileShape(shape) {
-      personaLayout.profileImage.shape = shape;
-      ['round','square','rounded'].forEach(s => {
-        const btn = document.getElementById('pshape-' + s);
-        if (btn) {
-          btn.classList.toggle('border-creo-purple', s === shape);
-          btn.classList.toggle('text-creo-purple', s === shape);
-          btn.classList.toggle('border-gray-200', s !== shape);
-          btn.classList.toggle('text-gray-500', s !== shape);
-        }
-      });
-      personaTrack();
-    }
-
-    function setProfileSize(val) {
-      personaLayout.profileImage.size = val;
-      const label = document.getElementById('psize-label');
-      const labels = { sm: 'Pequeño', md: 'Mediano', lg: 'Grande', xl: 'Extra Grande' };
-      if (label) label.textContent = labels[val] || val;
-      personaTrack();
-    }
-
-    function setCardRadius(val) {
-      personaLayout.cardStyle.radius = val;
-      ['none','md','xl','2xl'].forEach(v => {
-        const btn = document.getElementById('crad-' + v);
-        if (btn) {
-          btn.classList.toggle('border-creo-purple', v === val);
-          btn.classList.toggle('text-creo-purple', v === val);
-          btn.classList.toggle('border-gray-200', v !== val);
-          btn.classList.toggle('text-gray-500', v !== val);
-        }
-      });
-      updateCardPreview();
-      personaTrack();
-    }
-
-    function setCardShadow(val) {
-      personaLayout.cardStyle.shadow = val;
-      ['none','md','lg'].forEach(v => {
-        const btn = document.getElementById('cshad-' + v);
-        if (btn) {
-          btn.classList.toggle('border-creo-purple', v === val);
-          btn.classList.toggle('text-creo-purple', v === val);
-          btn.classList.toggle('border-gray-200', v !== val);
-          btn.classList.toggle('text-gray-500', v !== val);
-        }
-      });
-      updateCardPreview();
-      personaTrack();
-    }
-
-    function toggleCardGlass() {
-      personaLayout.cardStyle.glass = !personaLayout.cardStyle.glass;
-      const toggle = document.getElementById('card-glass-toggle');
-      const dot = document.getElementById('card-glass-dot');
-      if (toggle) toggle.classList.toggle('bg-creo-mint', personaLayout.cardStyle.glass);
-      if (toggle) toggle.classList.toggle('bg-gray-300', !personaLayout.cardStyle.glass);
-      if (dot) dot.style.transform = personaLayout.cardStyle.glass ? 'translateX(20px)' : 'translateX(0)';
-      updateCardPreview();
-      personaTrack();
-    }
-
-    function toggleCardBorder() {
-      personaLayout.cardStyle.border = !personaLayout.cardStyle.border;
-      const toggle = document.getElementById('card-border-toggle');
-      const dot = document.getElementById('card-border-dot');
-      if (toggle) toggle.classList.toggle('bg-creo-mint', personaLayout.cardStyle.border);
-      if (toggle) toggle.classList.toggle('bg-gray-300', !personaLayout.cardStyle.border);
-      if (dot) dot.style.transform = personaLayout.cardStyle.border ? 'translateX(20px)' : 'translateX(0)';
-      updateCardPreview();
-      personaTrack();
-    }
-
-    function updateCardPreview() {
-      const el = document.getElementById('card-style-preview');
-      if (!el) return;
-      const r = { none: '0', md: '0.75rem', xl: '1rem', '2xl': '1.5rem' };
-      const s = { none: 'none', md: '0 4px 6px rgba(0,0,0,0.1)', lg: '0 10px 25px rgba(0,0,0,0.15)' };
-      el.style.borderRadius = r[personaLayout.cardStyle.radius] || '1rem';
-      el.style.boxShadow = s[personaLayout.cardStyle.shadow] || 'none';
-      el.style.border = personaLayout.cardStyle.border ? '1px solid #e5e7eb' : 'none';
-      if (personaLayout.cardStyle.glass) {
-        el.style.background = 'rgba(255,255,255,0.7)';
-        el.style.backdropFilter = 'blur(12px)';
-      } else {
-        el.style.background = '#ffffff';
-        el.style.backdropFilter = 'none';
-      }
-    }
-
-    function setButtonShape(shape) {
-      personaLayout.buttonStyle.shape = shape;
-      ['rounded','pill','square'].forEach(s => {
-        const btn = document.getElementById('bshape-' + s);
-        if (btn) {
-          btn.classList.toggle('border-creo-purple', s === shape);
-          btn.classList.toggle('text-creo-purple', s === shape);
-          btn.classList.toggle('border-gray-200', s !== shape);
-          btn.classList.toggle('text-gray-500', s !== shape);
-        }
-      });
-      updateButtonPreview();
-      personaTrack();
-    }
-
-    function toggleBtnShadow() {
-      personaLayout.buttonStyle.shadow = !personaLayout.buttonStyle.shadow;
-      const toggle = document.getElementById('btn-shadow-toggle');
-      const dot = document.getElementById('btn-shadow-dot');
-      if (toggle) toggle.classList.toggle('bg-creo-mint', personaLayout.buttonStyle.shadow);
-      if (toggle) toggle.classList.toggle('bg-gray-300', !personaLayout.buttonStyle.shadow);
-      if (dot) dot.style.transform = personaLayout.buttonStyle.shadow ? 'translateX(20px)' : 'translateX(0)';
-      updateButtonPreview();
-      personaTrack();
-    }
-
-    function setButtonAnim(anim) {
-      personaLayout.buttonStyle.animation = anim;
-      ['none','lift','glow'].forEach(a => {
-        const btn = document.getElementById('banim-' + a);
-        if (btn) {
-          btn.classList.toggle('border-creo-purple', a === anim);
-          btn.classList.toggle('text-creo-purple', a === anim);
-          btn.classList.toggle('border-gray-200', a !== anim);
-          btn.classList.toggle('text-gray-500', a !== anim);
-        }
-      });
-      updateButtonPreview();
-      personaTrack();
-    }
-
-    function updateButtonPreview() {
-      const primary = document.getElementById('btn-preview-primary');
-      const secondary = document.getElementById('btn-preview-secondary');
-      if (!primary || !secondary) return;
-      const rMap = { rounded: '0.75rem', pill: '9999px', square: '0.25rem' };
-      const r = rMap[personaLayout.buttonStyle.shape] || '0.75rem';
-      [primary, secondary].forEach(b => {
-        b.style.borderRadius = r;
-        b.style.boxShadow = personaLayout.buttonStyle.shadow ? '0 4px 12px rgba(0,0,0,0.2)' : 'none';
-        b.style.transition = 'all 0.2s';
-      });
-      [primary, secondary].forEach(b => {
-        b.onmouseenter = b.onmouseleave = null;
-        if (personaLayout.buttonStyle.animation === 'lift') {
-          b.onmouseenter = () => { b.style.transform = 'translateY(-2px)'; b.style.boxShadow = '0 6px 20px rgba(0,0,0,0.25)'; };
-          b.onmouseleave = () => { b.style.transform = ''; b.style.boxShadow = personaLayout.buttonStyle.shadow ? '0 4px 12px rgba(0,0,0,0.2)' : 'none'; };
-        } else if (personaLayout.buttonStyle.animation === 'glow') {
-          b.onmouseenter = () => { b.style.boxShadow = '0 0 20px rgba(26,10,62,0.4)'; };
-          b.onmouseleave = () => { b.style.boxShadow = personaLayout.buttonStyle.shadow ? '0 4px 12px rgba(0,0,0,0.2)' : 'none'; };
-        }
-      });
-    }
-
-    let _sortDragEl = null;
-    let _sortListenersAttached = false;
-
-    function _readSortOrder() {
-      const container = document.getElementById('section-sortable');
-      if (!container) return;
-      const items = container.querySelectorAll('[data-section-id]');
-      items.forEach((el, i) => {
-        const sec = personaLayout.sections.find(s => s.id === el.dataset.sectionId);
-        if (sec) sec.order = i;
-      });
-      initSectionSortable();
-      personaTrack();
-    }
-
-    function moveSectionUp(id) {
-      const sorted = [...personaLayout.sections].sort((a, b) => a.order - b.order);
-      const idx = sorted.findIndex(s => s.id === id);
-      if (idx <= 0) return;
-      const prevOrder = sorted[idx - 1].order;
-      sorted[idx - 1].order = sorted[idx].order;
-      sorted[idx].order = prevOrder;
-      initSectionSortable();
-      personaTrack();
-    }
-
-    function moveSectionDown(id) {
-      const sorted = [...personaLayout.sections].sort((a, b) => a.order - b.order);
-      const idx = sorted.findIndex(s => s.id === id);
-      if (idx < 0 || idx >= sorted.length - 1) return;
-      const nextOrder = sorted[idx + 1].order;
-      sorted[idx + 1].order = sorted[idx].order;
-      sorted[idx].order = nextOrder;
-      initSectionSortable();
-      personaTrack();
-    }
-
-    function initSectionSortable() {
-      const container = document.getElementById('section-sortable');
-      if (!container) return;
-      const sorted = [...personaLayout.sections].sort((a, b) => a.order - b.order);
-      container.innerHTML = sorted.map((s, i) => `
-        <div class="flex items-center gap-2 p-3 bg-white rounded-xl border border-gray-200 shadow-sm cursor-grab active:cursor-grabbing" draggable="true" data-section-id="${s.id}">
-          <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
-          <span class="text-sm font-medium text-gray-800 flex-1">${esc(sectionLabels[s.id] || s.id)}</span>
-          <button onclick="moveSectionUp('${s.id}')" class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition ${i === 0 ? 'opacity-30 pointer-events-none' : ''}" title="Subir">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
-          </button>
-          <button onclick="moveSectionDown('${s.id}')" class="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition ${i === sorted.length - 1 ? 'opacity-30 pointer-events-none' : ''}" title="Bajar">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-          <button onclick="toggleSectionVisibility('${s.id}')" class="text-xs px-2 py-1 rounded-lg transition ${s.visible ? 'bg-creo-mint/20 text-creo-purple' : 'bg-gray-100 text-gray-400'}">
-            ${s.visible ? '👁 Visible' : '👁‍🗨 Oculto'}
-          </button>
-        </div>
-      `).join('');
-
-      if (_sortListenersAttached) return;
-      _sortListenersAttached = true;
-
-      container.addEventListener('dragstart', e => {
-        _sortDragEl = e.target.closest('[data-section-id]');
-        if (_sortDragEl) _sortDragEl.style.opacity = '0.5';
-      });
-      container.addEventListener('dragend', () => {
-        if (_sortDragEl) _sortDragEl.style.opacity = '1';
-        _sortDragEl = null;
-        _readSortOrder();
-      });
-      container.addEventListener('dragover', e => {
-        e.preventDefault();
-        if (!_sortDragEl) return;
-        const target = e.target.closest('[data-section-id]');
-        if (target && target !== _sortDragEl) {
-          const rect = target.getBoundingClientRect();
-          const mid = rect.top + rect.height / 2;
-          if (e.clientY < mid) container.insertBefore(_sortDragEl, target);
-          else container.insertBefore(_sortDragEl, target.nextSibling);
-        }
-      });
-      container.addEventListener('drop', e => {
-        e.preventDefault();
-      });
-
-      // Touch support for mobile drag-and-drop
-      container.addEventListener('touchstart', e => {
-        const item = e.target.closest('[data-section-id]');
-        if (!item || e.target.closest('button')) return;
-        _sortDragEl = item;
-        _sortDragEl.style.opacity = '0.5';
-        _sortDragEl._touchY = e.touches[0].clientY;
-      }, { passive: true });
-      container.addEventListener('touchmove', e => {
-        if (!_sortDragEl) return;
-        e.preventDefault();
-        const y = e.touches[0].clientY;
-        const target = document.elementFromPoint(e.touches[0].clientX, y)?.closest('[data-section-id]');
-        if (target && target !== _sortDragEl) {
-          const rect = target.getBoundingClientRect();
-          const mid = rect.top + rect.height / 2;
-          if (y < mid) container.insertBefore(_sortDragEl, target);
-          else container.insertBefore(_sortDragEl, target.nextSibling);
-        }
-      }, { passive: false });
-      container.addEventListener('touchend', () => {
-        if (_sortDragEl) {
-          _sortDragEl.style.opacity = '1';
-          _sortDragEl = null;
-          _readSortOrder();
-        }
-      });
-    }
-
-    function toggleSectionVisibility(id) {
-      const sec = personaLayout.sections.find(s => s.id === id);
-      if (sec) {
-        sec.visible = !sec.visible;
-        initSectionSortable();
-        personaTrack();
-      }
-    }
-
-    function loadPersonalizacion() {
-      if (!currentProfile) return;
-      const layout = currentProfile.profile_layout || {};
-      if (layout.sections) {
-        const defaultSections = [
-          {id:'cover',visible:true,order:0},{id:'header',visible:true,order:1},
-          {id:'story',visible:true,order:2},{id:'creo-en-ellos',visible:true,order:3},
-          {id:'metas',visible:true,order:4},{id:'completed-metas',visible:true,order:5},
-          {id:'posts',visible:true,order:6},{id:'business',visible:true,order:7},
-          {id:'payments',visible:true,order:8}
-        ];
-        const saved = layout.sections;
-        const merged = defaultSections.map(def => {
-          const s = saved.find(x => x.id === def.id);
-          return s || def;
-        });
-        saved.forEach(s => { if (!merged.find(x => x.id === s.id)) merged.push(s); });
-        personaLayout.sections = merged;
-      }
-      if (layout.profileImage) personaLayout.profileImage = layout.profileImage;
-      if (layout.banner) personaLayout.banner = layout.banner;
-      if (layout.cardStyle) personaLayout.cardStyle = layout.cardStyle;
-      if (layout.buttonStyle) personaLayout.buttonStyle = layout.buttonStyle;
-
-      personaTheme = currentProfile.profile_theme || {};
-
-      // Populate extended color pickers
-      const el = (id) => document.getElementById(id);
-      if (el('brand-accent-color')) el('brand-accent-color').value = personaTheme.accentColor || '#33f0b0';
-      if (el('brand-link-color')) el('brand-link-color').value = personaTheme.linkColor || '#6C3AED';
-      if (el('brand-border-color')) el('brand-border-color').value = personaTheme.borderColor || '#e5e7eb';
-
-      // Profile image controls
-      setProfileShape(personaLayout.profileImage.shape);
-      const sizeMap = { sm: 0, md: 1, lg: 2, xl: 3 };
-      const sizeRange = el('psize-range');
-      if (sizeRange) sizeRange.value = sizeMap[personaLayout.profileImage.size] ?? 1;
-      setProfileSize(personaLayout.profileImage.size);
-
-      // Card style
-      setCardRadius(personaLayout.cardStyle.radius);
-      setCardShadow(personaLayout.cardStyle.shadow);
-      if (personaLayout.cardStyle.glass) {
-        const gt = el('card-glass-toggle'); const gd = el('card-glass-dot');
-        if (gt) { gt.classList.add('bg-creo-mint'); gt.classList.remove('bg-gray-300'); }
-        if (gd) gd.style.transform = 'translateX(20px)';
-      }
-      if (personaLayout.cardStyle.border) {
-        const bt = el('card-border-toggle'); const bd = el('card-border-dot');
-        if (bt) { bt.classList.add('bg-creo-mint'); bt.classList.remove('bg-gray-300'); }
-        if (bd) bd.style.transform = 'translateX(20px)';
-      }
-      updateCardPreview();
-
-      // Button style
-      setButtonShape(personaLayout.buttonStyle.shape);
-      if (personaLayout.buttonStyle.shadow) {
-        const st = el('btn-shadow-toggle'); const sd = el('btn-shadow-dot');
-        if (st) { st.classList.add('bg-creo-mint'); st.classList.remove('bg-gray-300'); }
-        if (sd) sd.style.transform = 'translateX(20px)';
-      }
-      setButtonAnim(personaLayout.buttonStyle.animation);
-      updateButtonPreview();
-
-      // Heading font
-      if (el('brand-heading-font')) el('brand-heading-font').value = personaTheme.headingFont || '';
-      updateTypographyPreview();
-
-      // Init section sortable
-      initSectionSortable();
-
-      // Init undo history
-      personaHistory = [JSON.stringify({ layout: personaLayout, theme: personaTheme, brandState })];
-      personaHistoryIdx = 0;
-      updateUndoRedoBtns();
-
-      switchPersonaTab('images');
-    }
-
-    function updateTypographyPreview() {
-      const headingFont = document.getElementById('brand-heading-font')?.value || '';
-      const bodyFont = document.getElementById('brand-font')?.value || 'Inter';
-      const preview = document.getElementById('brand-font-preview');
-      const headingPreview = document.getElementById('brand-heading-preview');
-      if (preview) preview.style.fontFamily = bodyFont + ', sans-serif';
-      if (headingPreview) headingPreview.style.fontFamily = (headingFont || bodyFont) + ', sans-serif';
-    }
-
-    function refreshPersonaUI() {
-      loadBrandingPanel();
-      loadPersonalizacion();
-    }
-
-    async function savePersonalizacion(isAutosave) {
-      if (!currentProfile) return;
-      const status = document.getElementById('persona-autosave-status');
-
-      // Gather extended theme
-      personaTheme.accentColor = document.getElementById('brand-accent-color')?.value || '#33f0b0';
-      personaTheme.linkColor = document.getElementById('brand-link-color')?.value || '#6C3AED';
-      personaTheme.borderColor = document.getElementById('brand-border-color')?.value || '#e5e7eb';
-      personaTheme.headingFont = document.getElementById('brand-heading-font')?.value || '';
-
-      // Save branding colors
-      const { textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, bgOpacity, theme } = brandState;
-      if (getContrast(textColor, sectionBg) < 3) {
-        if (!isAutosave) {
-          showToast('El texto no es visible sobre el fondo de secciones. Ajusta los colores.', 'error');
-          return;
-        }
-      }
-      const colors = { theme, textColor, titleColor, btnTextColor, sectionBg, buttonColor, bgColor, font, bgMedia, bgOpacity };
-
-      const { error } = await sb.from('profiles').update({
-        profile_colors: colors,
-        profile_layout: personaLayout,
-        profile_theme: personaTheme
-      }).eq('id', currentProfile.id);
-
-      if (error) {
-        if (!isAutosave) showToast('Error al guardar personalización', 'error');
-        if (status) status.textContent = 'Error';
-        return;
-      }
-
-      currentProfile.profile_colors = colors;
-      currentProfile.profile_layout = personaLayout;
-      currentProfile.profile_theme = personaTheme;
-
-      if (status) status.textContent = 'Guardado ✓';
-      if (!isAutosave) showToast('Personalización guardada. Visita tu perfil para verlo.', 'success');
-    }
 
     // ===== MECENAS SETTINGS =====
     function loadMecenasPanel(tab) {
@@ -2743,40 +1332,6 @@
       }
     }
 
-    async function uploadBrandAvatar() {
-      const file = document.getElementById('brand-avatar-file').files[0];
-      if (!file || !currentProfile) return;
-      const url = await uploadToStorage(file, 'avatars', 5);
-      if (!url) return;
-      const { error } = await sb.from('profiles').update({ avatar_url: url }).eq('id', currentProfile.id);
-      if (error) { showToast('Error al guardar avatar', 'error'); return; }
-      currentProfile.avatar_url = url;
-      document.getElementById('brand-avatar-preview').innerHTML = `<img src="${esc(url)}" class="w-full h-full object-cover">`;
-      showToast('Foto de perfil actualizada');
-    }
-
-    async function uploadBrandCover() {
-      const file = document.getElementById('brand-cover-file').files[0];
-      if (!file || !currentProfile) return;
-      const url = await uploadToStorage(file, 'covers', 10);
-      if (!url) return;
-      const { error } = await sb.from('profiles').update({ cover_url: url }).eq('id', currentProfile.id);
-      if (error) { showToast('Error al guardar portada', 'error'); return; }
-      currentProfile.cover_url = url;
-      document.getElementById('brand-cover-preview').innerHTML = `<img src="${esc(url)}" class="w-full h-full object-cover">`;
-      showToast('Portada actualizada');
-    }
-
-    function loadBrandImagePreviews() {
-      if (!currentProfile) return;
-      if (currentProfile.avatar_url) {
-        document.getElementById('brand-avatar-preview').innerHTML = `<img src="${esc(currentProfile.avatar_url)}" class="w-full h-full object-cover">`;
-      }
-      if (currentProfile.cover_url) {
-        document.getElementById('brand-cover-preview').innerHTML = `<img src="${esc(currentProfile.cover_url)}" class="w-full h-full object-cover">`;
-      }
-    }
-
     // Business type toggle
     document.querySelectorAll('input[name="business_type"]').forEach(r => {
       r.addEventListener('change', () => {
@@ -2800,7 +1355,7 @@
         let targetUserId = user.id;
         if (impersonate && user.email === 'fullnessmindset@gmail.com') {
           const imp = JSON.parse(impersonate);
-          document.getElementById('user-welcome').innerHTML = `🔑 Actuando como <strong>${esc(imp.display_name || imp.username)}</strong> <button onclick="sessionStorage.removeItem('creo-impersonate');location.reload()" class="ml-2 text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-semibold">Salir</button>`;
+          document.getElementById('user-welcome').innerHTML = `<svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg> Actuando como <strong>${esc(imp.display_name || imp.username)}</strong> <button onclick="sessionStorage.removeItem('creo-impersonate');location.reload()" class="ml-2 text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-semibold">Salir</button>`;
           targetUserId = imp.id;
           currentUser = { ...user, id: imp.id };
         } else {
@@ -3145,17 +1700,6 @@
       showToast('Perfil guardado', 'success');
     }
 
-    async function uploadBrandBgMedia() {
-      const input = document.getElementById('brand-bg-media-file');
-      const file = input.files[0];
-      if (!file) return;
-      const url = await uploadToStorage(file, 'backgrounds', 10);
-      if (!url) return;
-      document.getElementById('brand-bg-media').value = url;
-      updateBrandingPreview();
-      showToast('Imagen de fondo cargada', 'success');
-    }
-
     // METAS
     const DUMMY_METAS = [];
 
@@ -3164,7 +1708,7 @@
       const raised = (m.raised_cents / 100).toFixed(2);
       const goal = (m.goal_amount_cents / 100).toFixed(2);
       const imgs = m.images || [];
-      const badge = isDummy ? ' <span class="text-[10px]">🤖</span>' : '';
+      const badge = isDummy ? ' <span class="text-[10px]"><svg class="w-3 h-3 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>' : '';
       const actions = isDummy ? '' : `<div class="flex gap-2">
         <button onclick="editMeta('${m.id}')" class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-600">Editar</button>
         <button onclick="toggleMeta('${m.id}', ${!m.is_active})" class="text-xs px-2 py-1 rounded ${m.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">${m.is_active ? 'Activa' : 'Inactiva'}</button>
@@ -3184,7 +1728,7 @@
         </div>
         ${imgs.length ? `<div class="flex gap-1 overflow-x-auto">${imgs.map(i => `<img src="${i}" class="w-14 h-14 rounded object-cover flex-shrink-0">`).join('')}</div>` : ''}
         <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden"><div class="${pct >= 100 ? 'bg-green-500' : 'bg-creo-mint'} h-full rounded-full transition-all duration-500" style="width:${pct}%"></div></div>
-        <div class="flex justify-between text-xs text-gray-500"><span>$${raised} / $${goal} (${pct}%)${pct >= 100 ? ' ✅ Meta Alcanzada' : ''}</span><span>${m.start_date} — ${m.end_date}</span></div>
+        <div class="flex justify-between text-xs text-gray-500"><span>$${raised} / $${goal} (${pct}%)${pct >= 100 ? ' <svg class="w-3.5 h-3.5 inline-block text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Meta Alcanzada' : ''}</span><span>${m.start_date} — ${m.end_date}</span></div>
         ${stageProgress}
       </div>`;
     }
@@ -3438,13 +1982,13 @@
 
     function getMetaStatusBadge(stage) {
       if (!stage) return '';
-      if (stage.banned) return `<span class="absolute -top-2 -right-2 text-[9px] bg-red-600 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">⛔ Creador Baneado</span>`;
-      if (stage.cancellation_type === 'fraud') return `<span class="absolute -top-2 -right-2 text-[9px] bg-red-600 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">🚫 Meta Cancelada — Fraude</span>`;
-      if (stage.cancellation_type === 'early_complete') return `<span class="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">✅ Meta Completada Antes de lo Esperado — Gracias al apoyo de todos</span>`;
-      if (stage.cancellation_type === 'cancelled') return `<span class="absolute -top-2 -right-2 text-[9px] bg-gray-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">❌ Meta Cancelada</span>`;
-      if (stage.stage3_approved) return `<span class="absolute -top-2 -right-2 text-[9px] bg-green-600 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">✅ Meta Completada Legítimamente</span>`;
-      if (stage.admin_review_status === 'pending') return `<span class="absolute -top-2 -right-2 text-[9px] bg-yellow-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10 animate-pulse">⏳ Meta en Review por Admin</span>`;
-      if (stage.admin_review_status === 'rejected') return `<span class="absolute -top-2 -right-2 text-[9px] bg-red-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10">❌ Rechazada por Admin</span>`;
+      if (stage.banned) return `<span class="absolute -top-2 -right-2 text-[9px] bg-red-600 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg> Creador Baneado</span>`;
+      if (stage.cancellation_type === 'fraud') return `<span class="absolute -top-2 -right-2 text-[9px] bg-red-600 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg> Meta Cancelada — Fraude</span>`;
+      if (stage.cancellation_type === 'early_complete') return `<span class="absolute -top-2 -right-2 text-[9px] bg-blue-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Meta Completada Antes de lo Esperado — Gracias al apoyo de todos</span>`;
+      if (stage.cancellation_type === 'cancelled') return `<span class="absolute -top-2 -right-2 text-[9px] bg-gray-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Meta Cancelada</span>`;
+      if (stage.stage3_approved) return `<span class="absolute -top-2 -right-2 text-[9px] bg-green-600 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Meta Completada Legítimamente</span>`;
+      if (stage.admin_review_status === 'pending') return `<span class="absolute -top-2 -right-2 text-[9px] bg-yellow-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10 animate-pulse flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Meta en Review por Admin</span>`;
+      if (stage.admin_review_status === 'rejected') return `<span class="absolute -top-2 -right-2 text-[9px] bg-red-500 text-white px-2.5 py-1 rounded-full font-bold shadow-lg z-10 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Rechazada por Admin</span>`;
       return '';
     }
 
@@ -3489,7 +2033,7 @@
             <span class="text-xs font-semibold ${s2Done ? 'text-green-700' : 'text-blue-700'}">Primera Liberación: $${half1} (50%)${s2Done ? ' ✓' : ''}</span>
           </div>`;
         if (stage.stage2_submitted && !stage.stage2_approved) {
-          html += `<p class="text-[10px] text-yellow-600 ml-7">📤 Enviado para revisión del admin. Esperando aprobación...</p>`;
+          html += `<p class="text-[10px] text-yellow-600 ml-7 flex items-center gap-1"><svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg> Enviado para revisión del admin. Esperando aprobación...</p>`;
         } else if (!stage.stage2_submitted) {
           html += `<div class="ml-7 space-y-2 mt-2">
             <p class="text-[10px] text-blue-600 font-medium">Sube tu recibo de compra y actualiza a tu comunidad:</p>
@@ -3520,7 +2064,7 @@
             <span class="text-xs font-semibold ${s3Done ? 'text-green-700' : 'text-emerald-700'}">Liberación Final: $${half2} (50% restante)${s3Done ? ' ✓' : ''}</span>
           </div>`;
         if (stage.stage3_submitted && !stage.stage3_approved) {
-          html += `<p class="text-[10px] text-yellow-600 ml-7">📤 Documentos finales enviados. Esperando aprobación del admin...</p>`;
+          html += `<p class="text-[10px] text-yellow-600 ml-7 flex items-center gap-1"><svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg> Documentos finales enviados. Esperando aprobación del admin...</p>`;
         } else if (!stage.stage3_submitted) {
           html += `<div class="ml-7 space-y-2 mt-2">
             <p class="text-[10px] text-emerald-600 font-medium">Sube prueba final de la adquisición (recibos, fotos, videos):</p>
@@ -3543,7 +2087,7 @@
         html += `<div class="pt-2 border-t border-gray-100">
           <button onclick="showCancelMeta('${metaId}')" class="text-[10px] text-red-500 hover:text-red-700 underline">Cancelar esta meta</button>
           <div id="cancel-meta-${metaId}" class="hidden mt-2 space-y-2 p-3 bg-red-50 rounded-lg border border-red-200">
-            <p class="text-[10px] text-red-600 font-semibold">⚠️ Cancelar una meta requiere una explicación pública:</p>
+            <p class="text-[10px] text-red-600 font-semibold flex items-center gap-1"><svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> Cancelar una meta requiere una explicación pública:</p>
             <textarea id="cancel-reason-${metaId}" rows="2" placeholder="Explica por qué cancelas esta meta..." class="w-full border border-red-300 bg-white p-2 rounded-lg text-[11px] text-gray-900 outline-none focus:ring-1 focus:ring-red-400"></textarea>
             <div class="flex gap-2">
               <button onclick="cancelMeta('${metaId}')" class="flex-1 bg-red-600 text-white py-1.5 rounded-lg text-[10px] font-semibold hover:bg-red-700 transition">Confirmar Cancelación</button>
@@ -4304,7 +2848,7 @@
       const list = document.getElementById('my-stories-list');
       const countEl = document.getElementById('stories-count');
       if (!data || data.length === 0) {
-        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-6">📖 Aún no has publicado historias</p>';
+        list.innerHTML = '<p class="text-center text-gray-400 text-xs py-6">Aún no has publicado historias</p>';
         if (countEl) countEl.textContent = '';
         myStoriesCache = [];
         return;
@@ -4417,7 +2961,7 @@
         await sb.from('community_posts').insert({
           author_id: currentUser.id,
           post_type: communityMedia.length > 0 ? 'video' : 'text',
-          title: title ? '📖 ' + title : '📖 Mi Historia',
+          title: title || 'Mi Historia',
           body: content || null,
           media_urls: communityMedia
         });
@@ -4446,7 +2990,7 @@
       if (!currentUser) return;
       const { data } = await sb.from('business_links').select('*').eq('creator_id', currentUser.id).order('sort_order', { ascending: true }).limit(50);
       const list = document.getElementById('my-biz-list');
-      if (!data || data.length === 0) { myBizLinksCache = []; list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">🔗 No tienes enlaces de negocio aún.</p>'; return; }
+      if (!data || data.length === 0) { myBizLinksCache = []; list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">No tienes enlaces de negocio aún.</p>'; return; }
       myBizLinksCache = data;
       list.innerHTML = data.map((l, i) => `<div class="bg-white p-4 rounded-xl border border-gray-200 flex gap-3 items-center">
         ${l.image_url ? `<img src="${esc(l.image_url)}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0">` : `<div class="w-12 h-12 rounded-lg bg-creo-purple/10 flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/></svg></div>`}
@@ -4600,21 +3144,21 @@
       {
         title: '¡Bienvenido a CREO!',
         message: 'Tu cuenta ha sido confirmada. Te guiaremos paso a paso para configurar tu perfil de creador.',
-        icon: '🎉',
+        icon: '<svg class="w-7 h-7 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>',
         target: null,
         action: null
       },
       {
         title: 'Completa tu Perfil',
         message: 'Agrega tu nombre, foto de perfil y biografía. Esto es lo primero que verán las personas que te apoyan.',
-        icon: '👤',
+        icon: '<svg class="w-7 h-7 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>',
         target: 'panel-profile',
         action: () => showTab('profile')
       },
       {
         title: 'Comparte tu Historia',
         message: 'Cuéntale al mundo quién eres. Sube un video de hasta 5 minutos y fotos que cuenten tu historia. No es obligatorio, pero los creadores con historia reciben hasta 3x más apoyo.',
-        icon: '📖',
+        icon: '<svg class="w-7 h-7 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>',
         target: 'panel-story',
         action: () => showTab('story'),
         highlight: true
@@ -4622,21 +3166,21 @@
       {
         title: 'Crea tu Primera Meta',
         message: 'Las metas son objetivos financieros. Publica qué necesitas, cuánto cuesta y deja que la comunidad te ayude a lograrlo.',
-        icon: '🎯',
+        icon: '<svg class="w-7 h-7 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
         target: 'panel-metas',
         action: () => showTab('metas')
       },
       {
         title: 'Conecta Stripe',
         message: 'Para recibir pagos necesitas conectar tu cuenta de Stripe. Es gratis y toma solo 5 minutos.',
-        icon: '💳',
+        icon: '<svg class="w-7 h-7 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>',
         target: 'panel-stripe',
         action: () => showTab('stripe')
       },
       {
         title: '¡Listo para empezar!',
         message: 'Tu perfil público estará disponible en tu enlace personal. Compártelo en redes sociales para que te descubran.',
-        icon: '🚀',
+        icon: '<svg class="w-7 h-7 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
         target: null,
         action: null
       }
@@ -4680,7 +3224,7 @@
             </div>
           </div>
           <p class="text-sm text-gray-600 leading-relaxed">${step.message}</p>
-          ${step.highlight ? '<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700 flex items-start gap-2"><span>💡</span><span>Los creadores que comparten su historia reciben significativamente más apoyo. ¡Te lo recomendamos!</span></div>' : ''}
+          ${step.highlight ? '<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-700 flex items-start gap-2"><svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg><span>Los creadores que comparten su historia reciben significativamente más apoyo. ¡Te lo recomendamos!</span></div>' : ''}
           <div class="flex items-center justify-between pt-2">
             <button onclick="skipOnboarding()" class="text-xs text-gray-400 hover:text-gray-600 transition">Saltar guía</button>
             <div class="flex gap-2">
@@ -4919,14 +3463,14 @@
         ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 50);
 
         if (allTransactions.length === 0) {
-          historyContainer.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">💰 Aún no tienes ingresos</p><p class="text-xs text-gray-300 mt-1">Comparte tu perfil para comenzar a recibir apoyo</p></div>';
+          historyContainer.innerHTML = '<div class="text-center py-8"><p class="text-gray-400 text-sm">Aún no tienes ingresos</p><p class="text-xs text-gray-300 mt-1">Comparte tu perfil para comenzar a recibir apoyo</p></div>';
           return;
         }
 
         const typeConfig = {
-          tip: { icon: '💚', label: 'Tip', color: 'bg-green-50 border-green-200' },
-          sub: { icon: '⭐', label: 'Suscripción', color: 'bg-purple-50 border-purple-200' },
-          meta: { icon: '🎯', label: 'Meta', color: 'bg-amber-50 border-amber-200' }
+          tip: { icon: '<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>', label: 'Tip', color: 'bg-green-50 border-green-200' },
+          sub: { icon: '<svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>', label: 'Suscripción', color: 'bg-purple-50 border-purple-200' },
+          meta: { icon: '<svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>', label: 'Meta', color: 'bg-amber-50 border-amber-200' }
         };
 
         historyContainer.innerHTML = allTransactions.map(tx => {
@@ -5081,8 +3625,8 @@
         summary.classList.remove('hidden');
 
         const typeConfig = {
-          tip: { icon: '💚', label: 'Tip', color: 'bg-green-50 border-green-200' },
-          sub: { icon: '⭐', label: 'Suscripción', color: 'bg-purple-50 border-purple-200' }
+          tip: { icon: '<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>', label: 'Tip', color: 'bg-green-50 border-green-200' },
+          sub: { icon: '<svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>', label: 'Suscripción', color: 'bg-purple-50 border-purple-200' }
         };
 
         container.innerHTML = allPayments.map(p => {
@@ -5180,7 +3724,7 @@
       loadCfhPanel();
     }
 
-    const CFH_TYPE_ICONS = { video: '▶️', book: '📖', recipe: '🍳', course: '🎓', article: '📝' };
+    const CFH_TYPE_ICONS = { video: '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>', book: '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>', recipe: '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>', course: '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>', article: '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>' };
     const CFH_STATUS_BADGES = {
       published: '<span class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Publicado</span>',
       draft: '<span class="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">Borrador</span>',
@@ -5191,11 +3735,11 @@
     function renderCfhContentList(items) {
       const list = document.getElementById('cfh-my-content-list');
       if (!items.length) {
-        list.innerHTML = '<div class="text-center py-8"><p class="text-3xl mb-2">🌱</p><p class="text-gray-400 text-sm">Sin contenido aún</p><p class="text-gray-500 text-xs mt-1">Publica tu primer contenido en El Futuro Hoy</p></div>';
+        list.innerHTML = '<div class="text-center py-8"><p class="mb-2"><svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></p><p class="text-gray-400 text-sm">Sin contenido aún</p><p class="text-gray-500 text-xs mt-1">Publica tu primer contenido en El Futuro Hoy</p></div>';
         return;
       }
       list.innerHTML = items.map(item => {
-        const icon = CFH_TYPE_ICONS[item.content_type] || '📁';
+        const icon = CFH_TYPE_ICONS[item.content_type] || '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>';
         const badge = CFH_STATUS_BADGES[item.status] || '';
         const freeBadge = item.is_free ? '<span class="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">Gratis</span>' : '<span class="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded">Premium</span>';
         const subName = item.subcategory?.name ? `<span class="text-[10px] text-gray-400">/ ${escapeHtml(item.subcategory.name)}</span>` : '';
@@ -5211,9 +3755,9 @@
             </div>
             <div class="flex items-center gap-3 mt-1 text-[10px] text-gray-400">
               <span>${icon} ${item.content_type}</span>
-              <span>👁 ${item.view_count || 0}</span>
-              <span>❤️ ${item.like_count || 0}</span>
-              <span>💬 ${item.comment_count || 0}</span>
+              <span class="flex items-center gap-0.5"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg> ${item.view_count || 0}</span>
+              <span class="flex items-center gap-0.5"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg> ${item.like_count || 0}</span>
+              <span class="flex items-center gap-0.5"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg> ${item.comment_count || 0}</span>
               <span>${date}</span>
             </div>
           </div>
@@ -5242,10 +3786,10 @@
           container.innerHTML = '<p class="text-gray-400 text-xs text-center py-4">Sin subcategorías</p>';
           return;
         }
-        const CAT_ICONS = { music: '🎵', books: '📚', food: '🍽️', health: '🏥', fitness: '💪', education: '🎓', faith: '✝️' };
+        const CAT_ICONS = { music: '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg>', books: '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>', food: '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>', health: '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>', fitness: '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>', education: '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>', faith: '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>' };
         container.innerHTML = data.map(sc => `<div class="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
           <div>
-            <span class="text-xs font-semibold text-gray-700">${CAT_ICONS[sc.category] || '📂'} ${escapeHtml(sc.name)}</span>
+            <span class="text-xs font-semibold text-gray-700">${CAT_ICONS[sc.category] || '<svg class="w-3.5 h-3.5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>'} ${escapeHtml(sc.name)}</span>
             ${sc.description ? `<span class="text-[10px] text-gray-400 ml-2">${escapeHtml(sc.description)}</span>` : ''}
           </div>
           <button onclick="deleteCfhSubcat('${sc.id}')" class="text-[10px] text-red-500 hover:underline">Eliminar</button>
