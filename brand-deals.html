@@ -23,7 +23,7 @@
   <link rel="icon" href="assets/logo-icon.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/logo-icon.png">
   <link rel="stylesheet" href="tailwind.min.css?v=20260719">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0/dist/umd/supabase.min.js" integrity="sha384-fPWur1rx/DE6YtXP/x0MD6dd90RgnVsz5yX/DIg7CcVAnTBZsENWuIcpvVTM39ti" crossorigin="anonymous"></script>
   <style>
     body { overscroll-behavior: contain; }
     input, select, textarea { font-size: max(16px, 1em) !important; }
@@ -1273,7 +1273,7 @@
           const res = await fetch(url);
           const json = await res.json();
           document.getElementById('dc-gif-results').innerHTML = (json.data || []).map(g =>
-            `<img src="${g.images.fixed_width_small.url}" class="w-full h-16 object-cover rounded cursor-pointer hover:opacity-80 transition" onclick="sendDealGif('${g.images.fixed_width.url}')" alt="GIF" loading="lazy">`
+            `<img src="${g.images.fixed_width_small.url}" class="w-full h-16 object-cover rounded cursor-pointer hover:opacity-80 transition" onclick="sendDealGif('${escAttr(g.images.fixed_width.url)}')" alt="GIF" loading="lazy">`
           ).join('');
         } catch(e) { console.error('[CREO]', e); }
       }, 300);

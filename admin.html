@@ -26,7 +26,7 @@
 </head>
 <body class="bg-white text-gray-900 min-h-screen transition-colors duration-300 overflow-x-hidden">
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0/dist/umd/supabase.min.js" integrity="sha384-fPWur1rx/DE6YtXP/x0MD6dd90RgnVsz5yX/DIg7CcVAnTBZsENWuIcpvVTM39ti" crossorigin="anonymous"></script>
   <script src="shared.js?v=2"></script>
 
   <!-- Auth Gate -->
@@ -263,30 +263,30 @@
       <!-- Quick Links Panel -->
       <div id="panel-links" class="hidden fade-in">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <a href="https://dashboard.stripe.com/connect/accounts/overview" target="_blank" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-stripe-purple transition group">
+          <a href="https://dashboard.stripe.com/connect/accounts/overview" target="_blank" rel="noopener noreferrer" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-stripe-purple transition group">
             <div class="flex items-center gap-2 mb-1">
               <svg class="w-4 h-4 text-stripe-purple" viewBox="0 0 24 24" fill="currentColor"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
               <h3 class="font-semibold text-gray-900 group-hover:text-stripe-purple transition">Stripe Connect Dashboard</h3>
             </div>
             <p class="text-gray-500 text-sm mt-1">Manage connected accounts, view payouts, and monitor activity.</p>
           </a>
-          <a href="https://dashboard.stripe.com/payments" target="_blank" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-stripe-purple transition group">
+          <a href="https://dashboard.stripe.com/payments" target="_blank" rel="noopener noreferrer" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-stripe-purple transition group">
             <h3 class="font-semibold text-gray-900 group-hover:text-stripe-purple transition">Stripe Payments</h3>
             <p class="text-gray-500 text-sm mt-1">View all payments, refunds, and disputes.</p>
           </a>
-          <a href="https://dashboard.stripe.com/identity/verification-sessions" target="_blank" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-stripe-purple transition group">
+          <a href="https://dashboard.stripe.com/identity/verification-sessions" target="_blank" rel="noopener noreferrer" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-stripe-purple transition group">
             <h3 class="font-semibold text-gray-900 group-hover:text-stripe-purple transition">Stripe Identity Verifications</h3>
             <p class="text-gray-500 text-sm mt-1">Review identity verification sessions and results.</p>
           </a>
-          <a href="https://supabase.com/dashboard/project/qddxoyjtoxtdcezwuvcq" target="_blank" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-creo-purple transition group">
+          <a href="https://supabase.com/dashboard/project/qddxoyjtoxtdcezwuvcq" target="_blank" rel="noopener noreferrer" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-creo-purple transition group">
             <h3 class="font-semibold text-gray-900 group-hover:text-creo-purple transition">Supabase Dashboard</h3>
             <p class="text-gray-500 text-sm mt-1">Database, auth users, edge functions, and storage.</p>
           </a>
-          <a href="https://github.com/FullnessMindset/creo" target="_blank" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-creo-purple transition group">
+          <a href="https://github.com/FullnessMindset/creo" target="_blank" rel="noopener noreferrer" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-creo-purple transition group">
             <h3 class="font-semibold text-gray-900 group-hover:text-creo-purple transition">GitHub Repository</h3>
             <p class="text-gray-500 text-sm mt-1">Source code, deployments, and GitHub Pages settings.</p>
           </a>
-          <a href="https://fullnessmindset.github.io/creo/feed.html" target="_blank" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-green-500 transition group">
+          <a href="https://fullnessmindset.github.io/creo/feed.html" target="_blank" rel="noopener noreferrer" class="bg-white border border-gray-200 rounded-xl p-5 hover:border-green-500 transition group">
             <h3 class="font-semibold text-gray-900 group-hover:text-green-600 transition">Creadores Feed (Live)</h3>
             <p class="text-gray-500 text-sm mt-1">The public video feed page.</p>
           </a>
@@ -1261,7 +1261,7 @@
             <div class="space-y-3">
               <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Uploaded Documents (${docs.length})</h5>
               <div class="space-y-2">
-                ${docs.map(d => `<a href="${esc(d.file_url)}" target="_blank" class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition text-sm">
+                ${docs.map(d => `<a href="${esc(d.file_url)}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition text-sm">
                   <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                   <div class="flex-1 min-w-0"><p class="text-gray-900 truncate">${esc(d.file_name || 'Document')}</p><p class="text-xs text-gray-400">${esc(d.document_type)} · ${new Date(d.uploaded_at).toLocaleDateString()}</p></div>
                   <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
@@ -1316,10 +1316,10 @@
         <div class="space-y-3">
           <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Social Media</h5>
           <div class="bg-gray-50 p-3 rounded-lg space-y-1 text-sm">
-            ${socials.instagram ? `<p><span class="text-gray-400">Instagram:</span> <a href="${esc(socials.instagram)}" target="_blank" class="text-creo-purple hover:underline break-all">${esc(socials.instagram)}</a></p>` : ''}
-            ${socials.tiktok ? `<p><span class="text-gray-400">TikTok:</span> <a href="${esc(socials.tiktok)}" target="_blank" class="text-creo-purple hover:underline break-all">${esc(socials.tiktok)}</a></p>` : ''}
-            ${socials.youtube ? `<p><span class="text-gray-400">YouTube:</span> <a href="${esc(socials.youtube)}" target="_blank" class="text-creo-purple hover:underline break-all">${esc(socials.youtube)}</a></p>` : ''}
-            ${socials.twitter ? `<p><span class="text-gray-400">Twitter/X:</span> <a href="${esc(socials.twitter)}" target="_blank" class="text-creo-purple hover:underline break-all">${esc(socials.twitter)}</a></p>` : ''}
+            ${socials.instagram ? `<p><span class="text-gray-400">Instagram:</span> <a href="${esc(socials.instagram)}" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline break-all">${esc(socials.instagram)}</a></p>` : ''}
+            ${socials.tiktok ? `<p><span class="text-gray-400">TikTok:</span> <a href="${esc(socials.tiktok)}" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline break-all">${esc(socials.tiktok)}</a></p>` : ''}
+            ${socials.youtube ? `<p><span class="text-gray-400">YouTube:</span> <a href="${esc(socials.youtube)}" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline break-all">${esc(socials.youtube)}</a></p>` : ''}
+            ${socials.twitter ? `<p><span class="text-gray-400">Twitter/X:</span> <a href="${esc(socials.twitter)}" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline break-all">${esc(socials.twitter)}</a></p>` : ''}
             ${!socials.instagram && !socials.tiktok && !socials.youtube && !socials.twitter ? '<p class="text-gray-400">No social links provided</p>' : ''}
           </div>
         </div>
@@ -1328,7 +1328,7 @@
 
         ${docsHtml}
 
-        <a href="${PROFILE_BASE}${esc(p.username)}" target="_blank" class="block text-center text-xs text-creo-purple hover:underline">View Public Profile &rarr;</a>
+        <a href="${PROFILE_BASE}${esc(p.username)}" target="_blank" rel="noopener noreferrer" class="block text-center text-xs text-creo-purple hover:underline">View Public Profile &rarr;</a>
       `;
 
       // Live Stripe & Identity status cards
@@ -1616,7 +1616,7 @@
           : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center border border-gray-200"><span class="text-xs font-bold text-creo-purple">${esc((p.username || '?')[0].toUpperCase())}</span></div>`;
         return `<tr class="border-b border-gray-100 hover:bg-gray-50 transition">
           <td class="px-5 py-3">
-            <a href="${PROFILE_BASE}${esc(p.username)}" target="_blank" class="flex items-center gap-2.5 hover:text-creo-purple">
+            <a href="${PROFILE_BASE}${esc(p.username)}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2.5 hover:text-creo-purple">
               ${avatar}
               <div>
                 <p class="font-medium text-gray-900 text-sm">${esc(p.username)}</p>
@@ -2699,7 +2699,7 @@
           <td class="px-5 py-3 text-gray-900 text-sm">${esc(u.email || '-')}</td>
           <td class="px-5 py-3">${providerBadge}</td>
           <td class="px-5 py-3">${profileBadge}</td>
-          <td class="px-5 py-3 text-gray-500">${username !== '-' ? '<a href="${PROFILE_BASE}' + esc(username) + '" target="_blank" class="text-creo-purple hover:underline">@' + esc(username) + '</a>' : '-'}${displayName ? ' <span class="text-gray-400 text-xs">(' + esc(displayName) + ')</span>' : ''}</td>
+          <td class="px-5 py-3 text-gray-500">${username !== '-' ? '<a href="${PROFILE_BASE}' + esc(username) + '" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline">@' + esc(username) + '</a>' : '-'}${displayName ? ' <span class="text-gray-400 text-xs">(' + esc(displayName) + ')</span>' : ''}</td>
           <td class="px-5 py-3">${u.has_profile ? statusBadge(u.profile?.verification_status) : '<span class="text-xs text-gray-300">—</span>'}</td>
           <td class="px-5 py-3">${u.has_profile ? stripeBadge(u.profile || {}) : '<span class="text-xs text-gray-300">—</span>'}</td>
           <td class="px-5 py-3 text-gray-500 text-xs">${registered}</td>
@@ -3450,7 +3450,7 @@
           <p class="text-xs font-medium text-gray-700">Monto a liberar: $${(meta.raised_cents/200).toFixed(2)}</p>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Recibos de compra:</p>
-            <div class="flex flex-wrap gap-2">${(meta.stage2_receipt_urls||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin recibos</p>'}</div>
+            <div class="flex flex-wrap gap-2">${(meta.stage2_receipt_urls||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin recibos</p>'}</div>
           </div>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Actualización para la comunidad:</p>
@@ -3458,7 +3458,7 @@
           </div>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Evidencia (fotos/videos):</p>
-            <div class="flex flex-wrap gap-2">${(meta.stage2_update_media||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin evidencia</p>'}</div>
+            <div class="flex flex-wrap gap-2">${(meta.stage2_update_media||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin evidencia</p>'}</div>
           </div>
         </div>`;
       }
@@ -3469,7 +3469,7 @@
           <p class="text-xs font-medium text-gray-700">Monto a liberar: $${(meta.raised_cents/200).toFixed(2)}</p>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Recibos y comprobantes finales:</p>
-            <div class="flex flex-wrap gap-2">${(meta.stage3_proof_urls||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-emerald-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin pruebas</p>'}</div>
+            <div class="flex flex-wrap gap-2">${(meta.stage3_proof_urls||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-emerald-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin pruebas</p>'}</div>
           </div>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Descripción de la adquisición:</p>

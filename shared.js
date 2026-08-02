@@ -10,7 +10,7 @@
     "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://js.stripe.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "connect-src 'self' https://qddxoyjtoxtdcezwuvcq.supabase.co wss://qddxoyjtoxtdcezwuvcq.supabase.co https://api.giphy.com https://api.stripe.com https://js.stripe.com",
-    "img-src 'self' data: blob: https: http:",
+    "img-src 'self' data: blob: https:",
     "media-src 'self' blob: https://qddxoyjtoxtdcezwuvcq.supabase.co",
     "frame-src https://checkout.stripe.com https://connect.stripe.com https://js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.tiktok.com",
     "font-src 'self' data: https://fonts.gstatic.com",
@@ -1756,6 +1756,9 @@ function esc(str) {
   d.textContent = str || '';
   return d.innerHTML;
 }
+function escAttr(str) {
+  return esc(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 window.escapeHtml = esc;
 
 function trapFocus(modal) {
@@ -1805,9 +1808,9 @@ function getEmbedHTML(url, type, aspectClass) {
     return `<iframe src="https://www.tiktok.com/embed/v2/${id}" class="w-full ${cls} rounded-xl" frameborder="0" allowfullscreen></iframe>`;
   }
   if (type === 'instagram') {
-    return `<iframe src="${esc(url.replace(/\/$/, ''))}/embed" class="w-full ${cls} rounded-xl" frameborder="0" allowfullscreen></iframe>`;
+    return `<iframe src="${escAttr(url.replace(/\/$/, ''))}/embed" class="w-full ${cls} rounded-xl" frameborder="0" allowfullscreen></iframe>`;
   }
-  return `<video src="${esc(url)}" class="w-full ${cls} rounded-xl object-cover" controls></video>`;
+  return `<video src="${escAttr(url)}" class="w-full ${cls} rounded-xl object-cover" controls></video>`;
 }
 
 // Toast notifications
@@ -2538,12 +2541,12 @@ function showAnnouncementBubble(a, user) {
   bubble.style.cssText = `position:fixed;bottom:80px;right:16px;z-index:9999;max-width:340px;width:calc(100% - 32px);background:rgba(255,255,255,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:#1a0a3e;border-radius:16px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.06);border:2px solid ${borderColor};animation:annBubbleIn 0.35s ease-out;font-family:inherit;`;
   bubble.innerHTML = `
     <div style="display:flex;align-items:flex-start;gap:10px;">
-      ${icon ? `<span style="font-size:20px;flex-shrink:0;margin-top:1px;">${icon}</span>` : ''}
+      ${icon ? `<span style="font-size:20px;flex-shrink:0;margin-top:1px;">${esc(icon)}</span>` : ''}
       <div style="flex:1;min-width:0;">
         <p style="font-size:11px;color:#6b7280;margin:0 0 3px;font-weight:600;letter-spacing:0.05em;">CREO</p>
         <p style="font-size:14px;line-height:1.4;margin:0;word-wrap:break-word;color:#1f2937;">${esc(a.message)}</p>
       </div>
-      <button onclick="dismissAnnouncement('${esc(a.id)}')" style="flex-shrink:0;background:rgba(0,0,0,0.06);border:none;color:#9ca3af;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:-2px;transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.12)'" onmouseout="this.style.background='rgba(0,0,0,0.06)'" aria-label="Close">&times;</button>
+      <button onclick="dismissAnnouncement('${escAttr(a.id)}')" style="flex-shrink:0;background:rgba(0,0,0,0.06);border:none;color:#9ca3af;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:-2px;transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.12)'" onmouseout="this.style.background='rgba(0,0,0,0.06)'" aria-label="Close">&times;</button>
     </div>
     <div style="margin-top:8px;height:3px;background:rgba(0,0,0,0.06);border-radius:2px;overflow:hidden;">
       <div id="ann-bubble-progress" style="height:100%;background:${progressColor};border-radius:2px;width:100%;transition:width 10s linear;"></div>
@@ -3716,26 +3719,26 @@ const MediaUploadService = (function() {
     if (!mt || !url) return '';
 
     if (mt === 'gif') {
-      return '<img src="' + esc(url) + '" class="max-w-[220px] rounded-xl" alt="GIF" loading="lazy">';
+      return '<img src="' + escAttr(url) + '" class="max-w-[220px] rounded-xl" alt="GIF" loading="lazy">';
     }
     if (mt === 'image') {
-      return '<img src="' + esc(url) + '" class="max-w-[240px] rounded-xl cursor-pointer" alt="" loading="lazy" onclick="window.open(this.src,\'_blank\')">';
+      return '<img src="' + escAttr(url) + '" class="max-w-[240px] rounded-xl cursor-pointer" alt="" loading="lazy" onclick="window.open(this.src,\'_blank\')">';
     }
     if (mt === 'video') {
       return '<div class="relative max-w-[260px]">' +
-        '<video src="' + esc(url) + '" controls playsinline preload="metadata" class="w-full rounded-xl"></video>' +
+        '<video src="' + escAttr(url) + '" controls playsinline preload="metadata" class="w-full rounded-xl"></video>' +
       '</div>';
     }
     if (mt === 'audio') {
       return '<div class="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2 max-w-[260px]">' +
-        '<audio controls src="' + esc(url) + '" class="w-full" style="height:36px"></audio>' +
+        '<audio controls src="' + escAttr(url) + '" class="w-full" style="height:36px"></audio>' +
       '</div>';
     }
     if (mt === 'document' || mt === 'file' || mt === 'archive' || mt === 'code' || mt === 'other') {
       const icon = getIcon(mt);
       const name = msg.file_name || url.split('/').pop() || 'Archivo';
       const size = msg.file_size ? ' · ' + formatSize(msg.file_size) : '';
-      return '<a href="' + esc(url) + '" target="_blank" rel="noopener" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-xl px-3 py-2 transition max-w-[260px]">' +
+      return '<a href="' + escAttr(url) + '" target="_blank" rel="noopener" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-xl px-3 py-2 transition max-w-[260px]">' +
         '<span class="text-2xl flex-shrink-0">' + icon + '</span>' +
         '<div class="min-w-0 flex-1">' +
           '<p class="text-xs font-medium truncate">' + esc(name) + '</p>' +

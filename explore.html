@@ -20,7 +20,7 @@
   <meta name="twitter:image" content="https://fullnessmindset.github.io/creo/assets/logo-icon.png">
   <link rel="canonical" href="https://fullnessmindset.github.io/creo/explore.html">
   <link rel="stylesheet" href="tailwind.min.css?v=20260719">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0/dist/umd/supabase.min.js" integrity="sha384-fPWur1rx/DE6YtXP/x0MD6dd90RgnVsz5yX/DIg7CcVAnTBZsENWuIcpvVTM39ti" crossorigin="anonymous"></script>
   <style>
     body { overscroll-behavior: contain; }
     input, select, textarea { font-size: max(16px, 1em) !important; }
@@ -414,7 +414,7 @@
             <p class="text-white text-xs font-bold">${esc(cName)}</p>
             <p class="text-gray-300 text-xs">${esc(c.body)}</p>
           </div>
-          ${isOwner ? `<button onclick="deleteStoryComment('${c.id}')" class="text-gray-500 hover:text-red-400 flex-shrink-0"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>` : ''}
+          ${isOwner ? `<button onclick="deleteStoryComment('${escAttr(c.id)}')" class="text-gray-500 hover:text-red-400 flex-shrink-0"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>` : ''}
         </div>`;
       }).join('');
     }

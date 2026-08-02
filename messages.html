@@ -12,7 +12,7 @@
   <meta name="description" content="CREO — Mensajes privados entre creadores y seguidores">
   <link rel="icon" href="assets/logo-icon.png" type="image/png">
   <link rel="stylesheet" href="tailwind.min.css?v=20260719">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0/dist/umd/supabase.min.js" integrity="sha384-fPWur1rx/DE6YtXP/x0MD6dd90RgnVsz5yX/DIg7CcVAnTBZsENWuIcpvVTM39ti" crossorigin="anonymous"></script>
   <style>
     input, select, textarea { font-size: max(16px, 1em) !important; }
     .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.3); }
@@ -132,7 +132,7 @@
   <div class="md:hidden pb-24">
     <div class="sticky top-0 z-20 bg-white/95 backdrop-blur-lg border-b border-gray-100 px-4 pt-4 pb-3">
       <div class="flex items-center justify-between mb-3">
-        <h1 class="text-xl font-bold text-creo-purple tracking-wider"><span aria-label="sobre">✉️</span> Mensajes</h1>
+        <h1 class="text-xl font-bold text-creo-purple tracking-wider"><svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> Mensajes</h1>
         <button onclick="openNewMessage()" class="w-9 h-9 rounded-full bg-creo-purple/10 flex items-center justify-center hover:bg-creo-purple/20 transition">
           <svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
         </button>
@@ -218,7 +218,7 @@
     <div class="absolute inset-0 bg-black/40" onclick="closeNewMessage()"></div>
     <div class="absolute inset-x-0 bottom-0 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[420px] bg-white rounded-t-2xl md:rounded-2xl max-h-[80vh] flex flex-col shadow-2xl">
       <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-        <h3 class="font-bold text-gray-900"><span aria-label="escribir">✏️</span> Nuevo Mensaje</h3>
+        <h3 class="font-bold text-gray-900"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg> Nuevo Mensaje</h3>
         <button onclick="closeNewMessage()" class="text-gray-400 hover:text-gray-600 transition">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -320,9 +320,9 @@
       const name = p.display_name || p.username || 'Usuario';
       const verified = p.verification_status === 'approved' ? '<svg class="w-3.5 h-3.5 text-creo-mint inline ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' : '';
       const avatar = p.avatar_url
-        ? `<img src="${esc(p.avatar_url)}" class="w-10 h-10 rounded-full object-cover">`
+        ? `<img src="${escAttr(p.avatar_url)}" class="w-10 h-10 rounded-full object-cover">`
         : `<div class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-creo-purple font-bold">${esc(name[0].toUpperCase())}</span></div>`;
-      return `<button onclick="openChat('${p.id}');document.getElementById('${containerId}').classList.add('hidden');${clearSrc}" class="w-full search-result flex items-center gap-3 p-3 rounded-xl transition text-left">${avatar}<div class="min-w-0"><p class="font-semibold text-sm text-gray-900 truncate">${esc(name)}${verified}</p><p class="text-xs text-gray-400 truncate">@${esc(p.username || '')}</p></div></button>`;
+      return `<button onclick="openChat('${escAttr(p.id)}');document.getElementById('${escAttr(containerId)}').classList.add('hidden');${clearSrc}" class="w-full search-result flex items-center gap-3 p-3 rounded-xl transition text-left">${avatar}<div class="min-w-0"><p class="font-semibold text-sm text-gray-900 truncate">${esc(name)}${verified}</p><p class="text-xs text-gray-400 truncate">@${esc(p.username || '')}</p></div></button>`;
     }
 
     async function searchNewMsgCreators(q) {
@@ -341,7 +341,7 @@
         container.innerHTML = profiles.map(p => {
           const name = p.display_name || p.username || 'Usuario';
           const avatar = p.avatar_url
-            ? `<img src="${esc(p.avatar_url)}" class="w-10 h-10 rounded-full object-cover">`
+            ? `<img src="${escAttr(p.avatar_url)}" class="w-10 h-10 rounded-full object-cover">`
             : `<div class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-creo-purple font-bold">${esc(name[0].toUpperCase())}</span></div>`;
           return `<button onclick="openChat('${p.id}');closeNewMessage()" class="w-full search-result flex items-center gap-3 p-3 rounded-xl transition text-left">${avatar}<div class="min-w-0"><p class="font-semibold text-sm text-gray-900 truncate">${esc(name)}</p><p class="text-xs text-gray-400 truncate">@${esc(p.username || '')}</p></div></button>`;
         }).join('');
@@ -501,17 +501,17 @@
       const reactionHtml = Object.keys(reactions).length > 0
         ? `<div class="flex flex-wrap gap-1 ${isMine ? 'justify-end' : 'justify-start'} mt-0.5">${Object.entries(reactions).map(([emoji, users]) => {
             const my = users.includes(currentUser.id);
-            return `<button onclick="toggleReaction('${m.id}','${emoji}')" class="text-xs px-1.5 py-0.5 rounded-full border transition ${my ? 'bg-creo-purple/20 border-creo-purple' : 'bg-gray-50 border-gray-200 hover:border-creo-mint'}">${emoji}${users.length>1?' '+users.length:''}</button>`;
+            return `<button onclick="toggleReaction('${escAttr(m.id)}','${escAttr(emoji)}')" class="text-xs px-1.5 py-0.5 rounded-full border transition ${my ? 'bg-creo-purple/20 border-creo-purple' : 'bg-gray-50 border-gray-200 hover:border-creo-mint'}">${emoji}${users.length>1?' '+users.length:''}</button>`;
           }).join('')}</div>` : '';
 
       return `<div class="flex ${isMine?'justify-end':'justify-start'} group" id="msg-${m.id}">
         <div class="max-w-[75%] relative">
-          <div class="${isMine?'msg-mine':'msg-theirs'} px-3.5 py-2 space-y-1" ondblclick="showReactionPicker('${m.id}',${isMine})">
+          <div class="${isMine?'msg-mine':'msg-theirs'} px-3.5 py-2 space-y-1" ondblclick="showReactionPicker('${escAttr(m.id)}',${isMine})">
             ${content}
             <p class="text-[10px] ${isMine?'text-white/40':'text-gray-400'} text-right leading-none">${timeAgo(m.created_at)}</p>
           </div>
           ${reactionHtml}
-          <button onclick="showReactionPicker('${m.id}',${isMine})" class="absolute ${isMine?'-left-7':'-right-7'} top-1 opacity-0 group-hover:opacity-100 transition text-gray-300 hover:text-gray-500 text-sm">😊</button>
+          <button onclick="showReactionPicker('${escAttr(m.id)}',${isMine})" class="absolute ${isMine?'-left-7':'-right-7'} top-1 opacity-0 group-hover:opacity-100 transition text-gray-300 hover:text-gray-500 text-sm">😊</button>
         </div>
       </div>`;
     }

@@ -6,7 +6,7 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
   apiVersion: "2023-10-16",
   httpClient: Stripe.createFetchHttpClient(),
 });
-const ADMIN_EMAIL = "fullnessmindset@gmail.com";
+const ADMIN_EMAIL_FALLBACK = Deno.env.get("ADMIN_EMAIL") || "fullnessmindset@gmail.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "https://fullnessmindset.github.io",
@@ -39,7 +39,15 @@ serve(async (req) => {
       data: { user },
       error: authError,
     } = await sbAdmin.auth.getUser(token);
-    if (authError || !user || user.email !== ADMIN_EMAIL)
+    if (authError || !user) return json({ error: "Unauthorized" }, 403);
+
+    // Check admin_emails table first, fall back to env/hardcoded email
+    const { data: adminRow } = await sbAdmin
+      .from("admin_emails")
+      .select("email")
+      .eq("email", user.email)
+      .maybeSingle();
+    if (!adminRow && user.email !== ADMIN_EMAIL_FALLBACK)
       return json({ error: "Unauthorized" }, 403);
 
     // Rate limit admin API (prevent abuse even with compromised admin session)
@@ -145,7 +153,7 @@ serve(async (req) => {
         data: { users },
         error: usersError,
       } = await sbAdmin.auth.admin.listUsers({ page, perPage });
-      if (usersError) return json({ error: usersError.message }, 500);
+      if (usersError) { console.error("all-users error:", usersError); return json({ error: "Failed to list users" }, 500); }
 
       const { data: profiles } = await sbAdmin
         .from("profiles")
@@ -192,7 +200,7 @@ serve(async (req) => {
         .from("profiles")
         .update(sanitized)
         .eq("id", profileId);
-      if (error) return json({ error: error.message }, 500);
+      if (error) { console.error("update-profile error:", error); return json({ error: "Failed to update profile" }, 500); }
       return json({ success: true });
     }
 
@@ -219,7 +227,7 @@ serve(async (req) => {
         );
         return json({ status: session.status, type: session.type });
       } catch (e) {
-        return json({ error: (e as Error).message }, 500);
+        console.error("identity-status error:", e); return json({ error: "Failed to retrieve identity status" }, 500);
       }
     }
 
@@ -345,7 +353,7 @@ serve(async (req) => {
 
         return json({ success: true, transfer_id: transfer.id });
       } catch (e) {
-        return json({ error: (e as Error).message }, 500);
+        console.error("approve-payout error:", e); return json({ error: "Payout failed" }, 500);
       }
     }
 
@@ -360,7 +368,7 @@ serve(async (req) => {
         return json({ error: "Missing to_email, subject, or message" }, 400);
 
       const gmailPassword = Deno.env.get("GMAIL_APP_PASSWORD");
-      const gmailUser = "fullnessmindset@gmail.com";
+      const gmailUser = Deno.env.get("GMAIL_USER") || "fullnessmindset@gmail.com";
 
       if (!gmailPassword)
         return json({ error: "GMAIL_APP_PASSWORD not configured. Generate one at myaccount.google.com/apppasswords" }, 500);
@@ -473,7 +481,7 @@ serve(async (req) => {
 
         return json({ success: true, email_id: emailId });
       } catch (e) {
-        return json({ error: "Gmail send failed: " + (e as Error).message }, 500);
+        console.error("Gmail send error:", e); return json({ error: "Email send failed" }, 500);
       }
     }
 
@@ -484,7 +492,7 @@ serve(async (req) => {
         .select("*")
         .order("created_at", { ascending: false })
         .limit(50);
-      if (error) return json({ error: error.message }, 500);
+      if (error) { console.error("sent-emails error:", error); return json({ error: "Failed to fetch emails" }, 500); }
       return json({ emails: data || [] });
     }
 

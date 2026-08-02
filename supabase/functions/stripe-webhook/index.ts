@@ -63,15 +63,21 @@ serve(async (req) => {
 
     console.log(`Processing event: ${event.type} (${event.id})`);
 
-    // Idempotency: check if this event was already processed
-    const { data: existing } = await supabase
+    // Idempotency: atomic insert-first — unique constraint on stripe_event_id
+    // prevents race conditions from concurrent Stripe retries
+    const { data: claimed, error: claimErr } = await supabase
       .from("processed_webhook_events")
+      .insert({
+        stripe_event_id: event.id,
+        event_type: event.type,
+        stripe_session_id: (event.data.object as Record<string, unknown>).id as string || null,
+        metadata: event.data.object,
+      })
       .select("id")
-      .eq("stripe_event_id", event.id)
-      .maybeSingle();
+      .single();
 
-    if (existing) {
-      console.log(`Event ${event.id} already processed, skipping`);
+    if (claimErr || !claimed) {
+      console.log(`Event ${event.id} already processed (or insert failed), skipping`);
       return new Response(JSON.stringify({ received: true, duplicate: true }), {
         status: 200, headers: { "Content-Type": "application/json" },
       });
@@ -252,6 +258,19 @@ serve(async (req) => {
       const piId = charge.payment_intent as string;
       console.log(`Charge refunded: ${charge.id}, payment_intent: ${piId}`);
 
+      // Mark tips as refunded
+      if (piId) {
+        await supabase.from("tips").update({ status: "refunded" })
+          .eq("stripe_session_id", piId).catch(() => {});
+        // Check if this was a meta contribution and reverse it
+        const { data: mc } = await supabase.from("meta_contributions")
+          .select("id, meta_id, amount_cents")
+          .eq("stripe_session_id", piId).maybeSingle();
+        if (mc) {
+          await supabase.from("meta_contributions").update({ status: "refunded" }).eq("id", mc.id);
+          await supabase.rpc("increment_meta_raised", { p_meta_id: mc.meta_id, p_amount: -(mc.amount_cents) }).catch(() => {});
+        }
+      }
       await supabase.from("admin_notifications").insert({
         type: "refund",
         title: `Reembolso procesado: $${((charge.amount_refunded as number || 0) / 100).toFixed(2)}`,
@@ -381,14 +400,6 @@ serve(async (req) => {
         else console.log(`Connect account deauthorized: ${connectId}`);
       }
     }
-
-    // Idempotency: record AFTER successful processing so retries work on failure
-    await supabase.from("processed_webhook_events").insert({
-      stripe_event_id: event.id,
-      event_type: event.type,
-      stripe_session_id: (event.data.object as Record<string, unknown>).id as string || null,
-      metadata: event.data.object,
-    });
 
     return new Response(JSON.stringify({ received: true }), {
       status: 200, headers: { "Content-Type": "application/json" },
