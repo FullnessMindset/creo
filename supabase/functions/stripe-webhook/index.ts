@@ -76,11 +76,19 @@ serve(async (req) => {
       .select("id")
       .single();
 
-    if (claimErr || !claimed) {
-      console.log(`Event ${event.id} already processed (or insert failed), skipping`);
-      return new Response(JSON.stringify({ received: true, duplicate: true }), {
-        status: 200, headers: { "Content-Type": "application/json" },
-      });
+    if (claimErr) {
+      if (claimErr.code === "23505") {
+        console.log(`Event ${event.id} already processed (duplicate), skipping`);
+        return new Response(JSON.stringify({ received: true, duplicate: true }), {
+          status: 200, headers: { "Content-Type": "application/json" },
+        });
+      }
+      console.error(`Failed to claim event ${event.id}:`, claimErr);
+      return new Response("DB error: idempotency claim", { status: 500 });
+    }
+    if (!claimed) {
+      console.error(`Event ${event.id} claim returned no data`);
+      return new Response("DB error: idempotency claim empty", { status: 500 });
     }
 
     // === CHECKOUT SESSION COMPLETED ===
@@ -104,6 +112,7 @@ serve(async (req) => {
         const { error: insertErr } = await supabase.from("meta_contributions").insert({
           meta_id: metadata.meta_id,
           stripe_session_id: session.id,
+          stripe_payment_intent: (session as unknown as Record<string, unknown>).payment_intent as string || null,
           amount_cents: baseCents,
           platform_fee_cents: platformFeeCents,
           stripe_surcharge_cents: stripeSurchargeCents,
@@ -141,6 +150,7 @@ serve(async (req) => {
       if (type === "tip") {
         const { error } = await supabase.from("tips").insert({
           stripe_session_id: session.id,
+          stripe_payment_intent: (session as unknown as Record<string, unknown>).payment_intent as string || null,
           creator_id: metadata.creator_id || null,
           creator_username: metadata.creator_username || null,
           amount_cents: baseCents,
@@ -258,17 +268,21 @@ serve(async (req) => {
       const piId = charge.payment_intent as string;
       console.log(`Charge refunded: ${charge.id}, payment_intent: ${piId}`);
 
-      // Mark tips as refunded
+      // Mark tips as refunded (match by payment_intent, not session ID)
       if (piId) {
-        await supabase.from("tips").update({ status: "refunded" })
-          .eq("stripe_session_id", piId).catch(() => {});
+        try {
+          await supabase.from("tips").update({ status: "refunded" })
+            .eq("stripe_payment_intent", piId);
+        } catch (e) { console.error("Refund tip update failed:", e); }
         // Check if this was a meta contribution and reverse it
         const { data: mc } = await supabase.from("meta_contributions")
           .select("id, meta_id, amount_cents")
-          .eq("stripe_session_id", piId).maybeSingle();
+          .eq("stripe_payment_intent", piId).maybeSingle();
         if (mc) {
-          await supabase.from("meta_contributions").update({ status: "refunded" }).eq("id", mc.id);
-          await supabase.rpc("increment_meta_raised", { p_meta_id: mc.meta_id, p_amount: -(mc.amount_cents) }).catch(() => {});
+          try {
+            await supabase.from("meta_contributions").update({ status: "refunded" }).eq("id", mc.id);
+            await supabase.rpc("increment_meta_raised", { p_meta_id: mc.meta_id, p_amount: -(mc.amount_cents) });
+          } catch (e) { console.error("Refund meta reversal failed:", e); }
         }
       }
       await supabase.from("admin_notifications").insert({

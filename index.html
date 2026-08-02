@@ -2819,7 +2819,7 @@
       return `<div class="bg-white p-4 rounded-xl border border-gray-200 space-y-3" id="story-card-${s.id}">
         ${s.title ? `<h4 class="font-bold text-gray-900 text-sm">${esc(s.title)}</h4>` : ''}
         ${s.content || s.description ? `<p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">${esc(s.content || s.description)}</p>` : ''}
-        ${videoThumb ? `<div class="relative cursor-pointer" onclick="window.open('${esc(s.main_video_url)}','_blank')">
+        ${videoThumb ? `<div class="relative cursor-pointer" onclick="window.open('${escAttr(s.main_video_url)}','_blank')">
           ${videoThumb}
           <div class="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg"><svg class="w-10 h-10 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
         </div>` : ''}
@@ -2828,7 +2828,7 @@
           if (isAudio) return `<audio controls src="${esc(u)}" class="flex-shrink-0 h-10"></audio>`;
           const isVid = /\.(mp4|webm|mov)$/i.test(u);
           if (isVid) return `<video src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover flex-shrink-0" preload="metadata"></video>`;
-          return `<img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:opacity-80" onclick="window.open('${esc(u)}','_blank')">`;
+          return `<img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:opacity-80" onclick="window.open('${escAttr(u)}','_blank')">`;
         }).join('')}</div>` : ''}
         <div class="flex items-center justify-between pt-2 border-t border-gray-100">
           <span class="text-[11px] text-gray-400">${date}</span>
@@ -3327,7 +3327,7 @@
             <p class="text-[11px] text-gray-400 truncate">@${esc(p.username)}</p>
             ${bio ? `<p class="text-[11px] text-gray-500 truncate mt-0.5">${esc(bio)}</p>` : ''}
           </div>
-          <button onclick="toggleCreoEllos('${p.id}', '${esc(p.username)}', '${esc(name)}', '${esc(p.avatar_url || '')}', this)" class="px-3 py-1.5 rounded-full text-xs font-bold transition ${isSelected ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-creo-purple text-white hover:bg-creo-light'}">
+          <button onclick="toggleCreoEllos('${escAttr(p.id)}', '${escAttr(p.username)}', '${escAttr(name)}', '${escAttr(p.avatar_url || '')}', this)" class="px-3 py-1.5 rounded-full text-xs font-bold transition ${isSelected ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-creo-purple text-white hover:bg-creo-light'}">
             ${isSelected ? 'Quitar' : 'Agregar'}
           </button>
         </div>`;

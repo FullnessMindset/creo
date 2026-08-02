@@ -305,7 +305,7 @@
             <div class="vid-act-count">${post.comment_count || ''}</div>
           </div>
           <div>
-            <button class="vid-act-btn" onclick="sharePost('${post.id}', '${esc(creator.username)}')">
+            <button class="vid-act-btn" onclick="sharePost('${escAttr(post.id)}', '${escAttr(creator.username)}')">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
             </button>
           </div>
@@ -342,7 +342,7 @@
         const av = c.avatar_url
           ? `<img src="${esc(c.avatar_url)}" class="w-12 h-12 rounded-full object-cover border-2 border-creo-mint/50 mx-auto">`
           : `<div class="w-12 h-12 rounded-full bg-creo-mint/15 border-2 border-creo-mint/50 mx-auto flex items-center justify-center text-sm font-bold text-creo-mint">${esc((c.display_name || c.username || '?')[0].toUpperCase())}</div>`;
-        return `<div class="rec-card text-center" onmouseenter="showRecPopup(event, ${groupIdx}, ${i})" onmouseleave="hideRecPopup()" onclick="window.location.href='profile.html?u=${esc(c.username)}'">
+        return `<div class="rec-card text-center" onmouseenter="showRecPopup(event, ${groupIdx}, ${i})" onmouseleave="hideRecPopup()" onclick="window.location.href='profile.html?u=${escAttr(c.username)}'">
           ${av}
           <p class="text-white text-[11px] font-semibold mt-1.5 truncate">${esc(c.display_name || c.username)}</p>
           <p class="text-gray-400 text-[9px] truncate">@${esc(c.username)}</p>

@@ -610,7 +610,7 @@
       const container = document.getElementById('category-pills');
       container.innerHTML = `<button onclick="filterDeals('all')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold ${activeCategoryFilter === 'all' ? 'bg-creo-purple text-white' : 'bg-gray-200 text-gray-700'}" data-cat="all">Todos</button>` +
         allCategories.map(c =>
-          `<button onclick="filterDeals('${esc(c.slug)}')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold ${activeCategoryFilter === c.slug ? 'bg-creo-purple text-white' : 'bg-gray-200 text-gray-700'}" data-cat="${esc(c.slug)}">${esc(c.label)}</button>`
+          `<button onclick="filterDeals('${escAttr(c.slug)}')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold ${activeCategoryFilter === c.slug ? 'bg-creo-purple text-white' : 'bg-gray-200 text-gray-700'}" data-cat="${esc(c.slug)}">${esc(c.label)}</button>`
         ).join('');
     }
 
@@ -1592,7 +1592,7 @@
         const name = other.display_name || other.username || 'Usuario';
         const avatar = other.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name);
         const dealTitle = c.brand_deals?.title || 'Deal';
-        return `<button onclick="openConvoFromList('${c.id}', '${esc(dealTitle)}', '${esc(name)}', '${esc(avatar)}')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition text-left">
+        return `<button onclick="openConvoFromList('${escAttr(c.id)}', '${escAttr(dealTitle)}', '${escAttr(name)}', '${escAttr(avatar)}')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition text-left">
           <img src="${esc(avatar)}" class="w-10 h-10 rounded-full object-cover">
           <div class="flex-1 min-w-0">
             <p class="font-semibold text-sm truncate">${esc(name)}</p>

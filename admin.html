@@ -1632,10 +1632,10 @@
           <td class="px-5 py-3 space-x-1">
             <button onclick="openReview('${p.id}')" class="text-xs text-creo-purple hover:underline">Review</button>
             <button onclick="editCreator('${p.id}')" class="text-xs text-blue-600 hover:underline">Edit</button>
-            <button onclick="deleteCreator('${p.id}', '${esc(p.username)}')" class="text-xs text-red-500 hover:underline">Delete</button>
+            <button onclick="deleteCreator('${escAttr(p.id)}', '${escAttr(p.username)}')" class="text-xs text-red-500 hover:underline">Delete</button>
           </td>
           <td class="px-5 py-3">
-            ${p.email ? `<div class="flex items-center gap-2"><span class="text-xs text-gray-500 truncate max-w-[160px]">${esc(p.email)}</span><button onclick="openEmailModal('${esc(p.email)}', '${esc(p.display_name || p.username)}')" class="text-xs bg-creo-purple/10 text-creo-purple px-2 py-0.5 rounded hover:bg-creo-purple/20 transition font-medium flex-shrink-0">Send</button></div>` : '<span class="text-xs text-gray-300">—</span>'}
+            ${p.email ? `<div class="flex items-center gap-2"><span class="text-xs text-gray-500 truncate max-w-[160px]">${esc(p.email)}</span><button onclick="openEmailModal('${escAttr(p.email)}', '${escAttr(p.display_name || p.username)}')" class="text-xs bg-creo-purple/10 text-creo-purple px-2 py-0.5 rounded hover:bg-creo-purple/20 transition font-medium flex-shrink-0">Send</button></div>` : '<span class="text-xs text-gray-300">—</span>'}
           </td>
         </tr>`;
       }).join('');
@@ -1751,7 +1751,7 @@
                   <option value="custom">Custom...</option>
                 </select>
                 <input id="dp-custom-${item.request_id}" type="number" min="1" max="100" placeholder="%" class="hidden w-16 bg-white border border-gray-300 rounded-lg text-sm px-2 py-1.5 outline-none focus:ring-2 focus:ring-creo-purple">
-                <button onclick="releaseDealFunds('${esc(item.request_id)}', '${esc(item.creator_connect_id)}', ${item.budget_cents}, '${esc(item.deal_title)}')" class="text-xs bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 transition font-medium flex items-center gap-1">
+                <button onclick="releaseDealFunds('${escAttr(item.request_id)}', '${escAttr(item.creator_connect_id)}', ${item.budget_cents}, '${escAttr(item.deal_title)}')" class="text-xs bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 transition font-medium flex items-center gap-1">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                   Release Funds
                 </button>
@@ -2882,7 +2882,7 @@
       container.innerHTML = bulkEmailList.map(e =>
         `<span class="inline-flex items-center gap-1 bg-creo-purple/10 text-creo-purple text-xs px-2 py-1 rounded-full font-medium">
           ${esc(e)}
-          <button onclick="removeBulkEmail('${esc(e)}')" class="text-creo-purple/60 hover:text-red-500 font-bold ml-0.5">&times;</button>
+          <button onclick="removeBulkEmail('${escAttr(e)}')" class="text-creo-purple/60 hover:text-red-500 font-bold ml-0.5">&times;</button>
         </span>`
       ).join('');
       countEl.textContent = bulkEmailList.length + ' recipient' + (bulkEmailList.length > 1 ? 's' : '') + ' added';
@@ -3395,7 +3395,7 @@
           'early_complete': 'Completada Anticipada'
         }[m.fund_status] || esc(m.fund_status || '');
 
-        return `<div class="p-4 flex items-center gap-4 hover:bg-gray-50 transition cursor-pointer" onclick="openMetaReview('${esc(m.id)}')">
+        return `<div class="p-4 flex items-center gap-4 hover:bg-gray-50 transition cursor-pointer" onclick="openMetaReview('${escAttr(m.id)}')">
           ${avatar}
           <div class="flex-1 min-w-0">
             <p class="font-semibold text-sm truncate">${esc(m.title || '')}</p>

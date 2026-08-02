@@ -105,3 +105,79 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 DROP POLICY IF EXISTS "Service manage fairness" ON public.creator_fairness_log;
 CREATE POLICY "Service manage fairness" ON public.creator_fairness_log
   FOR ALL TO service_role USING (true) WITH CHECK (true);
+
+-- C-01: Storage bucket "documents" SELECT policy has no ownership check.
+-- Any authenticated user can download any user's KYC/verification files.
+DROP POLICY IF EXISTS "Auth read own documents" ON storage.objects;
+CREATE POLICY "Auth read own documents" ON storage.objects
+  FOR SELECT USING (
+    bucket_id = 'documents'
+    AND auth.role() = 'authenticated'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+-- C-02: Storage bucket "documents" INSERT policy has no ownership check.
+-- Any authenticated user can upload/overwrite files at any path.
+DROP POLICY IF EXISTS "Auth upload documents" ON storage.objects;
+CREATE POLICY "Auth upload documents" ON storage.objects
+  FOR INSERT WITH CHECK (
+    bucket_id = 'documents'
+    AND auth.role() = 'authenticated'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+-- H-04: set_moderation_status is SECURITY DEFINER with no auth check.
+-- Add service_role OR admin check (called by moderate-content Edge Function and review_moderation_flag).
+CREATE OR REPLACE FUNCTION set_moderation_status(
+  p_content_type TEXT,
+  p_content_id UUID,
+  p_status TEXT,
+  p_category TEXT DEFAULT 'safe',
+  p_confidence NUMERIC DEFAULT 1.0,
+  p_source TEXT DEFAULT 'automated'
+)
+RETURNS void AS $$
+BEGIN
+  -- Only service_role or admins may call this
+  IF current_setting('role') != 'service_role' AND NOT EXISTS (
+    SELECT 1 FROM admin_emails WHERE email = auth.jwt()->>'email'
+  ) THEN
+    RAISE EXCEPTION 'Access denied: service_role or admin required';
+  END IF;
+
+  IF p_content_type = 'post' THEN
+    UPDATE posts SET moderation_status = p_status WHERE id = p_content_id;
+  ELSIF p_content_type = 'community_post' THEN
+    UPDATE community_posts SET moderation_status = p_status WHERE id = p_content_id;
+  END IF;
+
+  INSERT INTO moderation_flags (content_type, content_id, category, confidence, status, source, decided_at)
+  VALUES (
+    p_content_type, p_content_id, p_category, p_confidence,
+    CASE p_status
+      WHEN 'approved' THEN 'approved'
+      WHEN 'removed' THEN 'removed'
+      WHEN 'under_review' THEN 'pending'
+      ELSE 'pending'
+    END,
+    p_source,
+    CASE WHEN p_status IN ('approved', 'removed') THEN now() ELSE NULL END
+  )
+  ON CONFLICT (content_type, content_id, category) DO UPDATE SET
+    confidence = EXCLUDED.confidence,
+    status = EXCLUDED.status,
+    decided_at = EXCLUDED.decided_at;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- M-02b: Notifications INSERT allows any user to spoof notifications for any user_id.
+DROP POLICY IF EXISTS "Service insert notifications" ON public.notifications;
+CREATE POLICY "Service insert notifications" ON public.notifications
+  FOR INSERT TO service_role WITH CHECK (true);
+
+-- H-03: Add stripe_payment_intent column to tips and meta_contributions
+-- so refund handler can match by payment_intent instead of session ID.
+ALTER TABLE public.tips ADD COLUMN IF NOT EXISTS stripe_payment_intent TEXT;
+ALTER TABLE public.meta_contributions ADD COLUMN IF NOT EXISTS stripe_payment_intent TEXT;
+CREATE INDEX IF NOT EXISTS idx_tips_payment_intent ON public.tips(stripe_payment_intent) WHERE stripe_payment_intent IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_meta_contributions_payment_intent ON public.meta_contributions(stripe_payment_intent) WHERE stripe_payment_intent IS NOT NULL;
