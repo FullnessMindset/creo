@@ -111,10 +111,11 @@ serve(async (req) => {
       },
       success_url: validSuccessUrl,
       cancel_url: validCancelUrl,
-    });
+    }, { idempotencyKey: `deal_${conversation_id}_${user.id}_${baseCents}` });
 
     // Record payment message in deal chat with encryption
-    const encKey = Deno.env.get("DEAL_ENCRYPTION_KEY") || "creo_deal_default_key";
+    const encKey = Deno.env.get("DEAL_ENCRYPTION_KEY");
+    if (!encKey) return json({ error: "Encryption not configured" }, 500);
     const msgText = `Pago de $${amount_usd.toFixed(2)} — ${description || "Colaboración"}`;
     await supabase.rpc("insert_deal_message_encrypted", {
       p_conversation_id: conversation_id,

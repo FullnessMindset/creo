@@ -692,8 +692,8 @@
         const hero = document.getElementById('mec-tip-hero');
         const isVid = /\.(mp4|webm|mov)$/i.test(tip.image_url);
         hero.innerHTML = isVid
-          ? `<video src="${esc(tip.image_url)}" class="w-full object-cover" style="max-height:200px" preload="metadata" autoplay muted loop playsinline></video>`
-          : `<img src="${esc(tip.image_url)}" loading="lazy" class="w-full object-cover" style="max-height:200px" alt="">`;
+          ? `<video src="${escAttr(tip.image_url)}" class="w-full object-cover" style="max-height:200px" preload="metadata" autoplay muted loop playsinline></video>`
+          : `<img src="${escAttr(tip.image_url)}" loading="lazy" class="w-full object-cover" style="max-height:200px" alt="">`;
         hero.classList.remove('hidden');
       }
       // Update tab label
@@ -709,8 +709,8 @@
         const hero = document.getElementById('mec-sub-hero');
         const isVid = /\.(mp4|webm|mov)$/i.test(sub.image_url);
         hero.innerHTML = isVid
-          ? `<video src="${esc(sub.image_url)}" class="w-full object-cover" style="max-height:200px" preload="metadata" autoplay muted loop playsinline></video>`
-          : `<img src="${esc(sub.image_url)}" loading="lazy" class="w-full object-cover" style="max-height:200px" alt="">`;
+          ? `<video src="${escAttr(sub.image_url)}" class="w-full object-cover" style="max-height:200px" preload="metadata" autoplay muted loop playsinline></video>`
+          : `<img src="${escAttr(sub.image_url)}" loading="lazy" class="w-full object-cover" style="max-height:200px" alt="">`;
         hero.classList.remove('hidden');
       }
       if (sub.title) document.getElementById('pay-tab-sub').textContent = sub.title;
@@ -735,8 +735,8 @@
         const hero = document.getElementById('mec-meta-hero');
         const isVid = /\.(mp4|webm|mov)$/i.test(meta.image_url);
         hero.innerHTML = isVid
-          ? `<video src="${esc(meta.image_url)}" class="w-full object-cover" style="max-height:200px" preload="metadata" autoplay muted loop playsinline></video>`
-          : `<img src="${esc(meta.image_url)}" loading="lazy" class="w-full object-cover" style="max-height:200px" alt="">`;
+          ? `<video src="${escAttr(meta.image_url)}" class="w-full object-cover" style="max-height:200px" preload="metadata" autoplay muted loop playsinline></video>`
+          : `<img src="${escAttr(meta.image_url)}" loading="lazy" class="w-full object-cover" style="max-height:200px" alt="">`;
         hero.classList.remove('hidden');
       }
     }
@@ -810,7 +810,7 @@
 
         const linkSection = productLinks.length ? `
           <div class="space-y-1">
-            ${productLinks.map(l => `<a href="${esc(l.url)}" target="_blank" class="flex items-center gap-2 text-xs text-creo-purple hover:underline">
+            ${productLinks.map(l => `<a href="${escAttr(l.url)}" target="_blank" class="flex items-center gap-2 text-xs text-creo-purple hover:underline">
               <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
               Ver producto / precio
             </a>`).join('')}
@@ -839,13 +839,13 @@
                 if (isVideo) {
                   return `<div class="meta-slide relative aspect-[4/5] bg-gray-900 cursor-pointer" onclick="openMetaPost('${m.id}', ${i})">
                     <div class="meta-skeleton absolute inset-0 bg-gray-800 animate-pulse"></div>
-                    <video src="${esc(img)}" class="w-full h-full object-cover relative z-[1]" preload="metadata" autoplay muted loop playsinline onloadeddata="this.previousElementSibling.remove()" onerror="this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-full bg-gray-800 text-gray-400 text-sm\\'>Video no disponible</div>'"></video>
+                    <video src="${escAttr(img)}" class="w-full h-full object-cover relative z-[1]" preload="metadata" autoplay muted loop playsinline onloadeddata="this.previousElementSibling.remove()" onerror="this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-full bg-gray-800 text-gray-400 text-sm\\'>Video no disponible</div>'"></video>
                     <div class="absolute inset-0 flex items-center justify-center bg-black/20 z-[2] pointer-events-none"><svg class="w-14 h-14 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                   </div>`;
                 }
                 return `<div class="meta-slide cursor-pointer" onclick="openMetaPost('${m.id}', ${i})">
                   <div class="meta-skeleton aspect-[4/5] bg-gray-200 animate-pulse"></div>
-                  <img src="${esc(img)}" loading="lazy" class="w-full aspect-[4/5] object-cover" alt="${esc(m.title)}" onload="this.previousElementSibling.remove();this.style.opacity=1" onerror="this.previousElementSibling.innerHTML='<div class=\\'flex items-center justify-center h-full text-gray-400 text-sm\\'>Imagen no disponible</div>';this.remove()" style="opacity:0;transition:opacity .3s">
+                  <img src="${escAttr(img)}" loading="lazy" class="w-full aspect-[4/5] object-cover" alt="${escAttr(m.title)}" onload="this.previousElementSibling.remove();this.style.opacity=1" onerror="this.previousElementSibling.innerHTML='<div class=\\'flex items-center justify-center h-full text-gray-400 text-sm\\'>Imagen no disponible</div>';this.remove()" style="opacity:0;transition:opacity .3s">
                 </div>`;
               }).join('')}
             </div>
@@ -904,8 +904,8 @@
               const name = p.display_name || p.username || '?';
               const profileLink = p.username ? 'profile.html?u=' + encodeURIComponent(p.username) : '#';
               return p.avatar_url
-                ? `<a href="${profileLink}" title="${esc(name)}" class="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm -ml-2 first:ml-0 block overflow-hidden hover:ring-2 hover:ring-creo-mint transition"><img src="${esc(p.avatar_url)}" class="w-full h-full object-cover"></a>`
-                : `<a href="${profileLink}" title="${esc(name)}" class="w-8 h-8 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-white shadow-sm -ml-2 first:ml-0 hover:ring-2 hover:ring-creo-mint transition"><span class="text-creo-mint text-xs font-bold">${esc(name[0].toUpperCase())}</span></a>`;
+                ? `<a href="${profileLink}" title="${escAttr(name)}" class="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm -ml-2 first:ml-0 block overflow-hidden hover:ring-2 hover:ring-creo-mint transition"><img src="${escAttr(p.avatar_url)}" class="w-full h-full object-cover"></a>`
+                : `<a href="${profileLink}" title="${escAttr(name)}" class="w-8 h-8 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-white shadow-sm -ml-2 first:ml-0 hover:ring-2 hover:ring-creo-mint transition"><span class="text-creo-mint text-xs font-bold">${esc(name[0].toUpperCase())}</span></a>`;
             }).join('');
             return `<div class="flex items-center gap-2">
               <div class="flex items-center pl-2">${avatars}</div>
@@ -981,11 +981,11 @@
           const isVideo = firstMedia && (/\.(mp4|webm|mov)$/i.test(firstMedia) || /youtube|tiktok|youtu\.be/i.test(firstMedia));
           const mediaHtml = firstMedia ? (isVideo
             ? `<div class="relative rounded-xl overflow-hidden bg-gray-900 cursor-pointer" style="max-height:200px" onclick="openMetaPost('${m.id}', 0)">
-                <video src="${esc(firstMedia)}" class="w-full object-cover" style="max-height:200px" preload="metadata" muted playsinline></video>
+                <video src="${escAttr(firstMedia)}" class="w-full object-cover" style="max-height:200px" preload="metadata" muted playsinline></video>
                 <div class="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none"><svg class="w-10 h-10 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
               </div>`
             : `<div class="rounded-xl overflow-hidden cursor-pointer" style="max-height:200px" onclick="openMetaPost('${m.id}', 0)">
-                <img src="${esc(firstMedia)}" class="w-full object-cover" style="max-height:200px" alt="${esc(m.title)}" loading="lazy">
+                <img src="${escAttr(firstMedia)}" class="w-full object-cover" style="max-height:200px" alt="${escAttr(m.title)}" loading="lazy">
               </div>`) : '';
           return `<div class="border border-gray-100 rounded-xl overflow-hidden">
             ${mediaHtml}
@@ -1183,12 +1183,12 @@
         const img = images[mediaIndex];
         const isVideo = /\.(mp4|webm|mov)$/i.test(img) || /youtube|tiktok|youtu\.be/i.test(img);
         if (isVideo) {
-          mediaEl.innerHTML = `<video src="${esc(img)}" class="w-full max-h-[50vh] object-contain" controls autoplay></video>`;
+          mediaEl.innerHTML = `<video src="${escAttr(img)}" class="w-full max-h-[50vh] object-contain" controls autoplay></video>`;
         } else {
-          mediaEl.innerHTML = `<img src="${esc(img)}" class="w-full max-h-[50vh] object-contain">`;
+          mediaEl.innerHTML = `<img src="${escAttr(img)}" class="w-full max-h-[50vh] object-contain">`;
         }
       } else if (images.length > 0) {
-        mediaEl.innerHTML = `<img src="${esc(images[0])}" class="w-full max-h-[50vh] object-contain">`;
+        mediaEl.innerHTML = `<img src="${escAttr(images[0])}" class="w-full max-h-[50vh] object-contain">`;
       } else {
         mediaEl.innerHTML = '';
       }
@@ -1272,7 +1272,7 @@
         const name = p.display_name || p.username || 'Usuario';
         const profileLink = p.username ? `profile.html?u=${encodeURIComponent(p.username)}` : '#';
         const avatar = p.avatar_url
-          ? `<a href="${profileLink}"><img src="${esc(p.avatar_url)}" class="w-7 h-7 rounded-full object-cover flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition"></a>`
+          ? `<a href="${profileLink}"><img src="${escAttr(p.avatar_url)}" class="w-7 h-7 rounded-full object-cover flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition"></a>`
           : `<a href="${profileLink}" class="w-7 h-7 rounded-full bg-creo-mint/20 flex items-center justify-center flex-shrink-0 hover:ring-2 hover:ring-creo-mint transition"><span class="text-creo-mint text-[10px] font-bold">${esc(name[0].toUpperCase())}</span></a>`;
         return `<div class="flex gap-2">
           ${avatar}
@@ -1470,7 +1470,7 @@
       const profileUrl = creatorProfile.username ? `profile.html?u=${encodeURIComponent(creatorProfile.username)}` : '#';
       const avatar = document.getElementById('dm-avatar');
       if (creatorProfile.avatar_url) {
-        avatar.innerHTML = `<img src="${esc(creatorProfile.avatar_url)}" class="w-full h-full object-cover" alt="">`;
+        avatar.innerHTML = `<img src="${escAttr(creatorProfile.avatar_url)}" class="w-full h-full object-cover" alt="">`;
       } else {
         avatar.innerHTML = `<span class="text-creo-purple font-bold text-lg">${esc((creatorProfile.display_name || creatorProfile.username)[0].toUpperCase())}</span>`;
       }
@@ -1510,14 +1510,14 @@
         const isMine = m.sender_id === user.id;
         let content = '';
         if (m.media_type === 'gif') {
-          content = `<img src="${esc(m.media_url)}" class="max-w-[200px] rounded-xl" alt="GIF" loading="lazy">`;
+          content = `<img src="${escAttr(m.media_url)}" class="max-w-[200px] rounded-xl" alt="GIF" loading="lazy">`;
         } else if (m.media_type === 'audio') {
-          content = `<audio controls src="${esc(m.media_url)}" class="w-[200px] max-w-full" style="height:40px"></audio>`;
+          content = `<audio controls src="${escAttr(m.media_url)}" class="w-[200px] max-w-full" style="height:40px"></audio>`;
         } else if (m.media_type === 'image') {
-          content = `<img src="${esc(m.media_url)}" class="max-w-[200px] rounded-xl cursor-pointer" alt="" loading="lazy" onclick="window.open(this.src,'_blank')">`;
+          content = `<img src="${escAttr(m.media_url)}" class="max-w-[200px] rounded-xl cursor-pointer" alt="" loading="lazy" onclick="window.open(this.src,'_blank')">`;
         } else if (m.media_type === 'video') {
           content = `<div class="video-circle w-[140px] h-[140px] cursor-pointer" onclick="this.querySelector('video').paused?this.querySelector('video').play():this.querySelector('video').pause()">
-            <video src="${esc(m.media_url)}" playsinline class="w-full h-full object-cover"></video>
+            <video src="${escAttr(m.media_url)}" playsinline class="w-full h-full object-cover"></video>
             <div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div>
           </div>`;
         }
@@ -1858,7 +1858,7 @@
 
         const mainVideoHTML = s.main_video_url ? `
           <div class="relative rounded-2xl overflow-hidden bg-black">
-            <video src="${esc(s.main_video_url)}" class="w-full aspect-video object-cover story-autoplay-video" autoplay muted playsinline loop></video>
+            <video src="${escAttr(s.main_video_url)}" class="w-full aspect-video object-cover story-autoplay-video" autoplay muted playsinline loop></video>
             <button onclick="toggleStoryVideo(this)" class="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition group story-play-overlay">
               <div class="w-14 h-14 rounded-full bg-white/90 shadow-lg flex items-center justify-center group-hover:scale-110 transition">
                 <svg class="w-7 h-7 text-creo-purple ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -1879,13 +1879,13 @@
                 if (isAudio) {
                   return `<div class="glass rounded-xl p-3 flex items-center gap-2">
                     <svg class="w-5 h-5 text-creo-purple flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg>
-                    <audio controls src="${esc(url)}" class="flex-1 h-8" style="min-width:0"></audio>
+                    <audio controls src="${escAttr(url)}" class="flex-1 h-8" style="min-width:0"></audio>
                   </div>`;
                 }
                 if (isVid) {
-                  return `<video src="${esc(url)}" controls class="w-full aspect-video object-cover rounded-xl bg-black"></video>`;
+                  return `<video src="${escAttr(url)}" controls class="w-full aspect-video object-cover rounded-xl bg-black"></video>`;
                 }
-                return `<img src="${esc(url)}" class="w-full ${mediaArr.length === 1 ? 'aspect-auto max-h-80' : 'aspect-square'} object-cover rounded-xl cursor-pointer hover:opacity-90 transition shadow-sm" onclick="window.open('${escAttr(url)}','_blank')">`;
+                return `<img src="${escAttr(url)}" class="w-full ${mediaArr.length === 1 ? 'aspect-auto max-h-80' : 'aspect-square'} object-cover rounded-xl cursor-pointer hover:opacity-90 transition shadow-sm" onclick="window.open('${escAttr(url)}','_blank')">`;
               }).join('')}
             </div>
           </div>` : '';
@@ -2096,7 +2096,7 @@
           <div class="space-y-3">
             <div>
               <label class="text-xs font-semibold text-gray-600">Titulo</label>
-              <input id="edit-story-title" type="text" value="${esc(s.title || '')}" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">
+              <input id="edit-story-title" type="text" value="${escAttr(s.title || '')}" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">
             </div>
             <div>
               <label class="text-xs font-semibold text-gray-600">Resumen para "Yo Creo en Ti"</label>
@@ -2116,7 +2116,7 @@
                 ${s.main_video_url ? renderEditVideoPreview(s.main_video_url) : '<p class="text-xs text-gray-400 italic">Sin video principal</p>'}
               </div>
               <div class="flex gap-2 mt-2">
-                <input id="edit-story-video-url" type="url" value="${esc(s.main_video_url || '')}" placeholder="URL de YouTube o video directo..." class="flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">
+                <input id="edit-story-video-url" type="url" value="${escAttr(s.main_video_url || '')}" placeholder="URL de YouTube o video directo..." class="flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-creo-mint outline-none">
                 <button onclick="updateEditVideoPreview()" class="px-3 py-2 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold hover:bg-gray-200 transition">Aplicar</button>
               </div>
               <div class="flex items-center gap-2 mt-2">
@@ -2192,7 +2192,7 @@
         const vid = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
         return vid ? `<div class="relative rounded-xl overflow-hidden bg-black"><img src="https://img.youtube.com/vi/${vid[1]}/mqdefault.jpg" class="w-full h-32 object-cover"><div class="absolute inset-0 flex items-center justify-center"><div class="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"><svg class="w-5 h-5 text-red-600 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div>` : '';
       }
-      return `<video src="${esc(url)}" class="w-full h-32 object-cover rounded-xl bg-black" preload="metadata"></video>`;
+      return `<video src="${escAttr(url)}" class="w-full h-32 object-cover rounded-xl bg-black" preload="metadata"></video>`;
     }
 
     function updateEditVideoPreview() {
@@ -2235,8 +2235,8 @@
         const isVid = /\.(mp4|webm|mov)$/i.test(url);
         const isAudio = /\.(mp3|wav|ogg|m4a|webm)$/i.test(url) && !isVid;
         let preview = '';
-        if (isImg) preview = `<img src="${esc(url)}" class="w-full h-24 object-cover rounded-lg">`;
-        else if (isVid) preview = `<video src="${esc(url)}" class="w-full h-24 object-cover rounded-lg bg-black" preload="metadata"></video>`;
+        if (isImg) preview = `<img src="${escAttr(url)}" class="w-full h-24 object-cover rounded-lg">`;
+        else if (isVid) preview = `<video src="${escAttr(url)}" class="w-full h-24 object-cover rounded-lg bg-black" preload="metadata"></video>`;
         else if (isAudio) preview = `<div class="h-24 bg-gray-100 rounded-lg flex flex-col items-center justify-center gap-1"><svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m7 7v4m-4 0h8M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z"/></svg><span class="text-[9px] text-gray-500">Audio</span></div>`;
         else preview = `<div class="h-24 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-500">Archivo</div>`;
         return `<div class="relative group">
@@ -2420,9 +2420,9 @@
       document.getElementById('business-section').classList.remove('hidden');
       const list = document.getElementById('business-links-list');
       list.innerHTML = links.map(l => `
-        <a href="${esc(l.url)}" target="_blank" rel="noopener" class="glass rounded-xl p-3 flex gap-3 items-center hover:shadow-lg transition group">
+        <a href="${escAttr(l.url)}" target="_blank" rel="noopener" class="glass rounded-xl p-3 flex gap-3 items-center hover:shadow-lg transition group">
           ${l.image_url
-            ? `<img src="${esc(l.image_url)}" class="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-gray-100">`
+            ? `<img src="${escAttr(l.image_url)}" class="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-gray-100">`
             : `<div class="w-14 h-14 rounded-lg bg-creo-purple/10 flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg></div>`}
           <div class="flex-1 min-w-0">
             <p class="font-semibold text-sm text-gray-900 group-hover:text-creo-purple transition truncate">${esc(l.title)}</p>
@@ -2526,7 +2526,7 @@
         const raised = (m.raised_cents / 100).toFixed(2);
         const goal = (m.goal_amount_cents / 100).toFixed(2);
         const completed = pct >= 100;
-        const thumb = (m.images && m.images[0]) ? `<img src="${esc(m.images[0])}" class="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-gray-100">` : `<div class="w-14 h-14 rounded-lg bg-creo-mint/10 flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>`;
+        const thumb = (m.images && m.images[0]) ? `<img src="${escAttr(m.images[0])}" class="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-gray-100">` : `<div class="w-14 h-14 rounded-lg bg-creo-mint/10 flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-creo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>`;
         return `<div class="glass rounded-xl p-3 flex gap-3 items-center">
           ${thumb}
           <div class="flex-1 min-w-0">
@@ -2574,9 +2574,9 @@
           const url = mediaUrls[0];
           const isVid = /\.(mp4|webm|mov)$/i.test(url);
           if (isVid) {
-            mediaHTML = `<video src="${esc(url)}" class="w-full aspect-video object-contain bg-black rounded-t-xl" autoplay muted loop playsinline></video>`;
+            mediaHTML = `<video src="${escAttr(url)}" class="w-full aspect-video object-contain bg-black rounded-t-xl" autoplay muted loop playsinline></video>`;
           } else {
-            mediaHTML = `<img src="${esc(url)}" class="w-full aspect-video object-cover rounded-t-xl" loading="lazy">`;
+            mediaHTML = `<img src="${escAttr(url)}" class="w-full aspect-video object-cover rounded-t-xl" loading="lazy">`;
           }
         } else if (post.post_type === 'text') {
           mediaHTML = `<div class="w-full aspect-video bg-gradient-to-br from-purple-600 to-indigo-700 rounded-t-xl flex items-center justify-center p-4">
@@ -2813,10 +2813,10 @@
       const badge = isDummy ? ' 🤖' : '';
       const bio = (p.bio || p.content || '').slice(0, 60) + ((p.bio || p.content || '').length > 60 ? '...' : '');
       const cover = p.cover_url || '';
-      const dataAttrs = `data-creo-user="${esc(p.username)}" data-creo-name="${esc(name)}" data-creo-avatar="${esc(avatar || '')}" data-creo-bio="${esc(p.bio || p.content || '')}" data-creo-cover="${esc(cover)}" data-creo-dummy="${isDummy}"`;
+      const dataAttrs = `data-creo-user="${escAttr(p.username)}" data-creo-name="${escAttr(name)}" data-creo-avatar="${escAttr(avatar || '')}" data-creo-bio="${escAttr(p.bio || p.content || '')}" data-creo-cover="${escAttr(cover)}" data-creo-dummy="${isDummy}"`;
 
-      return `<div class="creo-ellos-card flex items-center gap-2 px-3 py-2 rounded-xl glass hover:shadow-md transition-all" ${dataAttrs} onmouseenter="showCreoPopup(event,this)" onmouseleave="hideCreoPopup()" onclick="${isDummy ? "event.preventDefault();showToast('Demo: perfil de ejemplo','info')" : "window.location.href='profile.html?u='+encodeURIComponent('"+esc(p.username)+"')"}">
-        ${avatar ? `<img src="${esc(avatar)}" class="w-8 h-8 rounded-full object-cover flex-shrink-0" alt="${esc(name)}">` : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center flex-shrink-0 text-xs font-bold text-creo-purple">${esc(initials)}</div>`}
+      return `<div class="creo-ellos-card flex items-center gap-2 px-3 py-2 rounded-xl glass hover:shadow-md transition-all" ${dataAttrs} onmouseenter="showCreoPopup(event,this)" onmouseleave="hideCreoPopup()" onclick="${isDummy ? "event.preventDefault();showToast('Demo: perfil de ejemplo','info')" : "window.location.href='profile.html?u='+encodeURIComponent('"+escAttr(p.username)+"')"}">
+        ${avatar ? `<img src="${escAttr(avatar)}" class="w-8 h-8 rounded-full object-cover flex-shrink-0" alt="${escAttr(name)}">` : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center flex-shrink-0 text-xs font-bold text-creo-purple">${esc(initials)}</div>`}
         <div class="min-w-0">
           <p class="creo-ellos-name text-[11px] font-bold truncate leading-tight" style="color:var(--brand-text-color, #1f2937)">${esc(name)}${badge}</p>
           <p class="creo-ellos-bio text-[9px] truncate leading-tight" style="color:var(--brand-text-color, #6b7280); opacity:0.6">${esc(bio)}</p>
@@ -2836,8 +2836,11 @@
       const isDummy = el.dataset.creoDummy === 'true';
 
       const coverEl = document.getElementById('creo-popup-cover');
-      if (cover) {
-        coverEl.style.background = `url('${cover}') center/cover no-repeat`;
+      if (cover && /^https?:\/\//.test(cover)) {
+        coverEl.style.backgroundImage = `url('${cover.replace(/'/g, "\\'")}')`;
+        coverEl.style.backgroundSize = 'cover';
+        coverEl.style.backgroundPosition = 'center';
+        coverEl.style.backgroundRepeat = 'no-repeat';
       } else {
         coverEl.style.background = '';
         coverEl.className = 'h-20 bg-gradient-to-r from-creo-purple to-creo-light';

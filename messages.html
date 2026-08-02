@@ -381,7 +381,7 @@
       const html = sorted.map(c => {
         const name = c.user.display_name || c.user.username || 'Usuario';
         const avatar = c.user.avatar_url
-          ? `<img src="${esc(c.user.avatar_url)}" class="w-full h-full object-cover">`
+          ? `<img src="${escAttr(c.user.avatar_url)}" class="w-full h-full object-cover">`
           : `<span class="text-creo-purple font-bold text-sm">${esc(name[0].toUpperCase())}</span>`;
         let preview = '';
         if (c.lastMsg.body) preview = esc(c.lastMsg.body).slice(0, 40);
@@ -427,7 +427,7 @@
         P('d-chat-profile-link-name').href = profileUrl;
         P('d-chat-view-btn').href = profileUrl;
         const av = P('d-chat-avatar');
-        av.innerHTML = profile.avatar_url ? `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
+        av.innerHTML = profile.avatar_url ? `<img src="${escAttr(profile.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
         createEmojiPicker('d-chat-input', 'd-emoji-btn');
       } else {
         P('chat-modal').classList.remove('hidden');
@@ -436,7 +436,7 @@
         P('m-chat-profile-link').href = profileUrl;
         P('m-chat-profile-link-name').href = profileUrl;
         const av = P('m-chat-avatar');
-        av.innerHTML = profile.avatar_url ? `<img src="${esc(profile.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
+        av.innerHTML = profile.avatar_url ? `<img src="${escAttr(profile.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-creo-purple font-bold text-lg">${esc(name[0].toUpperCase())}</span>`;
         createEmojiPicker('m-chat-input', 'm-emoji-btn');
       }
 
@@ -470,7 +470,7 @@
       if (!msgs || msgs.length === 0) {
         const n = activeChatUser.display_name || activeChatUser.username || '';
         const av = activeChatUser.avatar_url
-          ? `<img src="${esc(activeChatUser.avatar_url)}" class="w-16 h-16 rounded-full object-cover">`
+          ? `<img src="${escAttr(activeChatUser.avatar_url)}" class="w-16 h-16 rounded-full object-cover">`
           : `<div class="w-16 h-16 rounded-full bg-creo-purple/10 flex items-center justify-center"><span class="text-creo-purple font-bold text-2xl">${esc(n[0]?.toUpperCase()||'?')}</span></div>`;
         list.innerHTML = `<div class="flex flex-col items-center justify-center py-12 space-y-3">${av}<p class="font-bold text-gray-900">${esc(n)}</p><p class="text-xs text-gray-400">Envía un mensaje para iniciar</p></div>`;
         return;

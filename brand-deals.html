@@ -610,7 +610,7 @@
       const container = document.getElementById('category-pills');
       container.innerHTML = `<button onclick="filterDeals('all')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold ${activeCategoryFilter === 'all' ? 'bg-creo-purple text-white' : 'bg-gray-200 text-gray-700'}" data-cat="all">Todos</button>` +
         allCategories.map(c =>
-          `<button onclick="filterDeals('${escAttr(c.slug)}')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold ${activeCategoryFilter === c.slug ? 'bg-creo-purple text-white' : 'bg-gray-200 text-gray-700'}" data-cat="${esc(c.slug)}">${esc(c.label)}</button>`
+          `<button onclick="filterDeals('${escAttr(c.slug)}')" class="cat-btn shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold ${activeCategoryFilter === c.slug ? 'bg-creo-purple text-white' : 'bg-gray-200 text-gray-700'}" data-cat="${escAttr(c.slug)}">${esc(c.label)}</button>`
         ).join('');
     }
 
@@ -619,7 +619,7 @@
       if (!sel) return;
       const current = sel.value;
       sel.innerHTML = '<option value="">Seleccionar...</option>' +
-        allCategories.map(c => `<option value="${esc(c.slug)}" ${current === c.slug ? 'selected' : ''}>${esc(c.label)}</option>`).join('');
+        allCategories.map(c => `<option value="${escAttr(c.slug)}" ${current === c.slug ? 'selected' : ''}>${esc(c.label)}</option>`).join('');
     }
 
     async function createCategory() {
@@ -708,14 +708,14 @@
         const budget = (d.budget_per_creator_cents / 100).toFixed(0);
         const deadlineText = d.deadline ? new Date(d.deadline).toLocaleDateString('es') : '';
         const deliveryText = d.delivery_deadline ? new Date(d.delivery_deadline).toLocaleDateString('es') : '';
-        const coverImg = d.cover_url ? `<img src="${esc(d.cover_url)}" class="w-full h-40 object-cover" alt="">` : `<div class="w-full h-40 bg-gradient-to-br from-creo-purple to-creo-light flex items-center justify-center"><svg class="w-12 h-12 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>`;
+        const coverImg = d.cover_url ? `<img src="${escAttr(d.cover_url)}" class="w-full h-40 object-cover" alt="">` : `<div class="w-full h-40 bg-gradient-to-br from-creo-purple to-creo-light flex items-center justify-center"><svg class="w-12 h-12 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.64-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>`;
 
         return `
           <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all cursor-pointer group" onclick="openDealDetail('${d.id}')">
             ${coverImg}
             <div class="p-4">
               <div class="flex items-center gap-2 mb-2">
-                <img src="${esc(brand.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(brand.display_name || 'B'))}" class="w-7 h-7 rounded-full object-cover border border-gray-200">
+                <img src="${escAttr(brand.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(brand.display_name || 'B'))}" class="w-7 h-7 rounded-full object-cover border border-gray-200">
                 <span class="text-xs font-medium text-gray-500 truncate">${esc(brand.display_name || brand.username || 'Marca')}</span>
                 ${d.category ? `<span class="ml-auto text-[10px] bg-creo-purple/10 text-creo-purple px-2 py-0.5 rounded-full font-semibold">${esc(getCatLabel(d.category))}</span>` : ''}
               </div>
@@ -926,7 +926,7 @@
 
       const catSelect = document.getElementById('edit-deal-category');
       catSelect.innerHTML = '<option value="">Seleccionar...</option>' +
-        allCategories.map(c => `<option value="${esc(c.slug)}" ${deal.category === c.slug ? 'selected' : ''}>${esc(c.label)}</option>`).join('');
+        allCategories.map(c => `<option value="${escAttr(c.slug)}" ${deal.category === c.slug ? 'selected' : ''}>${esc(c.label)}</option>`).join('');
 
       editDealCoverUrl = deal.cover_url || null;
       editDealCoverFile = null;
@@ -1157,21 +1157,21 @@
       const raw = m.content || '';
 
       if (mt === 'gif') {
-        mediaHtml = `<img src="${esc(raw)}" class="max-w-[200px] rounded-xl" alt="GIF" loading="lazy">`;
+        mediaHtml = `<img src="${escAttr(raw)}" class="max-w-[200px] rounded-xl" alt="GIF" loading="lazy">`;
       } else if (mt === 'audio') {
-        mediaHtml = `<audio controls src="${esc(raw)}" class="w-[200px] max-w-full" style="height:40px"></audio>`;
+        mediaHtml = `<audio controls src="${escAttr(raw)}" class="w-[200px] max-w-full" style="height:40px"></audio>`;
       } else if (mt === 'image') {
         const parts = raw.split('\n');
         const url = parts[0];
         const caption = parts.slice(1).join('\n').trim();
-        mediaHtml = `<img src="${esc(url)}" class="max-w-[200px] rounded-xl cursor-pointer" alt="" loading="lazy" onclick="window.open(this.src,'_blank')">`;
+        mediaHtml = `<img src="${escAttr(url)}" class="max-w-[200px] rounded-xl cursor-pointer" alt="" loading="lazy" onclick="window.open(this.src,'_blank')">`;
         if (caption) textContent = `<p class="text-sm whitespace-pre-wrap break-words">${esc(caption)}</p>`;
       } else if (mt === 'video') {
         const parts = raw.split('\n');
         const url = parts[0];
         const caption = parts.slice(1).join('\n').trim();
         mediaHtml = `<div class="video-circle cursor-pointer" onclick="this.querySelector('video').paused?this.querySelector('video').play():this.querySelector('video').pause()">
-          <video src="${esc(url)}" playsinline class="w-full h-full object-cover"></video>
+          <video src="${escAttr(url)}" playsinline class="w-full h-full object-cover"></video>
           <div class="creo-badge"><img src="assets/logo-icon.png" alt="CREO"></div>
         </div>`;
         if (caption) textContent = `<p class="text-sm whitespace-pre-wrap break-words">${esc(caption)}</p>`;
@@ -1593,7 +1593,7 @@
         const avatar = other.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name);
         const dealTitle = c.brand_deals?.title || 'Deal';
         return `<button onclick="openConvoFromList('${escAttr(c.id)}', '${escAttr(dealTitle)}', '${escAttr(name)}', '${escAttr(avatar)}')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition text-left">
-          <img src="${esc(avatar)}" class="w-10 h-10 rounded-full object-cover">
+          <img src="${escAttr(avatar)}" class="w-10 h-10 rounded-full object-cover">
           <div class="flex-1 min-w-0">
             <p class="font-semibold text-sm truncate">${esc(name)}</p>
             <p class="text-xs text-gray-400 truncate">${esc(dealTitle)}</p>

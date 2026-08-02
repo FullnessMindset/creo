@@ -40,19 +40,32 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Idempotency: check if this event was already processed
-    const { data: existing } = await supabaseAdmin
+    // Idempotency: atomic insert-first, catch unique violation (23505)
+    const { data: claimed, error: claimErr } = await supabaseAdmin
       .from("processed_webhook_events")
+      .insert({
+        stripe_event_id: event.id,
+        event_type: event.type,
+        stripe_session_id: (event.data.object as Record<string, unknown>).id as string || null,
+        metadata: event.data.object,
+      })
       .select("id")
-      .eq("stripe_event_id", event.id)
-      .maybeSingle();
+      .single();
 
-    if (existing) {
-      console.log(`Identity event ${event.id} already processed, skipping`);
-      return new Response(
-        JSON.stringify({ received: true, duplicate: true }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      );
+    if (claimErr) {
+      if (claimErr.code === "23505") {
+        console.log(`Identity event ${event.id} already processed (duplicate), skipping`);
+        return new Response(
+          JSON.stringify({ received: true, duplicate: true }),
+          { status: 200, headers: { "Content-Type": "application/json" } }
+        );
+      }
+      console.error(`Failed to claim identity event ${event.id}:`, claimErr);
+      return new Response("DB error: idempotency claim", { status: 500 });
+    }
+    if (!claimed) {
+      console.error(`Identity event ${event.id} claim returned no data`);
+      return new Response("DB error: idempotency claim empty", { status: 500 });
     }
 
     const eventTypeMap: Record<string, string> = {
@@ -105,15 +118,6 @@ serve(async (req) => {
     } else {
       console.log(`Unhandled identity event type: ${event.type}`);
     }
-
-    // Idempotency: record AFTER successful processing so retries work on failure
-    await supabaseAdmin.from("processed_webhook_events").insert({
-      stripe_event_id: event.id,
-      event_type: event.type,
-      stripe_session_id:
-        (event.data.object as Record<string, unknown>).id as string || null,
-      metadata: event.data.object,
-    });
 
     return new Response(JSON.stringify({ received: true }), {
       status: 200,

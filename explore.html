@@ -160,7 +160,7 @@
         const name = p?.display_name || p?.username || '?';
         const verified = p?.verification_status === 'approved';
         const avatar = p?.avatar_url
-          ? `<img src="${esc(p.avatar_url)}" class="w-7 h-7 rounded-full object-cover ring-1 ring-white">`
+          ? `<img src="${escAttr(p.avatar_url)}" class="w-7 h-7 rounded-full object-cover ring-1 ring-white">`
           : `<div class="w-7 h-7 rounded-full bg-white/30 flex items-center justify-center ring-1 ring-white"><span class="text-white text-[10px] font-bold">${esc(name[0])}</span></div>`;
 
         let thumb = '';
@@ -170,14 +170,14 @@
             const vid = s.main_video_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
             thumb = vid ? `<img src="https://img.youtube.com/vi/${vid[1]}/mqdefault.jpg" class="w-full h-full object-cover">` : '';
           } else {
-            thumb = `<video src="${esc(s.main_video_url)}" class="w-full h-full object-cover" autoplay muted loop playsinline></video>`;
+            thumb = `<video src="${escAttr(s.main_video_url)}" class="w-full h-full object-cover" autoplay muted loop playsinline></video>`;
           }
         } else if (s.media_urls && s.media_urls.length > 0) {
           const first = s.media_urls[0];
           const isVid = /\.(mp4|webm|mov)$/i.test(first);
           thumb = isVid
-            ? `<video src="${esc(first)}" class="w-full h-full object-cover" autoplay muted loop playsinline></video>`
-            : `<img src="${esc(first)}" class="w-full h-full object-cover">`;
+            ? `<video src="${escAttr(first)}" class="w-full h-full object-cover" autoplay muted loop playsinline></video>`
+            : `<img src="${escAttr(first)}" class="w-full h-full object-cover">`;
         } else {
           thumb = `<div class="w-full h-full bg-gradient-to-br from-creo-purple to-creo-light flex items-center justify-center">
             <svg class="w-8 h-8 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
@@ -205,7 +205,7 @@
       const p = s.profile;
       const name = p?.display_name || p?.username || '?';
       const avatar = p?.avatar_url
-        ? `<img src="${esc(p.avatar_url)}" class="w-10 h-10 rounded-full object-cover">`
+        ? `<img src="${escAttr(p.avatar_url)}" class="w-10 h-10 rounded-full object-cover">`
         : `<div class="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center"><span class="text-white font-bold">${esc(name[0])}</span></div>`;
 
       let media = '';
@@ -215,14 +215,14 @@
           const vid = s.main_video_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
           media = vid ? `<iframe data-src="https://www.youtube.com/embed/${vid[1]}?rel=0" class="w-full h-full" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>` : '';
         } else {
-          media = `<video data-src="${esc(s.main_video_url)}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`;
+          media = `<video data-src="${escAttr(s.main_video_url)}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`;
         }
       } else if (s.media_urls && s.media_urls.length > 0) {
         const first = s.media_urls[0];
         const isVid = /\.(mp4|webm|mov)$/i.test(first);
         media = isVid
-          ? `<video data-src="${esc(first)}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`
-          : `<img src="${esc(first)}" class="w-full h-full object-contain">`;
+          ? `<video data-src="${escAttr(first)}" autoplay muted loop playsinline class="w-full h-full object-contain"></video>`
+          : `<img src="${escAttr(first)}" class="w-full h-full object-contain">`;
       } else {
         media = `<div class="w-full h-full flex items-center justify-center"><div class="max-w-md p-8 text-center text-white space-y-4">
           <h3 class="text-xl font-bold">${esc(s.title || t('miHistoria'))}</h3>
@@ -405,7 +405,7 @@
         const cp = c.profile;
         const cName = cp?.display_name || cp?.username || '?';
         const cAvatar = cp?.avatar_url
-          ? `<img src="${esc(cp.avatar_url)}" class="w-8 h-8 rounded-full object-cover">`
+          ? `<img src="${escAttr(cp.avatar_url)}" class="w-8 h-8 rounded-full object-cover">`
           : `<div class="w-8 h-8 rounded-full bg-creo-purple/30 flex items-center justify-center"><span class="text-white text-xs font-bold">${esc(cName[0])}</span></div>`;
         const isOwner = exploreUser && c.user_id === exploreUser.id;
         return `<div class="flex gap-2">
@@ -471,7 +471,7 @@
     function renderCreatorCard(p) {
       const name = p.display_name || p.username || '?';
       const avatar = p.avatar_url
-        ? `<img src="${esc(p.avatar_url)}" class="w-12 h-12 rounded-full object-cover border-2 border-creo-mint">`
+        ? `<img src="${escAttr(p.avatar_url)}" class="w-12 h-12 rounded-full object-cover border-2 border-creo-mint">`
         : `<div class="w-12 h-12 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold">${esc(name[0].toUpperCase())}</span></div>`;
       const verified = p.verification_status === 'approved' ? '<svg class="w-4 h-4 text-creo-mint flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>' : '';
       const dk = isDark();

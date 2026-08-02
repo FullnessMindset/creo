@@ -154,7 +154,11 @@ serve(async (req) => {
       if (msgBody) messageData.body = msgBody;
       if (media_url) messageData.media_url = media_url;
       if (media_type) messageData.media_type = media_type;
-      if (attachment_id) messageData.attachment_id = attachment_id;
+      if (attachment_id) {
+        const { data: att } = await supabase.from("message_attachments").select("id").eq("id", attachment_id).eq("uploader_id", user.id).single();
+        if (!att) return json({ error: "Attachment not found or not yours" }, 403);
+        messageData.attachment_id = attachment_id;
+      }
 
       const { error: msgErr } = await supabase.from("messages").insert(messageData);
       if (msgErr) return json({ error: "Failed to send: " + msgErr.message }, 500);

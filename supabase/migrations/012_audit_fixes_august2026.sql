@@ -181,3 +181,115 @@ ALTER TABLE public.tips ADD COLUMN IF NOT EXISTS stripe_payment_intent TEXT;
 ALTER TABLE public.meta_contributions ADD COLUMN IF NOT EXISTS stripe_payment_intent TEXT;
 CREATE INDEX IF NOT EXISTS idx_tips_payment_intent ON public.tips(stripe_payment_intent) WHERE stripe_payment_intent IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_meta_contributions_payment_intent ON public.meta_contributions(stripe_payment_intent) WHERE stripe_payment_intent IS NOT NULL;
+
+-- =============================================
+-- AUDIT V3 FIXES — August 2, 2026
+-- =============================================
+
+-- C-02: Views fairness_metrics and system_health bypass RLS (run with view owner privileges).
+-- Any authenticated user can read admin-only moderation/manipulation data via REST API.
+ALTER VIEW IF EXISTS fairness_metrics SET (security_invoker = true);
+ALTER VIEW IF EXISTS system_health SET (security_invoker = true);
+REVOKE SELECT ON fairness_metrics FROM anon, authenticated;
+REVOKE SELECT ON system_health FROM anon, authenticated;
+GRANT SELECT ON fairness_metrics TO service_role;
+GRANT SELECT ON system_health TO service_role;
+
+-- H-02: Storage buckets avatars/covers/meta-images lack folder-ownership enforcement.
+-- Any authenticated user can overwrite another user's avatar/cover/meta-image.
+-- Fix: Add ownership check matching the documents bucket pattern.
+
+-- Avatars bucket
+DROP POLICY IF EXISTS "Auth upload avatars" ON storage.objects;
+CREATE POLICY "Auth upload avatars" ON storage.objects
+  FOR INSERT WITH CHECK (
+    bucket_id = 'avatars'
+    AND auth.role() = 'authenticated'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+DROP POLICY IF EXISTS "Auth update avatars" ON storage.objects;
+CREATE POLICY "Auth update avatars" ON storage.objects
+  FOR UPDATE USING (
+    bucket_id = 'avatars'
+    AND auth.role() = 'authenticated'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+-- Covers bucket
+DROP POLICY IF EXISTS "Auth upload covers" ON storage.objects;
+CREATE POLICY "Auth upload covers" ON storage.objects
+  FOR INSERT WITH CHECK (
+    bucket_id = 'covers'
+    AND auth.role() = 'authenticated'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+DROP POLICY IF EXISTS "Auth update covers" ON storage.objects;
+CREATE POLICY "Auth update covers" ON storage.objects
+  FOR UPDATE USING (
+    bucket_id = 'covers'
+    AND auth.role() = 'authenticated'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+-- Meta-images bucket
+DROP POLICY IF EXISTS "Auth upload meta-images" ON storage.objects;
+CREATE POLICY "Auth upload meta-images" ON storage.objects
+  FOR INSERT WITH CHECK (
+    bucket_id = 'meta-images'
+    AND auth.role() = 'authenticated'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+DROP POLICY IF EXISTS "Auth update meta-images" ON storage.objects;
+CREATE POLICY "Auth update meta-images" ON storage.objects
+  FOR UPDATE USING (
+    bucket_id = 'meta-images'
+    AND auth.role() = 'authenticated'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+-- H-03: manipulation_signals and moderation_flags INSERT policies unscoped to service_role.
+-- Any authenticated user can insert fabricated anti-abuse signals.
+DROP POLICY IF EXISTS "manipulation_signals_service_insert" ON public.manipulation_signals;
+CREATE POLICY "manipulation_signals_service_insert" ON public.manipulation_signals
+  FOR INSERT TO service_role WITH CHECK (true);
+
+DROP POLICY IF EXISTS "moderation_flags_service_insert" ON public.moderation_flags;
+CREATE POLICY "moderation_flags_service_insert" ON public.moderation_flags
+  FOR INSERT TO service_role WITH CHECK (true);
+
+-- H-04: check_manipulation() takes unvalidated p_actor_id — griefing vector.
+-- Add auth check: p_actor_id must equal auth.uid() unless caller is service_role.
+CREATE OR REPLACE FUNCTION check_manipulation(p_actor_id UUID, p_post_id UUID)
+RETURNS TABLE(allowed BOOLEAN, action TEXT, confidence NUMERIC) AS $$
+DECLARE
+  v_velocity INT;
+  v_config RECORD;
+  v_result_action TEXT := 'none';
+  v_result_confidence NUMERIC := 0;
+  v_allowed BOOLEAN := true;
+BEGIN
+  -- Auth check: only the actor themselves or service_role can call this
+  IF p_actor_id != auth.uid() AND current_setting('role') != 'service_role' THEN
+    RAISE EXCEPTION 'Access denied: can only check own actor_id';
+  END IF;
+
+  SELECT * INTO v_config FROM algorithm_config LIMIT 1;
+
+  SELECT COUNT(*) INTO v_velocity
+  FROM engagements
+  WHERE actor_id = p_actor_id
+    AND created_at > now() - interval '5 minutes';
+
+  IF v_velocity > COALESCE(v_config.manipulation_velocity_threshold, 20) THEN
+    v_result_action := 'rate_limit';
+    v_result_confidence := LEAST(v_velocity::NUMERIC / COALESCE(v_config.manipulation_velocity_threshold, 20), 1.0);
+    v_allowed := false;
+
+    INSERT INTO manipulation_signals (actor_id, signal_type, confidence, details)
+    VALUES (p_actor_id, 'velocity_spike', v_result_confidence,
+      jsonb_build_object('velocity', v_velocity, 'threshold', v_config.manipulation_velocity_threshold));
+  END IF;
+
+  RETURN QUERY SELECT v_allowed, v_result_action, v_result_confidence;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

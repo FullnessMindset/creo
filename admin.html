@@ -1191,7 +1191,7 @@
         return `<div class="px-5 py-4 hover:bg-gray-50 transition flex items-center justify-between">
           <div class="flex items-center space-x-4 flex-1 min-w-0">
             <div class="w-10 h-10 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0">
-              ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-xs font-bold text-creo-purple">${esc((p.username || '?')[0].toUpperCase())}</span>`}
+              ${p.avatar_url ? `<img src="${escAttr(p.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-xs font-bold text-creo-purple">${esc((p.username || '?')[0].toUpperCase())}</span>`}
             </div>
             <div class="min-w-0">
               <div class="flex items-center space-x-2">
@@ -1261,7 +1261,7 @@
             <div class="space-y-3">
               <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Uploaded Documents (${docs.length})</h5>
               <div class="space-y-2">
-                ${docs.map(d => `<a href="${esc(d.file_url)}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition text-sm">
+                ${docs.map(d => `<a href="${escAttr(d.file_url)}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition text-sm">
                   <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                   <div class="flex-1 min-w-0"><p class="text-gray-900 truncate">${esc(d.file_name || 'Document')}</p><p class="text-xs text-gray-400">${esc(d.document_type)} · ${new Date(d.uploaded_at).toLocaleDateString()}</p></div>
                   <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
@@ -1274,7 +1274,7 @@
       content.innerHTML = `
         <div class="flex items-center space-x-4">
           <div class="w-16 h-16 rounded-full bg-creo-purple/10 flex items-center justify-center overflow-hidden flex-shrink-0">
-            ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-xl font-bold text-creo-purple">${esc((p.username || '?')[0].toUpperCase())}</span>`}
+            ${p.avatar_url ? `<img src="${escAttr(p.avatar_url)}" class="w-full h-full object-cover">` : `<span class="text-xl font-bold text-creo-purple">${esc((p.username || '?')[0].toUpperCase())}</span>`}
           </div>
           <div>
             <h4 class="text-lg font-bold text-gray-900">${esc(p.display_name || p.username)}</h4>
@@ -1316,10 +1316,10 @@
         <div class="space-y-3">
           <h5 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Social Media</h5>
           <div class="bg-gray-50 p-3 rounded-lg space-y-1 text-sm">
-            ${socials.instagram ? `<p><span class="text-gray-400">Instagram:</span> <a href="${esc(socials.instagram)}" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline break-all">${esc(socials.instagram)}</a></p>` : ''}
-            ${socials.tiktok ? `<p><span class="text-gray-400">TikTok:</span> <a href="${esc(socials.tiktok)}" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline break-all">${esc(socials.tiktok)}</a></p>` : ''}
-            ${socials.youtube ? `<p><span class="text-gray-400">YouTube:</span> <a href="${esc(socials.youtube)}" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline break-all">${esc(socials.youtube)}</a></p>` : ''}
-            ${socials.twitter ? `<p><span class="text-gray-400">Twitter/X:</span> <a href="${esc(socials.twitter)}" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline break-all">${esc(socials.twitter)}</a></p>` : ''}
+            ${socials.instagram ? `<p><span class="text-gray-400">Instagram:</span> <a href="${escAttr(socials.instagram)}" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline break-all">${esc(socials.instagram)}</a></p>` : ''}
+            ${socials.tiktok ? `<p><span class="text-gray-400">TikTok:</span> <a href="${escAttr(socials.tiktok)}" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline break-all">${esc(socials.tiktok)}</a></p>` : ''}
+            ${socials.youtube ? `<p><span class="text-gray-400">YouTube:</span> <a href="${escAttr(socials.youtube)}" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline break-all">${esc(socials.youtube)}</a></p>` : ''}
+            ${socials.twitter ? `<p><span class="text-gray-400">Twitter/X:</span> <a href="${escAttr(socials.twitter)}" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline break-all">${esc(socials.twitter)}</a></p>` : ''}
             ${!socials.instagram && !socials.tiktok && !socials.youtube && !socials.twitter ? '<p class="text-gray-400">No social links provided</p>' : ''}
           </div>
         </div>
@@ -1612,7 +1612,7 @@
       document.getElementById('no-creators').classList.add('hidden');
       tbody.innerHTML = profiles.map(p => {
         const avatar = p.avatar_url
-          ? `<img src="${esc(p.avatar_url)}" class="w-8 h-8 rounded-full object-cover border border-gray-200">`
+          ? `<img src="${escAttr(p.avatar_url)}" class="w-8 h-8 rounded-full object-cover border border-gray-200">`
           : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 flex items-center justify-center border border-gray-200"><span class="text-xs font-bold text-creo-purple">${esc((p.username || '?')[0].toUpperCase())}</span></div>`;
         return `<tr class="border-b border-gray-100 hover:bg-gray-50 transition">
           <td class="px-5 py-3">
@@ -1736,7 +1736,7 @@
           ? '<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Released</span>'
           : '<span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium">' + esc(item.status) + '</span>';
         const avatar = item.creator_avatar
-          ? `<img src="${esc(item.creator_avatar)}" class="w-9 h-9 rounded-full object-cover flex-shrink-0">`
+          ? `<img src="${escAttr(item.creator_avatar)}" class="w-9 h-9 rounded-full object-cover flex-shrink-0">`
           : `<div class="w-9 h-9 rounded-full bg-creo-purple/20 flex items-center justify-center text-creo-purple font-bold text-sm flex-shrink-0">${(item.creator_username || '?')[0].toUpperCase()}</div>`;
 
         const releaseBtn = isPaid
@@ -2038,7 +2038,7 @@
       list.innerHTML = reports.map(r => {
         const reporter = r.reporter?.display_name || r.reporter?.username || '?';
         const reported = r.reported?.display_name || r.reported?.username || '?';
-        const reportedAvatar = r.reported?.avatar_url ? `<img src="${esc(r.reported.avatar_url)}" class="w-8 h-8 rounded-full object-cover">` : `<div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center"><span class="text-xs font-bold text-red-600">${esc(reported[0])}</span></div>`;
+        const reportedAvatar = r.reported?.avatar_url ? `<img src="${escAttr(r.reported.avatar_url)}" class="w-8 h-8 rounded-full object-cover">` : `<div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center"><span class="text-xs font-bold text-red-600">${esc(reported[0])}</span></div>`;
         const statusColor = r.status === 'pending' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : r.status === 'reviewed' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-green-100 text-green-700 border-green-200';
         return `<div class="px-5 py-4 hover:bg-gray-50 transition">
           <div class="flex items-start gap-3">
@@ -2076,7 +2076,7 @@
 
       // Avatar
       document.getElementById('rr-reported-avatar').innerHTML = reported.avatar_url
-        ? `<img src="${esc(reported.avatar_url)}" class="w-12 h-12 rounded-full object-cover">`
+        ? `<img src="${escAttr(reported.avatar_url)}" class="w-12 h-12 rounded-full object-cover">`
         : `<div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center"><span class="text-lg font-bold text-red-600">${esc(reportedName[0])}</span></div>`;
       document.getElementById('rr-reported-name').textContent = reportedName;
       document.getElementById('rr-reported-email').textContent = reported.email || '';
@@ -2699,14 +2699,14 @@
           <td class="px-5 py-3 text-gray-900 text-sm">${esc(u.email || '-')}</td>
           <td class="px-5 py-3">${providerBadge}</td>
           <td class="px-5 py-3">${profileBadge}</td>
-          <td class="px-5 py-3 text-gray-500">${username !== '-' ? '<a href="${PROFILE_BASE}' + esc(username) + '" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline">@' + esc(username) + '</a>' : '-'}${displayName ? ' <span class="text-gray-400 text-xs">(' + esc(displayName) + ')</span>' : ''}</td>
+          <td class="px-5 py-3 text-gray-500">${username !== '-' ? '<a href="' + PROFILE_BASE + escAttr(username) + '" target="_blank" rel="noopener noreferrer" class="text-creo-purple hover:underline">@' + esc(username) + '</a>' : '-'}${displayName ? ' <span class="text-gray-400 text-xs">(' + esc(displayName) + ')</span>' : ''}</td>
           <td class="px-5 py-3">${u.has_profile ? statusBadge(u.profile?.verification_status) : '<span class="text-xs text-gray-300">—</span>'}</td>
           <td class="px-5 py-3">${u.has_profile ? stripeBadge(u.profile || {}) : '<span class="text-xs text-gray-300">—</span>'}</td>
           <td class="px-5 py-3 text-gray-500 text-xs">${registered}</td>
           <td class="px-5 py-3 text-gray-500 text-xs">${lastLogin}</td>
           <td class="px-5 py-3">${typeSelect}</td>
           <td class="px-5 py-3">
-            ${u.email ? '<button onclick="openEmailModal(\'' + esc(u.email) + '\', \'' + esc(displayName || username) + '\')" class="text-xs bg-creo-purple/10 text-creo-purple px-2.5 py-1 rounded-lg hover:bg-creo-purple/20 transition font-medium">📧 Email</button>' : ''}
+            ${u.email ? '<button data-email="' + escAttr(u.email) + '" data-name="' + escAttr(displayName || username) + '" onclick="openEmailModal(this.dataset.email, this.dataset.name)" class="text-xs bg-creo-purple/10 text-creo-purple px-2.5 py-1 rounded-lg hover:bg-creo-purple/20 transition font-medium">📧 Email</button>' : ''}
           </td>
         </tr>`;
       }).join('');
@@ -3450,7 +3450,7 @@
           <p class="text-xs font-medium text-gray-700">Monto a liberar: $${(meta.raised_cents/200).toFixed(2)}</p>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Recibos de compra:</p>
-            <div class="flex flex-wrap gap-2">${(meta.stage2_receipt_urls||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin recibos</p>'}</div>
+            <div class="flex flex-wrap gap-2">${(meta.stage2_receipt_urls||[]).map(u => `<a href="${escAttr(u)}" target="_blank" rel="noopener noreferrer"><img src="${escAttr(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin recibos</p>'}</div>
           </div>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Actualización para la comunidad:</p>
@@ -3458,7 +3458,7 @@
           </div>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Evidencia (fotos/videos):</p>
-            <div class="flex flex-wrap gap-2">${(meta.stage2_update_media||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin evidencia</p>'}</div>
+            <div class="flex flex-wrap gap-2">${(meta.stage2_update_media||[]).map(u => `<a href="${escAttr(u)}" target="_blank" rel="noopener noreferrer"><img src="${escAttr(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-blue-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin evidencia</p>'}</div>
           </div>
         </div>`;
       }
@@ -3469,7 +3469,7 @@
           <p class="text-xs font-medium text-gray-700">Monto a liberar: $${(meta.raised_cents/200).toFixed(2)}</p>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Recibos y comprobantes finales:</p>
-            <div class="flex flex-wrap gap-2">${(meta.stage3_proof_urls||[]).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer"><img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-emerald-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin pruebas</p>'}</div>
+            <div class="flex flex-wrap gap-2">${(meta.stage3_proof_urls||[]).map(u => `<a href="${escAttr(u)}" target="_blank" rel="noopener noreferrer"><img src="${escAttr(u)}" class="w-24 h-24 rounded-lg object-cover border hover:border-emerald-400 transition"></a>`).join('') || '<p class="text-xs text-gray-400">Sin pruebas</p>'}</div>
           </div>
           <div>
             <p class="text-xs font-semibold text-gray-600 mb-1">Descripción de la adquisición:</p>

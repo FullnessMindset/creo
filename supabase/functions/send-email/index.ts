@@ -192,7 +192,8 @@ serve(async (req) => {
       });
       if (emailRl === false) return json({ error: "Rate limit exceeded" }, 429);
       const { data: { user } } = await supabase.auth.getUser(authHeader!.replace("Bearer ", ""));
-      if (!user || user.email !== (Deno.env.get("ADMIN_EMAIL") || "fullnessmindset@gmail.com")) return json({ error: "Admin only" }, 403);
+      const { data: adminRow } = await supabase.from("admin_emails").select("email").eq("email", user.email).maybeSingle();
+      if (!adminRow) return json({ error: "Admin only" }, 403);
     }
 
     const { type, to, data } = await req.json();

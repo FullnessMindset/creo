@@ -1258,8 +1258,8 @@
       if (s.image_url) {
         const isVid = /\.(mp4|webm|mov)$/i.test(s.image_url);
         previewEl.innerHTML = isVid
-          ? `<video src="${esc(s.image_url)}" class="w-full h-32 object-cover rounded-lg border border-gray-200" controls></video>`
-          : `<img src="${esc(s.image_url)}" class="w-full h-32 object-cover rounded-lg border border-gray-200" alt="">`;
+          ? `<video src="${escAttr(s.image_url)}" class="w-full h-32 object-cover rounded-lg border border-gray-200" controls></video>`
+          : `<img src="${escAttr(s.image_url)}" class="w-full h-32 object-cover rounded-lg border border-gray-200" alt="">`;
         previewEl.classList.remove('hidden');
       } else {
         previewEl.classList.add('hidden');
@@ -1326,8 +1326,8 @@
         const previewEl = document.getElementById('mec-' + key + '-media-preview');
         const isVid = /\.(mp4|webm|mov)$/i.test(settings.image_url);
         previewEl.innerHTML = isVid
-          ? `<video src="${esc(settings.image_url)}" class="w-full h-32 object-cover rounded-lg border border-gray-200" controls></video>`
-          : `<img src="${esc(settings.image_url)}" class="w-full h-32 object-cover rounded-lg border border-gray-200" alt="">`;
+          ? `<video src="${escAttr(settings.image_url)}" class="w-full h-32 object-cover rounded-lg border border-gray-200" controls></video>`
+          : `<img src="${escAttr(settings.image_url)}" class="w-full h-32 object-cover rounded-lg border border-gray-200" alt="">`;
         previewEl.classList.remove('hidden');
       }
     }
@@ -1399,10 +1399,10 @@
           }
 
           if (data.avatar_url) {
-            document.getElementById('avatar-preview').innerHTML = `<img src="${esc(data.avatar_url)}" class="w-full h-full object-cover">`;
+            document.getElementById('avatar-preview').innerHTML = `<img src="${escAttr(data.avatar_url)}" class="w-full h-full object-cover">`;
           }
           if (data.cover_url) {
-            document.getElementById('cover-preview').innerHTML = `<img src="${esc(data.cover_url)}" class="w-full h-full object-cover">`;
+            document.getElementById('cover-preview').innerHTML = `<img src="${escAttr(data.cover_url)}" class="w-full h-full object-cover">`;
           }
 
           if (data.stripe_onboarded) {
@@ -1504,7 +1504,7 @@
       if (upErr) return showToast('Error al guardar: ' + upErr.message, 'error');
 
       const preview = document.getElementById(previewId);
-      preview.innerHTML = `<img src="${esc(publicUrl)}" class="w-full h-full object-cover">`;
+      preview.innerHTML = `<img src="${escAttr(publicUrl)}" class="w-full h-full object-cover">`;
       showToast('Imagen actualizada', 'success');
     }
 
@@ -1529,7 +1529,7 @@
 
         const thumb = document.createElement('div');
         thumb.className = 'w-16 h-16 rounded-lg overflow-hidden border border-gray-200';
-        thumb.innerHTML = `<img src="${esc(urlData.publicUrl)}" class="w-full h-full object-cover">`;
+        thumb.innerHTML = `<img src="${escAttr(urlData.publicUrl)}" class="w-full h-full object-cover">`;
         preview.appendChild(thumb);
       }
       showToast(`${files.length} imagen(es) subida(s)`, 'success');
@@ -1848,7 +1848,7 @@
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Titulo</label>
-            <input id="edit-meta-title" type="text" value="${esc(m.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+            <input id="edit-meta-title" type="text" value="${escAttr(m.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Descripcion</label>
@@ -2248,7 +2248,7 @@
         const meta = inv.metas || {};
         const name = inviter.display_name || inviter.username || 'Alguien';
         const avatar = inviter.avatar_url
-          ? `<img src="${esc(inviter.avatar_url)}" class="w-10 h-10 rounded-full object-cover border-2 border-creo-mint">`
+          ? `<img src="${escAttr(inviter.avatar_url)}" class="w-10 h-10 rounded-full object-cover border-2 border-creo-mint">`
           : `<div class="w-10 h-10 rounded-full bg-creo-mint/20 flex items-center justify-center border-2 border-creo-mint"><span class="text-creo-mint font-bold text-sm">${esc(name[0].toUpperCase())}</span></div>`;
         const inviterUsername = inviter.username || '';
         return `<div class="bg-white p-4 rounded-xl border border-creo-mint/30 shadow-sm space-y-3">
@@ -2414,8 +2414,8 @@
         const mediaHtml = (p.media_urls || []).map(url => {
           const isVid = /\.(mp4|webm|mov)$/i.test(url);
           return isVid
-            ? `<video src="${esc(url)}" class="w-full max-h-48 object-contain bg-black rounded-lg" controls preload="metadata"></video>`
-            : `<img src="${esc(url)}" class="w-full max-h-48 object-contain rounded-lg">`;
+            ? `<video src="${escAttr(url)}" class="w-full max-h-48 object-contain bg-black rounded-lg" controls preload="metadata"></video>`
+            : `<img src="${escAttr(url)}" class="w-full max-h-48 object-contain rounded-lg">`;
         }).join('');
         return `<div class="bg-white p-4 rounded-xl border border-gray-200 space-y-2">
           <div class="flex justify-between items-start">
@@ -2526,7 +2526,7 @@
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Título</label>
-            <input id="edit-post-title" type="text" value="${esc(p.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+            <input id="edit-post-title" type="text" value="${escAttr(p.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Contenido</label>
@@ -2811,7 +2811,7 @@
           const vid = s.main_video_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
           videoThumb = vid ? `<img src="https://img.youtube.com/vi/${vid[1]}/mqdefault.jpg" class="w-full aspect-video object-cover rounded-lg">` : '';
         } else {
-          videoThumb = `<video src="${esc(s.main_video_url)}" class="w-full aspect-video object-cover rounded-lg" preload="metadata"></video>`;
+          videoThumb = `<video src="${escAttr(s.main_video_url)}" class="w-full aspect-video object-cover rounded-lg" preload="metadata"></video>`;
         }
       }
       const date = new Date(s.created_at).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -2825,10 +2825,10 @@
         </div>` : ''}
         ${mediaArr.length ? `<div class="flex gap-2 overflow-x-auto pb-1" style="scrollbar-width:none">${mediaArr.map(u => {
           const isAudio = /\.(mp3|wav|ogg|webm)$/i.test(u);
-          if (isAudio) return `<audio controls src="${esc(u)}" class="flex-shrink-0 h-10"></audio>`;
+          if (isAudio) return `<audio controls src="${escAttr(u)}" class="flex-shrink-0 h-10"></audio>`;
           const isVid = /\.(mp4|webm|mov)$/i.test(u);
-          if (isVid) return `<video src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover flex-shrink-0" preload="metadata"></video>`;
-          return `<img src="${esc(u)}" class="w-24 h-24 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:opacity-80" onclick="window.open('${escAttr(u)}','_blank')">`;
+          if (isVid) return `<video src="${escAttr(u)}" class="w-24 h-24 rounded-lg object-cover flex-shrink-0" preload="metadata"></video>`;
+          return `<img src="${escAttr(u)}" class="w-24 h-24 rounded-lg object-cover flex-shrink-0 cursor-pointer hover:opacity-80" onclick="window.open('${escAttr(u)}','_blank')">`;
         }).join('')}</div>` : ''}
         <div class="flex items-center justify-between pt-2 border-t border-gray-100">
           <span class="text-[11px] text-gray-400">${date}</span>
@@ -2878,7 +2878,7 @@
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Título</label>
-            <input id="edit-story-title" type="text" value="${esc(s.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+            <input id="edit-story-title" type="text" value="${escAttr(s.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Descripción</label>
@@ -2993,7 +2993,7 @@
       if (!data || data.length === 0) { myBizLinksCache = []; list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">No tienes enlaces de negocio aún.</p>'; return; }
       myBizLinksCache = data;
       list.innerHTML = data.map((l, i) => `<div class="bg-white p-4 rounded-xl border border-gray-200 flex gap-3 items-center">
-        ${l.image_url ? `<img src="${esc(l.image_url)}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0">` : `<div class="w-12 h-12 rounded-lg bg-creo-purple/10 flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/></svg></div>`}
+        ${l.image_url ? `<img src="${escAttr(l.image_url)}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0">` : `<div class="w-12 h-12 rounded-lg bg-creo-purple/10 flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-creo-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/></svg></div>`}
         <div class="flex-1 min-w-0">
           <p class="font-semibold text-sm text-gray-900 truncate">${esc(l.title)}</p>
           <p class="text-[10px] text-gray-400 truncate">${esc(l.url)}</p>
@@ -3057,11 +3057,11 @@
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Titulo</label>
-            <input id="edit-biz-title" type="text" value="${esc(l.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+            <input id="edit-biz-title" type="text" value="${escAttr(l.title || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">URL</label>
-            <input id="edit-biz-url" type="text" value="${esc(l.url || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
+            <input id="edit-biz-url" type="text" value="${escAttr(l.url || '')}" class="w-full border border-gray-300 bg-gray-50 p-3 rounded-lg text-gray-900 outline-none focus:ring-2 focus:ring-creo-purple text-sm">
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Descripcion</label>
@@ -3321,7 +3321,7 @@
         const initials = name[0].toUpperCase();
         const bio = (p.bio || '').slice(0, 80) + ((p.bio || '').length > 80 ? '...' : '');
         return `<div class="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition">
-          ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">` : `<div class="w-10 h-10 rounded-full bg-creo-purple/10 text-creo-purple flex items-center justify-center text-sm font-bold flex-shrink-0">${esc(initials)}</div>`}
+          ${p.avatar_url ? `<img src="${escAttr(p.avatar_url)}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">` : `<div class="w-10 h-10 rounded-full bg-creo-purple/10 text-creo-purple flex items-center justify-center text-sm font-bold flex-shrink-0">${esc(initials)}</div>`}
           <div class="flex-1 min-w-0">
             <p class="text-sm font-semibold text-gray-900 truncate">${esc(name)}</p>
             <p class="text-[11px] text-gray-400 truncate">@${esc(p.username)}</p>
@@ -3385,7 +3385,7 @@
         const initials = name[0].toUpperCase();
         return `<div class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50">
           <span class="text-xs text-gray-400 font-bold w-5 text-center">${i + 1}</span>
-          ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">` : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 text-creo-purple flex items-center justify-center text-xs font-bold flex-shrink-0">${esc(initials)}</div>`}
+          ${p.avatar_url ? `<img src="${escAttr(p.avatar_url)}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">` : `<div class="w-8 h-8 rounded-full bg-creo-purple/10 text-creo-purple flex items-center justify-center text-xs font-bold flex-shrink-0">${esc(initials)}</div>`}
           <div class="flex-1 min-w-0">
             <p class="text-sm font-semibold text-gray-900 truncate">${esc(name)}</p>
             <p class="text-[11px] text-gray-400">@${esc(p.username)}</p>

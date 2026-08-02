@@ -6,7 +6,7 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
   apiVersion: "2023-10-16",
   httpClient: Stripe.createFetchHttpClient(),
 });
-const ADMIN_EMAIL_FALLBACK = Deno.env.get("ADMIN_EMAIL") || "fullnessmindset@gmail.com";
+// Admin auth via admin_emails table only (no hardcoded fallback)
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "https://fullnessmindset.github.io",
@@ -47,8 +47,7 @@ serve(async (req) => {
       .select("email")
       .eq("email", user.email)
       .maybeSingle();
-    if (!adminRow && user.email !== ADMIN_EMAIL_FALLBACK)
-      return json({ error: "Unauthorized" }, 403);
+    if (!adminRow) return json({ error: "Unauthorized" }, 403);
 
     // Rate limit admin API (prevent abuse even with compromised admin session)
     const { data: allowed } = await sbAdmin.rpc("check_rate_limit", {
@@ -332,6 +331,9 @@ serve(async (req) => {
           400
         );
 
+      if (typeof amountCents !== "number" || amountCents < 1 || amountCents > 10000000 || !Number.isInteger(amountCents))
+        return json({ error: "Invalid amount_cents" }, 400);
+
       try {
         const transfer = await stripe.transfers.create({
           amount: amountCents,
@@ -339,7 +341,7 @@ serve(async (req) => {
           destination: connectId,
           description,
           metadata: { meta_id: metaId, type: "meta_payout" },
-        });
+        }, { idempotencyKey: `payout_meta_${metaId}_${amountCents}` });
 
         try {
           await sbAdmin.from("payout_log").insert({
@@ -550,6 +552,9 @@ serve(async (req) => {
       if (!requestId || !connectId || !amountCents)
         return json({ error: "Missing request_id, connect_id, or amount_cents" }, 400);
 
+      if (typeof amountCents !== "number" || amountCents < 1 || amountCents > 50000000 || !Number.isInteger(amountCents))
+        return json({ error: "Invalid amount_cents" }, 400);
+
       try {
         const transfer = await stripe.transfers.create({
           amount: amountCents,
@@ -557,7 +562,7 @@ serve(async (req) => {
           destination: connectId,
           description: `CREO Deal Release (${percent || 50}%) — ${dealTitle}`,
           metadata: { request_id: requestId, type: "deal_payout", percent: String(percent || 50) },
-        });
+        }, { idempotencyKey: `payout_deal_${requestId}_${amountCents}` });
 
         try {
           await sbAdmin.from("payout_log").insert({
